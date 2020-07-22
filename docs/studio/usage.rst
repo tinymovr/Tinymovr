@@ -1,5 +1,5 @@
 ************
-Client Usage
+Studio Usage
 ************
 
 

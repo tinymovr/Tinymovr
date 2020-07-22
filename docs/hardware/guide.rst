@@ -31,10 +31,26 @@ A series of motor, PCB and magnet mount designs are available to 3D print for va
 .. note::
    For safety reasons, you should always ensure the motor&controller assembly are securely fastened to a stable surface before operation. The motor may experience high acceleration that may cause injury or damage.
 
-Electrical Setup
+
+Connecting Power
 ################
 
-Electrical setup is simple, just connect the three motor phases to the three terminals on Tinymovr. The order of connection is not important and will be determined during motor/encoder calibration.
+Tinymovr is powered from s 12-26V power source. Connect the XT30 plug to the socket on the board. The LED near the center should light up.
+
+.. note::
+   The LED is not connected to the VBus rail, rather it is connected to the 5V rail coming out of the PAC MCU. A LED not lighting up indicates failure of the MCU power subsystem.
+
+.. note::
+   Depending on the board version, the LED may have different color.
+
+Connecting Motor
+################
+
+Connect the three motor phases to the three terminals on Tinymovr. The order of connection is not important, motor direction will be determined during motor/encoder calibration.
+
+The connection can be achieved in two ways. Either by soldering the motor leads directly on the terminals, or by securing the leads with a 2mm lug.
+
+.. note::
+   If using a lug connection, ensure that the screw and nut are not rotating against the PCB surface, as this may remove parts of the soldermask or even conductive copper layer.
 
 (image)
-
