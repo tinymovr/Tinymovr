@@ -31,6 +31,9 @@ A series of motor, PCB and magnet mount designs are available to 3D print for va
 .. note::
    For safety reasons, you should always ensure the motor&controller assembly are securely fastened to a stable surface before operation. The motor may experience high acceleration that may cause injury or damage.
 
+.. image:: connections.png
+  :width: 400
+  :alt: Tinymovr power and data connection diagram
 
 Connecting Power
 ################
