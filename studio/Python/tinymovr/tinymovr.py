@@ -18,6 +18,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 import copy
 from tinymovr.iface import CAN, CANBusCodec, DataType
 from tinymovr import Endpoints
+from tinymovr.attr_object import AttrObject
 
 class Tinymovr:
 
@@ -25,7 +26,7 @@ class Tinymovr:
         self.node_id = node_id
         self.iface = iface
         self.codec = codec
-        self.endpoints = eps 
+        self.endpoints = eps
 
     def __getattr__(self, attr):
         if attr in self.endpoints:
@@ -49,10 +50,12 @@ class Tinymovr:
                 values = self.codec.deserialize(payload, *d["types"])
                 if len(values) == 1:
                     return values[0]
-                return values
+                else:
+                    assert("labels" in d)
+                    return AttrObject(d["labels"], values)
 
     def __dir__(self):
-        return self.endpoints.keys()
+        return list(self.endpoints.keys())
 
     def calibrate(self):
         self.set_state(1)
