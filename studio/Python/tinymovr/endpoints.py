@@ -112,11 +112,11 @@ Endpoints = {
     },
     "Iq":
     {
-        "description": "Get current Estimate and Setpoint",
+        "description": "Get current setpoint and estimate",
         "type": "r",
         "ep_id": 0x014,
         "types": (DataType.FLOAT, DataType.FLOAT),
-        "labels": ("estimate", "setpoint")
+        "labels": ("setpoint", "estimate")
     },
     "limits":
     {
@@ -160,8 +160,8 @@ Endpoints = {
         "description": "Get Device Info",
         "type": "r",
         "ep_id": 0x01A,
-        "types": (DataType.UINT32, DataType.UINT16),
-        "labels": ("device_id", "temp")
+        "types": (DataType.UINT32, DataType.UINT16, DataType.UINT16),
+        "labels": ("device_id", "temp", "encoder_cpr")
     },
     "timings":
     {
