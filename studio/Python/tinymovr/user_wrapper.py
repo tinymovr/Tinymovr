@@ -38,9 +38,9 @@ class UserWrapper:
         Enter calibration state, perform motor and encoder calibration
         '''
         state = self.tinymovr.state
-        if state[0] != 0:
+        if state.error != 0:
             print("Error flag present, cannot continue with calibration. Please reset Tinymovr.")
-        elif state[1] != 0:
+        elif state.state != 0:
             print("Tinymovr state is not idle, calibration needs to be started from idle state.")
         else:
             input("Ready to calibrate. Please remove any loads from the motor and hit Enter to continue")
@@ -57,9 +57,9 @@ class UserWrapper:
         Enter closed loop control state and position control mode
         '''
         state = self.tinymovr.state
-        if state[0] != 0:
+        if state.error != 0:
             print("Error flag present, cannot enable position control. Please reset Tinymovr.")
-        elif state[1] == 1:
+        elif state.mode == 1:
             print("Tinymovr is currently calibrating, please do not interrupt.")
         else:
             self.tinymovr.position_control()
@@ -69,9 +69,9 @@ class UserWrapper:
         Enter closed loop control state and velocity control mode
         '''
         state = self.tinymovr.state
-        if state[0] != 0:
+        if state.error != 0:
             print("Error flag present, cannot enable velocity control. Please reset Tinymovr.")
-        elif state[1] == 1:
+        elif state.mode == 1:
             print("Tinymovr is currently calibrating, please do not interrupt.")
         else:
             self.tinymovr.velocity_control()
@@ -81,9 +81,9 @@ class UserWrapper:
         Enter closed loop control state and current control mode
         '''
         state = self.tinymovr.state
-        if state[0] != 0:
+        if state.error != 0:
             print("Error flag present, cannot enable current control. Please reset Tinymovr.")
-        elif state[1] == 1:
+        elif state.mode == 1:
             print("Tinymovr is currently calibrating, please do not interrupt.")
         else:
             self.tinymovr.current_control()
@@ -97,7 +97,7 @@ class UserWrapper:
         velocity control mode and does not support
         current feed-forward value.
         '''
-        return 60 * (self.tinymovr.encoder_estimates[1] / self.encoder_cpr)
+        return 60 * (self.tinymovr.encoder_estimates.velocity / self.encoder_cpr)
 
     def set_velocity_setpoint_rpm(self, value):
         '''
@@ -115,18 +115,18 @@ class UserWrapper:
         Report controller error in human-readable form
         '''
         state = self.tinymovr.state
-        error_id = ErrorIDs(state[0])
-        print(error_descriptions(error_id) + " (error code: " + str(error_id) + ")")
+        error_id = ErrorIDs(state.error)
+        print(error_descriptions[error_id] + " (error code: " + str(error_id) + ")")
 
     @property
     def encoder_cpr(self):
         if self._encoder_cpr < 2048:
-            self._encoder_cpr = self.tinymovr.device_info[5]
+            self._encoder_cpr = self.tinymovr.device_info.encoder_cpr
         assert(self._encoder_cpr >= 2048)
         return self._encoder_cpr
 
     def __dir__(self):
-        tm_keys = list(self.tinymovr.__dir__())
+        tm_keys = self.tinymovr.__dir__()
         self_keys = object.__dir__(self)
-        self_keys.pop("tinymovr", None)
+        self_keys.remove("tinymovr")
         return tm_keys + self_keys
