@@ -40,14 +40,16 @@ Endpoints = {
         "description": "Get Tinymovr State, Control Mode and Error Code",
         "type": "r",
         "ep_id": 0x003,
-        "types": (DataType.UINT8, DataType.UINT8, DataType.UINT8)
+        "types": (DataType.UINT8, DataType.UINT8, DataType.UINT8),
+        "labels": ("error", "state", "mode")
     },
     "can_config":
     {
         "description": "Get CAN Config",
         "type": "r",
         "ep_id": 0x005,
-        "types": (DataType.UINT8, DataType.UINT16)
+        "types": (DataType.UINT8, DataType.UINT16),
+        "labels": ("id", "baud_rate")
     },
     "set_can_config":
     {
@@ -55,7 +57,8 @@ Endpoints = {
         "type": "w",
         "ep_id": 0x006,
         "types": (DataType.UINT8, DataType.UINT16),
-        "defaults": (0,)
+        "defaults": (0,),
+        "labels": ("id", "baud_rate")
     },
     "set_state":
     {
@@ -63,14 +66,16 @@ Endpoints = {
         "type": "w",
         "ep_id": 0x007,
         "types": (DataType.UINT8, DataType.UINT8),
-        "defaults": (0,)
+        "defaults": (0,),
+        "labels": ("state", "mode")
     },
     "encoder_estimates":
     {
         "description": "Get Encoder Estimates (Position, Velocity)",
         "type": "r",
         "ep_id": 0x009,
-        "types": (DataType.FLOAT, DataType.FLOAT)
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "labels": ("position", "velocity")
     },
     "set_pos_setpoint":
     {
@@ -78,7 +83,8 @@ Endpoints = {
         "type": "w",
         "ep_id": 0x00C,
         "types": (DataType.FLOAT, DataType.INT16, DataType.INT16),
-        "defaults": (0, 0)
+        "defaults": (0, 0),
+        "labels": ("position", "velocity_ff", "current_ff")
     },
     "set_vel_setpoint":
     {
@@ -86,7 +92,8 @@ Endpoints = {
         "type": "w",
         "ep_id": 0x00D,
         "types": (DataType.FLOAT, DataType.FLOAT),
-        "defaults": (0,)
+        "defaults": (0,),
+        "labels": ("velocity", "current_ff")
     },
     "set_cur_setpoint":
     {
@@ -100,21 +107,24 @@ Endpoints = {
         "description": "Set Limits (Velocity, Current)",
         "type": "w",
         "ep_id": 0x00F,
-        "types": (DataType.FLOAT, DataType.FLOAT)
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "labels": ("velocity", "current")
     },
     "Iq":
     {
-        "description": "Get Iq Estimate and Setpoint",
+        "description": "Get current Estimate and Setpoint",
         "type": "r",
         "ep_id": 0x014,
-        "types": (DataType.FLOAT, DataType.FLOAT)
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "labels": ("estimate", "setpoint")
     },
     "limits":
     {
-        "description": "Get velocity and Iq limits",
+        "description": "Get velocity and current limits",
         "type": "r",
         "ep_id": 0x015,
-        "types": (DataType.FLOAT, DataType.FLOAT)
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "labels": ("velocity", "current")
     },
     "reset":
     {
@@ -134,28 +144,32 @@ Endpoints = {
         "description": "Get Gains (Position, Velocity)",
         "type": "r",
         "ep_id": 0x018,
-        "types": (DataType.FLOAT, DataType.FLOAT)
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "labels": ("position", "velocity")
     },
     "set_gains":
     {
-        "description": "Set Gains (Velocity, Current)",
+        "description": "Set Gains (Position, Velocity)",
         "type": "w",
         "ep_id": 0x019,
-        "types": (DataType.FLOAT, DataType.FLOAT)
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "labels": ("position", "velocity")
     },
     "device_info":
     {
         "description": "Get Device Info",
         "type": "r",
         "ep_id": 0x01A,
-        "types": (DataType.UINT8, DataType.UINT8, DataType.UINT8, DataType.UINT8, DataType.UINT16)
+        "types": (DataType.UINT32, DataType.UINT16),
+        "labels": ("device_id", "temp")
     },
     "timings":
     {
-        "description": "Get Processor Timings (Busy Cycles/PWM, Cycles/PWM)",
+        "description": "Get Processor Timings (Busy Cycles/PWM, Total Cycles/PWM)",
         "type": "r",
         "ep_id": 0x01B,
-        "types": (DataType.UINT32, DataType.UINT32)
+        "types": (DataType.UINT32, DataType.UINT32),
+        "labels": ("busy", "total")
     },
     "save_config":
     {
@@ -174,6 +188,7 @@ Endpoints = {
         "description": "Get Attached Motor Info (Calibrated, Resistance, Pole Pairs, Inductance)",
         "type": "r",
         "ep_id": 0x01E,
-        "types": (DataType.UINT8, DataType.UINT16, DataType.UINT8, DataType.FLOAT)
+        "types": (DataType.UINT8, DataType.UINT16, DataType.UINT8, DataType.FLOAT),
+        "labels": ("calibrated", "R", "pole_pairs", "L")
     },
 }

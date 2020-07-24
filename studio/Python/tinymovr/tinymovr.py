@@ -21,11 +21,12 @@ from tinymovr import Endpoints
 
 class Tinymovr:
 
-    def __init__(self, node_id, iface, codec=CANBusCodec(), eps=Endpoints):
+    def __init__(self, node_id, iface, codec=CANBusCodec(), eps=Endpoints, use_labels=True):
         self.node_id = node_id
         self.iface = iface
         self.codec = codec
-        self.endpoints = eps 
+        self.endpoints = eps
+        self.use_labels = use_labels
 
     def __getattr__(self, attr):
         if attr in self.endpoints:
@@ -49,6 +50,8 @@ class Tinymovr:
                 values = self.codec.deserialize(payload, *d["types"])
                 if len(values) == 1:
                     return values[0]
+                elif self.use_labels and "labels" in d:
+                    return dict(zip(d["labels"], values))
                 return values
 
     def __dir__(self):
