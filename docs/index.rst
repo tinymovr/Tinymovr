@@ -1,9 +1,9 @@
-.. Tinymovr API documentation master file, created by
+.. Tinymovr documentation master file, created by
    sphinx-quickstart on Wed Jul 15 14:48:40 2020.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Tinymovr API's documentation!
+Welcome to Tinymovr documentation!
 ========================================
 
 .. toctree::
@@ -12,8 +12,8 @@ Welcome to Tinymovr API's documentation!
 
    quickstart
    hardware/guide
-   client/installation
-   client/usage
+   studio/installation
+   studio/usage
    api/guide
    troubleshooting
 
