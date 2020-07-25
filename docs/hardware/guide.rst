@@ -40,8 +40,10 @@ A series of motor, PCB and magnet mount designs are available to 3D print for va
 Electrical Setup
 ################
 
+Electircal setup comprises three main parts: Motor connection, data connection and power connection. Below is a diagram with the electrical connection scheme.
+
 .. image:: connections.png
-  :width: 400
+  :width: 800
   :alt: Tinymovr power and data connection diagram
 
 Connecting Motor
