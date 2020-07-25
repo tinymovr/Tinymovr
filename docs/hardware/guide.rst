@@ -3,13 +3,17 @@ Hardware Guide
 **************
 
 .. note::
-   Images in the documentation may refer to different hardware versions. Where incompatibilities among hardware versions exist, this is noted in the image caption.
+   Images in the documentation may refer to shightly different hardware versions. Where incompatibilities among hardware versions do exist, this is noted in the image caption.
 
 
-Overview
-########
+Requirements
+############
 
-Tinymovr is a brushless motor controller in the form of a small PCB that can be integrated to the back of a motor. Tinymovr uses Field Oriented Control for efficient commutation of motor phases, together with position feedback from an integrated magnetic encoder. 
+1. A 3-phase brushless motor (see below for supported types)
+2. A means to talk CAN Bus, such as a CANdapter or a Canable adapter.
+3. A mechanical rig that ensures firm connection between the Tinymovr PCB and the brushless motor. Designs that can be 3D printed are available.
+
+Note that the Tinymovr Dev Kit includes all of the above in an assembled kit.
 
 
 Supported Motor Types
@@ -18,6 +22,7 @@ Supported Motor Types
 Most three-phase pancake-style outrunners can be used with Tinymovr. While there is a lot of variation between motors of even the same size and external appearance, as a general rule-of-thumb motors ranging from 40mm outer diameter to 110mm should work fine with Tinymovr.
 
 (image)
+
 
 Mechanical Setup
 ################
@@ -31,20 +36,15 @@ A series of motor, PCB and magnet mount designs are available to 3D print for va
 .. note::
    For safety reasons, you should always ensure the motor&controller assembly are securely fastened to a stable surface before operation. The motor may experience high acceleration that may cause injury or damage.
 
-.. image:: connections.png
-  :width: 400
-  :alt: Tinymovr power and data connection diagram
 
-Connecting Power
+Electrical Setup
 ################
 
-Tinymovr is powered from s 12-26V power source. Connect the XT30 plug to the socket on the board. The LED near the center should light up.
+Electircal setup comprises three main parts: Motor connection, data connection and power connection. Below is a diagram with the electrical connection scheme.
 
-.. note::
-   The LED is not connected to the VBus rail, rather it is connected to the 5V rail coming out of the PAC MCU. A LED not lighting up indicates failure of the MCU power subsystem.
-
-.. note::
-   Depending on the board version, the LED may have different color.
+.. image:: connections.png
+  :width: 800
+  :alt: Tinymovr power and data connection diagram
 
 Connecting Motor
 ################
@@ -57,3 +57,17 @@ The connection can be achieved in two ways. Either by soldering the motor leads 
    If using a lug connection, ensure that the screw and nut are not rotating against the PCB surface, as this may remove parts of the soldermask or even conductive copper layer.
 
 (image)
+
+Connecting Data
+###############
+
+Connect the CAN bus header to one of the two DF-13 sockets on the board. It is not important which one you choose. If this is a terminal node in the CAN network, flip the DIP switch labelled "CAN 120R" to on to enable the 120Ohm termination resistor.
+
+
+Connecting Power
+################
+
+Tinymovr can be powered from a 12-26V power source. Connect the XT30 plug to the socket on the board. The LED near the center should light up.
+
+.. note::
+   The LED is not connected to the VBus rail, rather it is connected to the 5V rail coming out of the PAC MCU. A LED not lighting up indicates failure of the MCU power subsystem.

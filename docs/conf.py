@@ -19,7 +19,7 @@ master_doc = 'index'
 
 # -- Project information -----------------------------------------------------
 
-project = 'Tinymovr API'
+project = 'Tinymovr'
 copyright = '2020, Yannis Chatzikonstantinou'
 author = 'Yannis Chatzikonstantinou'
 
