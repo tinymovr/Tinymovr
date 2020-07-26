@@ -4,4 +4,4 @@ This folder contains 3D models and drawings of various pieces of hardware used t
 
 The following are currently available:
 
-[STL files for the Tinymovr alpha Dev Kit Motor Stand](motor_Stand/)
+[STL files for the Tinymovr alpha Dev Kit Motor Stand](./motor_stand/)
