@@ -1,14 +1,14 @@
-##Tinymovr Studio Python
+## Tinymovr Studio Python
 
 This is the Python client library and application that allows easy interfacing with the Tinymovr motor control board.
 
-###Installing using pip
+### Installing using pip
 
 This is the most straightforward method to install Tinymovr studio and have access to hardware.
 
     pip install tinymovr
 
-###Installing using git clone
+### Installing using git clone
 
 First clone the Tinymovr repo to a local directory:
 
@@ -19,11 +19,11 @@ Then cd to the cloned repo directory and install in developer mode:
     cd Tinymovr/studio/Python
     pip install -e .
 
-###Launching the command line app
+### Launching the command line app
 
     tinymovr
 
-###More information
+### More information
 
 For documentation:
 
