@@ -9,8 +9,11 @@ Tinymovr is an affordable motor controller for precise control of 3-phase brushl
 The repository is organized as follows:
 
 firmware: Firmware for the PAC5527 MCU in Tinymovr(to be added)
+
 [studio](./studio/): Tinymovr Studio client software and library
+
 [hardware](./hardware): Designs and drawings for related hardware
+
 [documentation](./docs): Documentation source
 
 ### Documentation
