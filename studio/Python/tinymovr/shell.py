@@ -2,12 +2,14 @@
 """Tinymovr Shell Utility
 
 Usage:
-    tinymovr [--iface=<iface>]
+    tinymovr [--iface=<iface>] [--chan=<chan>] [--bitrate=<bitrate>]
     tinymovr -h | --help
     tinymovr --version
 
 Options:
-    --iface=<iface>  CAN interface to use [default: arduino_can].
+    --iface=<iface>      CAN interface to use [default: slcan].
+    --chan=<chan>        CAN channel (i.e. device) to use [default: auto].
+    --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
 
 '''
@@ -29,6 +31,7 @@ import IPython
 
 from docopt import docopt
 
+from tinymovr.iface import guess_channel
 from tinymovr import UserWrapper
 from tinymovr.iface import CAN
 
@@ -36,17 +39,23 @@ shell_name = 'Tinymovr Shell Utility'
 base_name = "tm"
 
 def spawn_shell():
+    '''
+    Spawns the Tinymovr Studio IPython shell.
+    '''
     version = pkg_resources.require("tinymovr")[0].version
     arguments = docopt(__doc__, version=shell_name + ' ' + str(version))
-    logging.getLogger('parso').setLevel(logging.WARNING)
-    logging.getLogger('asyncio').setLevel(logging.WARNING)
-    can.util.set_logging_level('warning')
+    
+    logger = configure_logging()
 
-    logger = logging.getLogger('tinymovr')
-    logger.setLevel(logging.DEBUG)
-    iface = CAN(can.interface.Bus(interface=arguments['--iface'], channel='can0'))
+    iface = arguments['--iface']
+    chan = arguments['--chan']
+    bitrate = int(arguments['--bitrate'])
+    if chan == 'auto':
+        chan = guess_channel(iface_hint=iface)
+    iface = CAN(can.interface.Bus(interface=iface, channel=chan, bitrate=bitrate))
+
     tms = {}
-    for node_id in range(1, 9):
+    for node_id in range(1, 2):
         try:
             tm = UserWrapper(node_id=node_id, iface=iface)
             _ = tm.device_info
@@ -57,6 +66,7 @@ def spawn_shell():
             logger.error("Node " + str(node_id) + " timed out")
         except IOError:
             logger.error("Node " + str(node_id) + " received abnormal message (possibly wrong ID?)")
+    
     if len(tms) == 0:
         logger.error("No Tinymovr instances detected. Exiting shell...")
     else:
@@ -66,6 +76,18 @@ def spawn_shell():
         print("Instances are also available by index in the tms list.")
         IPython.start_ipython(argv=["--no-banner"], user_ns=tms)
         logger.debug("Exiting shell...")
+
+def configure_logging():
+    '''
+    Configures logging options and
+    generates a default logger instance.
+    '''
+    logging.getLogger('parso').setLevel(logging.WARNING)
+    logging.getLogger('asyncio').setLevel(logging.WARNING)
+    can.util.set_logging_level('warning')
+    logger = logging.getLogger('tinymovr')
+    logger.setLevel(logging.DEBUG)
+    return logger
 
 if __name__ == "__main__":
     main()
