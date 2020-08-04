@@ -18,6 +18,6 @@ error_descriptions = {
     ErrorIDs.VBusUndervoltage: "Power supply bus under low voltage threshold",
     ErrorIDs.OverCurrent: "Phase current exceeded threshold",
     ErrorIDs.PhaseResistanceOutOfRange: "Measured phase resistance is out of range",
-    ErrorIDs.PhaseResistanceOutOfRange: "Measured phase inductance is out of range",
+    ErrorIDs.PhaseInductanceOutOfRange: "Measured phase inductance is out of range",
     ErrorIDs.InvalidPolePairs: "Pole pairs calculation did not converge to a valid value"
 }    
