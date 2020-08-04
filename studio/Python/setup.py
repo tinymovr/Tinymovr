@@ -31,9 +31,6 @@ setuptools.setup(
         "docopt"
     ],
     entry_points={
-        'can.interface': [
-            "arduino_can=tinymovr.bus:ArduinoCAN",
-        ],
         "console_scripts": [
             "tinymovr=tinymovr.shell:spawn_shell"
         ],
