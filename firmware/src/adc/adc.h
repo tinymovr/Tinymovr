@@ -1,0 +1,90 @@
+
+//  * This file is part of the Tinymovr-Firmware distribution
+//  * (https://github.com/yconst/tinymovr-firmware).
+//  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
+//  * 
+//  * This program is free software: you can redistribute it and/or modify  
+//  * it under the terms of the GNU General Public License as published by  
+//  * the Free Software Foundation, version 3.
+//  *
+//  * This program is distributed in the hope that it will be useful, but 
+//  * WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  * General Public License for more details.
+//  *
+//  * You should have received a copy of the GNU General Public License 
+//  * along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef ADC_ADC_H_
+#define ADC_ADC_H_
+
+#include "src/common.h"
+
+#ifdef CAFE_ARCH2
+typedef enum {
+#if defined(PAC5527)
+    PWRCTL_PWRMON_VCORE0                = 0u << 3,                   // 0<<3 --> VCORE
+    PWRCTL_PWRMON_VP                    = 1u << 3,                   // 1<<3 --> VP * 1/10
+    PWRCTL_PWRMON_VCC33                 = 2u << 3,                   // 2<<3 --> VCC33 * 4/10
+    PWRCTL_PWRMON_VCCIO                 = 3u << 3,                   // 3<<3 --> VCCIO * 4/10
+    PWRCTL_PWRMON_VSYS                  = 4u << 3,                   // 4<<3 --> VSYS * 4/10
+    PWRCTL_PWRMON_VREFDIV2              = 5u << 3,                   // 5<<3 --> VREF/2
+    PWRCTL_PWRMON_VPTAT                 = 6u << 3,                   // 6<<3 --> VPTAT
+    PWRCTL_PWRMON_VCP_MINUS_VM          = 7u << 3                    // 7<<3 --> (VCP-VM) * 5/10
+#endif  // #if defined(PAC5527)
+}ADC_PWRCTL_PWRMON_Type;
+#endif  // #ifdef CAFE_ARCH2
+
+#ifdef CAFE_ARCH2
+    // MODULE MISC CAFE REGISTER
+    #define HIB_BIT_DEFAULT            0u								                                    //0 = Normal; 1 = Hibernate
+    #define PBEN_BIT_DEFAULT           0u								                                    //0 = Push Button Disabled; 1 = Push Button Enabled (AIO6)
+    #define VREFSET_BIT_DEFAULT        0u								                                    //0 = ADC VREF is 2.5V; 1 = ADC VREF is 3.0V
+    #define CLKOUTEN_BIT_DEFAULT       0u								                                    //0 = Disabled; 1 = Enabled
+    #define MCUALIVE_BIT_DEFAULT       1u								                                    //0 = Disabled; 1 = Enabled
+    #define TPBD_BIT_DEFAULT           1u                                                                   //0 = Disabled; 1 = Enabled
+    #define RFU_BIT_DEFAULT            0u                                                                   //0 = Disabled; 1 = Enabled
+    #define ENSIG_BIT_DEFAULT          1u								                                    //0 = Disabled; 1 = Enabled
+    #define MODULE_MISC_BITS_DEFAULT   ((HIB_BIT_DEFAULT << 7) + (PBEN_BIT_DEFAULT << 6) + (VREFSET_BIT_DEFAULT << 5) + (CLKOUTEN_BIT_DEFAULT << 4) + (MCUALIVE_BIT_DEFAULT << 3) + (TPBD_BIT_DEFAULT << 2) + (RFU_BIT_DEFAULT << 1) + (ENSIG_BIT_DEFAULT << 0))
+#endif
+
+// meas * ONE_OVER_ADC_RES * VREF / R * ONE_OVER_ADC_GAIN
+// Examples:
+// 1/2^12 * 3,3 / 0,001 / 32 ~= 0.025176
+//#define SHUNT_SCALING_FACTOR ( 0.025176f )
+// 1/2^12 * 3,3 / 0,001 / 16 ~= 0.0503
+#define SHUNT_SCALING_FACTOR ( 0.0503f )
+// 1/2^12 * 3,3 / 0,001 / 1 ~= 0.8056
+//#define SHUNT_SCALING_FACTOR ( 0.8056f )
+#define ONE_OVER_SHUNT_SCALING_FACTOR ( 1.0f / SHUNT_SCALING_FACTOR )
+
+#define VBUS_SCALING_FACTOR ( 0.0127f )
+
+typedef void (*Callback)(void);
+
+struct ADCState
+{
+    float vbus;
+    int16_t temp;
+    struct FloatTriplet I_phase_meas;
+    struct FloatTriplet I_phase_offset;
+
+    Callback DTSE_callback;
+    Callback Prot_callback;
+};
+
+struct ADCConfig
+{
+    float Iphase_limit;
+    float I_filter_k;
+    float I_phase_offset_tau;
+};
+
+void ADC_Init(void);
+PAC5XXX_RAMFUNC float ADC_GetVBus(void);
+PAC5XXX_RAMFUNC int16_t ADC_GetMCUTemp(void);
+PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc);
+void ADC_SetDTSE_callback(Callback cb);
+void ADC_SetProt_callback(Callback cb);
+
+#endif /* ADC_ADC_H_ */
