@@ -77,6 +77,14 @@ Endpoints = {
         "types": (DataType.FLOAT, DataType.FLOAT),
         "labels": ("position", "velocity")
     },
+    "setpoints":
+    {
+        "description": "Get Setpoints (Position, Velocity)",
+        "type": "r",
+        "ep_id": 0x009,
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "labels": ("position", "velocity")
+    },
     "set_pos_setpoint":
     {
         "description": "Set Position Setpoint",
@@ -160,8 +168,8 @@ Endpoints = {
         "description": "Get Device Info",
         "type": "r",
         "ep_id": 0x01A,
-        "types": (DataType.UINT32, DataType.UINT16, DataType.UINT16),
-        "labels": ("device_id", "temp", "encoder_cpr")
+        "types": ( DataType.UINT32, DataType.UINT8, DataType.UINT8, DataType.UINT8, DataType.UINT8,),
+        "labels": ("device_id", "fw_major", "fw_minor", "fw_patch", "temp")
     },
     "timings":
     {
@@ -185,10 +193,10 @@ Endpoints = {
     },
     "motor_info":
     {
-        "description": "Get Attached Motor Info (Calibrated, Resistance, Pole Pairs, Inductance)",
+        "description": "Get Attached Motor Info (Calibrated, Resistance, Pole Pairs, Inductance, enc CPR)",
         "type": "r",
         "ep_id": 0x01E,
-        "types": (DataType.UINT8, DataType.UINT16, DataType.UINT8, DataType.FLOAT),
-        "labels": ("calibrated", "R", "pole_pairs", "L")
+        "types": (DataType.UINT8, DataType.UINT16, DataType.UINT8, DataType.UINT16, DataType.UINT16),
+        "labels": ("calibrated", "R", "pole_pairs", "L", "encoder_cpr")
     },
 }
