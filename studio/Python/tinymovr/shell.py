@@ -47,12 +47,13 @@ def spawn_shell():
     
     logger = configure_logging()
 
-    iface = arguments['--iface']
+    iface_name = arguments['--iface']
     chan = arguments['--chan']
     bitrate = int(arguments['--bitrate'])
     if chan == 'auto':
-        chan = guess_channel(iface_hint=iface)
-    iface = CAN(can.interface.Bus(interface=iface, channel=chan, bitrate=bitrate))
+        chan = guess_channel(iface_hint=iface_name)
+    bus = can.Bus(bustype=iface_name, channel=chan, bitrate=bitrate)
+    iface = CAN(bus)
 
     tms = {}
     for node_id in range(1, 2):
@@ -72,7 +73,8 @@ def spawn_shell():
     else:
         tms["tms"] = list(tms.values())
         print(shell_name + ' ' + str(version))
-        print("Access Tinymovr instances as tmx, where x is the index, e.g. tm1")
+        print("Access Tinymovr instances as tmx, where x is the index starting from 1")
+        print("e.g. the first Tinymovr instance will be tm1.")
         print("Instances are also available by index in the tms list.")
         IPython.start_ipython(argv=["--no-banner"], user_ns=tms)
         logger.debug("Exiting shell...")
