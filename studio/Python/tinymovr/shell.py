@@ -47,12 +47,13 @@ def spawn_shell():
     
     logger = configure_logging()
 
-    iface = arguments['--iface']
+    iface_name = arguments['--iface']
     chan = arguments['--chan']
     bitrate = int(arguments['--bitrate'])
     if chan == 'auto':
-        chan = guess_channel(iface_hint=iface)
-    iface = CAN(can.interface.Bus(interface=iface, channel=chan, bitrate=bitrate))
+        chan = guess_channel(iface_hint=iface_name)
+    bus = can.Bus(bustype=iface_name, channel=chan, bitrate=bitrate)
+    iface = CAN(bus)
 
     tms = {}
     for node_id in range(1, 2):

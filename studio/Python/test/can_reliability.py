@@ -10,12 +10,19 @@ import unittest
 class CANReliability(unittest.TestCase):
 
     def test_can_reliability(self):
-        iface = CAN(can.interface.Bus(interface='arduino_can', channel='can0'))
+        
+        iface_name = 'slcan'
+        chan = guess_channel(iface_hint=iface_name)
+        bus = can.Bus(bustype=iface_name, channel=chan, bitrate=bitrate)
+        iface = CAN(bus)
+
         tm = Tinymovr(node_id=1, iface=iface)
+        
         time.sleep(0.5)
         state = tm.state
         self.assertEqual(state[0], 0, "Error flag present")
         time.sleep(0.1)
+        
         prev_pos = tm.encoder_estimates[0]
         for counter in range(20000):
             pos = tm.encoder_estimates[0]
