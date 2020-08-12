@@ -73,7 +73,8 @@ def spawn_shell():
     else:
         tms["tms"] = list(tms.values())
         print(shell_name + ' ' + str(version))
-        print("Access Tinymovr instances as tmx, where x is the index, e.g. tm1")
+        print("Access Tinymovr instances as tmx, where x is the index starting from 1")
+        print("e.g. the first Tinymovr instance will be tm1.")
         print("Instances are also available by index in the tms list.")
         IPython.start_ipython(argv=["--no-banner"], user_ns=tms)
         logger.debug("Exiting shell...")
