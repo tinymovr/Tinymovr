@@ -9,7 +9,8 @@ class IFace:
         self.bus = bus
 
 ifaces_to_devices = {
-    "slcan": "cantact"
+    "slcan": "cantact",
+    "robotell": "CP2102"
 }
 
 def guess_channel(iface_hint):
@@ -20,7 +21,7 @@ def guess_channel(iface_hint):
     ports = ([
         p.device
         for p in serial.tools.list_ports.comports()
-        if device in p.description.lower()
+        if device.lower() in p.description.lower()
     ])
     if not ports:
         raise IOError("Could not autodiscover CAN channel")
