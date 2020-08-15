@@ -1,0 +1,63 @@
+******************
+Firmware Dev Guide
+******************
+
+
+Overview
+########
+
+This document provides a guide for setting up a development environment for developing Tinymovr firmware. Development is currently possible in the Qorvo-supplied Eclipse distribution in Windows. Any help for porting support for development to Macos and Linux would be greatly appreciated!
+
+It is possible to build the Tinymovr firmware using make and gcc, however this configuration is outdated and should be avoided. In particular, this generated a non-bootloader enabled binary and may brick your board.
+
+
+Hardware Connections
+####################
+
+For proper debuggin capabilities you will need a Segger J-Link adapter. Unfortunately original J-Link adapters are quite expensive. A more affordable option is the J-Link EDU adapter at around $60 or the J-Link EDU mini adapter at around $20. In addition, there are J-Link clones that can be purchased for very low prices on ebay or Aliexpress. However, reliability of these clones is not guaranteed.
+
+With the board and J-Link adapter powered off, connect the J-Link to Tinymovr as shown below:
+
+(image)
+
+Setting up the repo
+###################
+
+First, clone the Tinymovr repo:
+
+.. code-block:: console
+
+    git clone https://github.com/yconst/Tinymovr
+
+The Tinymovr repo includes the firmware source code and supporting files, however the PAC55xx SDK is not included due to licensing restrictions imposed by Qorvo. Thus, you will need to `download it from the Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_, where you will need to supply your email.
+
+The file comes in a zipped installer exe (!), which all it does is extract the contents to a directory. Navigate to the extracted files directory and copy the 'pac55xx_sdk' directory inside the Tinymovr repo:
+
+.. code-block:: console
+
+    cp -r <pac55xx_sdk location> <tinymovr_location>/firmware/
+
+Now you have the required PAC SDK almost ready. As a final step, there is a small patch that you will need to apply in one of the SDK files as follows:
+
+.. code-block:: console
+
+    cd <tinymovr_location>/firmware/pac55xx_sdk/driver
+    patch -p0 -i pac5xxx_driver_tile_socbridge.patch
+
+Setting up Eclipse
+##################
+
+You will need the Qorvo-supplied Eclipse distribution. Download from the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_.
+
+Run the downloaded installer that will install Eclipse for you.
+
+Once installation is complete, run Eclipse and import the Tinymovr project. Try building to verify everything is ok.
+
+Setting up J-Link
+#################
+
+The required J-Link drivers and software, together with instructions, can be found in the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_, under the download 'Segger J-Link Support'.
+
+Once you have the J-Link adapter wired up and the software installed, you are ready to debug the firmware in Eclipse. Please note that the default configuration in Eclipse is configured to flash the bootloader and firmware together.
+
+TODO: Writeup debugging bootloader.

@@ -2,9 +2,6 @@
 
 Firmware for the Tinymovr R3 platform (PAC5527).
 
-__NOTE: This firmware no longer supports earlier versions of Tinymovr based on the PAC5523 (R1 and R2).__
-
-
 ### Supported Environments
 
 This project can be imported in Eclipse. The Qorvo-supplied Eclipse distribution is recommended. Full debug capabilities are available. This is the officially supported development environment.
