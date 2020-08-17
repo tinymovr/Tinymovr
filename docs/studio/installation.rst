@@ -2,6 +2,11 @@
 Tinymovr Studio Installation
 ****************************
 
+Preparation
+###########
+
+If using Windows with a CANtact-compatible CAN Bus adapter, such as the one included with the Tinymovr Dev Kit, you will need to install an .inf file to allow proper device naming. You can `download the inf file here <https://canable.io/utilities/windows-driver.zip>`_. Extract the archive, right click and select Install.
+
 Using pip
 #########
 
