@@ -118,6 +118,14 @@ Endpoints = {
         "types": (DataType.FLOAT, DataType.FLOAT),
         "labels": ("velocity", "current")
     },
+    "Iphase":
+    {
+        "description": "Get measured phase currents",
+        "type": "r",
+        "ep_id": 0x010,
+        "types": (DataType.INT16, DataType.INT16, DataType.INT16),
+        "labels": ("I_A", "I_B", "I_C")
+    },
     "Iq":
     {
         "description": "Get current setpoint and estimate",
