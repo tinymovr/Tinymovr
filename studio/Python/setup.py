@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 
 setuptools.setup(
     name="tinymovr",
-    version="0.2.0",
+    version="0.2.1",
     author="Yannis Chatzikonstantinou",
     author_email="info@tinymovr.com",
     description="Tinymovr Studio",
@@ -26,7 +26,7 @@ setuptools.setup(
     python_requires='>=3.6',
     install_requires=[
         "ipython",
-        "python-can",
+        "python-can>=4.0.0.dev0",
         "pyserial",
         "docopt"
     ],

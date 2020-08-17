@@ -9,14 +9,15 @@ class IFace:
         self.bus = bus
 
 ifaces_to_devices = {
-    "slcan": "cantact"
+    "slcan": "cantact",
+    "robotell": "CP210"
 }
 
 def guess_channel(iface_hint):
     '''
     Tries to guess a channel based on an interface hint.
     '''
-    device = ifaces_to_devices[iface_hint]
+    device = ifaces_to_devices[iface_hint].lower()
     ports = ([
         p.device
         for p in serial.tools.list_ports.comports()

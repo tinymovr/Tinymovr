@@ -1,12 +1,9 @@
-*************************
+****************************
 Tinymovr Studio Installation
-*************************
+****************************
 
 Using pip
 #########
-
-.. note::
-   Installing using pip from PyPI is not yet supported. Please use the Git clone method below.
 
 This is the most straightforward method to install Tinymovr studio and have access to hardware.
 
