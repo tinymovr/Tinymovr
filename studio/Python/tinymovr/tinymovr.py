@@ -16,6 +16,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import copy
+from pkg_resources import parse_version
 from tinymovr.iface import CAN, CANBusCodec, DataType
 from tinymovr import Endpoints
 from tinymovr.attr_object import AttrObject
@@ -26,7 +27,15 @@ class Tinymovr:
         self.node_id = node_id
         self.iface = iface
         self.codec = codec
+
+        # Temporarily assign to self.endpoints purely for convenience
         self.endpoints = eps
+        di = self.device_info
+        self.fw_version = '.'.join([str(di.fw_major), str(di.fw_minor), str(di.fw_patch)])
+
+        # Now reassig filtered endpoints
+        self.endpoints = { key:value for (key,value) in eps.items() if (("from_version" not in value) or
+                (parse_version(self.fw_version) >= parse_version(value["from_version"]))) }
 
     def __getattr__(self, attr):
         if attr in self.endpoints:

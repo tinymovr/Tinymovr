@@ -59,7 +59,6 @@ def spawn_shell():
     for node_id in range(1, 2):
         try:
             tm = UserWrapper(node_id=node_id, iface=iface)
-            _ = tm.device_info
             tm_string = base_name+str(node_id)
             logger.info("Connected to " + tm_string)
             tms[tm_string] = tm
