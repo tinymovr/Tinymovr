@@ -1,6 +1,9 @@
 
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
+//  * 
+//  *  *except* for the function "SVM()", which is Copyright (c) 2016-2018 Oskar Weigl
+//  * 
 //  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
 //  * 
 //  * This program is free software: you can redistribute it and/or modify  
@@ -14,6 +17,7 @@
 //  *
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 
 #include "stdint.h"
 #include "src/common.h"
@@ -36,6 +40,29 @@ PAC5XXX_RAMFUNC int ltoa(int32_t value, uint8_t *sp, int radix);
 PAC5XXX_RAMFUNC char checksum(char* msg, uint8_t len);
 
 // https://github.com/madcowswe/ODrive/blob/3113aedf081cf40e942d25d3b0b36c8806f11f23/Firmware/MotorControl/utils.c
+// Released under teh following license:
+// The MIT License (MIT)
+
+// Copyright (c) 2016-2018 Oskar Weigl
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 // Needs to be defined in header for inlining
 PAC5XXX_RAMFUNC static inline int SVM(float alpha, float beta, float* tA, float* tB, float* tC)
 {
