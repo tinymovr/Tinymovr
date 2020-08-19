@@ -64,7 +64,7 @@ static struct ADCState adc;
 
 static struct ADCConfig config = {
         .Iphase_limit = 40.0f,
-        .I_filter_k = 0.3,
+        .I_filter_k = 0.6,
         .I_phase_offset_tau = 0.2
 };
 
