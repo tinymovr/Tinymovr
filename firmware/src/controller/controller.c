@@ -65,10 +65,10 @@ static struct ControllerConfig config ={
     .vel_limit = 300000.0f,
     .I_limit = 10.0f,
 
-    .pos_gain = 35.0f,
-    .vel_gain = 1.5e-4f,
+    .pos_gain = 25.0f,
+    .vel_gain = 1.0e-4f,
     .vel_integrator_gain = 0.0f,
-    .I_bw = 1000.0,
+    .I_bw = 800.0,
     .I_gain = 0.0f,
     .Iq_integrator_gain = 0.0f,
     .Id_integrator_gain = 0.0f,
@@ -188,7 +188,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     const float VBus = ADC_GetVBus();
 
     // Clarke transform
-    const float Ialpha = -state.I_phase_meas.B - state.I_phase_meas.C;
+    const float Ialpha = state.I_phase_meas.A;
     const float Ibeta = one_by_sqrt3 * (state.I_phase_meas.B - state.I_phase_meas.C);
 
     // Park transform
