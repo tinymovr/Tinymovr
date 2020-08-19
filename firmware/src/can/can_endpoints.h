@@ -44,6 +44,7 @@ uint8_t CAN_SetPosSetpoint(uint8_t buffer[]);
 uint8_t CAN_SetVelSetpoint(uint8_t buffer[]);
 uint8_t CAN_SetIqSetpoint(uint8_t buffer[]);
 uint8_t CAN_SetLimits(uint8_t buffer[]);
+uint8_t CAN_GetPhaseCurrents(uint8_t buffer[]);
 
 uint8_t CAN_GetIq(uint8_t buffer[]);
 uint8_t CAN_GetLimits(uint8_t buffer[]);

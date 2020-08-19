@@ -52,7 +52,7 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_SetVelSetpoint, 0x00D);
     CANEP_AddEndpoint(&CAN_SetIqSetpoint, 0x00E);
     CANEP_AddEndpoint(&CAN_SetLimits, 0x00F);
-    // 0x010 AVAIL
+    CANEP_AddEndpoint(&CAN_GetPhaseCurrents, 0x010);
     // 0x011 Reserved: Move To Pos
     // 0x012 Reserved: Move To Pos
     // 0x013 AVAIL
@@ -230,6 +230,19 @@ uint8_t CAN_SetLimits(uint8_t buffer[])
     Controller_SetVelLimit(vel_limit);
     Controller_SetIqLimit(iq_limit);
     return CANRP_Write;
+}
+
+uint8_t CAN_GetPhaseCurrents(uint8_t buffer[])
+{
+    struct FloatTriplet I_phase;
+    ADC_GetPhaseCurrents(&I_phase);
+    int16_t IA = (int16_t)(I_phase.A * 1000.0f);
+    int16_t IB = (int16_t)(I_phase.B * 1000.0f);
+    int16_t IC = (int16_t)(I_phase.C * 1000.0f);
+    memcpy(&buffer[0], &IA, sizeof(int16_t));
+    memcpy(&buffer[2], &IB, sizeof(int16_t));
+    memcpy(&buffer[4], &IC, sizeof(int16_t));
+    return CANRP_Read;
 }
 
 uint8_t CAN_GetIq(uint8_t buffer[])
