@@ -16,6 +16,7 @@ Welcome to Tinymovr documentation!
    studio/usage
    api/guide
    troubleshooting
+   develop/guide
 
 Indices and tables
 ==================
