@@ -29,6 +29,16 @@ Most three-phase pancake-style outrunners can be used with Tinymovr. While there
 Mechanical Setup
 ################
 
+Board dimensions
+****************
+
+.. image:: dimensions.png
+  :width: 400
+  :alt: Tinymovr dimensions
+
+Mounting motor and Tinymovr
+***************************
+
 The most important aspect of a correct setup is to ensure the controller is properly positioned in relation to the motor. The center of the PCB, where the encoder is located, should lie as close to the motor rotation axis as possible. In addition, the distance from the encoder magnet to the encoder IC should be less than 2mm (less than 1mm if the magnet is on the back side of the PCB).
 
 .. image:: mount.png

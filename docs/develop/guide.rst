@@ -44,20 +44,24 @@ Now you have the required PAC SDK almost ready. As a final step, there is a smal
     cd <tinymovr_location>/firmware/pac55xx_sdk/driver
     patch -p0 -i pac5xxx_driver_tile_socbridge.patch
 
+.. _setting-up-eclipse:
+
 Setting up Eclipse
 ##################
 
 You will need the Qorvo-supplied Eclipse distribution. Download from the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_.
 
-Run the downloaded installer that will install Eclipse for you.
+Run the downloaded installer that will install Eclipse and the J-Link utility (ver. 6.31) for you.
 
 Once installation is complete, run Eclipse and import the Tinymovr project. Try building to verify everything is ok.
+
+.. _setting-up-jlink:
 
 Setting up J-Link
 #################
 
-The required J-Link drivers and software, together with instructions, can be found in the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_, under the download 'Segger J-Link Support'.
+The required J-Link drivers and software, together with instructions, can be found in the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_, under the download 'Segger J-Link Support'. This download includes a nacessary patch to enable J-Link to work with Qorvo devices. Instructions on how to apply the patch are included.
 
-Once you have the J-Link adapter wired up and the software installed, you are ready to debug the firmware in Eclipse. Please note that the default configuration in Eclipse is configured to flash the bootloader and firmware together.
+Once you have the J-Link adapter wired up and the software installed, you are ready to flash and debug the firmware in Eclipse. Please note that the default configuration in Eclipse is configured to flash the bootloader and firmware together.
 
 TODO: Writeup debugging bootloader.
