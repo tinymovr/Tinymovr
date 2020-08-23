@@ -1,0 +1,5 @@
+# --- Firmware
+Release
+*.pdf
+cser
+build
