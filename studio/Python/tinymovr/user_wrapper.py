@@ -110,6 +110,7 @@ class UserWrapper:
         '''
         self.tinymovr.set_velocity_setpoint(value * self.encoder_cpr / 60)
 
+    @property
     def error(self):
         '''
         Report controller error in human-readable form
