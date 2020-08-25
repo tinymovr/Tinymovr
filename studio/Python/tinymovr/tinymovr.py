@@ -27,6 +27,7 @@ class Tinymovr:
         self.node_id = node_id
         self.iface = iface
         self.codec = codec
+        self._encoder_cpr = -1
 
         # Temporarily assign to self.endpoints purely for convenience
         self.endpoints = eps
@@ -80,3 +81,10 @@ class Tinymovr:
 
     def current_control(self):
         self.set_state(2, 0)
+
+    @property
+    def encoder_cpr(self):
+        if self._encoder_cpr < 2048:
+            self._encoder_cpr = self.motor_info.encoder_cpr
+        assert(self._encoder_cpr >= 2048)
+        return self._encoder_cpr

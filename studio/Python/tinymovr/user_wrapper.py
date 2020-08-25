@@ -28,7 +28,6 @@ class UserWrapper:
     '''
     def __init__(self, **kwargs):
         self.tinymovr = Tinymovr(**kwargs)
-        self._encoder_cpr = -1
 
     def __getattr__(self, attr):
         return getattr(self.tinymovr, attr)
@@ -118,13 +117,6 @@ class UserWrapper:
         state = self.tinymovr.state
         error_id = ErrorIDs(state.error)
         print(error_descriptions[error_id] + " (error code: " + str(error_id) + ")")
-
-    @property
-    def encoder_cpr(self):
-        if self._encoder_cpr < 2048:
-            self._encoder_cpr = self.tinymovr.device_info.encoder_cpr
-        assert(self._encoder_cpr >= 2048)
-        return self._encoder_cpr
 
     def __dir__(self):
         tm_keys = self.tinymovr.__dir__()
