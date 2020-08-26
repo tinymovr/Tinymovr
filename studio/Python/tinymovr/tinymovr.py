@@ -82,6 +82,18 @@ class Tinymovr:
     def current_control(self):
         self.set_state(2, 0)
 
+    def save_config_file(self, file_path):
+        '''
+        Save the board config to a file
+        '''
+        pass
+
+    def restore_config_file(self, file_path):
+        '''
+        Restore the board config from a file
+        '''
+        pass
+
     @property
     def encoder_cpr(self):
         if self._encoder_cpr < 2048:

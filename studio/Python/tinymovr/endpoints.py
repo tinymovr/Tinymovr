@@ -50,7 +50,7 @@ Endpoints = {
         "ep_id": 0x005,
         "types": (DataType.UINT8, DataType.UINT16),
         "labels": ("id", "baud_rate"),
-        "save_map": ("id": "can/id", "baud_rate" : "can/baud_rate")
+        "ser_map": {"can": ("id", "baud_rate")}
     },
     "set_can_config":
     {
@@ -60,7 +60,7 @@ Endpoints = {
         "types": (DataType.UINT8, DataType.UINT16),
         "defaults": (0,),
         "labels": ("id", "baud_rate"),
-        "restore_map": {"id": "can/id", "baud_rate" : "can/baud_rate"}
+        "ser_map": {"can": ("id", "baud_rate")}
     },
     "set_state":
     {
@@ -119,7 +119,7 @@ Endpoints = {
         "ep_id": 0x00F,
         "types": (DataType.FLOAT, DataType.FLOAT),
         "labels": ("velocity", "current"),
-        "restore_map": {"velocity": "limits/velocity", "current": "limits/current"}
+        "ser_map": {"limits": ("velocity", "current")}
     },
     "Iphase":
     {
@@ -145,7 +145,7 @@ Endpoints = {
         "ep_id": 0x015,
         "types": (DataType.FLOAT, DataType.FLOAT),
         "labels": ("velocity", "current"),
-        "save_map": {"velocity": "limits/velocity", "current": "limits/current"}
+        "ser_map": {"limits": ("velocity", "current")}
     },
     "reset":
     {
@@ -167,7 +167,7 @@ Endpoints = {
         "ep_id": 0x018,
         "types": (DataType.FLOAT, DataType.FLOAT),
         "labels": ("position", "velocity"),
-        "save_map": {"position": "limits/position", "velocity": "limits/velocity"}
+        "ser_map": {"gains": ("position", "velocity")}
     },
     "set_gains":
     {
@@ -176,7 +176,7 @@ Endpoints = {
         "ep_id": 0x019,
         "types": (DataType.FLOAT, DataType.FLOAT),
         "labels": ("position", "velocity"),
-        "restore_map": {"position": "limits/position", "velocity": "limits/velocity"}
+        "ser_map": {"gains": ("position", "velocity")}
     },
     "device_info":
     {
@@ -212,6 +212,7 @@ Endpoints = {
         "type": "r",
         "ep_id": 0x01E,
         "types": (DataType.UINT8, DataType.UINT16, DataType.UINT8, DataType.UINT16, DataType.UINT16),
-        "labels": ("calibrated", "R", "pole_pairs", "L", "encoder_cpr")
+        "labels": ("calibrated", "R", "pole_pairs", "L", "encoder_cpr"),
+        "ser_map": {"motor": ("R", "L", "pole_pairs")}
     },
 }
