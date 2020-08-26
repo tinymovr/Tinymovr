@@ -34,16 +34,22 @@ class Tinymovr:
         di = self.device_info
         self.fw_version = '.'.join([str(di.fw_major), str(di.fw_minor), str(di.fw_patch)])
 
-        # Now reassig filtered endpoints
+        # Now reassign filtered endpoints
         self.endpoints = { key:value for (key,value) in eps.items() if (("from_version" not in value) or
                 (parse_version(self.fw_version) >= parse_version(value["from_version"]))) }
 
     def __getattr__(self, attr):
         if attr in self.endpoints:
             d = self.endpoints[attr]
+            assert("labels" in d)
             if d["type"] == "w":
+                # This is a write-type endpoint
                 def wrapper(*args, **kwargs):
-                    f_args = copy.copy(args)
+                    assert(len(args) == 0 or len(kwargs) == 0)
+                    if len(kwargs) > 0:
+                        f_args = [kwargs[k] for k in d["labels"]]
+                    else:
+                        f_args = copy.copy(args)
                     if "types" in d:
                         slack = len(d["types"]) - len(f_args)
                         if slack > 0:
@@ -55,13 +61,13 @@ class Tinymovr:
                         self.iface.send_new(self.node_id, d["ep_id"])
                 return wrapper
             elif d["type"] == "r":
+                # This is a read-type endpoint
                 self.iface.send_new(self.node_id, d["ep_id"], rtr=True)
                 payload = self.iface.receive(self.node_id, d["ep_id"], 1)
                 values = self.codec.deserialize(payload, *d["types"])
                 if len(values) == 1:
                     return values[0]
                 else:
-                    assert("labels" in d)
                     return AttrObject(d["labels"], values)
 
     def __dir__(self):
@@ -86,12 +92,32 @@ class Tinymovr:
         '''
         Save the board config to a file
         '''
-        pass
+        config_map = {}
+        for ep_id in self.endpoints:
+            ep = self.endpoints[ep_id]
+            if ep["type"] == 'r' and "ser_map" in ep:
+                # Node can be serialized (saved)
+                vals = self.__getattr__(ep_id)
+                config_map[ep_id] = self.traverse_endpoint_map(vals, ep["ser_map"])
+        with open(file_path, 'w') as f:
+            json.dump(config_map, f)
 
     def restore_config_file(self, file_path):
         '''
         Restore the board config from a file
         '''
+        with open(file_path, 'r') as f:
+            config_map = json.read(f)
+        for ep_id in self.endpoints:
+            ep = self.endpoints[ep_id]
+            if ep["type"] == 'w' and "ser_map" in ep:
+                # Node can be deserialized (restored)
+                self.apply_endpoint_map(ep, config_map)
+
+    def traverse_endpoint_map(self, vals, ep_map):
+        pass
+
+    def apply_endpoint_map(self, ep, json_map):
         pass
 
     @property
