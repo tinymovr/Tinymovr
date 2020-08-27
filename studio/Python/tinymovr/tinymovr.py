@@ -56,7 +56,7 @@ class Tinymovr:
                 return wrapper
             elif d["type"] == "r":
                 self.iface.send_new(self.node_id, d["ep_id"], rtr=True)
-                payload = self.iface.receive(self.node_id, d["ep_id"], 1)
+                payload = self.iface.receive(self.node_id, d["ep_id"])
                 values = self.codec.deserialize(payload, *d["types"])
                 if len(values) == 1:
                     return values[0]
