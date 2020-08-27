@@ -2,11 +2,12 @@
 """Tinymovr Shell Utility
 
 Usage:
-    tinymovr [--iface=<iface>] [--chan=<chan>] [--bitrate=<bitrate>]
+    tinymovr [--range=<range>] [--iface=<iface>] [--chan=<chan>] [--bitrate=<bitrate>]
     tinymovr -h | --help
     tinymovr --version
 
 Options:
+    --range=<range>      Range of node IDs to search [default: 1-10]
     --iface=<iface>      CAN interface to use [default: slcan].
     --chan=<chan>        CAN channel (i.e. device) to use [default: auto].
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
@@ -47,6 +48,7 @@ def spawn_shell():
     
     logger = configure_logging()
 
+    id_range = [int(s) for s in arguments['--range'].split("-")]
     iface_name = arguments['--iface']
     chan = arguments['--chan']
     bitrate = int(arguments['--bitrate'])
@@ -56,7 +58,7 @@ def spawn_shell():
     iface = CAN(bus)
 
     tms = {}
-    for node_id in range(1, 2):
+    for node_id in range(id_range[0], id_range[1]):
         try:
             tm = UserWrapper(node_id=node_id, iface=iface)
             tm_string = base_name+str(node_id)
