@@ -28,7 +28,8 @@ setuptools.setup(
         "ipython",
         "python-can>=4.0.0.dev0",
         "pyserial",
-        "docopt"
+        "docopt",
+        "pynumparser"
     ],
     entry_points={
         "console_scripts": [

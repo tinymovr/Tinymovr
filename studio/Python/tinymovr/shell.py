@@ -31,6 +31,7 @@ import can
 import IPython
 
 from docopt import docopt
+import pynumparser
 
 from tinymovr.iface import guess_channel
 from tinymovr import UserWrapper
@@ -48,7 +49,9 @@ def spawn_shell():
     
     logger = configure_logging()
 
-    id_range = [int(s) for s in arguments['--range'].split("-")]
+    num_parser = pynumparser.NumberSequence(limits=(0, 16))
+    node_ids = num_parser(arguments['--range'])
+
     iface_name = arguments['--iface']
     chan = arguments['--chan']
     bitrate = int(arguments['--bitrate'])
@@ -58,7 +61,7 @@ def spawn_shell():
     iface = CAN(bus)
 
     tms = {}
-    for node_id in range(id_range[0], id_range[1]):
+    for node_id in node_ids:
         try:
             tm = UserWrapper(node_id=node_id, iface=iface)
             tm_string = base_name+str(node_id)
