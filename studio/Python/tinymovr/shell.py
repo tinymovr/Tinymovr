@@ -2,12 +2,12 @@
 """Tinymovr Shell Utility
 
 Usage:
-    tinymovr [--range=<range>] [--iface=<iface>] [--chan=<chan>] [--bitrate=<bitrate>]
+    tinymovr [--ids=<ids>] [--iface=<iface>] [--chan=<chan>] [--bitrate=<bitrate>]
     tinymovr -h | --help
     tinymovr --version
 
 Options:
-    --range=<range>      Range of node IDs to search [default: 1-10]
+    --ids=<ids>          CAN node IDs to search [default: 1-10]
     --iface=<iface>      CAN interface to use [default: slcan].
     --chan=<chan>        CAN channel (i.e. device) to use [default: auto].
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
@@ -50,7 +50,7 @@ def spawn_shell():
     logger = configure_logging()
 
     num_parser = pynumparser.NumberSequence(limits=(0, 16))
-    node_ids = num_parser(arguments['--range'])
+    node_ids = num_parser(arguments['--ids'])
 
     iface_name = arguments['--iface']
     chan = arguments['--chan']
