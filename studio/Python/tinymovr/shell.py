@@ -68,7 +68,7 @@ def spawn_shell():
             logger.info("Connected to " + tm_string)
             tms[tm_string] = tm
         except TimeoutError:
-            logger.error("Node " + str(node_id) + " timed out")
+            logger.info("Node " + str(node_id) + " timed out")
         except IOError:
             logger.error("Node " + str(node_id) + " received abnormal message (possibly wrong ID?)")
     
@@ -77,6 +77,7 @@ def spawn_shell():
     else:
         tms["tms"] = list(tms.values())
         print(shell_name + ' ' + str(version))
+        print("Discovered instances: " + ", ".join(list(tms.keys())))
         print("Access Tinymovr instances as tmx, where x is the index starting from 1")
         print("e.g. the first Tinymovr instance will be tm1.")
         print("Instances are also available by index in the tms list.")
