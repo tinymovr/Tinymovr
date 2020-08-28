@@ -16,6 +16,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import copy
+import numbers
 from pkg_resources import parse_version
 from tinymovr.iface import CAN, CANBusCodec, DataType
 from tinymovr import Endpoints
@@ -98,7 +99,7 @@ class Tinymovr:
             if ep["type"] == 'r' and "ser_map" in ep:
                 # Node can be serialized (saved)
                 vals = self.__getattr__(ep_id)
-                config_map[ep_id] = self.traverse_endpoint_map(vals, ep["ser_map"])
+                config_map[ep_id] = self.data_from_arguments(vals, ep["ser_map"])
         with open(file_path, 'w') as f:
             json.dump(config_map, f)
 
@@ -110,15 +111,41 @@ class Tinymovr:
             config_map = json.read(f)
         for ep_id in self.endpoints:
             ep = self.endpoints[ep_id]
-            if ep["type"] == 'w' and "ser_map" in ep:
-                # Node can be deserialized (restored)
-                self.apply_endpoint_map(ep, config_map)
+            if ep["type"] == 'w' and "ser_map" in ep and ep_id in config_map:
+                # Node has saved data and can be deserialized (restored)
+                kwargs = self.arguments_from_data(ep, config_map[ep_id])
+                f = self.__getattr__(ep_id)
+                f(**kwargs)
 
-    def traverse_endpoint_map(self, vals, ep_map):
-        pass
+    def data_from_arguments(self, args, ep_map):
+        '''
+        Generate a nested dictionary from a dictionary of values,
+        following the template in ep_map.
+        '''
+        data = {}
+        for key, value in items(ep_map):
+            if isinstance(value, dict):
+                data[key] = self.data_from_arguments(args, value)
+            elif isinstance(value, tuple):
+                data[key] = {k: args[k] for k in value}
+            else:
+                raise TypeError("Map is not a dictionary or tuple")
+        return data
 
-    def apply_endpoint_map(self, ep, json_map):
-        pass
+    def arguments_from_data(self, ep, ep_data):
+        '''
+        Generate a flat argument list from a nested dictionary
+        containing values for keys in endpoint labels
+        '''
+        kwargs = {}
+        for key, value in items(ep_data):
+            if isinstance(value, dict):
+                kwargs.extend(arguments_from_data(ep, value))
+            elif isinstance(value, numbers.Number) and key in ep["labels"]
+                kwargs[key] = value
+            else:
+                raise TypeError("Value is not a dictionary or number")
+        return kwargs
 
     @property
     def encoder_cpr(self):
