@@ -12,8 +12,8 @@ Discovery
 
 Tinymovr Studio uses a polling mechanism to discover Tinymovr nodes in the CAN network. Upon launching the app, the first eight nodes are scanned. The ones that are present are available through the variable handle 'tmx', where x the device index. 
 
-Basic Commands
-##############
+Issuing Commands
+################
 
 You can read variables and issue commands using the respective Tinymovr handle, e.g.:
 
