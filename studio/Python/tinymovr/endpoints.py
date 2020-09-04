@@ -105,7 +105,7 @@ Endpoints = {
     },
     "set_cur_setpoint":
     {
-        "description": "Set Current Setpoint",
+        "description": "Set Current (Iq) Setpoint",
         "type": "w",
         "ep_id": 0x00E,
         "types": (DataType.FLOAT,)
