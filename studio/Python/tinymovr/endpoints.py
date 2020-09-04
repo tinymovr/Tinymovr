@@ -49,7 +49,8 @@ Endpoints = {
         "type": "r",
         "ep_id": 0x005,
         "types": (DataType.UINT8, DataType.UINT16),
-        "labels": ("id", "baud_rate")
+        "labels": ("id", "baud_rate"),
+        "ser_map": {"can": ("id", "baud_rate")}
     },
     "set_can_config":
     {
@@ -58,7 +59,8 @@ Endpoints = {
         "ep_id": 0x006,
         "types": (DataType.UINT8, DataType.UINT16),
         "defaults": (0,),
-        "labels": ("id", "baud_rate")
+        "labels": ("id", "baud_rate"),
+        "ser_map": {"can": ("id", "baud_rate")}
     },
     "set_state":
     {
@@ -116,7 +118,8 @@ Endpoints = {
         "type": "w",
         "ep_id": 0x00F,
         "types": (DataType.FLOAT, DataType.FLOAT),
-        "labels": ("velocity", "current")
+        "labels": ("velocity", "current"),
+        "ser_map": {"limits": ("velocity", "current")}
     },
     "Iphase":
     {
@@ -141,7 +144,8 @@ Endpoints = {
         "type": "r",
         "ep_id": 0x015,
         "types": (DataType.FLOAT, DataType.FLOAT),
-        "labels": ("velocity", "current")
+        "labels": ("velocity", "current"),
+        "ser_map": {"limits": ("velocity", "current")}
     },
     "reset":
     {
@@ -162,7 +166,8 @@ Endpoints = {
         "type": "r",
         "ep_id": 0x018,
         "types": (DataType.FLOAT, DataType.FLOAT),
-        "labels": ("position", "velocity")
+        "labels": ("position", "velocity"),
+        "ser_map": {"gains": ("position", "velocity")}
     },
     "set_gains":
     {
@@ -170,7 +175,8 @@ Endpoints = {
         "type": "w",
         "ep_id": 0x019,
         "types": (DataType.FLOAT, DataType.FLOAT),
-        "labels": ("position", "velocity")
+        "labels": ("position", "velocity"),
+        "ser_map": {"gains": ("position", "velocity")}
     },
     "device_info":
     {
@@ -206,6 +212,7 @@ Endpoints = {
         "type": "r",
         "ep_id": 0x01E,
         "types": (DataType.UINT8, DataType.UINT16, DataType.UINT8, DataType.UINT16, DataType.UINT16),
-        "labels": ("calibrated", "R", "pole_pairs", "L", "encoder_cpr")
+        "labels": ("calibrated", "R", "pole_pairs", "L", "encoder_cpr"),
+        "ser_map": {"motor": ("R", "L", "pole_pairs")}
     },
 }
