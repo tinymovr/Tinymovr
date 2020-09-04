@@ -1,3 +1,5 @@
+.. _studio-installation:
+
 ****************************
 Tinymovr Studio Installation
 ****************************
