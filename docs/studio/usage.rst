@@ -7,10 +7,20 @@ Overview
 
 Tinymovr Studio is an IPython application that enables communication with multiple Tinymovr instances, allowing configuration and control. 
 
+
+Launching the command line app
+##############################
+
+.. code-block:: console
+
+    tinymovr
+
+
 Discovery
 #########
 
-Tinymovr Studio uses a polling mechanism to discover Tinymovr nodes in the CAN network. Upon launching the app, the first eight nodes are scanned. The ones that are present are available through the variable handle 'tmx', where x the device index. 
+Tinymovr Studio uses a polling mechanism to discover Tinymovr nodes in the CAN network. Upon launching the app, by default the first ten nodes are scanned. The ones that are present are available through the variable handle 'tmx', where x the device index. To specify the scan range, take a look at :ref:`command-line-options`.
+
 
 Issuing Commands
 ################
@@ -28,6 +38,7 @@ or
     tmx.set_vel_setpoint(0)
 
 Where x is the device ID. Full tab completion is available.
+
 
 Multiple Instances
 ##################
@@ -53,6 +64,56 @@ where x is the desired ID. Valid IDs are from 1-64, but the Studio app currently
     tmx.save_config()
 
 5. Power down or reset the board. Tinymovr is now ready to use with the new ID.
+
+.. _command-line-options:
+
+Command-line options
+********************
+
+Tinymovr Studio supports the following command line options.
+
+
+``--ids=<ids>``
+===================
+
+The --ids option specifies a set of CAN node IDs to scan. 
+
+Example:
+
+.. code-block:: console
+
+    tinymovr --ids=1,3,5,7-9
+
+All syntax options supported by Pynumparser are available.
+
+
+``--iface=<iface>``
+===================
+
+The --iface option specifies a CAN interface to use.
+
+Example:
+
+.. code-block:: console
+
+    tinymovr --iface=robotell
+
+All interfaces offered by python-can are supported.
+
+
+``--chan=<chan>``
+=================
+
+The --chan options specifies a channel to use, optionally together with the --iface option. 
+
+Example:
+
+.. code-block:: console
+
+    tinymovr --iface=robotell --chan=COM3
+
+By default, Tinymovr Studio will use slcan as the interface, and will search for CANAble-type devices.
+
 
 Upgrading Firmware
 ##################

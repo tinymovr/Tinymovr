@@ -19,7 +19,7 @@ class CAN(IFace):
     def send_new(self, node_id, endpoint_id, rtr=False, payload=None):
         self.bus.send(self.create_frame(node_id, endpoint_id, rtr, payload))
 
-    def receive(self, node_id, endpoint_id, timeout=0.2):
+    def receive(self, node_id, endpoint_id, timeout=0.05):
         frame_id = self.create_id(node_id, endpoint_id)
         frame = self.bus.recv(timeout=timeout)
         if frame:

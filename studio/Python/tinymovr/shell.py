@@ -2,11 +2,12 @@
 """Tinymovr Shell Utility
 
 Usage:
-    tinymovr [--iface=<iface>] [--chan=<chan>] [--bitrate=<bitrate>]
+    tinymovr [--ids=<ids>] [--iface=<iface>] [--chan=<chan>] [--bitrate=<bitrate>]
     tinymovr -h | --help
     tinymovr --version
 
 Options:
+    --ids=<ids>          CAN node IDs to search [default: 1-10]
     --iface=<iface>      CAN interface to use [default: slcan].
     --chan=<chan>        CAN channel (i.e. device) to use [default: auto].
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
@@ -30,6 +31,7 @@ import can
 import IPython
 
 from docopt import docopt
+import pynumparser
 
 from tinymovr.iface import guess_channel
 from tinymovr import UserWrapper
@@ -47,6 +49,9 @@ def spawn_shell():
     
     logger = configure_logging()
 
+    num_parser = pynumparser.NumberSequence(limits=(0, 16))
+    node_ids = num_parser(arguments['--ids'])
+
     iface_name = arguments['--iface']
     chan = arguments['--chan']
     bitrate = int(arguments['--bitrate'])
@@ -56,22 +61,24 @@ def spawn_shell():
     iface = CAN(bus)
 
     tms = {}
-    for node_id in range(1, 2):
+    for node_id in node_ids:
         try:
             tm = UserWrapper(node_id=node_id, iface=iface)
             tm_string = base_name+str(node_id)
             logger.info("Connected to " + tm_string)
             tms[tm_string] = tm
         except TimeoutError:
-            logger.error("Node " + str(node_id) + " timed out")
+            logger.info("Node " + str(node_id) + " timed out")
         except IOError:
             logger.error("Node " + str(node_id) + " received abnormal message (possibly wrong ID?)")
     
     if len(tms) == 0:
         logger.error("No Tinymovr instances detected. Exiting shell...")
     else:
+        tms_discovered = ", ".join(list(tms.keys()))
         tms["tms"] = list(tms.values())
         print(shell_name + ' ' + str(version))
+        print("Discovered instances: " + tms_discovered)
         print("Access Tinymovr instances as tmx, where x is the index starting from 1")
         print("e.g. the first Tinymovr instance will be tm1.")
         print("Instances are also available by index in the tms list.")
