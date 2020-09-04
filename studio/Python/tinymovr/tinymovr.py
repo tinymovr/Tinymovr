@@ -17,6 +17,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 import copy
 import numbers
+import json
 from pkg_resources import parse_version
 from tinymovr.iface import CAN, CANBusCodec, DataType
 from tinymovr import Endpoints
@@ -89,62 +90,66 @@ class Tinymovr:
     def current_control(self):
         self.set_state(2, 0)
 
-    def save_config_file(self, file_path):
+    def export_config(self, file_path):
         '''
-        Save the board config to a file
+        Export the board config to a file
         '''
         config_map = {}
         for ep_id in self.endpoints:
             ep = self.endpoints[ep_id]
             if ep["type"] == 'r' and "ser_map" in ep:
                 # Node can be serialized (saved)
-                vals = self.__getattr__(ep_id)
-                config_map[ep_id] = self.data_from_arguments(vals, ep["ser_map"])
+                vals = getattr(self, ep_id)
+                config_map.update(self._data_from_arguments(vals, ep["ser_map"]))
         with open(file_path, 'w') as f:
             json.dump(config_map, f)
 
-    def restore_config_file(self, file_path):
+    def restore_config(self, file_path):
         '''
         Restore the board config from a file
         '''
         with open(file_path, 'r') as f:
-            config_map = json.read(f)
+            data = json.load(f)
         for ep_id in self.endpoints:
             ep = self.endpoints[ep_id]
-            if ep["type"] == 'w' and "ser_map" in ep and ep_id in config_map:
+            if ep["type"] == 'w' and "ser_map" in ep:
                 # Node has saved data and can be deserialized (restored)
-                kwargs = self.arguments_from_data(ep, config_map[ep_id])
-                f = self.__getattr__(ep_id)
-                f(**kwargs)
+                kwargs = self._arguments_from_data(ep["ser_map"], data)
+                if len(kwargs):
+                    f = getattr(self, ep_id)
+                    f(**kwargs)
 
-    def data_from_arguments(self, args, ep_map):
+    def _data_from_arguments(self, args, ep_map):
         '''
         Generate a nested dictionary from a dictionary of values,
-        following the template in ep_map.
+        following the template in ep_map
         '''
         data = {}
-        for key, value in items(ep_map):
+        for key, value in ep_map.items():
             if isinstance(value, dict):
-                data[key] = self.data_from_arguments(args, value)
+                data[key] = self._data_from_arguments(args, value)
             elif isinstance(value, tuple):
-                data[key] = {k: args[k] for k in value}
+                data[key] = {k: getattr(args, k) for k in value}
             else:
                 raise TypeError("Map is not a dictionary or tuple")
         return data
 
-    def arguments_from_data(self, ep, ep_data):
+    def _arguments_from_data(self, ep_map, ep_data):
         '''
-        Generate a flat argument list from a nested dictionary
+        Generate a flat argument dictionary from a nested dictionary
         containing values for keys in endpoint labels
         '''
         kwargs = {}
-        for key, value in items(ep_data):
-            if isinstance(value, dict):
-                kwargs.extend(arguments_from_data(ep, value))
-            elif isinstance(value, numbers.Number) and key in ep["labels"]
-                kwargs[key] = value
-            else:
-                raise TypeError("Value is not a dictionary or number")
+        if isinstance(ep_map, dict) and isinstance(ep_data, dict):
+            for key, value in ep_map.items():
+                if key in ep_data:
+                    kwargs.update(self._arguments_from_data(value, ep_data[key]))
+        elif isinstance(ep_map, tuple) and isinstance(ep_data, dict):
+            for key in ep_map:
+                if key in ep_data:
+                    kwargs[key] = ep_data[key]
+        else:
+            raise TypeError("Mismatch in passed arguments")
         return kwargs
 
     @property
