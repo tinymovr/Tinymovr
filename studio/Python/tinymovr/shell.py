@@ -75,9 +75,10 @@ def spawn_shell():
     if len(tms) == 0:
         logger.error("No Tinymovr instances detected. Exiting shell...")
     else:
+        tms_discovered = ", ".join(list(tms.keys()))
         tms["tms"] = list(tms.values())
         print(shell_name + ' ' + str(version))
-        print("Discovered instances: " + ", ".join(list(tms.keys())))
+        print("Discovered instances: " + tms_discovered)
         print("Access Tinymovr instances as tmx, where x is the index starting from 1")
         print("e.g. the first Tinymovr instance will be tm1.")
         print("Instances are also available by index in the tms list.")
