@@ -414,25 +414,9 @@ ControlMode Controller_GetMode(void)
 
 void Controller_SetMode(ControlMode new_mode)
 {
-    if (new_mode == state.mode)
+    if (new_mode != state.mode)
     {
-        // No action
-    }
-	else if (new_mode == CTRL_POSITION)
-	{
-		state.mode = CTRL_POSITION;
-	}
-	else if (new_mode == CTRL_VELOCITY)
-	{
-		state.mode = CTRL_VELOCITY;
-	}
-	else if (new_mode == CTRL_CURRENT)
-	{
-		state.mode = CTRL_CURRENT;
-	}
-    else
-    {
-        // No action
+        state.mode = new_mode;
     }
 }
 
