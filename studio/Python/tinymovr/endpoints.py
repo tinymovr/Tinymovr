@@ -110,7 +110,8 @@ Endpoints = {
         "description": "Set Current (Iq) Setpoint",
         "type": "w",
         "ep_id": 0x00E,
-        "types": (DataType.FLOAT,)
+        "types": (DataType.FLOAT,),
+        "labels": ("current")
     },
     "set_limits":
     {
