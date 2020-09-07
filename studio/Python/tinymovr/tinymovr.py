@@ -43,12 +43,12 @@ class Tinymovr:
     def __getattr__(self, attr):
         if attr in self.endpoints:
             d = self.endpoints[attr]
-            assert("labels" in d)
             if d["type"] == "w":
                 # This is a write-type endpoint
                 def wrapper(*args, **kwargs):
                     assert(len(args) == 0 or len(kwargs) == 0)
                     if len(kwargs) > 0:
+                        assert("labels" in d)
                         f_args = [kwargs[k] for k in d["labels"]]
                     else:
                         f_args = copy.copy(args)
