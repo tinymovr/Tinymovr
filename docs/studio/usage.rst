@@ -68,7 +68,7 @@ where x is the desired ID. Valid IDs are from 1-64, but the Studio app currently
 .. _command-line-options:
 
 Command-line options
-********************
+####################
 
 Tinymovr Studio supports the following command line options.
 
@@ -84,7 +84,7 @@ Example:
 
     tinymovr --ids=1,3,5,7-9
 
-All syntax options supported by Pynumparser are available.
+All syntax options supported by `Pynumparser<https://pypi.org/project/pynumparser/>`_ are available.
 
 
 ``--iface=<iface>``
@@ -112,7 +112,17 @@ Example:
 
     tinymovr --iface=robotell --chan=COM3
 
-By default, Tinymovr Studio will use slcan as the interface, and will search for CANAble-type devices.
+By default, Tinymovr Studio will use slcan as the interface, and will search for CANAble/CANtact-type devices with slcan firmware. Such is the CANine adapter supplied with Tinymovr Dev Kits.
+
+
+Using with Socketcan on Linux
+#############################
+
+You can use a socketcan-enabled CAN adapter with Tinymovr Studio. The CANine adapter supplied with Tinymovr Dev Kits supports Socketcan natively with the alternative Candlelight Firmware. To connect to a Socketcan device, run Studio as follows:
+
+.. code-block:: console
+
+    tinymovr --iface=socketcan --chan=CAN0
 
 
 Upgrading Firmware
