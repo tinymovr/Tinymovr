@@ -29,7 +29,6 @@ class Tinymovr:
         self.node_id = node_id
         self.iface = iface
         self.codec = codec
-        self._encoder_cpr = -1
 
         # Temporarily assign to self.endpoints purely for convenience
         self.endpoints = eps
@@ -40,7 +39,7 @@ class Tinymovr:
         self.endpoints = { key:value for (key,value) in eps.items() if (("from_version" not in value) or
                 (parse_version(self.fw_version) >= parse_version(value["from_version"]))) }
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr:str):
         if attr in self.endpoints:
             d = self.endpoints[attr]
             if d["type"] == "w":
@@ -90,7 +89,7 @@ class Tinymovr:
     def current_control(self):
         self.set_state(2, 0)
 
-    def export_config(self, file_path):
+    def export_config(self, file_path:str):
         '''
         Export the board config to a file
         '''
@@ -104,7 +103,7 @@ class Tinymovr:
         with open(file_path, 'w') as f:
             json.dump(config_map, f)
 
-    def restore_config(self, file_path):
+    def restore_config(self, file_path:str):
         '''
         Restore the board config from a file
         '''
@@ -151,10 +150,3 @@ class Tinymovr:
         else:
             raise TypeError("Mismatch in passed arguments")
         return kwargs
-
-    @property
-    def encoder_cpr(self):
-        if self._encoder_cpr < 2048:
-            self._encoder_cpr = self.motor_info.encoder_cpr
-        assert(self._encoder_cpr >= 2048)
-        return self._encoder_cpr
