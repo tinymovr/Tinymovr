@@ -41,7 +41,7 @@ class Tinymovr:
         self.endpoints = { key:value for (key,value) in eps.items() if (("from_version" not in value) or
                 (parse_version(self.fw_version) >= parse_version(value["from_version"]))) }
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr:str):
         if attr in self.endpoints:
             d = self.endpoints[attr]
             if d["type"] == "w":
