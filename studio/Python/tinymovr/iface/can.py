@@ -6,22 +6,22 @@ from tinymovr.iface import IFace
 
 import logging
 
-CAN_EP_SIZE = 6
+CAN_EP_SIZE: int = 6
 
 class CAN(IFace):
     '''
     Class implementing a CAN bus interface 
     '''
-    def send(self, msg, delay=0.001):
+    def send(self, msg: can.Message):
         self.bus.send(msg)
-        time.sleep(delay)
 
-    def send_new(self, node_id, endpoint_id, rtr=False, payload=None):
+    def send_new(self, node_id: int, endpoint_id: int,
+                 rtr:bool=False, payload:bytearray=None):
         self.bus.send(self.create_frame(node_id, endpoint_id, rtr, payload))
 
-    def receive(self, node_id, endpoint_id, timeout=0.05):
-        frame_id = self.create_id(node_id, endpoint_id)
-        frame = self.bus.recv(timeout=timeout)
+    def receive(self, node_id: int, endpoint_id: int, timeout:float=0.05):
+        frame_id: int = self.create_id(node_id, endpoint_id)
+        frame: can.Message = self.bus.recv(timeout=timeout)
         if frame:
             if frame.arbitration_id == frame_id:
                 return frame.data
@@ -30,7 +30,8 @@ class CAN(IFace):
         else:
             raise TimeoutError()
 
-    def create_frame(self, node_id, endpoint_id, rtr=False, payload=None):
+    def create_frame(self, node_id: int, endpoint_id: int,
+                     rtr:bool=False, payload:bytearray=None) -> can.Message:
         '''
         Generate and return a CAN frame using python-can Message class
         '''
@@ -39,7 +40,7 @@ class CAN(IFace):
                            is_remote_frame=rtr,
                            data=payload)
 
-    def create_id(self, node_id, endpoint_id):
+    def create_id(self, node_id: int, endpoint_id: int):
         '''
         Generate a CAN id from node and endpoint ids
         '''

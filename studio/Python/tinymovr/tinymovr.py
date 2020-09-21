@@ -18,6 +18,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 import copy
 import numbers
 import json
+from typing import Dict
 from pkg_resources import parse_version
 from tinymovr.iface import CAN, CANBusCodec, DataType
 from tinymovr import Endpoints
@@ -25,11 +26,11 @@ from tinymovr.attr_object import AttrObject
 
 class Tinymovr:
 
-    def __init__(self, node_id, iface, codec=CANBusCodec(), eps=Endpoints):
+    def __init__(self, node_id:int, iface, 
+                 codec:CANBusCodec=CANBusCodec(), eps:Dict[str,Dict]=Endpoints):
         self.node_id = node_id
         self.iface = iface
         self.codec = codec
-        self._encoder_cpr = -1
 
         # Temporarily assign to self.endpoints purely for convenience
         self.endpoints = eps
@@ -90,7 +91,7 @@ class Tinymovr:
     def current_control(self):
         self.set_state(2, 0)
 
-    def export_config(self, file_path):
+    def export_config(self, file_path:str):
         '''
         Export the board config to a file
         '''
@@ -104,7 +105,7 @@ class Tinymovr:
         with open(file_path, 'w') as f:
             json.dump(config_map, f)
 
-    def restore_config(self, file_path):
+    def restore_config(self, file_path:str):
         '''
         Restore the board config from a file
         '''
@@ -151,10 +152,3 @@ class Tinymovr:
         else:
             raise TypeError("Mismatch in passed arguments")
         return kwargs
-
-    @property
-    def encoder_cpr(self):
-        if self._encoder_cpr < 2048:
-            self._encoder_cpr = self.motor_info.encoder_cpr
-        assert(self._encoder_cpr >= 2048)
-        return self._encoder_cpr

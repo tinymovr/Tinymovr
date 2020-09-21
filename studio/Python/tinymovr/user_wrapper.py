@@ -87,28 +87,6 @@ class UserWrapper:
         else:
             self.tinymovr.current_control()
 
-    def get_velocity_estimate_rpm(self, value):
-        '''
-        Get velocity estimate in RPM by automatically
-        converting from encoder counts per second.
-
-        NOTE: This convenience function exists only for
-        velocity control mode and does not support
-        current feed-forward value.
-        '''
-        return 60 * (self.tinymovr.encoder_estimates.velocity / self.encoder_cpr)
-
-    def set_velocity_setpoint_rpm(self, value):
-        '''
-        Set velocity setpoint in RPM by automatically
-        converting to encoder counts per second
-
-        NOTE: This convenience function exists only for
-        velocity control mode and does not support
-        current feed-forward value.
-        '''
-        self.tinymovr.set_velocity_setpoint(value * self.encoder_cpr / 60)
-
     @property
     def error(self):
         '''

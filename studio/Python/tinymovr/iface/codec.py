@@ -1,4 +1,5 @@
 
+from typing import Dict, List
 import struct
 from enum import Enum
 
@@ -17,21 +18,24 @@ class StructCodec():
     Adapted from:
     https://github.com/madcowswe/ODrive/blob/master/Firmware/fibre/python/fibre/remote_object.py
     """
-    def __init__(self, struct_format, target_type):
+    def __init__(self, struct_format, target_type:type):
         self._struct_format = struct_format
         self._target_type = target_type
-    def get_length(self):
+
+    def get_length(self) -> int:
         return struct.calcsize(self._struct_format)
-    def serialize(self, value):
+
+    def serialize(self, value) -> bytes:
         value = self._target_type(value)
         return struct.pack(self._struct_format, value)
-    def deserialize(self, buffer):
-        trimmed_buffer = buffer[:self.get_length()]
+
+    def deserialize(self, buffer:bytes):
+        trimmed_buffer:bytes = buffer[:self.get_length()]
         value = struct.unpack(self._struct_format, trimmed_buffer)
         value = value[0] if len(value) == 1 else value
         return self._target_type(value)
 
-codecs = {
+codecs: Dict[DataType, StructCodec] = {
     DataType.INT8 : StructCodec("<b", int),
     DataType.UINT8 : StructCodec("<B", int),
     DataType.INT16 : StructCodec("<h", int),
@@ -43,7 +47,7 @@ codecs = {
 
 class CANBusCodec:
     
-    def serialize(self, values, *args):
+    def serialize(self, values, *args) -> bytearray:
         '''
         Serialize a series of variables to a
         CAN Bus-compatible bytes array
@@ -55,12 +59,12 @@ class CANBusCodec:
         return buffer
 
 
-    def deserialize(self, data, *args):
+    def deserialize(self, data, *args) -> List:
         '''
         Deserialize a CAN Bus-compatible bytes
         array to a tuple of values
         '''
-        index = 0
+        index: int = 0
         values = []
         for dtype in args:
             values.append(codecs[dtype].deserialize(data[index:]))
