@@ -48,6 +48,7 @@ class Tinymovr:
     def __getattr__(self, attr: str):
         if attr in self.endpoints:
             d = self.endpoints[attr]
+            
             if d["type"] == "w":
                 # This is a write-type endpoint
                 def wrapper(*args, **kwargs):
@@ -68,6 +69,7 @@ class Tinymovr:
                     else:
                         self.iface.send_new(self.node_id, d["ep_id"])
                 return wrapper
+
             elif d["type"] == "r":
                 # This is a read-type endpoint
                 self.iface.send_new(self.node_id, d["ep_id"], rtr=True)
