@@ -16,10 +16,10 @@ class CAN(IFace):
 
     def send_new(self, node_id: int, endpoint_id: int,
                  rtr: bool=False, payload: bytearray=None):
-        self.bus.send(self.create_frame(node_id, endpoint_id, rtr, payload))
+        self.bus.send(create_frame(node_id, endpoint_id, rtr, payload))
 
     def receive(self, node_id: int, endpoint_id: int, timeout: float=0.05):
-        frame_id: int = self.create_id(node_id, endpoint_id)
+        frame_id: int = create_node_id(node_id, endpoint_id)
         frame: can.Message = self.bus.recv(timeout=timeout)
         if frame:
             if frame.arbitration_id == frame_id:
@@ -30,18 +30,20 @@ class CAN(IFace):
         else:
             raise TimeoutError()
 
-    def create_frame(self, node_id: int, endpoint_id: int,
-                     rtr: bool=False, payload: bytearray=None) -> can.Message:
-        '''
-        Generate and return a CAN frame using python-can Message class
-        '''
-        return can.Message(arbitration_id=self.create_id(node_id, endpoint_id),
-                           is_extended_id=False,
-                           is_remote_frame=rtr,
-                           data=payload)
 
-    def create_id(self, node_id: int, endpoint_id: int):
-        '''
-        Generate a CAN id from node and endpoint ids
-        '''
-        return (node_id << CAN_EP_SIZE) | endpoint_id
+def create_frame(node_id: int, endpoint_id: int,
+                    rtr: bool=False, payload: bytearray=None) -> can.Message:
+    '''
+    Generate and return a CAN frame using python-can Message class
+    '''
+    return can.Message(arbitration_id=create_node_id(node_id, endpoint_id),
+                       is_extended_id=False,
+                       is_remote_frame=rtr,
+                       data=payload)
+
+
+def create_node_id(node_id: int, endpoint_id: int):
+    '''
+    Generate a CAN id from node and endpoint ids
+    '''
+    return (node_id << CAN_EP_SIZE) | endpoint_id
