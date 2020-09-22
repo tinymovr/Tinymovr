@@ -1,10 +1,11 @@
 
-import time
+import math
 import can
+from typing import Tuple
 from tinymovr.iface import IFace
-import logging
 
 CAN_EP_SIZE: int = 6
+CAN_EP_MASK: int = int(math.pow(2, CAN_EP_SIZE) - 1)
 
 
 class CAN(IFace):
@@ -42,8 +43,14 @@ def create_frame(node_id: int, endpoint_id: int,
                        data=payload)
 
 
-def create_node_id(node_id: int, endpoint_id: int):
+def create_node_id(node_id: int, endpoint_id: int) -> int:
     '''
     Generate a CAN id from node and endpoint ids
     '''
     return (node_id << CAN_EP_SIZE) | endpoint_id
+
+
+def extract_node_message_id(arbitration_id: int) -> Tuple[int, int]:
+    node_id = arbitration_id >> CAN_EP_SIZE & 0xFF
+    message_id = arbitration_id & CAN_EP_MASK
+    return node_id, message_id
