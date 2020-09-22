@@ -48,7 +48,7 @@ class Tinymovr:
     def __getattr__(self, attr: str):
         if attr in self.endpoints:
             d = self.endpoints[attr]
-            
+
             if d["type"] == "w":
                 # This is a write-type endpoint
                 def wrapper(*args, **kwargs):
