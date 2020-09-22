@@ -191,7 +191,7 @@ Endpoints: Dict[str, Dict] = {
     "timings":
     {
         "description": "Get Processor Timings \
-                        (Busy Cycles/PWM, Total Cycles/PWM)",
+(Busy Cycles/PWM, Total Cycles/PWM)",
         "type": "r",
         "ep_id": 0x01B,
         "types": (DataType.UINT32, DataType.UINT32),

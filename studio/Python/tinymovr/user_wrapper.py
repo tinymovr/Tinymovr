@@ -41,13 +41,13 @@ class UserWrapper:
         state = self.tinymovr.state
         if state.error != 0:
             print("Error flag present, cannot continue with calibration. \
-                  Please reset Tinymovr.")
+Please reset Tinymovr.")
         elif state.state != 0:
             print("Tinymovr state is not idle, \
-                  calibration needs to be started from idle state.")
+calibration needs to be started from idle state.")
         else:
             input("Ready to calibrate. Please remove any loads \
-                  from the motor and hit Enter to continue")
+from the motor and hit Enter to continue")
             self.tinymovr.calibrate()
 
     def idle(self):
@@ -63,10 +63,10 @@ class UserWrapper:
         state = self.tinymovr.state
         if state.error != 0:
             print("Error flag present, cannot enable position control. \
-                  Please reset Tinymovr.")
+Please reset Tinymovr.")
         elif state.state == 1:
             print("Tinymovr is currently calibrating, \
-                  please do not interrupt.")
+please do not interrupt.")
         else:
             self.tinymovr.position_control()
 
@@ -77,10 +77,10 @@ class UserWrapper:
         state = self.tinymovr.state
         if state.error != 0:
             print("Error flag present, cannot enable velocity control. \
-                  Please reset Tinymovr.")
+Please reset Tinymovr.")
         elif state.state == 1:
             print("Tinymovr is currently calibrating, \
-                  please do not interrupt.")
+please do not interrupt.")
         else:
             self.tinymovr.velocity_control()
 
@@ -91,10 +91,10 @@ class UserWrapper:
         state = self.tinymovr.state
         if state.error != 0:
             print("Error flag present, cannot enable current control. \
-                  Please reset Tinymovr.")
+Please reset Tinymovr.")
         elif state.state == 1:
             print("Tinymovr is currently calibrating, \
-                  please do not interrupt.")
+please do not interrupt.")
         else:
             self.tinymovr.current_control()
 
