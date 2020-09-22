@@ -14,6 +14,11 @@ class Test(can.BusABC):
         self.buffer: can.Message = None
         self.codec = CANBusCodec()
 
+        self.endpoint_values = {
+            k:self.codec.deserialize(bytearray(8), *v["types"])
+            for k, v in Endpoints.items() if "types" in v
+        }
+
     def send(self, msg: can.Message):
         arbitration_id: int = msg.arbitration_id
         node_id, msg_id = extract_node_message_id(arbitration_id)
@@ -21,7 +26,9 @@ class Test(can.BusABC):
             for d in Endpoints.values():
                 if d["ep_id"] == msg_id and "r" in d["type"]:
                     self.buffer = create_frame(
-                        node_id, msg_id, False, bytearray(8))
+                        node_id, msg_id, False, 
+                        self.codec.serialize(self.endpoint_values[msg_id], *d["types"])
+                    )
                     break
 
     def _recv_internal(self, timeout: float) -> can.Message:
