@@ -39,6 +39,4 @@ setuptools.setup(
             "tinymovr_test=tinymovr.bus:Test",
         ]
     }
-    
 )
-

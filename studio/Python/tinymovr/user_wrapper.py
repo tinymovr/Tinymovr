@@ -17,6 +17,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 from tinymovr import Tinymovr, ErrorIDs, error_descriptions
 
+
 class UserWrapper:
     '''
     This is a user-friendly wrapper to the Tinymover class, that
@@ -24,7 +25,8 @@ class UserWrapper:
     getters/setters.
     This class sacrifices Pythonic-ness (e.g. raising exceptions)
     for better user-friendliness (e.g. using simple print statements).
-    There are also additional checks performed prior to the 
+    There are also additional checks performed prior to changing
+    states, with errors displayed if checks fail.
     '''
     def __init__(self, **kwargs):
         self.tinymovr = Tinymovr(**kwargs)
@@ -38,11 +40,14 @@ class UserWrapper:
         '''
         state = self.tinymovr.state
         if state.error != 0:
-            print("Error flag present, cannot continue with calibration. Please reset Tinymovr.")
+            print("Error flag present, cannot continue with calibration. \
+                  Please reset Tinymovr.")
         elif state.state != 0:
-            print("Tinymovr state is not idle, calibration needs to be started from idle state.")
+            print("Tinymovr state is not idle, \
+                  calibration needs to be started from idle state.")
         else:
-            input("Ready to calibrate. Please remove any loads from the motor and hit Enter to continue")
+            input("Ready to calibrate. Please remove any loads \
+                  from the motor and hit Enter to continue")
             self.tinymovr.calibrate()
 
     def idle(self):
@@ -57,9 +62,11 @@ class UserWrapper:
         '''
         state = self.tinymovr.state
         if state.error != 0:
-            print("Error flag present, cannot enable position control. Please reset Tinymovr.")
+            print("Error flag present, cannot enable position control. \
+                  Please reset Tinymovr.")
         elif state.state == 1:
-            print("Tinymovr is currently calibrating, please do not interrupt.")
+            print("Tinymovr is currently calibrating, \
+                  please do not interrupt.")
         else:
             self.tinymovr.position_control()
 
@@ -69,9 +76,11 @@ class UserWrapper:
         '''
         state = self.tinymovr.state
         if state.error != 0:
-            print("Error flag present, cannot enable velocity control. Please reset Tinymovr.")
+            print("Error flag present, cannot enable velocity control. \
+                  Please reset Tinymovr.")
         elif state.state == 1:
-            print("Tinymovr is currently calibrating, please do not interrupt.")
+            print("Tinymovr is currently calibrating, \
+                  please do not interrupt.")
         else:
             self.tinymovr.velocity_control()
 
@@ -81,9 +90,11 @@ class UserWrapper:
         '''
         state = self.tinymovr.state
         if state.error != 0:
-            print("Error flag present, cannot enable current control. Please reset Tinymovr.")
+            print("Error flag present, cannot enable current control. \
+                  Please reset Tinymovr.")
         elif state.state == 1:
-            print("Tinymovr is currently calibrating, please do not interrupt.")
+            print("Tinymovr is currently calibrating, \
+                  please do not interrupt.")
         else:
             self.tinymovr.current_control()
 

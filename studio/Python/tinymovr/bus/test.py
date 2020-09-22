@@ -1,5 +1,6 @@
 import can
 
+
 class Test(can.BusABC):
 
     def __init__(self, channel, can_filters=None, **kwargs):

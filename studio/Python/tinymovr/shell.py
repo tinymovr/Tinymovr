@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Tinymovr Shell Utility
 
 Usage:
@@ -13,6 +12,19 @@ Options:
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
 
+from typing import Dict
+import logging
+import pkg_resources
+import can
+import IPython
+
+from docopt import docopt
+import pynumparser
+
+from tinymovr.iface import guess_channel
+from tinymovr import UserWrapper
+from tinymovr.iface import IFace, CAN
+
 '''
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -25,67 +37,61 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import logging
-import pkg_resources
-import can
-import IPython
-
-from docopt import docopt
-import pynumparser
-
-from tinymovr.iface import guess_channel
-from tinymovr import UserWrapper
-from tinymovr.iface import CAN
-
-shell_name = 'Tinymovr Shell Utility'
+shell_name = "Tinymovr Shell Utility"
 base_name = "tm"
+
 
 def spawn_shell():
     '''
     Spawns the Tinymovr Studio IPython shell.
     '''
-    version = pkg_resources.require("tinymovr")[0].version
-    arguments = docopt(__doc__, version=shell_name + ' ' + str(version))
-    
+    version: str = pkg_resources.require("tinymovr")[0].version
+    arguments: Dict[str, str] = docopt(__doc__, version=shell_name + ' ' + str(version))
+
     logger = configure_logging()
 
     num_parser = pynumparser.NumberSequence(limits=(0, 16))
     node_ids = num_parser(arguments['--ids'])
 
-    iface_name = arguments['--iface']
-    chan = arguments['--chan']
-    bitrate = int(arguments['--bitrate'])
-    if chan == 'auto':
-        chan = guess_channel(iface_hint=iface_name)
-    bus = can.Bus(bustype=iface_name, channel=chan, bitrate=bitrate)
-    iface = CAN(bus)
+    iface_name: str = arguments['--iface']
+    chan_name: str = arguments['--chan']
+    bitrate: int = int(arguments['--bitrate'])
+    if chan_name == 'auto':
+        chan_name = guess_channel(iface_hint=iface_name)
+    bus: can.Bus = can.Bus(bustype=iface_name,
+                           channel=chan_name,
+                           bitrate=bitrate)
+    iface: IFace = CAN(bus)
 
-    tms = {}
+    tms: Dict[str, UserWrapper] = {}
     for node_id in node_ids:
         try:
-            tm = UserWrapper(node_id=node_id, iface=iface)
-            tm_string = base_name+str(node_id)
-            logger.info("Connected to " + tm_string)
-            tms[tm_string] = tm
+            tm: UserWrapper = UserWrapper(node_id=node_id, iface=iface)
+            tm_name: str = base_name + str(node_id)
+            logger.info("Connected to " + tm_name)
+            tms[tm_name] = tm
         except TimeoutError:
             logger.info("Node " + str(node_id) + " timed out")
         except IOError:
-            logger.error("Node " + str(node_id) + " received abnormal message (possibly wrong ID?)")
-    
+            logger.error("Node " + str(node_id) +
+                         " received abnormal message (possibly wrong ID?)")
+
     if len(tms) == 0:
         logger.error("No Tinymovr instances detected. Exiting shell...")
     else:
-        tms_discovered = ", ".join(list(tms.keys()))
+        tms_discovered: str = ", ".join(list(tms.keys()))
         tms["tms"] = list(tms.values())
         print(shell_name + ' ' + str(version))
         print("Discovered instances: " + tms_discovered)
-        print("Access Tinymovr instances as tmx, where x is the index starting from 1")
+        print("Access Tinymovr instances as tmx, where x \
+               is the index starting from 1")
         print("e.g. the first Tinymovr instance will be tm1.")
         print("Instances are also available by index in the tms list.")
         IPython.start_ipython(argv=["--no-banner"], user_ns=tms)
         logger.debug("Exiting shell...")
 
-def configure_logging():
+
+def configure_logging() -> logging.Logger:
     '''
     Configures logging options and
     generates a default logger instance.
@@ -96,6 +102,3 @@ def configure_logging():
     logger = logging.getLogger('tinymovr')
     logger.setLevel(logging.DEBUG)
     return logger
-
-if __name__ == "__main__":
-    main()

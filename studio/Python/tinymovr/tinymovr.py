@@ -16,18 +16,19 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import copy
-import numbers
 import json
 from typing import Dict
 from pkg_resources import parse_version
-from tinymovr.iface import CAN, CANBusCodec, DataType
+from tinymovr.iface import CANBusCodec
 from tinymovr import Endpoints
 from tinymovr.attr_object import AttrObject
 
+
 class Tinymovr:
 
-    def __init__(self, node_id:int, iface, 
-                 codec:CANBusCodec=CANBusCodec(), eps:Dict[str,Dict]=Endpoints):
+    def __init__(self, node_id: int, iface,
+                 codec: CANBusCodec=CANBusCodec(),
+                 eps: Dict[str, Dict]=Endpoints):
         self.node_id = node_id
         self.iface = iface
         self.codec = codec
@@ -35,13 +36,16 @@ class Tinymovr:
         # Temporarily assign to self.endpoints purely for convenience
         self.endpoints = eps
         di = self.device_info
-        self.fw_version = '.'.join([str(di.fw_major), str(di.fw_minor), str(di.fw_patch)])
+        self.fw_version = '.'.join([str(di.fw_major),
+                                   str(di.fw_minor), str(di.fw_patch)])
 
         # Now reassign filtered endpoints
-        self.endpoints = { key:value for (key,value) in eps.items() if (("from_version" not in value) or
-                (parse_version(self.fw_version) >= parse_version(value["from_version"]))) }
+        self.endpoints = {key: value for (key, value) in eps.items()
+                          if (("from_version" not in value) or
+                          (parse_version(self.fw_version) >=
+                           parse_version(value["from_version"])))}
 
-    def __getattr__(self, attr:str):
+    def __getattr__(self, attr: str):
         if attr in self.endpoints:
             d = self.endpoints[attr]
             if d["type"] == "w":
@@ -59,7 +63,8 @@ class Tinymovr:
                             slack_defaults = d["defaults"][-slack:]
                             f_args = f_args + slack_defaults
                         payload = self.codec.serialize(f_args, *d["types"])
-                        self.iface.send_new(self.node_id, d["ep_id"], payload=payload)
+                        self.iface.send_new(self.node_id,
+                                            d["ep_id"], payload=payload)
                     else:
                         self.iface.send_new(self.node_id, d["ep_id"])
                 return wrapper
@@ -91,7 +96,7 @@ class Tinymovr:
     def current_control(self):
         self.set_state(2, 0)
 
-    def export_config(self, file_path:str):
+    def export_config(self, file_path: str):
         '''
         Export the board config to a file
         '''
@@ -101,11 +106,12 @@ class Tinymovr:
             if ep["type"] == 'r' and "ser_map" in ep:
                 # Node can be serialized (saved)
                 vals = getattr(self, ep_id)
-                config_map.update(self._data_from_arguments(vals, ep["ser_map"]))
+                config_map.update(
+                    self._data_from_arguments(vals, ep["ser_map"]))
         with open(file_path, 'w') as f:
             json.dump(config_map, f)
 
-    def restore_config(self, file_path:str):
+    def restore_config(self, file_path: str):
         '''
         Restore the board config from a file
         '''
@@ -144,7 +150,8 @@ class Tinymovr:
         if isinstance(ep_map, dict) and isinstance(ep_data, dict):
             for key, value in ep_map.items():
                 if key in ep_data:
-                    kwargs.update(self._arguments_from_data(value, ep_data[key]))
+                    kwargs.update(
+                        self._arguments_from_data(value, ep_data[key]))
         elif isinstance(ep_map, tuple) and isinstance(ep_data, dict):
             for key in ep_map:
                 if key in ep_data:

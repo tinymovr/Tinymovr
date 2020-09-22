@@ -1,5 +1,6 @@
 from typing import List
 
+
 class AttrObject:
 
     def __init__(self, keys: List[str], values: List):

@@ -3,6 +3,7 @@ from typing import Dict, List
 import struct
 from enum import Enum
 
+
 class DataType(Enum):
     INT8 = 0
     UINT8 = 1
@@ -12,13 +13,14 @@ class DataType(Enum):
     UINT32 = 5
     FLOAT = 6
 
+
 class StructCodec():
     """
     Generic serializer/deserializer based on struct pack
     Adapted from:
     https://github.com/madcowswe/ODrive/blob/master/Firmware/fibre/python/fibre/remote_object.py
     """
-    def __init__(self, struct_format, target_type:type):
+    def __init__(self, struct_format, target_type: type):
         self._struct_format = struct_format
         self._target_type = target_type
 
@@ -29,24 +31,26 @@ class StructCodec():
         value = self._target_type(value)
         return struct.pack(self._struct_format, value)
 
-    def deserialize(self, buffer:bytes):
-        trimmed_buffer:bytes = buffer[:self.get_length()]
+    def deserialize(self, buffer: bytes):
+        trimmed_buffer: bytes = buffer[:self.get_length()]
         value = struct.unpack(self._struct_format, trimmed_buffer)
         value = value[0] if len(value) == 1 else value
         return self._target_type(value)
 
+
 codecs: Dict[DataType, StructCodec] = {
-    DataType.INT8 : StructCodec("<b", int),
-    DataType.UINT8 : StructCodec("<B", int),
-    DataType.INT16 : StructCodec("<h", int),
-    DataType.UINT16 : StructCodec("<H", int),
-    DataType.INT32 : StructCodec("<i", int),
-    DataType.UINT32 : StructCodec("<I", int),
-    DataType.FLOAT : StructCodec("<f", float)
+    DataType.INT8: StructCodec("<b", int),
+    DataType.UINT8: StructCodec("<B", int),
+    DataType.INT16: StructCodec("<h", int),
+    DataType.UINT16: StructCodec("<H", int),
+    DataType.INT32: StructCodec("<i", int),
+    DataType.UINT32: StructCodec("<I", int),
+    DataType.FLOAT: StructCodec("<f", float)
 }
 
+
 class CANBusCodec:
-    
+
     def serialize(self, values, *args) -> bytearray:
         '''
         Serialize a series of variables to a
@@ -57,7 +61,6 @@ class CANBusCodec:
         for value, dtype in zip(values, args):
             buffer.extend(codecs[dtype].serialize(value))
         return buffer
-
 
     def deserialize(self, data, *args) -> List:
         '''

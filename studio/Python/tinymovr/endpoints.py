@@ -16,7 +16,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 from typing import Dict
 from tinymovr.iface import DataType
 
-Endpoints: Dict[str,Dict] = {
+Endpoints: Dict[str, Dict] = {
     "nmt":
     {
         "description": "CANOpen NMT Message",
@@ -184,12 +184,14 @@ Endpoints: Dict[str,Dict] = {
         "description": "Get Device Info",
         "type": "r",
         "ep_id": 0x01A,
-        "types": ( DataType.UINT32, DataType.UINT8, DataType.UINT8, DataType.UINT8, DataType.UINT8,),
+        "types": (DataType.UINT32, DataType.UINT8,
+                  DataType.UINT8, DataType.UINT8, DataType.UINT8),
         "labels": ("device_id", "fw_major", "fw_minor", "fw_patch", "temp")
     },
     "timings":
     {
-        "description": "Get Processor Timings (Busy Cycles/PWM, Total Cycles/PWM)",
+        "description": "Get Processor Timings \
+                        (Busy Cycles/PWM, Total Cycles/PWM)",
         "type": "r",
         "ep_id": 0x01B,
         "types": (DataType.UINT32, DataType.UINT32),
@@ -209,10 +211,12 @@ Endpoints: Dict[str,Dict] = {
     },
     "motor_info":
     {
-        "description": "Get Attached Motor Info (Calibrated, Resistance, Pole Pairs, Inductance, enc CPR)",
+        "description": "Get Attached Motor Info (Calibrated, \
+                        Resistance, Pole Pairs, Inductance, enc CPR)",
         "type": "r",
         "ep_id": 0x01E,
-        "types": (DataType.UINT8, DataType.UINT16, DataType.UINT8, DataType.UINT16, DataType.UINT16),
+        "types": (DataType.UINT8, DataType.UINT16,
+                  DataType.UINT8, DataType.UINT16, DataType.UINT16),
         "labels": ("calibrated", "R", "pole_pairs", "L", "encoder_cpr"),
         "ser_map": {"motor": ("R", "L", "pole_pairs")}
     },
