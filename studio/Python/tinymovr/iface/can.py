@@ -4,8 +4,7 @@ from typing import Tuple, Dict, List
 import serial
 from serial.tools import list_ports
 
-from tinymovr.iface import CANBusCodec
-from tinymovr.iface import IFace
+from tinymovr.iface import IFace, CANBusCodec
 
 
 CAN_EP_SIZE: int = 6
@@ -24,7 +23,7 @@ class CAN(IFace):
     def __init__(self, bus):
         self.bus = bus
 
-    def codec(self):
+    def get_codec(self):
         return CANBusCodec()
 
     def send(self, msg: can.Message):

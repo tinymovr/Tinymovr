@@ -83,7 +83,7 @@ Endpoints: Dict[str, Dict] = {
     {
         "description": "Get Setpoints (Position, Velocity)",
         "type": "r",
-        "ep_id": 0x009,
+        "ep_id": 0x00A,
         "types": (DataType.FLOAT, DataType.FLOAT),
         "labels": ("position", "velocity")
     },

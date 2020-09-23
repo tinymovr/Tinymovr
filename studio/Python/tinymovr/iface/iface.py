@@ -1,5 +1,5 @@
 
 class IFace:
 
-    def codec(self):
+    def get_codec(self):
         raise NotImplementedError()

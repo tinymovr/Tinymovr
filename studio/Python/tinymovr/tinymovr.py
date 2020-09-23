@@ -29,7 +29,7 @@ class Tinymovr:
                  eps: Dict[str, Dict]=Endpoints):
         self.node_id = node_id
         self.iface = iface
-        self.codec = iface.codec
+        self.codec = iface.get_codec()
 
         # Temporarily assign to self.endpoints purely for convenience
         self.endpoints = eps
