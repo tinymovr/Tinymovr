@@ -19,7 +19,6 @@ import copy
 import json
 from typing import Dict
 from pkg_resources import parse_version
-from tinymovr.iface import CANBusCodec
 from tinymovr import Endpoints
 from tinymovr.attr_object import AttrObject
 
@@ -27,11 +26,10 @@ from tinymovr.attr_object import AttrObject
 class Tinymovr:
 
     def __init__(self, node_id: int, iface,
-                 codec: CANBusCodec=CANBusCodec(),
                  eps: Dict[str, Dict]=Endpoints):
         self.node_id = node_id
         self.iface = iface
-        self.codec = codec
+        self.codec = iface.codec
 
         # Temporarily assign to self.endpoints purely for convenience
         self.endpoints = eps

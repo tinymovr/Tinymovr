@@ -1,3 +1,5 @@
 
 class IFace:
-    pass
+
+    def codec(self):
+        raise NotImplementedError()
