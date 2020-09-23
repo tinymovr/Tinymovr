@@ -1,17 +1,27 @@
-
 import math
 import can
-from typing import Tuple
+from typing import Tuple, Dict, List
+import serial
+from serial.tools import list_ports
 from tinymovr.iface import IFace
+
 
 CAN_EP_SIZE: int = 6
 CAN_EP_MASK: int = int(math.pow(2, CAN_EP_SIZE) - 1)
+
+can_devices: Dict[str, tuple] = {
+    "slcan": ("canable", "cantact"),
+    "robotell": ("CP210", )
+}
 
 
 class CAN(IFace):
     '''
     Class implementing a CAN bus interface
     '''
+    def __init__(self, bus):
+        self.bus = bus
+
     def send(self, msg: can.Message):
         self.bus.send(msg)
 
@@ -54,3 +64,22 @@ def extract_node_message_id(arbitration_id: int) -> Tuple[int, int]:
     node_id = arbitration_id >> CAN_EP_SIZE & 0xFF
     message_id = arbitration_id & CAN_EP_MASK
     return node_id, message_id
+
+
+def guess_channel(iface_hint: str) -> str:
+    '''
+    Tries to guess a channel based on an interface hint.
+    '''
+    device_strings: List[str] = [s.lower() for s in
+                                 can_devices[iface_hint]]
+    ports: List[str] = []
+    for p in serial.tools.list_ports.comports():
+        desc_lower: str = p.description.lower()
+        if any([s in desc_lower for s in device_strings]):
+            ports.append(p.device)
+    if not ports:
+        raise IOError("Could not autodiscover CAN channel")
+    if len(ports) > 1:
+        logging.warning('Multiple channels discovered - using the first')
+
+    return ports[0]

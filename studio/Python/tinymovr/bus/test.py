@@ -1,12 +1,15 @@
 import can
 from time import sleep
+from datetime import datetime
 from tinymovr import Endpoints
 from tinymovr.iface import (
     create_frame, extract_node_message_id, CANBusCodec)
 
 
 class Test(can.BusABC):
-
+    '''
+    A Bus subclass to test Tinymovr Studio features offline
+    '''
     def __init__(self, channel, can_filters=None, **kwargs):
         super().__init__(channel, can_filters, **kwargs)
         self.channel_info = "Tinymovr Test Channel"
@@ -14,22 +17,20 @@ class Test(can.BusABC):
         self.buffer: can.Message = None
         self.codec = CANBusCodec()
 
-        self.endpoint_values = {
-            k:self.codec.deserialize(bytearray(8), *v["types"])
-            for k, v in Endpoints.items() if "types" in v
+        self.last_call = datetime.now()
+
+        self.ep_func_map = {
+            0x1A: self._device_info
         }
 
     def send(self, msg: can.Message):
         arbitration_id: int = msg.arbitration_id
         node_id, msg_id = extract_node_message_id(arbitration_id)
         if node_id == self.node_id:
-            for d in Endpoints.values():
-                if d["ep_id"] == msg_id and "r" in d["type"]:
-                    self.buffer = create_frame(
-                        node_id, msg_id, False, 
-                        self.codec.serialize(self.endpoint_values[msg_id], *d["types"])
-                    )
-                    break
+            try:
+                self.ep_func_map[msg_id](msg.data)
+            except KeyError:
+                pass
 
     def _recv_internal(self, timeout: float) -> can.Message:
         if self.buffer:
@@ -39,3 +40,9 @@ class Test(can.BusABC):
         if timeout > 0:
             sleep(timeout)
         return None, True
+
+    def _device_info(self, payload):
+        vals = (0, 0, 7, 1, 25)
+        gen_payload = self.codec.serialize(vals,
+                                           *Endpoints["device_info"]["types"])
+        self.buffer = create_frame(self.node_id, 0x1A, False, gen_payload)
