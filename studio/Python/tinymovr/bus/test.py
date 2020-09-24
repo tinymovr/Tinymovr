@@ -1,6 +1,7 @@
 import can
 from time import sleep
 from datetime import datetime
+from typing import Tuple, List, Dict, Union
 from tinymovr import Endpoints
 from tinymovr.iface import (
     create_frame, extract_node_message_id, CANBusCodec)
@@ -13,16 +14,16 @@ class Test(can.BusABC):
     '''
     def __init__(self, channel, can_filters=None, **kwargs):
         super().__init__(channel, can_filters, **kwargs)
-        self.channel_info = "Tinymovr Test Channel"
-        self.node_id = 1
+        self.channel_info: str = "Tinymovr Test Channel"
+        self.node_id: int = 1
         self.buffer: can.Message = None
-        self.codec = CANBusCodec()
-        self.Kv = 100
-        self.CPR = 8192
+        self.codec: CANBusCodec = CANBusCodec()
+        self.Kv: float = 100.
+        self.CPR: int = 8192
 
         self.last_call_time = datetime.now()
 
-        self.ep_func_map = {
+        self.ep_func_map: Dict[int, callable] = {
             0x03: self._get_state,
             0x07: self._set_state,
             0x09: self._get_encoder_estimates,
@@ -33,7 +34,7 @@ class Test(can.BusABC):
             0x1A: self._get_device_info
         }
 
-        self._state = {
+        self._state: Dict[str, Union[int, float]] = {
             "error": 0,
             "state": 0,
             "mode": 0,
@@ -72,14 +73,16 @@ class Test(can.BusABC):
 
         if self._state["state"] == 2:
             self._state["current_estimate"] = self._state["current_setpoint"]
-            torque = self._state["current_estimate"] / self.Kv
-            self._state["velocity_estimate"] += torque * self.CPR * diff
-            self._state["position_estimate"] += 1/2 * torque * self.CPR * diff * diff
-            if self._state["mode"] == 1:
+            if self._state["mode"] == 0:
+                torque = self._state["current_estimate"] / self.Kv
+                v: float = self._state["velocity_estimate"]
+                self._state["velocity_estimate"] += torque * self.CPR * diff
+                self._state["position_estimate"] += v * diff + 0.5 * torque * self.CPR * (diff * diff)
+            elif self._state["mode"] == 1:
                 self._state["current_estimate"] = 0
                 self._state["velocity_estimate"] = self._state["velocity_setpoint"]
                 self._state["position_estimate"] += self._state["velocity_estimate"] * diff
-            if self._state["mode"] == 2:
+            elif self._state["mode"] == 2:
                 self._state["current_estimate"] = 0
                 self._state["velocity_estimate"] = 0
                 self._state["position_estimate"] = self._state["position_setpoint"]
@@ -90,53 +93,53 @@ class Test(can.BusABC):
     # ---- Endpoint methods -----------------------------------------
 
     def _get_state(self, payload):
-        vals = (self._state["error"],
-                self._state["state"],
-                self._state["mode"])
-        gen_payload = self.codec.serialize(vals,
-                                           *Endpoints["state"]["types"])
+        vals: Tuple = (self._state["error"],
+                       self._state["state"],
+                       self._state["mode"])
+        gen_payload = self.codec.serialize(
+            vals, *Endpoints["state"]["types"])
         self.buffer = create_frame(self.node_id, 0x03, False, gen_payload)
 
     def _set_state(self, payload):
-        vals = self.codec.deserialize(payload,
-                                      *Endpoints["set_state"]["types"])
+        vals = self.codec.deserialize(
+            payload, *Endpoints["set_state"]["types"])
         self._state["state"] = vals[0]
         self._state["mode"] = vals[1]
 
     def _get_device_info(self, payload):
-        vals = (0, 0, 7, 1, 25)
-        gen_payload = self.codec.serialize(vals,
-                                           *Endpoints["device_info"]["types"])
+        vals: Tuple = (0, 0, 7, 1, 25)
+        gen_payload = self.codec.serialize(
+            vals, *Endpoints["device_info"]["types"])
         self.buffer = create_frame(self.node_id, 0x1A, False, gen_payload)
 
     def _get_encoder_estimates(self, payload):
-        vals = (self._state["position_estimate"],
-                self._state["velocity_estimate"])
-        gen_payload = self.codec.serialize(vals,
-                                           *Endpoints["encoder_estimates"]["types"])
+        vals: Tuple = (self._state["position_estimate"],
+                       self._state["velocity_estimate"])
+        gen_payload = self.codec.serialize(
+            vals, *Endpoints["encoder_estimates"]["types"])
         self.buffer = create_frame(self.node_id, 0x09, False, gen_payload)
 
     def _get_setpoints(self, payload):
-        vals = (self._state["position_setpoint"],
-                self._state["velocity_setpoint"])
-        gen_payload = self.codec.serialize(vals,
-                                           *Endpoints["setpoints"]["types"])
+        vals: Tuple = (self._state["position_setpoint"],
+                       self._state["velocity_setpoint"])
+        gen_payload = self.codec.serialize(
+            vals, *Endpoints["setpoints"]["types"])
         self.buffer = create_frame(self.node_id, 0x0A, False, gen_payload)
 
     def _set_pos_setpoint(self, payload):
-        vals = self.codec.deserialize(payload,
-                                      *Endpoints["set_pos_setpoint"]["types"])
+        vals: List = self.codec.deserialize(
+            payload, *Endpoints["set_pos_setpoint"]["types"])
         self._state["position_setpoint"] = vals[0]
         self._state["velocity_setpoint"] = vals[1]
         self._state["current_setpoint"] = vals[2]
 
     def _set_vel_setpoint(self, payload):
-        vals = self.codec.deserialize(payload,
-                                      *Endpoints["set_vel_setpoint"]["types"])
+        vals: List = self.codec.deserialize(
+            payload, *Endpoints["set_vel_setpoint"]["types"])
         self._state["velocity_setpoint"] = vals[0]
         self._state["current_setpoint"] = vals[1]
 
     def _set_cur_setpoint(self, payload):
-        vals = self.codec.deserialize(payload,
-                                      *Endpoints["set_cur_setpoint"]["types"])
+        vals: List = self.codec.deserialize(
+            payload, *Endpoints["set_cur_setpoint"]["types"])
         self._state["current_setpoint"] = vals[0]
