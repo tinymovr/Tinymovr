@@ -29,7 +29,8 @@ setuptools.setup(
         "python-can>=4.0.0.dev0",
         "pyserial",
         "docopt",
-        "pynumparser"
+        "pynumparser",
+        "flatten-dict"
     ],
     entry_points={
         "console_scripts": [

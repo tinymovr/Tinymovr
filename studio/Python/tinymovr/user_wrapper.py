@@ -27,6 +27,7 @@ class UserWrapper:
     for better user-friendliness (e.g. using simple print statements).
     There are also additional checks performed prior to changing
     states, with errors displayed if checks fail.
+    It also includes a plotter.
     '''
     def __init__(self, **kwargs):
         self.tinymovr = Tinymovr(**kwargs)
