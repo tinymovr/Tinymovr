@@ -14,7 +14,16 @@ class DataType(Enum):
     FLOAT = 6
 
 
-class StructCodec():
+class Codec:
+
+    def serialize(self, value) -> bytes:
+        raise NotImplementedError()
+
+    def deserialize(self, buffer: bytes):
+        raise NotImplementedError()
+
+
+class StructCodec(Codec):
     """
     Generic serializer/deserializer based on struct pack
     Adapted from:
@@ -49,12 +58,11 @@ codecs: Dict[DataType, StructCodec] = {
 }
 
 
-class CANBusCodec:
+class MultibyteCodec(Codec):
 
     def serialize(self, values, *args) -> bytearray:
         '''
-        Serialize a series of variables to a
-        CAN Bus-compatible bytes array
+        Serialize a series of variables to a bytes array
         '''
         buffer = bytearray()
         assert(len(values) == len(args))
@@ -64,8 +72,7 @@ class CANBusCodec:
 
     def deserialize(self, data, *args) -> List:
         '''
-        Deserialize a CAN Bus-compatible bytes
-        array to a tuple of values
+        Deserialize a bytes array to a tuple of values
         '''
         index: int = 0
         values = []
