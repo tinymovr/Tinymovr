@@ -3,8 +3,8 @@ from time import sleep
 from datetime import datetime
 from typing import Tuple, List, Dict, Union
 from tinymovr import Endpoints
-from tinymovr.iface import (
-    create_frame, extract_node_message_id, CANBusCodec)
+from tinymovr.iface import (create_frame, extract_node_message_id)
+from tinymovr.codec import Codec, MultibyteCodec
 
 
 class Test(can.BusABC):
@@ -17,7 +17,7 @@ class Test(can.BusABC):
         self.channel_info: str = "Tinymovr Test Channel"
         self.node_id: int = 1
         self.buffer: can.Message = None
-        self.codec: CANBusCodec = CANBusCodec()
+        self.codec: MultibyteCodec = MultibyteCodec()
         self.Kv: float = 100.
         self.CPR: int = 8192
 
