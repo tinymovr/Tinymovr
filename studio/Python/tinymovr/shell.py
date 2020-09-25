@@ -1,13 +1,13 @@
 """Tinymovr Shell Utility
 
 Usage:
-    tinymovr [--ids=<ids>] [--iface=<iface>] [--chan=<chan>] [--bitrate=<bitrate>]
+    tinymovr [--ids=<ids>] [--bustype=<bustype>] [--chan=<chan>] [--bitrate=<bitrate>]
     tinymovr -h | --help
     tinymovr --version
 
 Options:
     --ids=<ids>          CAN node IDs to search [default: 1-10]
-    --iface=<iface>      CAN interface to use [default: slcan].
+    --bustype=<bustype>  CAN bus type to use [default: slcan].
     --chan=<chan>        CAN channel (i.e. device) to use [default: auto].
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
@@ -53,15 +53,15 @@ def spawn_shell():
     num_parser = pynumparser.NumberSequence(limits=(0, 16))
     node_ids = num_parser(arguments['--ids'])
 
-    iface_name: str = arguments['--iface']
-    chan_name: str = arguments['--chan']
+    bustype: str = arguments['--bustype']
+    channel: str = arguments['--chan']
     bitrate: int = int(arguments['--bitrate'])
-    if chan_name == 'auto':
-        chan_name = guess_channel(iface_hint=iface_name)
-    bus: can.Bus = can.Bus(bustype=iface_name,
-                           channel=chan_name,
-                           bitrate=bitrate)
-    iface: IFace = CAN(bus)
+    if channel == 'auto':
+        channel = guess_channel(bustype_hint=bustype)
+    can_bus: can.Bus = can.Bus(bustype=bustype,
+                               channel=channel,
+                               bitrate=bitrate)
+    iface: IFace = CAN(can_bus)
 
     tms: Dict[str, UserWrapper] = {}
     for node_id in node_ids:

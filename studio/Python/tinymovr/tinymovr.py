@@ -17,35 +17,25 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 import copy
 import json
-from typing import Dict
 from pkg_resources import parse_version
-from tinymovr import Endpoints
+from tinymovr.iface import IFace
 from tinymovr.attr_object import AttrObject
 
 
 class Tinymovr:
 
-    def __init__(self, node_id: int, iface,
-                 eps: Dict[str, Dict]=Endpoints):
-        self.node_id = node_id
-        self.iface = iface
-        self.codec = iface.get_codec()
+    def __init__(self, node_id: int, iface: IFace):
+        self.node_id: int = node_id
+        self.iface: IFace = iface
 
-        # Temporarily assign to self.endpoints purely for convenience
-        self.endpoints = eps
         di = self.device_info
         self.fw_version = '.'.join([str(di.fw_major),
                                    str(di.fw_minor), str(di.fw_patch)])
 
-        # Now reassign filtered endpoints
-        self.endpoints = {key: value for (key, value) in eps.items()
-                          if (("from_version" not in value) or
-                          (parse_version(self.fw_version) >=
-                           parse_version(value["from_version"])))}
-
     def __getattr__(self, attr: str):
-        if attr in self.endpoints:
-            d = self.endpoints[attr]
+        eps = self.iface.get_ep_map()
+        if attr in eps:
+            d = eps[attr]
 
             if d["type"] == "w":
                 # This is a write-type endpoint
@@ -61,25 +51,24 @@ class Tinymovr:
                         if slack > 0:
                             slack_defaults = d["defaults"][-slack:]
                             f_args = f_args + slack_defaults
-                        payload = self.codec.serialize(f_args, *d["types"])
-                        self.iface.send_new(self.node_id,
-                                            d["ep_id"], payload=payload)
+                        payload = self.iface.get_codec().serialize(f_args, *d["types"])
+                        self.iface.send(self.node_id, d["ep_id"], payload=payload)
                     else:
                         self.iface.send_new(self.node_id, d["ep_id"])
                 return wrapper
 
             elif d["type"] == "r":
                 # This is a read-type endpoint
-                self.iface.send_new(self.node_id, d["ep_id"], rtr=True)
+                self.iface.send(self.node_id, d["ep_id"])
                 payload = self.iface.receive(self.node_id, d["ep_id"])
-                values = self.codec.deserialize(payload, *d["types"])
+                values = self.iface.get_codec().deserialize(payload, *d["types"])
                 if len(values) == 1:
                     return values[0]
                 else:
                     return AttrObject(d["labels"], values)
 
     def __dir__(self):
-        return list(self.endpoints.keys())
+        return list(self.iface.get_ep_map().keys())
 
     def calibrate(self):
         self.set_state(1)
@@ -101,13 +90,12 @@ class Tinymovr:
         Export the board config to a file
         '''
         config_map = {}
-        for ep_id in self.endpoints:
-            ep = self.endpoints[ep_id]
-            if ep["type"] == 'r' and "ser_map" in ep:
+        for k, v in self.iface.get_ep_map().items():
+            if v["type"] == 'r' and "ser_map" in v:
                 # Node can be serialized (saved)
-                vals = getattr(self, ep_id)
+                vals = getattr(self, k)
                 config_map.update(
-                    self._data_from_arguments(vals, ep["ser_map"]))
+                    self._data_from_arguments(vals, v["ser_map"]))
         with open(file_path, 'w') as f:
             json.dump(config_map, f)
 
@@ -117,13 +105,12 @@ class Tinymovr:
         '''
         with open(file_path, 'r') as f:
             data = json.load(f)
-        for ep_id in self.endpoints:
-            ep = self.endpoints[ep_id]
-            if ep["type"] == 'w' and "ser_map" in ep:
+        for k, v in self.iface.get_ep_map().items():
+            if v["type"] == 'w' and "ser_map" in v:
                 # Node has saved data and can be deserialized (restored)
-                kwargs = self._arguments_from_data(ep["ser_map"], data)
+                kwargs = self._arguments_from_data(v["ser_map"], data)
                 if len(kwargs):
-                    f = getattr(self, ep_id)
+                    f = getattr(self, k)
                     f(**kwargs)
 
     def _data_from_arguments(self, args, ep_map):
