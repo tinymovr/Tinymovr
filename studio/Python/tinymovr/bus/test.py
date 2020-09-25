@@ -77,11 +77,12 @@ class Test(can.BusABC):
                 torque = self._state["current_estimate"] / self.Kv
                 v: float = self._state["velocity_estimate"]
                 self._state["velocity_estimate"] += torque * self.CPR * diff
-                self._state["position_estimate"] += v * diff + 0.5 * torque * self.CPR * (diff * diff)
+                self._state["position_estimate"] += (v + 0.5 * torque * self.CPR * diff) * diff
             elif self._state["mode"] == 1:
                 self._state["current_estimate"] = 0
+                v: float = self._state["velocity_estimate"]
                 self._state["velocity_estimate"] = self._state["velocity_setpoint"]
-                self._state["position_estimate"] += self._state["velocity_estimate"] * diff
+                self._state["position_estimate"] += v * diff
             elif self._state["mode"] == 2:
                 self._state["current_estimate"] = 0
                 self._state["velocity_estimate"] = 0
