@@ -125,6 +125,18 @@ You can use a socketcan-enabled CAN adapter with Tinymovr Studio. The CANine ada
     tinymovr --iface=socketcan --chan=CAN0
 
 
+Using with Tinymovr in silico
+#############################
+
+Tinymovr studio implements a simplistic simulation of the actual controller, in order to facilitate validation of basic commands etc. To use the simulation mode, run Studio as follows:
+
+.. code-block:: console
+
+    tinymovr --iface=tinymovr_test --chan=test
+
+Basic commands such as :code:`state`, :code:`encoder_estimates`, :code:`set_pos_setpoint` work, more to be implemented soon.
+
+
 Upgrading Firmware
 ##################
 

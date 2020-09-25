@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 
 setuptools.setup(
     name="tinymovr",
-    version="0.2.4",
+    version="0.2.5",
     author="Yannis Chatzikonstantinou",
     author_email="info@tinymovr.com",
     description="Tinymovr Studio",
@@ -35,7 +35,8 @@ setuptools.setup(
         "console_scripts": [
             "tinymovr=tinymovr.shell:spawn_shell"
         ],
+        "can.interface": [
+            "tinymovr_test=tinymovr.bus:Test",
+        ]
     }
-    
 )
-
