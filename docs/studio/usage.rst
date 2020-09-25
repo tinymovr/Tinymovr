@@ -87,16 +87,16 @@ Example:
 All syntax options supported by `Pynumparser<https://pypi.org/project/pynumparser/>`_ are available.
 
 
-``--iface=<iface>``
+``--bustype=<bustype>``
 ===================
 
-The --iface option specifies a CAN interface to use.
+The --bustype option specifies a CAN bus type to use.
 
 Example:
 
 .. code-block:: console
 
-    tinymovr --iface=robotell
+    tinymovr --bustype=robotell
 
 All interfaces offered by python-can are supported.
 
@@ -104,13 +104,13 @@ All interfaces offered by python-can are supported.
 ``--chan=<chan>``
 =================
 
-The --chan options specifies a channel to use, optionally together with the --iface option. 
+The --chan options specifies a channel to use, optionally together with the --bustype option. 
 
 Example:
 
 .. code-block:: console
 
-    tinymovr --iface=robotell --chan=COM3
+    tinymovr --bustype=robotell --chan=COM3
 
 By default, Tinymovr Studio will use slcan as the interface, and will search for CANAble/CANtact-type devices with slcan firmware. Such is the CANine adapter supplied with Tinymovr Dev Kits.
 
@@ -122,7 +122,7 @@ You can use a socketcan-enabled CAN adapter with Tinymovr Studio. The CANine ada
 
 .. code-block:: console
 
-    tinymovr --iface=socketcan --chan=CAN0
+    tinymovr --bustype=socketcan --chan=CAN0
 
 
 Using with Tinymovr in silico
@@ -132,7 +132,7 @@ Tinymovr studio implements a simplistic simulation of the actual controller, in 
 
 .. code-block:: console
 
-    tinymovr --iface=tinymovr_test --chan=test
+    tinymovr --bustype=tinymovr_test --chan=test
 
 Basic commands such as :code:`state`, :code:`encoder_estimates`, :code:`set_pos_setpoint` work, more to be implemented soon.
 
