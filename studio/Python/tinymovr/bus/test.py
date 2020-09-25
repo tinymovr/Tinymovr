@@ -2,9 +2,9 @@ import can
 from time import sleep
 from datetime import datetime
 from typing import Tuple, List, Dict, Union
-from tinymovr import Endpoints
-from tinymovr.iface import (create_frame, extract_node_message_id)
-from tinymovr.codec import Codec, MultibyteCodec
+from tinymovr.codec import MultibyteCodec
+from tinymovr.iface.can import (create_frame, extract_node_message_id)
+from tinymovr.iface.can import can_endpoints
 
 
 class Test(can.BusABC):
@@ -98,49 +98,49 @@ class Test(can.BusABC):
                        self._state["state"],
                        self._state["mode"])
         gen_payload = self.codec.serialize(
-            vals, *Endpoints["state"]["types"])
+            vals, *can_endpoints["state"]["types"])
         self.buffer = create_frame(self.node_id, 0x03, False, gen_payload)
 
     def _set_state(self, payload):
         vals = self.codec.deserialize(
-            payload, *Endpoints["set_state"]["types"])
+            payload, *can_endpoints["set_state"]["types"])
         self._state["state"] = vals[0]
         self._state["mode"] = vals[1]
 
     def _get_device_info(self, payload):
         vals: Tuple = (0, 0, 7, 1, 25)
         gen_payload = self.codec.serialize(
-            vals, *Endpoints["device_info"]["types"])
+            vals, *can_endpoints["device_info"]["types"])
         self.buffer = create_frame(self.node_id, 0x1A, False, gen_payload)
 
     def _get_encoder_estimates(self, payload):
         vals: Tuple = (self._state["position_estimate"],
                        self._state["velocity_estimate"])
         gen_payload = self.codec.serialize(
-            vals, *Endpoints["encoder_estimates"]["types"])
+            vals, *can_endpoints["encoder_estimates"]["types"])
         self.buffer = create_frame(self.node_id, 0x09, False, gen_payload)
 
     def _get_setpoints(self, payload):
         vals: Tuple = (self._state["position_setpoint"],
                        self._state["velocity_setpoint"])
         gen_payload = self.codec.serialize(
-            vals, *Endpoints["setpoints"]["types"])
+            vals, *can_endpoints["setpoints"]["types"])
         self.buffer = create_frame(self.node_id, 0x0A, False, gen_payload)
 
     def _set_pos_setpoint(self, payload):
         vals: List = self.codec.deserialize(
-            payload, *Endpoints["set_pos_setpoint"]["types"])
+            payload, *can_endpoints["set_pos_setpoint"]["types"])
         self._state["position_setpoint"] = vals[0]
         self._state["velocity_setpoint"] = vals[1]
         self._state["current_setpoint"] = vals[2]
 
     def _set_vel_setpoint(self, payload):
         vals: List = self.codec.deserialize(
-            payload, *Endpoints["set_vel_setpoint"]["types"])
+            payload, *can_endpoints["set_vel_setpoint"]["types"])
         self._state["velocity_setpoint"] = vals[0]
         self._state["current_setpoint"] = vals[1]
 
     def _set_cur_setpoint(self, payload):
         vals: List = self.codec.deserialize(
-            payload, *Endpoints["set_cur_setpoint"]["types"])
+            payload, *can_endpoints["set_cur_setpoint"]["types"])
         self._state["current_setpoint"] = vals[0]

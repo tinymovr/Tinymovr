@@ -16,7 +16,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 from typing import Dict
 from tinymovr.codec import DataType
 
-Endpoints: Dict[str, Dict] = {
+can_endpoints: Dict[str, Dict] = {
     "nmt":
     {
         "description": "CANOpen NMT Message",

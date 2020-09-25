@@ -17,7 +17,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 import copy
 import json
-from pkg_resources import parse_version
+#from pkg_resources import parse_version
 from tinymovr.iface import IFace
 from tinymovr.attr_object import AttrObject
 
@@ -31,6 +31,8 @@ class Tinymovr:
         di = self.device_info
         self.fw_version = '.'.join([str(di.fw_major),
                                    str(di.fw_minor), str(di.fw_patch)])
+
+        #parse_version(self.fw_version) >= parse_version(value["from_version"]
 
     def __getattr__(self, attr: str):
         eps = self.iface.get_ep_map()

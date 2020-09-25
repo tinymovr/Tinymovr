@@ -21,9 +21,9 @@ import IPython
 from docopt import docopt
 import pynumparser
 
-from tinymovr.iface import guess_channel
 from tinymovr import UserWrapper
-from tinymovr.iface import IFace, CAN
+from tinymovr.iface import IFace
+from tinymovr.iface.can import CAN, guess_channel
 
 '''
 This program is free software: you can redistribute it and/or modify it under

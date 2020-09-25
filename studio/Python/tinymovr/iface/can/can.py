@@ -4,8 +4,8 @@ from typing import Tuple, Dict, List
 import serial
 from serial.tools import list_ports
 
-from tinymovr import Endpoints
 from tinymovr.iface import IFace
+from tinymovr.iface.can import can_endpoints
 from tinymovr.codec import MultibyteCodec
 
 
@@ -29,7 +29,7 @@ class CAN(IFace):
         return MultibyteCodec()
 
     def get_ep_map(self) -> Dict:
-        return Endpoints
+        return can_endpoints
 
     def send(self, node_id: int, endpoint_id: int, payload: bytearray=None):
         rtr: bool = False if payload and len(payload) else True
