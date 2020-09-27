@@ -20,7 +20,7 @@ import json
 from typing import Dict
 from pkg_resources import parse_version
 from tinymovr import Endpoints
-from tinymovr.attr_object import AttrObject
+from tinymovr.objdict import objdict
 
 
 class Tinymovr:
@@ -76,7 +76,7 @@ class Tinymovr:
                 if len(values) == 1:
                     return values[0]
                 else:
-                    return AttrObject(d["labels"], values)
+                    return objdict(zip(d["labels"], values))
 
     def __dir__(self):
         return list(self.endpoints.keys())
