@@ -17,6 +17,7 @@ import logging
 import pkg_resources
 import can
 import IPython
+from traitlets.config import Config
 
 from docopt import docopt
 import pynumparser
@@ -91,7 +92,11 @@ def spawn_shell():
 is the index starting from 1")
         print("e.g. the first Tinymovr instance will be tm1.")
         print("Instances are also available by index in the tms list.")
-        IPython.start_ipython(argv=["--no-banner"], user_ns=user_ns)
+
+        c = Config()
+        c.InteractiveShellApp.gui = 'qt'
+        c.TerminalIPythonApp.display_banner = False
+        IPython.start_ipython(argv=[], config=c, user_ns=user_ns)
         logger.debug("Exiting shell...")
 
 

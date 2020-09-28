@@ -8,8 +8,11 @@ from flatten_dict import flatten
 
 sample_count = 500
 
+ani = None
 
 def plot(getter: Callable):
+
+    plt.ion()
 
     flat_dict = chain_and_flatten(getter())
 
@@ -43,6 +46,7 @@ def plot(getter: Callable):
             plt.draw()
         return lines
 
+    global ani
     ani = animation.FuncAnimation(fig, animate, interval=25, blit=True)
 
     ax.relim()
