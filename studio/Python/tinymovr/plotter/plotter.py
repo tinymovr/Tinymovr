@@ -1,55 +1,55 @@
-import datetime as dt
-from types import LambdaType
-from typing import Callable
+from collections import ChainMap
+from typing import Callable, List
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 from flatten_dict import flatten
 
-class Plotter:
+sample_count = 500
 
-    def __init__(self, getter: Callable, window: int=50):
-        self.getter = getter
-
-        # Create figure for plotting
-        fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1)
-        xs = []
-        ys_by_label = {}
-
-        # This function is called periodically from FuncAnimation
-        def animate(i, xs, ys_by_label):
-
-            flat_values = flatten(self.getter(), reducer='path')
-            for k, v in flat_values.items():
-                try:
-                    ys_by_label[k].append(v)
-                    ys_by_label[k] = ys_by_label[k][-window:]
-                except KeyError:
-                    ys_by_label[k] = [v]
-
-            xs.append(dt.datetime.now().strftime('%H:%M:%S.%f'))
-            xs = xs[-window:]
-
-            # Draw x and y lists
-            ax.clear()
-            c = 0
-            for k, ys in ys_by_label.items():
-                ax.plot(xs, ys, color='C'+str(c), label=k)
-                c += 1
-
-            # Format plot
-            plt.xticks(rotation=45, ha='right')
-            plt.subplots_adjust(bottom=0.30)
-            plt.title('Time')
-            plt.ylabel('Values')
-
-            plt.legend()
-
-        # Set up plot to call animate() function periodically
-        ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys_by_label), interval=20)
-        plt.show()
 
 def plot(getter: Callable):
-    plotter = Plotter(getter)
+
+    flat_dict = chain_and_flatten(getter())
+
+    fig, ax = plt.subplots()
+
+    ax.margins(0, 0.2)
+
+    xdata = range(sample_count)
+    ydata = {k: [flat_dict[k]]*sample_count for k in flat_dict}
+
+    lines = [ax.plot(xdata, ydata[k], color='C'+str(i), label=k, lw=2)[0]
+             for i, k in enumerate(flat_dict)]
+
+    def animate(i) -> List:
+        new_data = chain_and_flatten(getter())
+
+        _, _, ymin_plot, ymax_plot = plt.axis()
+        redraw = False
+
+        for i, k in enumerate(new_data):
+            ydata[k].append(new_data[k])
+            ydata[k] = ydata[k][-sample_count:]
+            lines[i].set_ydata(ydata[k])
+            ymin_val, ymax_val = min(ydata[k]), max(ydata[k])
+            if ymin_val < ymin_plot or ymax_val > ymax_plot:
+                redraw = True
+
+        if redraw:
+            ax.relim()
+            ax.autoscale_view()
+            plt.draw()
+        return lines
+
+    ani = animation.FuncAnimation(fig, animate, interval=25, blit=True)
+
+    ax.relim()
+    ax.autoscale_view()
+    plt.legend(loc='upper left')
+    plt.show()
+
+
+def chain_and_flatten(dicts):
+    return flatten(dict(ChainMap(*dicts)), reducer='path')

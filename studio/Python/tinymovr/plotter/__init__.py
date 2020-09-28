@@ -1,1 +1,1 @@
-from tinymovr.plotter.plotter import Plotter, plot
+from tinymovr.plotter.plotter import plot
