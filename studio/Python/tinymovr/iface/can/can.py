@@ -4,7 +4,9 @@ from typing import Tuple, Dict, List
 import serial
 from serial.tools import list_ports
 
-from tinymovr.iface import IFace, CANBusCodec
+from tinymovr.iface import IFace
+from tinymovr.iface.can import can_endpoints
+from tinymovr.codec import MultibyteCodec
 
 
 CAN_EP_SIZE: int = 6
@@ -24,13 +26,13 @@ class CAN(IFace):
         self.bus = bus
 
     def get_codec(self):
-        return CANBusCodec()
+        return MultibyteCodec()
 
-    def send(self, msg: can.Message):
-        self.bus.send(msg)
+    def get_ep_map(self) -> Dict:
+        return can_endpoints
 
-    def send_new(self, node_id: int, endpoint_id: int,
-                 rtr: bool=False, payload: bytearray=None):
+    def send(self, node_id: int, endpoint_id: int, payload: bytearray=None):
+        rtr: bool = False if payload and len(payload) else True
         self.bus.send(create_frame(node_id, endpoint_id, rtr, payload))
 
     def receive(self, node_id: int, endpoint_id: int, timeout: float=0.05):
@@ -70,12 +72,12 @@ def extract_node_message_id(arbitration_id: int) -> Tuple[int, int]:
     return node_id, message_id
 
 
-def guess_channel(iface_hint: str) -> str:
+def guess_channel(bustype_hint: str) -> str:
     '''
     Tries to guess a channel based on an interface hint.
     '''
     device_strings: List[str] = [s.lower() for s in
-                                 can_devices[iface_hint]]
+                                 can_devices[bustype_hint]]
     ports: List[str] = []
     for p in serial.tools.list_ports.comports():
         desc_lower: str = p.description.lower()

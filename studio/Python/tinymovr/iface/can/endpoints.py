@@ -14,9 +14,9 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 from typing import Dict
-from tinymovr.iface import DataType
+from tinymovr.codec import DataType
 
-Endpoints: Dict[str, Dict] = {
+can_endpoints: Dict[str, Dict] = {
     "nmt":
     {
         "description": "CANOpen NMT Message",
