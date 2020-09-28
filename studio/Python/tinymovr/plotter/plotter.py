@@ -1,6 +1,8 @@
 from collections import ChainMap
 from typing import Callable, List
 
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
@@ -15,9 +17,8 @@ def plot(getter: Callable):
     plt.ion()
 
     flat_dict = chain_and_flatten(getter())
-
     fig, ax = plt.subplots()
-
+    fig.canvas.set_window_title('Tinymovr Plotter')
     ax.margins(0, 0.3)
 
     xdata = range(sample_count)

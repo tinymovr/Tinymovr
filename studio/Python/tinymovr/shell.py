@@ -94,7 +94,7 @@ is the index starting from 1")
         print("Instances are also available by index in the tms list.")
 
         c = Config()
-        c.InteractiveShellApp.gui = 'qt'
+        c.InteractiveShellApp.gui = 'tk'
         c.TerminalIPythonApp.display_banner = False
         IPython.start_ipython(argv=[], config=c, user_ns=user_ns)
         logger.debug("Exiting shell...")
