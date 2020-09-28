@@ -15,6 +15,7 @@ Welcome to Tinymovr documentation!
    studio/installation
    studio/usage
    studio/commands
+   studio/plotting
    api/guide
    troubleshooting
    develop/guide
