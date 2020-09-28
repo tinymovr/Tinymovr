@@ -1,4 +1,5 @@
 import math
+import numbers
 from collections import ChainMap
 from typing import Callable, List
 
@@ -79,7 +80,16 @@ def plot(getter: Callable):
 
 
 def chain_and_flatten(dicts):
-    return flatten(dict(ChainMap(*dicts)), reducer='path')
+    if isinstance(dicts, dict):
+        d = dicts
+    elif isinstance(dicts, list):
+        d = {}
+        for e in dicts:
+            if isinstance(e, dict):
+                d.update(e)
+            elif isinstance(e, numbers.Number):
+                d["val"] = e
+    return flatten(d, reducer='path')
 
 
 def make_patch_spines_invisible(ax):
