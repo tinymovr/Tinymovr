@@ -15,7 +15,7 @@ def plot(getter: Callable):
 
     fig, ax = plt.subplots()
 
-    ax.margins(0, 0.2)
+    ax.margins(0, 0.3)
 
     xdata = range(sample_count)
     ydata = {k: [flat_dict[k]]*sample_count for k in flat_dict}
