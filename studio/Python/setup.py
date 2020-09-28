@@ -29,6 +29,7 @@ setuptools.setup(
         "python-can>=4.0.0.dev0",
         "pyserial",
         "matplotlib",
+        "pyqt5",
         "docopt",
         "pynumparser",
         "flatten-dict"
