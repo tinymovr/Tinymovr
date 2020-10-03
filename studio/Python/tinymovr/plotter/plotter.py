@@ -62,7 +62,9 @@ def plot(getter: Callable):
             ydata[k] = ydata[k][-sample_count:]
             lines[i].set_ydata(ydata[k])
             ymin_val, ymax_val = min(ydata[k]), max(ydata[k])
-            if ymin_val < ymin_plot or ymax_val > ymax_plot:
+            if ( (ymin_val < ymin_plot or ymax_val > ymax_plot) or
+                 (ymax_val - ymin_val < (ymax_plot - ymin_plot) * 0.1 and
+                 ymax_val - ymin_val > 1) ):
                 redraw = True
 
         if redraw:
