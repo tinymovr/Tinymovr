@@ -24,6 +24,8 @@ def plot(getter: Callable):
 
     flat_dict = chain_and_flatten(getter())
     fig, ax = plt.subplots()
+    ax.set_xlabel('Samples')
+    fig.set_size_inches(12, 6)
     fig.canvas.set_window_title('Tinymovr Plotter')
     ax.margins(0, 0.3)
 
@@ -38,9 +40,9 @@ def plot(getter: Callable):
 
     if len(pars) >= 3:
         for i in range(len(pars) - 2):
-            pars[i].spines["right"].set_position(("axes", math.pow(1.2, i+1)))
-            make_patch_spines_invisible(pars[i])
-            pars[i].spines["right"].set_visible(True)
+            pars[i+2].spines["right"].set_position(("axes", 1.12 + 0.12 * i))
+            make_patch_spines_invisible(pars[i+2])
+            pars[i+2].spines["right"].set_visible(True)
 
     lines = [z[1].plot(xdata, ydata[z[0]], color='C'+str(i), label=z[0], lw=2)[0]
              for i, z in enumerate(zip(flat_dict, pars))]
@@ -78,6 +80,7 @@ def plot(getter: Callable):
     ani = animation.FuncAnimation(fig, animate, interval=25, blit=True)
 
     ax.legend(lines, [line.get_label() for line in lines], loc='upper left')
+    fig.tight_layout()
     plt.show()
 
 
