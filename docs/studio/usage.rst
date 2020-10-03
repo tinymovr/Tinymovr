@@ -74,7 +74,7 @@ Tinymovr Studio supports the following command line options.
 
 
 ``--ids=<ids>``
-===================
+===============
 
 The --ids option specifies a set of CAN node IDs to scan. 
 
@@ -88,7 +88,7 @@ All syntax options supported by `Pynumparser<https://pypi.org/project/pynumparse
 
 
 ``--bustype=<bustype>``
-===================
+=======================
 
 The --bustype option specifies a CAN bus type to use.
 

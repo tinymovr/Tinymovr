@@ -19,7 +19,7 @@ import copy
 import json
 #from pkg_resources import parse_version
 from tinymovr.iface import IFace
-from tinymovr.attr_object import AttrObject
+from tinymovr.objdict import objdict
 
 
 class Tinymovr:
@@ -34,7 +34,8 @@ class Tinymovr:
 
         #parse_version(self.fw_version) >= parse_version(value["from_version"]
 
-    def __getattr__(self, attr: str):
+    def __getattr__(self, _attr: str):
+        attr = strip_end(_attr, "_asdict")
         eps = self.iface.get_ep_map()
         if attr in eps:
             d = eps[attr]
@@ -65,9 +66,12 @@ class Tinymovr:
                 payload = self.iface.receive(self.node_id, d["ep_id"])
                 values = self.iface.get_codec().deserialize(payload, *d["types"])
                 if len(values) == 1:
-                    return values[0]
+                    if _attr.endswith("_asdict"):
+                        return {attr: values[0]}
+                    else:    
+                        return values[0]
                 else:
-                    return AttrObject(d["labels"], values)
+                    return objdict(zip(d["labels"], values))
 
     def __dir__(self):
         return list(self.iface.get_ep_map().keys())
@@ -148,3 +152,8 @@ class Tinymovr:
         else:
             raise TypeError("Mismatch in passed arguments")
         return kwargs
+
+def strip_end(text, suffix):
+    if not text.endswith(suffix):
+        return text
+    return text[:len(text)-len(suffix)]

@@ -1,1 +1,0 @@
-from tinymovr.attr_object.attr_object import AttrObject

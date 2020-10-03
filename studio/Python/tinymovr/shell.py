@@ -17,6 +17,7 @@ import logging
 import pkg_resources
 import can
 import IPython
+from traitlets.config import Config
 
 from docopt import docopt
 import pynumparser
@@ -24,6 +25,7 @@ import pynumparser
 from tinymovr import UserWrapper
 from tinymovr.iface import IFace
 from tinymovr.iface.can import CAN, guess_channel
+from tinymovr.plotter import plot
 
 '''
 This program is free software: you can redistribute it and/or modify it under
@@ -63,7 +65,7 @@ def spawn_shell():
                                bitrate=bitrate)
     iface: IFace = CAN(can_bus)
 
-    tms: Dict[str, UserWrapper] = {}
+    tms: Dict = {}
     for node_id in node_ids:
         try:
             tm: UserWrapper = UserWrapper(node_id=node_id, iface=iface)
@@ -80,14 +82,21 @@ def spawn_shell():
         logger.error("No Tinymovr instances detected. Exiting shell...")
     else:
         tms_discovered: str = ", ".join(list(tms.keys()))
-        tms["tms"] = list(tms.values())
+        user_ns: Dict = {}
+        user_ns.update(tms)
+        user_ns["tms"] = list(tms.values())
+        user_ns["plot"] = plot
         print(shell_name + ' ' + str(version))
         print("Discovered instances: " + tms_discovered)
         print("Access Tinymovr instances as tmx, where x \
 is the index starting from 1")
         print("e.g. the first Tinymovr instance will be tm1.")
         print("Instances are also available by index in the tms list.")
-        IPython.start_ipython(argv=["--no-banner"], user_ns=tms)
+
+        c = Config()
+        c.InteractiveShellApp.gui = 'tk'
+        c.TerminalIPythonApp.display_banner = False
+        IPython.start_ipython(argv=[], config=c, user_ns=user_ns)
         logger.debug("Exiting shell...")
 
 

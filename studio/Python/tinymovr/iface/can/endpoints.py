@@ -133,7 +133,7 @@ can_endpoints: Dict[str, Dict] = {
     },
     "Iq":
     {
-        "description": "Get current setpoint and estimate",
+        "description": "Get quadrature current setpoint and estimate",
         "type": "r",
         "ep_id": 0x014,
         "types": (DataType.FLOAT, DataType.FLOAT),
