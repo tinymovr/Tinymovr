@@ -10,6 +10,8 @@ import matplotlib.animation as animation
 
 from flatten_dict import flatten
 
+from tinymovr.units import get_registry
+
 sample_count = 500
 
 ani = None
@@ -19,6 +21,9 @@ ani = None
 
 
 def plot(getter: Callable):
+
+    ureg = units.get_registry()
+    ureg.setup_matplotlib(True)
 
     plt.ion()
 

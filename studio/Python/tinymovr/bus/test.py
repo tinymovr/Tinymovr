@@ -7,8 +7,8 @@ from tinymovr.codec import MultibyteCodec
 from tinymovr.iface.can import (create_frame, extract_node_message_id)
 from tinymovr.iface.can import can_endpoints
 
-ENC_CPR: int = 8192
-rad_to_cpr: float = ENC_CPR / (2 * math.pi)
+ENC_TICKS: int = 8192
+rad_to_ticks: float = ENC_TICKS / (2 * math.pi)
 
 class Test(can.BusABC):
     '''
@@ -25,7 +25,7 @@ class Test(can.BusABC):
         R: float = 0.05
         M: float = 0.5
         self.I: float = M * R * R # thin hoop formula
-        self.CPR: int = ENC_CPR
+        self.TICKS: int = ENC_TICKS
 
         self.last_call_time = datetime.now()
 
@@ -84,8 +84,8 @@ class Test(can.BusABC):
                 torque = self._state["current_estimate"] / self.Kv_SI
                 v: float = self._state["velocity_estimate"]
                 a: float = torque / self.I
-                self._state["velocity_estimate"] += a * rad_to_cpr * dt
-                self._state["position_estimate"] += (v + 0.5 * a * rad_to_cpr * dt) * dt
+                self._state["velocity_estimate"] += a * rad_to_ticks * dt
+                self._state["position_estimate"] += (v + 0.5 * a * rad_to_ticks * dt) * dt
             elif self._state["mode"] == 1:
                 self._state["current_estimate"] = 0
                 v: float = self._state["velocity_estimate"]

@@ -15,6 +15,9 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 from typing import Dict
 from tinymovr.codec import DataType
+from tinymovr.units import get_registry
+
+ureg = get_registry()
 
 can_endpoints: Dict[str, Dict] = {
     "nmt":
@@ -77,6 +80,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "r",
         "ep_id": 0x009,
         "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": (ureg.rad, ureg.rad / ureg.second),
         "labels": ("position", "velocity")
     },
     "setpoints":
@@ -85,6 +89,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "r",
         "ep_id": 0x00A,
         "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": (ureg.tick, ureg.tick / ureg.second),
         "labels": ("position", "velocity")
     },
     "set_pos_setpoint":
@@ -93,6 +98,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "w",
         "ep_id": 0x00C,
         "types": (DataType.FLOAT, DataType.INT16, DataType.INT16),
+        "units": (ureg.tick, (ureg.tick / ureg.second) * 10., ureg.ampere * 1e-2),
         "defaults": (0, 0),
         "labels": ("position", "velocity_ff", "current_ff")
     },
@@ -102,6 +108,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "w",
         "ep_id": 0x00D,
         "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": (ureg.tick / ureg.second, ureg.ampere),
         "defaults": (0,),
         "labels": ("velocity", "current_ff")
     },
@@ -111,6 +118,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "w",
         "ep_id": 0x00E,
         "types": (DataType.FLOAT,),
+        "units": (ureg.amperes,),
         "labels": ("current")
     },
     "set_limits":
@@ -119,6 +127,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "w",
         "ep_id": 0x00F,
         "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": (ureg.tick / ureg.second, ureg.ampere),
         "labels": ("velocity", "current"),
         "ser_map": {"limits": ("velocity", "current")}
     },
@@ -128,6 +137,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "r",
         "ep_id": 0x010,
         "types": (DataType.INT16, DataType.INT16, DataType.INT16),
+        "units": (ureg.ampere * 1e-3, ureg.ampere * 1e-3, ureg.ampere * 1e-3),
         "labels": ("I_A", "I_B", "I_C"),
         "from_version": "0.7.1"
     },
@@ -137,6 +147,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "r",
         "ep_id": 0x014,
         "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": (ureg.ampere, ureg.ampere),
         "labels": ("setpoint", "estimate")
     },
     "limits":
@@ -145,6 +156,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "r",
         "ep_id": 0x015,
         "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": (ureg.tick / ureg.second, ureg.ampere),
         "labels": ("velocity", "current"),
         "ser_map": {"limits": ("velocity", "current")}
     },
@@ -159,6 +171,7 @@ can_endpoints: Dict[str, Dict] = {
         "description": "Get Bus Voltage",
         "type": "r",
         "ep_id": 0x017,
+        "units": (ureg.volt,),
         "types": (DataType.FLOAT,)
     },
     "gains":
@@ -167,6 +180,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "r",
         "ep_id": 0x018,
         "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": (ureg.tick, ureg.tick / ureg.second),
         "labels": ("position", "velocity"),
         "ser_map": {"gains": ("position", "velocity")}
     },
@@ -176,6 +190,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "w",
         "ep_id": 0x019,
         "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": (ureg.tick, ureg.tick / ureg.second),
         "labels": ("position", "velocity"),
         "ser_map": {"gains": ("position", "velocity")}
     },
@@ -212,12 +227,13 @@ can_endpoints: Dict[str, Dict] = {
     "motor_info":
     {
         "description": "Get Attached Motor Info (Calibrated, \
-                        Resistance, Pole Pairs, Inductance, enc CPR)",
+                        Resistance, Pole Pairs, Inductance, Encoder Ticks)",
         "type": "r",
         "ep_id": 0x01E,
         "types": (DataType.UINT8, DataType.UINT16,
                   DataType.UINT8, DataType.UINT16, DataType.UINT16),
-        "labels": ("calibrated", "R", "pole_pairs", "L", "encoder_cpr"),
+        "labels": ("calibrated", "R", "pole_pairs", "L", "encoder_ticks"),
+        "units": (None, ureg.ohm * 1e-3, None, ureg.henry * 1e-6, ureg.ticks),
         "ser_map": {"motor": ("R", "L", "pole_pairs")}
     },
 }
