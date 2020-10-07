@@ -346,7 +346,7 @@ void CalibrateStep(void)
         // Set neutral pwm immediately
         GateDriver_SetDutyCycle(&zeroDC);
         static const float end_angle = CAL_PHASE_TURNS * twopi;
-        if (!Motor_FindPolePairs(ENCODER_CPR, calState.dir_initial_pos, Observer_GetPosEstimate(), end_angle))
+        if (!Motor_FindPolePairs(ENCODER_TICKS, calState.dir_initial_pos, Observer_GetPosEstimate(), end_angle))
         {
             state.error = ERROR_INVALID_POLE_PAIRS;
         }
