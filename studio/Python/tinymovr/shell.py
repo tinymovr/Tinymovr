@@ -17,10 +17,12 @@ import logging
 import pkg_resources
 import can
 import IPython
+from IPython import get_ipython
 from traitlets.config import Config
 
 from docopt import docopt
 import pynumparser
+import pint
 
 from tinymovr import UserWrapper
 from tinymovr.iface import IFace
@@ -51,6 +53,7 @@ def spawn_shell():
     arguments: Dict[str, str] = docopt(__doc__, version=shell_name + ' ' + str(version))
 
     logger = configure_logging()
+    configure_printing()
 
     num_parser = pynumparser.NumberSequence(limits=(0, 16))
     node_ids = num_parser(arguments['--ids'])
@@ -111,3 +114,17 @@ def configure_logging() -> logging.Logger:
     logger = logging.getLogger('tinymovr')
     logger.setLevel(logging.DEBUG)
     return logger
+
+def configure_printing():
+    '''
+    Configures pretty printing for Units and Quantities
+    '''
+    get_ipython().display_formatter.formatters['text/plain'].for_type(
+        pint.Unit,
+        lambda obj, p, cycle: p.text(str(obj) if not cycle else '...')
+    )
+    
+    get_ipython().display_formatter.formatters['text/plain'].for_type(
+        pint.Quantity,
+        lambda obj, p, cycle: p.text(str(obj) if not cycle else '...')
+    )
