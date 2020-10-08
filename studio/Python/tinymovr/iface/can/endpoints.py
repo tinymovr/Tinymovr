@@ -17,8 +17,6 @@ from typing import Dict
 from tinymovr.codec import DataType
 from tinymovr.units import get_registry
 
-ureg = get_registry()
-
 can_endpoints: Dict[str, Dict] = {
     "nmt":
     {
@@ -119,7 +117,7 @@ can_endpoints: Dict[str, Dict] = {
         "ep_id": 0x00E,
         "types": (DataType.FLOAT,),
         "units": ("ampere",),
-        "labels": ("current")
+        "labels": ("current",)
     },
     "set_limits":
     {
@@ -171,7 +169,7 @@ can_endpoints: Dict[str, Dict] = {
         "description": "Get Bus Voltage",
         "type": "r",
         "ep_id": 0x017,
-        "units": (ureg.volt,),
+        "units": ("volt",),
         "types": (DataType.FLOAT,)
     },
     "gains":
