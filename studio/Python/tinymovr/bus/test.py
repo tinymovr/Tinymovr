@@ -38,6 +38,7 @@ class Test(can.BusABC):
             0x0D: self._set_vel_setpoint,
             0x0E: self._set_cur_setpoint,
             0x14: self._get_Iq_estimates,
+            0x17: self._get_vbus,
             0x1A: self._get_device_info
         }
 
@@ -50,7 +51,8 @@ class Test(can.BusABC):
             "current_estimate": 0,
             "position_setpoint": 0,
             "velocity_setpoint": 0,
-            "current_setpoint": 0
+            "current_setpoint": 0,
+            "vbus": 12.0,
         }
 
     def send(self, msg: can.Message):
@@ -114,6 +116,13 @@ class Test(can.BusABC):
             payload, *can_endpoints["set_state"]["types"])
         self._state["state"] = vals[0]
         self._state["mode"] = vals[1]
+
+    def _get_vbus(self, payload):
+        vals: Tuple = (self._state["vbus"],)
+        gen_payload = self.codec.serialize(
+            vals, *can_endpoints["Vbus"]["types"])
+        self.buffer = create_frame(self.node_id, 0x17, False, gen_payload)
+
 
     def _get_device_info(self, payload):
         vals: Tuple = (0, 0, 7, 1, 25)
