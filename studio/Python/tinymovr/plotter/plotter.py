@@ -10,8 +10,6 @@ import matplotlib.animation as animation
 
 from flatten_dict import flatten
 
-from tinymovr.units import get_registry
-
 sample_count = 500
 
 ani = None
@@ -21,9 +19,6 @@ ani = None
 
 
 def plot(getter: Callable):
-
-    ureg = get_registry()
-    ureg.setup_matplotlib(True)
 
     plt.ion()
 
@@ -35,7 +30,10 @@ def plot(getter: Callable):
     ax.margins(0, 0.3)
 
     xdata = range(sample_count)
-    ydata = {k: [flat_dict[k]]*sample_count for k in flat_dict}
+    try:
+        ydata = {k: [v.m]*sample_count for k, v in flat_dict.items()}
+    except AttributeError:
+        ydata = {k: [v]*sample_count for k, v in flat_dict.items()}
 
     pars = [ax.twinx() for i in range(len(flat_dict) - 1)]
     pars.insert(0, ax)
@@ -65,8 +63,11 @@ def plot(getter: Callable):
             k = z[0]
             par = z[1]
             _, _, ymin_plot, ymax_plot = par.axis()
-            ydata[k].append(new_data[k])
-            ydata[k] = ydata[k][-sample_count:]
+            try:
+                ydata[k].append(new_data[k].m)
+            except AttributeError:
+                ydata[k].append(new_data[k])
+            ydata[k].pop(0)
             lines[i].set_ydata(ydata[k])
             ymin_val, ymax_val = min(ydata[k]), max(ydata[k])
             if ( (ymin_val < ymin_plot or ymax_val > ymax_plot) or
