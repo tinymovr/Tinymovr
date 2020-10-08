@@ -22,7 +22,7 @@ ani = None
 
 def plot(getter: Callable):
 
-    ureg = units.get_registry()
+    ureg = get_registry()
     ureg.setup_matplotlib(True)
 
     plt.ion()
