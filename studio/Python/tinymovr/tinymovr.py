@@ -21,7 +21,7 @@ import json
 from tinymovr.iface import IFace
 from tinymovr.objdict import objdict
 from tinymovr.units import get_registry
-from pint import Quantity
+from pint import Quantity as _Q
 
 ureg = get_registry()
 
@@ -56,7 +56,7 @@ class Tinymovr:
                         inputs = [args[i] if i < len(args) else
                                   d["defaults"][k] for i, k in enumerate(d["labels"])]
                     if "units" in d:
-                        inputs = [v.to(d["units"][i]).magnitude if isinstance(v, Quantity)
+                        inputs = [v.to(d["units"][i]).magnitude if isinstance(v, _Q)
                                   else v for i, v in enumerate(inputs)]
                     payload=None
                     if len(inputs) > 0:                        
