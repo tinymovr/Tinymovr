@@ -195,12 +195,11 @@ uint8_t CAN_SetPosSetpoint(uint8_t buffer[])
 uint8_t CAN_SetVelSetpoint(uint8_t buffer[])
 {
     float vel;
-    int16_t Iq_ff;
+    float Iq_ff;
     memcpy(&vel, &buffer[0], sizeof(float));
-    memcpy(&Iq_ff, &buffer[4], sizeof(int16_t));
-    float iqFF_float = Iq_ff * 0.01f;
+    memcpy(&Iq_ff, &buffer[4], sizeof(float));
     Controller_SetVelSetpoint(vel);
-    Controller_SetIqSetpoint(iqFF_float);
+    Controller_SetIqSetpoint(Iq_ff);
     return CANRP_Write;
 }
 
