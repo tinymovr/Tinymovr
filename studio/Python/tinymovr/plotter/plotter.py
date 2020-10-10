@@ -79,7 +79,7 @@ def plot(getter: Callable):
             for par in pars:
                 par.relim()
                 par.autoscale_view()
-            plt.draw()
+            fig.canvas.draw()
         return lines
 
     global ani
