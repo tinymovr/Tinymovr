@@ -16,9 +16,9 @@ jobs:
     - name: Remove cppcheck
       run: rm -rf ./cppcheck
       working-directory: firmware
-    - name: Install gcc-arm-none-eabi
-      run: sudo apt install gcc-arm-none-eabi
-      working-directory: firmware
-    - name: Build Tinymovr
-      run: make
-      working-directory: firmware
+    # - name: Install gcc-arm-none-eabi
+    #   run: sudo apt install gcc-arm-none-eabi
+    #   working-directory: firmware
+    # - name: Build Tinymovr
+    #   run: make
+    #   working-directory: firmware
