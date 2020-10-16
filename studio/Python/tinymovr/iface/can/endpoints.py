@@ -191,11 +191,11 @@ can_endpoints: Dict[str, Dict] = {
     "timings":
     {
         "description": "Get Processor Timings \
-(Busy Cycles/PWM, Total Cycles/PWM)",
+(Total Cycles/PWM, Busy Cycles/PWM)",
         "type": "r",
         "ep_id": 0x01B,
         "types": (DataType.UINT32, DataType.UINT32),
-        "labels": ("busy", "total")
+        "labels": ("total", "busy")
     },
     "save_config":
     {

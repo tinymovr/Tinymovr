@@ -39,7 +39,7 @@ void System_Init(void)
 
     // Configure SCLK=PLLCLK=300 MHz, HCLK=150 MHz, PCLK=150 MHz, ACLK=300 MHz and WaitStates;  Use default PCLKDIV=1
     PAC55XX_SCC->CCSCTL.HCLKDIV = CCSCTL_HCLKDIV_DIV2;          // HCLK = 150 MHz = SCLK/2; when SCLK = PLLCLK
-    PAC55XX_SCC->CCSCTL.ACLKDIV = CCSCTL_ACLKDIV_DIV1;          // ACLK = 300 MHz = SCLK/1; when SCLK = PLLCLK
+    PAC55XX_SCC->CCSCTL.ACLKDIV = (ACLK_DIVIDER - 1);
     PAC55XX_MEMCTL->MEMCTL.WSTATE = 5 + 1;                      // Flash = 150/25 = 6 clocks = 5 WS; So, need 5 + 1 Extra WS
     PAC55XX_SCC->CCSCTL.SCLKMUXSEL = CCSCTL_SCLK_PLLCLK;        // SCLK = PLLCLK
 
@@ -62,6 +62,10 @@ void System_Init(void)
 
 	// Configure SOC Bridge for talking to CAFE
 	pac5xxx_tile_socbridge_config(1, 0);
+
+	// System Configuration Power Options
+	// Vp = 10V , 440mA-540mA, Charge Pump Enable
+	pac5xxx_tile_register_write(ADDR_SYSCONF, 0x01);
 
 	if (ARM_CM_DWT_CTRL != 0) {        // See if DWT is available
 		ARM_CM_DEMCR      |= 1u << 24;  // Set bit 24
