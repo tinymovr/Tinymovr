@@ -193,14 +193,14 @@ void ADC_DTSE_Init(void)
     // Setup DTSE Sequence Trigger - See "DTSE Trigger Mapping Table" in the PAC55XX Family User's Guide
     //========================================================================================================
 
-	//  Timer A CCR2 = Trigger 0 and will initiate Sequence starting at Entry 0
+	//  Timer A CCR2 = Trigger 0 and initiate sequence starting at DTSE Entry 0
     PAC55XX_ADC->DTSETRIGENT0TO3.FORCE0 = 0;                            // Reset to 0
     PAC55XX_ADC->DTSETRIGENT0TO3.TRIG0CFGIDX = 0;                       // DTSE Trigger 0 Sequence Configuration Entry Index
     PAC55XX_ADC->DTSETRIGENT0TO3.TRIG0EDGE = ADCDTSE_TRIGEDGE_RISING;   // PWMA0 rising edge
 
     pac5xxx_timer_a_ccctr0_value_set(1);
 
-    //===== Setup DTSE Sequence A (zerocrossing) - Starts at Entry 0 =====
+    //===== Setup DTSE Sequence A (sense offset) - Starts at Entry 0 =====
     pac5xxx_dtse_seq_config(0, ADC0, EMUX_AB10 , 0,           0);
     pac5xxx_dtse_seq_config(1, ADC0, EMUX_AB10 , 0,           0);
     pac5xxx_dtse_seq_config(2, ADC0, EMUX_AB13 , 0,           0);       // Get VPTAT result at DTSERES2
@@ -213,14 +213,14 @@ void ADC_DTSE_Init(void)
     pac5xxx_dtse_seq_config(9, ADC0, EMUX_AIO54, 0,           0);
     pac5xxx_dtse_seq_config(10, ADC0, 0        , 0,           SEQ_END); // Get result at DTSERES10
 
-    //  Timer A CCR2 = Trigger 0 and will initiate Sequence starting at Entry 0
+    //  Timer A CCR2 = Trigger 0 and initiate sequence starting at DTSE Entry 0
     PAC55XX_ADC->DTSETRIGENT0TO3.FORCE1 = 0;                            // Reset to 0
     PAC55XX_ADC->DTSETRIGENT0TO3.TRIG1CFGIDX = 12;                      // DTSE Trigger 1 Sequence Configuration Entry Index
     PAC55XX_ADC->DTSETRIGENT0TO3.TRIG1EDGE = ADCDTSE_TRIGEDGE_RISING;   // PWMA0 rising edge
 
     pac5xxx_timer_a_ccctr1_value_set( (ACLK_FREQ_HZ/2/PWM_TIMER_FREQ) - 2);
 
-    //===== Setup DTSE Sequence B (VP crossing) - Starts at Entry 12 =====
+    //===== Setup DTSE Sequence B (sense current) - Starts at Entry 12 =====
     pac5xxx_dtse_seq_config(12, ADC0, EMUX_AIO10, 0,           0);
     pac5xxx_dtse_seq_config(13, ADC0, EMUX_AIO10, 0,           0);
     pac5xxx_dtse_seq_config(14, ADC0, EMUX_AIO32, 0,           0);       // Get result at DTSERES14
