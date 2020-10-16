@@ -1,6 +1,7 @@
 
 from enum import Enum
 
+
 class ErrorIDs(Enum):
     NoError = 0
     InvalidState = 1
@@ -12,6 +13,7 @@ class ErrorIDs(Enum):
     PhaseInductanceOutOfRange = 7
     InvalidPolePairs = 8
     MagneticFieldOutOfRange = 9
+
 
 error_descriptions = {
     ErrorIDs.NoError: "No error",

@@ -68,13 +68,13 @@ where x is the desired ID. Valid IDs are from 1-64, but the Studio app currently
 .. _command-line-options:
 
 Command-line options
-********************
+####################
 
 Tinymovr Studio supports the following command line options.
 
 
 ``--ids=<ids>``
-===================
+===============
 
 The --ids option specifies a set of CAN node IDs to scan. 
 
@@ -84,19 +84,19 @@ Example:
 
     tinymovr --ids=1,3,5,7-9
 
-All syntax options supported by Pynumparser are available.
+All syntax options supported by `Pynumparser<https://pypi.org/project/pynumparser/>`_ are available.
 
 
-``--iface=<iface>``
-===================
+``--bustype=<bustype>``
+=======================
 
-The --iface option specifies a CAN interface to use.
+The --bustype option specifies a CAN bus type to use.
 
 Example:
 
 .. code-block:: console
 
-    tinymovr --iface=robotell
+    tinymovr --bustype=robotell
 
 All interfaces offered by python-can are supported.
 
@@ -104,15 +104,37 @@ All interfaces offered by python-can are supported.
 ``--chan=<chan>``
 =================
 
-The --chan options specifies a channel to use, optionally together with the --iface option. 
+The --chan options specifies a channel to use, optionally together with the --bustype option. 
 
 Example:
 
 .. code-block:: console
 
-    tinymovr --iface=robotell --chan=COM3
+    tinymovr --bustype=robotell --chan=COM3
 
-By default, Tinymovr Studio will use slcan as the interface, and will search for CANAble-type devices.
+By default, Tinymovr Studio will use slcan as the interface, and will search for CANAble/CANtact-type devices with slcan firmware. Such is the CANine adapter supplied with Tinymovr Dev Kits.
+
+
+Using with Socketcan on Linux
+#############################
+
+You can use a socketcan-enabled CAN adapter with Tinymovr Studio. The CANine adapter supplied with Tinymovr Dev Kits supports Socketcan natively with the alternative Candlelight Firmware. To connect to a Socketcan device, run Studio as follows:
+
+.. code-block:: console
+
+    tinymovr --bustype=socketcan --chan=CAN0
+
+
+Using with Tinymovr in silico
+#############################
+
+Tinymovr studio implements a simplistic simulation of the actual controller, in order to facilitate validation of basic commands etc. To use the simulation mode, run Studio as follows:
+
+.. code-block:: console
+
+    tinymovr --bustype=tinymovr_test --chan=test
+
+Basic commands such as :code:`state`, :code:`encoder_estimates`, :code:`set_pos_setpoint` work, more to be implemented soon.
 
 
 Upgrading Firmware
