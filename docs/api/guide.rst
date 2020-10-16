@@ -22,13 +22,13 @@ Here below is an example using the API from Python scripts and controlling hardw
     import can
     from tinymovr import Tinymovr
 
-    bus = can.Bus(bustype="cantact", channel="COM1, bitrate=1000000)
+    bus = can.Bus(bustype="cantact", channel="COM1", bitrate=1000000)
     iface = CAN(bus)
     tm = Tinymovr(node_id=1, iface=iface)
 
     tm.calibrate()
 
-Teh above code block will instantiate a Tinymovr with CAN bus id of 1 and calibrate it. Following the above, you can issue commands such as:
+The above code block will instantiate a Tinymovr with CAN bus id of 1 and calibrate it. Following the above, you can issue commands such as:
 
 .. code-block:: python
 

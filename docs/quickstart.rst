@@ -70,7 +70,7 @@ Testing Position Control Mode
 
 .. code-block:: python
 
-    tm1.set_position_control()
+    tm1.position_control()
 
 The motor should now be actively holding it's position. Try moving it by hand and you should feel resistance.
 

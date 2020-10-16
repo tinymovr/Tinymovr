@@ -13,10 +13,10 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 '''
+from typing import Dict
+from tinymovr.codec import DataType
 
-from tinymovr.iface import DataType
-
-Endpoints = {
+can_endpoints: Dict[str, Dict] = {
     "nmt":
     {
         "description": "CANOpen NMT Message",
@@ -83,7 +83,7 @@ Endpoints = {
     {
         "description": "Get Setpoints (Position, Velocity)",
         "type": "r",
-        "ep_id": 0x009,
+        "ep_id": 0x00A,
         "types": (DataType.FLOAT, DataType.FLOAT),
         "labels": ("position", "velocity")
     },
@@ -110,7 +110,8 @@ Endpoints = {
         "description": "Set Current (Iq) Setpoint",
         "type": "w",
         "ep_id": 0x00E,
-        "types": (DataType.FLOAT,)
+        "types": (DataType.FLOAT,),
+        "labels": ("current")
     },
     "set_limits":
     {
@@ -132,7 +133,7 @@ Endpoints = {
     },
     "Iq":
     {
-        "description": "Get current setpoint and estimate",
+        "description": "Get quadrature current setpoint and estimate",
         "type": "r",
         "ep_id": 0x014,
         "types": (DataType.FLOAT, DataType.FLOAT),
@@ -183,16 +184,18 @@ Endpoints = {
         "description": "Get Device Info",
         "type": "r",
         "ep_id": 0x01A,
-        "types": ( DataType.UINT32, DataType.UINT8, DataType.UINT8, DataType.UINT8, DataType.UINT8,),
+        "types": (DataType.UINT32, DataType.UINT8,
+                  DataType.UINT8, DataType.UINT8, DataType.UINT8),
         "labels": ("device_id", "fw_major", "fw_minor", "fw_patch", "temp")
     },
     "timings":
     {
-        "description": "Get Processor Timings (Busy Cycles/PWM, Total Cycles/PWM)",
+        "description": "Get Processor Timings \
+(Total Cycles/PWM, Busy Cycles/PWM)",
         "type": "r",
         "ep_id": 0x01B,
         "types": (DataType.UINT32, DataType.UINT32),
-        "labels": ("busy", "total")
+        "labels": ("total", "busy")
     },
     "save_config":
     {
@@ -208,10 +211,12 @@ Endpoints = {
     },
     "motor_info":
     {
-        "description": "Get Attached Motor Info (Calibrated, Resistance, Pole Pairs, Inductance, enc CPR)",
+        "description": "Get Attached Motor Info (Calibrated, \
+                        Resistance, Pole Pairs, Inductance, enc CPR)",
         "type": "r",
         "ep_id": 0x01E,
-        "types": (DataType.UINT8, DataType.UINT16, DataType.UINT8, DataType.UINT16, DataType.UINT16),
+        "types": (DataType.UINT8, DataType.UINT16,
+                  DataType.UINT8, DataType.UINT16, DataType.UINT16),
         "labels": ("calibrated", "R", "pole_pairs", "L", "encoder_cpr"),
         "ser_map": {"motor": ("R", "L", "pole_pairs")}
     },

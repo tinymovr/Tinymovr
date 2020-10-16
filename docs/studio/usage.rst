@@ -68,13 +68,13 @@ where x is the desired ID. Valid IDs are from 1-64, but the Studio app currently
 .. _command-line-options:
 
 Command-line options
-********************
+####################
 
 Tinymovr Studio supports the following command line options.
 
 
 ``--ids=<ids>``
-===================
+===============
 
 The --ids option specifies a set of CAN node IDs to scan. 
 
@@ -84,19 +84,19 @@ Example:
 
     tinymovr --ids=1,3,5,7-9
 
-All syntax options supported by Pynumparser are available.
+All syntax options supported by `Pynumparser<https://pypi.org/project/pynumparser/>`_ are available.
 
 
-``--iface=<iface>``
-===================
+``--bustype=<bustype>``
+=======================
 
-The --iface option specifies a CAN interface to use.
+The --bustype option specifies a CAN bus type to use.
 
 Example:
 
 .. code-block:: console
 
-    tinymovr --iface=robotell
+    tinymovr --bustype=robotell
 
 All interfaces offered by python-can are supported.
 
@@ -104,15 +104,37 @@ All interfaces offered by python-can are supported.
 ``--chan=<chan>``
 =================
 
-The --chan options specifies a channel to use, optionally together with the --iface option. 
+The --chan options specifies a channel to use, optionally together with the --bustype option. 
 
 Example:
 
 .. code-block:: console
 
-    tinymovr --iface=robotell --chan=COM3
+    tinymovr --bustype=robotell --chan=COM3
 
-By default, Tinymovr Studio will use slcan as the interface, and will search for CANAble-type devices.
+By default, Tinymovr Studio will use slcan as the interface, and will search for CANAble/CANtact-type devices with slcan firmware. Such is the CANine adapter supplied with Tinymovr Dev Kits.
+
+
+Using with Socketcan on Linux
+#############################
+
+You can use a socketcan-enabled CAN adapter with Tinymovr Studio. The CANine adapter supplied with Tinymovr Dev Kits supports Socketcan natively with the alternative Candlelight Firmware. To connect to a Socketcan device, run Studio as follows:
+
+.. code-block:: console
+
+    tinymovr --bustype=socketcan --chan=CAN0
+
+
+Using with Tinymovr in silico
+#############################
+
+Tinymovr studio implements a simplistic simulation of the actual controller, in order to facilitate validation of basic commands etc. To use the simulation mode, run Studio as follows:
+
+.. code-block:: console
+
+    tinymovr --bustype=tinymovr_test --chan=test
+
+Basic commands such as :code:`state`, :code:`encoder_estimates`, :code:`set_pos_setpoint` work, more to be implemented soon.
 
 
 Upgrading Firmware
@@ -125,6 +147,10 @@ Upgrading using bootloader
 
 For this method you will need a USB to UART adapter or similar device to connect to Tinymovr's UART interface, such as an FTDI interface or similar. Such devices are very common and inexpensive. Please follow the diagram below to correctly setup the UART interface.
 
+
+.. warning::
+   The UART port on Tinymovr is NOT 5V tolerant. Applying 5V voltage will immediately damage the onboard PAC5527 controller. Please use only 3.3V for UART communication.
+   
 (image of UART ports)
 
 Qorvo provides an application to interface with the bootloader environment using UART and enable firmware upgrades. It is available through the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_ as an archive named "PAC55xx ActiveFlashLight Bootloader". Please download and extract the archive and follow these steps:

@@ -48,16 +48,21 @@ typedef enum {
     #define MODULE_MISC_BITS_DEFAULT   ((HIB_BIT_DEFAULT << 7) + (PBEN_BIT_DEFAULT << 6) + (VREFSET_BIT_DEFAULT << 5) + (CLKOUTEN_BIT_DEFAULT << 4) + (MCUALIVE_BIT_DEFAULT << 3) + (TPBD_BIT_DEFAULT << 2) + (RFU_BIT_DEFAULT << 1) + (ENSIG_BIT_DEFAULT << 0))
 #endif
 
+// Current sensing multipler defined as follows:
 // meas * ONE_OVER_ADC_RES * VREF / R * ONE_OVER_ADC_GAIN
-// Examples:
-// 1/2^12 * 3,3 / 0,001 / 32 ~= 0.025176
-//#define SHUNT_SCALING_FACTOR ( 0.025176f )
+
+// Tinymovr R3.3 (alpha2) and later have 2mOhm shunts
+// ^12 * 3.3 / 0.002 / 16 ~= 0.025177
+#define SHUNT_SCALING_FACTOR ( 0.025177f )
+
+// Tinymovr R3.2 (alpha1) and earlier have 1mOhm shunts
 // 1/2^12 * 3,3 / 0,001 / 16 ~= 0.0503
-#define SHUNT_SCALING_FACTOR ( 0.0503f )
-// 1/2^12 * 3,3 / 0,001 / 1 ~= 0.8056
-//#define SHUNT_SCALING_FACTOR ( 0.8056f )
+// #define SHUNT_SCALING_FACTOR ( 0.0503f )
+
+// Inverse of sensing multiplier
 #define ONE_OVER_SHUNT_SCALING_FACTOR ( 1.0f / SHUNT_SCALING_FACTOR )
 
+// VBus scaling factor
 #define VBUS_SCALING_FACTOR ( 0.0127f )
 
 typedef void (*Callback)(void);

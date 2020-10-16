@@ -1,7 +1,7 @@
-diff --git a/original.c b/modified.c
+diff --git pac5xxx_driver_tile_socbridge.c pac5xxx_driver_tile_socbridge.c
 index f99ced2..630212e 100644
---- a/original.c
-+++ b/modified.c
+--- pac5xxx_driver_tile_socbridge.c
++++ pac5xxx_driver_tile_socbridge.c
 @@ -27,7 +27,8 @@ RAMFUNC_TILE void pac5xxx_tile_socbridge_config(int enable, int int_enable)
  }
  
