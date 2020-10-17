@@ -42,6 +42,7 @@
 
 // Limits
 #define PWM_LIMIT                   (0.8f)
+#define I_INTEGRATOR_DECAY_FACTOR   (0.995f)
 #define I_TRIP_MARGIN               (1.25f)
 #define VBUS_LOW_THRESHOLD          (11.0f)
 
