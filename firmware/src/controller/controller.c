@@ -15,7 +15,6 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/common.h"
 #include "src/encoders/MA702.h"
 #include "src/observer/observer.h"
 #include "src/adc/adc.h"
@@ -213,7 +212,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     float mod_d = Vd / VBus;
 
     // dq modulation limiter
-    const float dq_mod_scale_factor = PWM_LIMIT / fast_sqrt(mod_q * mod_q + mod_d * mod_d);
+    const float dq_mod_scale_factor = PWM_LIMIT * fast_inv_sqrt(mod_q * mod_q + mod_d * mod_d);
 
     if (dq_mod_scale_factor < 1.0f)
     {

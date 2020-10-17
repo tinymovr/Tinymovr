@@ -45,6 +45,24 @@ PAC5XXX_RAMFUNC float wrapf(float unbound_val, float half_interval)
     return bound_val;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+PAC5XXX_RAMFUNC float fast_inv_sqrt(float n)
+{
+	long i;
+	float x, y;
+
+	x = n * 0.5f;
+	y = n;
+	i = *(long *)&y;
+	i = 0x5f3759df - (i >> 1);
+	y = *(float *)&i;
+	y = y * (1.5f - (x * y * y));
+
+	return y;
+}
+#pragma GCC diagnostic pop
+
 // based on https://github.com/divideconcept/FastTrigo/blob/master/fasttrigo.cpp
 PAC5XXX_RAMFUNC float cos_32s(float x)
 {
