@@ -74,7 +74,6 @@ struct ADCState
     struct FloatTriplet I_phase_meas;
     struct FloatTriplet I_phase_offset;
 
-    Callback DTSE_callback;
     Callback Prot_callback;
 };
 
@@ -89,7 +88,6 @@ void ADC_Init(void);
 PAC5XXX_RAMFUNC float ADC_GetVBus(void);
 PAC5XXX_RAMFUNC int16_t ADC_GetMCUTemp(void);
 PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc);
-void ADC_SetDTSE_callback(Callback cb);
 void ADC_SetProt_callback(Callback cb);
 
 #endif /* ADC_ADC_H_ */

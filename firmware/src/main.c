@@ -48,12 +48,10 @@ int main(void)
     Watchdog_Init();
     __enable_irq();
 
-    // From this point onward the main loop idles
-    // main control is through the ADC DTSE interrupt
-    // found in src/adc/adc.h
-    while(1)
+    while(true)
     {
         __WFI();
+        Controller_Update();
     }
 }
 

@@ -94,10 +94,7 @@ struct CalibrateState
 
 struct CalibrateState calState = {0};
 
-void Controller_Init(void)
-{
-    ADC_SetDTSE_callback(Controller_Update);
-}
+void Controller_Init(void) {}
 
 void Controller_Update(void)
 {

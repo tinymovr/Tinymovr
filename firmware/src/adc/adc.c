@@ -248,11 +248,6 @@ PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc)
     phc->C = adc.I_phase_meas.C;
 }
 
-void ADC_SetDTSE_callback(void (*Callback)(void))
-{
-    adc.DTSE_callback = Callback;
-}
-
 void ADC_SetProt_callback(void (*Callback)(void))
 {
     adc.Prot_callback = Callback;
@@ -288,11 +283,6 @@ void ADC_IRQHandler(void)
     adc.temp = ( (((FTTEMP + 273) * ((temp_val * 100) + 12288)) / (((int16_t)TTEMPS * 100) + 12288)) - 273);
     
     adc.vbus = ((float)PAC55XX_ADC->DTSERES4.VAL) * VBUS_SCALING_FACTOR;
-
-    if (adc.DTSE_callback != NULL)
-    {
-        adc.DTSE_callback();
-    }
 }
 
 void ADC1_IRQHandler(void)
