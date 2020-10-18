@@ -5,7 +5,7 @@ Hardware Setup Guide
 ********************
 
 .. note::
-   Images in the documentation may refer to shightly different hardware versions. Where incompatibilities among hardware versions do exist, this is noted in the image caption.
+   Images in the documentation may refer to slightly different hardware versions. Where incompatibilities among hardware versions do exist, this is noted in the image caption.
 
 
 Requirements
@@ -45,10 +45,16 @@ The most important aspect of a correct setup is to ensure the controller is prop
   :width: 800
   :alt: Tinymovr and motor mechanical mounting
 
-A series of motor, PCB and magnet mount designs are available to 3D print for various kinds of motor hole patterns.
+For a 3D printable motor mount design, check out the `Tinymovr alpha dev kit mount <https://github.com/yconst/Tinymovr/tree/master/hardware/motor-stand>`_ (suitable for 40xx motors).
 
 .. note::
    For safety reasons, you should always ensure the motor & controller assembly are secured to a stable surface before operation. The motor rotor may experience high acceleration that may cause injury or damage if not secured properly.
+
+Mounting Tips
+
+* Ensure the encoder magnet is firmly attached to the motor shaft, otherwise it may slip out of sync. Use adhesive to secure if necessary.
+
+* Calibration needs to be performed without any loads on the motor. If the motor is coupled to a load, the encoder offset angle may not be determined correctly, leading to a sub-optimal setup.
 
 .. _electrical-setup:
 
