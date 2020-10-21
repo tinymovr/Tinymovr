@@ -1,8 +1,17 @@
 
-#include <src/encoders/MA702.h>
-#include "src/common.h"
+#include <src/common.hpp>
+#include <src/encoders/MA702.hpp>
+#include <src/observer/observer.hpp>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "src/utils/utils.h"
-#include "observer.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 PAC5XXX_RAMFUNC static inline void Observer_UpdatePosEstimate(int newMeas);
 
@@ -17,10 +26,11 @@ static struct ObserverConfig config = {
 		.track_bw = 1000.0f,
 		.kp = 0.0f,
 		.ki = 0.0f,
+		.sector_half_interval = 0,
 		.pos_offset = 0.0f,
 		.offset_calibrated = 0,
-		.direction_calibrated = 0,
 		.direction = 1,
+		.direction_calibrated = 0
 };
 
 void Observer_Init(void)

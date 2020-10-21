@@ -15,18 +15,27 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/system/system.h"
-#include "src/motor/motor.h"
-#include "src/encoders/MA702.h"
-#include "src/observer/observer.h"
-#include "src/controller/controller.h"
-#include "src/adc/adc.h"
-#include "src/nvm/nvm.h"
-#include "src/can/can.h"
+#include <src/adc/adc.hpp>
+#include <src/can/can.hpp>
+#include <src/controller/controller.hpp>
+#include <src/encoders/MA702.hpp>
+#include <src/motor/motor.hpp>
+#include <src/nvm/nvm.hpp>
+#include <src/observer/observer.hpp>
+#include <src/system/system.hpp>
+#include <src/uart/uart.hpp>
+#include <src/watchdog/watchdog.hpp>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "src/uart/uart_func.h"
 #include "src/utils/utils.h"
-#include "src/watchdog/watchdog.h"
-#include "src/uart/uart_interface.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 struct UART {
 	SerialMessageType msg_type;
@@ -39,7 +48,7 @@ struct UART {
 };
 
 static struct UART state = {
-	.msg_type = 0,
+	.msg_type = MSG_TYPE_UNKNOWN,
 	.rx_byte_count = 0,
 	.tx_byte_count = 0,
 

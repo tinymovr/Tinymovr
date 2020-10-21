@@ -15,14 +15,10 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "string.h"
-
-#include "src/system/system.h"
-#include "src/watchdog/watchdog.h"
-
-#include "src/can/can_endpoints.h"
-#include "src/can/can_func.h"
-#include "src/can/can.h"
+#include <src/can/can.hpp>
+#include <src/can/can_endpoints.hpp>
+#include <src/system/system.hpp>
+#include <src/watchdog/watchdog.hpp>
 
 void CAN_ProcessMessage(uint8_t command_id, bool rtr);
 
@@ -58,8 +54,7 @@ void CAN_Init(void)
     pac5xxx_can_reset_mode_set(1);	// CAN in reset mode, in order to configure CAN module
     PAC55XX_CAN->MR.AFM = 1;		// Single filter scheme
 
-    // This below ensures a valid value is always assigned
-    can_baud(CAN_IntToBaudType(CAN_BaudTypeToInt(config.kbaud_rate)));
+    can_baud(config.kbaud_rate);
 
     PAC55XX_CAN->BTR0.SJW = 1;		// Synchronization jump width
     PAC55XX_CAN->BTR1.SAM = 0;		// Bus is sampled once 

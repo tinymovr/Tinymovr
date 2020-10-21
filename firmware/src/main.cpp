@@ -15,20 +15,19 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/common.h"
-#include "src/system/system.h"
-
-#include "src/uart/uart_interface.h"
-#include "src/observer/observer.h"
-#include "src/adc/adc.h"
-#include "src/motor/motor.h"
-#include "src/controller/controller.h"
-#include "src/gatedriver/gatedriver.h"
-#include "src/timer/timer.h"
-#include "src/can/can.h"
-#include "src/nvm/nvm.h"
-#include "src/watchdog/watchdog.h"
-#include <src/encoders/MA702.h>
+#include <src/adc/adc.hpp>
+#include <src/can/can.hpp>
+#include <src/controller/controller.hpp>
+#include <src/encoders/MA702.hpp>
+#include <src/gatedriver/gatedriver.hpp>
+#include <src/motor/motor.hpp>
+#include <src/nvm/nvm.hpp>
+#include <src/observer/observer.hpp>
+#include <src/uart/uart.hpp>
+#include "common.hpp"
+#include "system/system.hpp"
+#include "timer/timer.hpp"
+#include "watchdog/watchdog.hpp"
 
 int main(void)
 {

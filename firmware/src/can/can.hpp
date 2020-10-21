@@ -18,6 +18,18 @@
 #ifndef CAN_CAN_H_
 #define CAN_CAN_H_
 
+#include <src/common.hpp>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "src/can/can_func.h"
+
+#ifdef __cplusplus
+}
+#endif
+
 #define CAN_EP_SIZE 6
 
 typedef enum {
@@ -81,7 +93,7 @@ typedef enum {
 struct CANConfig
 {
     uint8_t id;
-    uint8_t kbaud_rate;
+    CAN_BAUD_TYPE kbaud_rate;
 };
 
 void CAN_Init(void);

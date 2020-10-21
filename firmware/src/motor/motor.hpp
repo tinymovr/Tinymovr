@@ -24,7 +24,7 @@
 #define MIN_PHASE_INDUCTANCE ( 2e-6f )
 #define MAX_PHASE_INDUCTANCE ( 5000e-6f )
 
-#include "src/common.h"
+#include "../common.hpp"
 
 struct MotorConfig
 {

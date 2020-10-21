@@ -18,9 +18,15 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
+#include <stdint.h>
 #include <math.h>
 #include <float.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -51,7 +57,13 @@
 #include "pac5527.h"
 #include "pac5xxx_tile_power_manager.h"
 #include "pac5xxx_tile_signal_manager.h"
-#include "config.h"
+
+#ifdef __cplusplus
+}
+#endif
+
+#include "config.hpp"
+
 
 // ARM DWT
 #define  ARM_CM_DEMCR      (*(uint32_t *)0xE000EDFC)

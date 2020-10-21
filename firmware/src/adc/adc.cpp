@@ -15,8 +15,8 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include <src/adc/adc.hpp>
 #include "string.h"
-#include "adc.h"
 
 // Resistor value of diffamp AIO RC filter
 #define AIORES_VALUE                    100.0f

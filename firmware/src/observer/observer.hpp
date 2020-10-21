@@ -20,7 +20,8 @@
 #define OBSERVER_OBSERVER_H_
 
 #include <stdint.h>
-#include "src/common.h"
+
+#include "../common.hpp"
 
 struct ObserverState
 {

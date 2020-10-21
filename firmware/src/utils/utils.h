@@ -20,7 +20,8 @@
 
 
 #include "stdint.h"
-#include "src/common.h"
+
+#include "../common.hpp"
 
 #ifndef UTILS_UTILS_H_
 #define UTILS_UTILS_H_

@@ -15,29 +15,34 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef NVM_NVM_H_
-#define NVM_NVM_H_
+#ifndef ENCODERS_MA702_H_
+#define ENCODERS_MA702_H_
 
-#include "src/motor/motor.h"
-#include "src/observer/observer.h"
-#include "src/controller/controller.h"
-#include "src/can/can.h"
+#include "../common.hpp"
 
-#define SETTINGS_PAGE (120)
-#define SETTINGS_PAGE_HEX (0x0001E000)
+#define ENCODER_CPR                (8192)
+#define ENCODER_HALF_CPR           (ENCODER_CPR / 2)
 
+// MA702 commands
+typedef enum {
+    MA_CMD_NOP              = 0x0000,
+    MA_CMD_ANGLE            = 0x0000
+} MA702Command;
 
-struct NVMStruct {
-    struct MotorConfig motor_config;
-    struct ObserverConfig observer_config;
-    struct ControllerConfig controller_config;
-    struct CANConfig can_config;
-    uint32_t version;
+struct MA702State
+{
+    uint16_t angle_buffer;    // buffer for angle results from last transfer
+    MA702Command last_command;    // command sent during last Transfer
 };
 
-void NVM_Init(void);
-bool NVM_SaveConfig(void);
-bool NVM_LoadConfig(void);
-void NVM_Erase(void);
+struct MA702Config
+{
+    uint16_t kCountsPerRev;
+    float kRadPerRev;
+};
 
-#endif /* NVM_NVM_H_ */
+void MA_Init(void);
+PAC5XXX_RAMFUNC int MA_GetAngle(void);
+PAC5XXX_RAMFUNC void MA_ReadAngle(void);
+
+#endif /* ENCODERS_MA702_H_ */

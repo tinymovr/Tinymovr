@@ -15,9 +15,18 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <src/encoders/MA702.h>
-#include "src/system/system.h"
+#include <src/encoders/MA702.hpp>
+#include <src/system/system.hpp>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "src/ssp/ssp_func.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 PAC5XXX_RAMFUNC static inline void MA_Transfer(MA702Command cmd);
 

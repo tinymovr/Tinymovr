@@ -15,15 +15,29 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SYSTEM_SYSTEM_H_
-#define SYSTEM_SYSTEM_H_
+#ifndef NVM_NVM_H_
+#define NVM_NVM_H_
 
-#include "src/common.h"
+#include <src/can/can.hpp>
+#include <src/controller/controller.hpp>
+#include <src/motor/motor.hpp>
+#include <src/observer/observer.hpp>
 
-#define FW_VERSION 510 // 00.05.10 / major.min.rev
+#define SETTINGS_PAGE (120)
+#define SETTINGS_PAGE_HEX (0x0001E000)
 
-void System_Init(void);
-void System_Reset(void);
-void System_DelayUS(const uint32_t us);
 
-#endif /* SYSTEM_SYSTEM_H_ */
+struct NVMStruct {
+    struct MotorConfig motor_config;
+    struct ObserverConfig observer_config;
+    struct ControllerConfig controller_config;
+    struct CANConfig can_config;
+    uint32_t version;
+};
+
+void NVM_Init(void);
+bool NVM_SaveConfig(void);
+bool NVM_LoadConfig(void);
+void NVM_Erase(void);
+
+#endif /* NVM_NVM_H_ */

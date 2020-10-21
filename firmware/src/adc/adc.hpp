@@ -18,7 +18,7 @@
 #ifndef ADC_ADC_H_
 #define ADC_ADC_H_
 
-#include "src/common.h"
+#include "src/common.hpp"
 
 #ifdef CAFE_ARCH2
 typedef enum {

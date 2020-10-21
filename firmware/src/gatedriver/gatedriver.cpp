@@ -15,8 +15,8 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/common.h"
-#include "gatedriver.h"
+#include <src/common.hpp>
+#include <src/gatedriver/gatedriver.hpp>
 
 struct GateDriver_ gateDriver = 
 {

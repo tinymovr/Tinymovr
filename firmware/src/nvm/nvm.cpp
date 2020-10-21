@@ -15,12 +15,19 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <string.h>
-#include "src/common.h"
+#include <src/common.hpp>
+#include <src/nvm/nvm.hpp>
+#include <src/system/system.hpp>
 
-#include "src/system/system.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "src/nvm/flash_func.h"
-#include "src/nvm/nvm.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 static struct NVMStruct s;
 static uint8_t data[sizeof(struct NVMStruct)];
@@ -34,7 +41,7 @@ void NVM_StageData(void)
     s.observer_config = *Observer_GetConfig();
     s.controller_config = *Controller_GetConfig();
 	s.can_config = *CAN_GetConfig();
-    s.version = FW_VERSION;
+    s.version = VERSION_MAJOR * 1000000 + VERSION_MINOR * 10000 + VERSION_PATCH;
     memcpy(data, &s, sizeof(struct NVMStruct));
     staged = true;
 }
@@ -67,7 +74,8 @@ bool NVM_LoadConfig(void)
 	memcpy(&s, (uint8_t *)SETTINGS_PAGE_HEX, sizeof(struct NVMStruct));
 	// TODO: Also validate checksum
 	bool loaded = false;
-	if (s.version == FW_VERSION)
+	uint32_t fw_version = VERSION_MAJOR * 1000000 + VERSION_MINOR * 10000 + VERSION_PATCH;
+	if (s.version == fw_version)
 	{
 		Motor_RestoreConfig(&s.motor_config);
 		Observer_RestoreConfig(&s.observer_config);

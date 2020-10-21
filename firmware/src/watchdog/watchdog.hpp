@@ -15,34 +15,26 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ENCODERS_MA702_H_
-#define ENCODERS_MA702_H_
+#ifndef WATCHDOG_WATCHDOG_H_
+#define WATCHDOG_WATCHDOG_H_
 
-#include "src/common.h"
+#include <src/common.hpp>
 
-#define ENCODER_CPR                (8192)
-#define ENCODER_HALF_CPR           (ENCODER_CPR / 2)
-
-// MA702 commands
-typedef enum {
-    MA_CMD_NOP              = 0x0000,
-    MA_CMD_ANGLE            = 0x0000
-} MA702Command;
-
-struct MA702State
+struct WatchdogConfig
 {
-    uint16_t angle_buffer;    // buffer for angle results from last transfer
-    MA702Command last_command;    // command sent during last Transfer
+    bool auto_enable;
+    uint16_t timeout;
 };
 
-struct MA702Config
-{
-    uint16_t kCountsPerRev;
-    float kRadPerRev;
-};
+void Watchdog_Init(void);
+void Watchdog_SetEnabled(bool enabled);
+bool Watchdog_GetEnabled(void);
+void Watchdog_SetAutoEnable(bool auto_enable);
+bool Watchdog_GetAutoEnable(void);
 
-void MA_Init(void);
-PAC5XXX_RAMFUNC int MA_GetAngle(void);
-PAC5XXX_RAMFUNC void MA_ReadAngle(void);
+PAC5XXX_RAMFUNC void Watchdog_Feed(void);
 
-#endif /* ENCODERS_MA702_H_ */
+int32_t Watchdog_GetTimeout(void);
+void Watchdog_SetTimeout(int32_t new_timeout);
+
+#endif /* WATCHDOG_WATCHDOG_H_ */

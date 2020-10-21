@@ -15,8 +15,8 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/observer/observer.h"
-#include "motor.h"
+#include <src/motor/motor.hpp>
+#include <src/observer/observer.hpp>
 
 static struct MotorConfig config = {
     .pole_pairs = 7u,

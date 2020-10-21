@@ -11,7 +11,7 @@
 //
 //=============================================================================
 
-#include "src/common.h"
+#include "../common.hpp"
 
 #ifndef FLASH_FUNC_H
 #define FLASH_FUNC_H

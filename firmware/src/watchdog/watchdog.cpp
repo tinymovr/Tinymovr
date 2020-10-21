@@ -15,8 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/common.h"
-#include "watchdog.h"
+#include "watchdog.hpp"
 
 static const float ms_to_clk = 1.201;
 

@@ -18,7 +18,7 @@
 #ifndef CONTROLLER_CONTROLLER_H_
 #define CONTROLLER_CONTROLLER_H_
 
-#include "src/common.h"
+#include "src/common.hpp"
 
 typedef enum {
 	STATE_IDLE = 0,
@@ -76,7 +76,6 @@ struct ControllerState
 struct ControllerConfig
 {
     float vel_limit;
-    float vel_ramp_limit;
     float I_limit;
 
     float pos_gain; // cpr/s / cpr

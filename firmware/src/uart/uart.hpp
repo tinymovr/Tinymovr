@@ -33,7 +33,7 @@
 #ifndef UART_UART_INTERFACE_H_
 #define UART_UART_INTERFACE_H_
 
-#include "src/common.h"
+#include "../common.hpp"
 
 #define UART_ENUM UARTB
 #define UART_REF PAC55XX_UARTB

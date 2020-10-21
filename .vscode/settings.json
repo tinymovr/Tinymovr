@@ -1,0 +1,5 @@
+{
+    "python.pythonPath": "C:\\Users\\ihatz\\AppData\\Local\\Continuum\\miniconda3\\envs\\tinymovr-api\\python.exe",
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true
+}

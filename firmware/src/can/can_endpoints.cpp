@@ -15,17 +15,16 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include <src/adc/adc.hpp>
+#include <src/can/can_endpoints.hpp>
+#include <src/controller/controller.hpp>
+#include <src/encoders/MA702.hpp>
+#include <src/nvm/nvm.hpp>
+#include <src/observer/observer.hpp>
+#include <src/system/system.hpp>
+#include <src/watchdog/watchdog.hpp>
 #include "string.h"
 
-#include "src/system/system.h"
-#include "src/adc/adc.h"
-#include "src/encoders/MA702.h"
-#include "src/observer/observer.h"
-#include "src/controller/controller.h"
-#include "src/nvm/nvm.h"
-#include "src/watchdog/watchdog.h"
-
-#include "src/can/can_endpoints.h"
 
 #define EP_LIST_SIZE 64
 #define EP_MAP_SIZE 256
@@ -140,8 +139,8 @@ uint8_t CAN_SetCANConfig(uint8_t buffer[])
 
 uint8_t CAN_SetState(uint8_t buffer[])
 {
-    uint8_t requested_state;
-    uint8_t requested_mode;
+	ControlState requested_state;
+	ControlMode requested_mode;
     memcpy(&requested_state, &buffer[0], sizeof(uint8_t));
     memcpy(&requested_mode, &buffer[1], sizeof(uint8_t));
     CAN_ResponseType response = CANRP_NoAction;

@@ -15,24 +15,13 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef WATCHDOG_WATCHDOG_H_
-#define WATCHDOG_WATCHDOG_H_
+#ifndef SYSTEM_SYSTEM_H_
+#define SYSTEM_SYSTEM_H_
 
-struct WatchdogConfig
-{
-    bool auto_enable;
-    uint16_t timeout;
-};
+#include <src/common.hpp>
 
-void Watchdog_Init(void);
-void Watchdog_SetEnabled(bool enabled);
-bool Watchdog_GetEnabled(void);
-void Watchdog_SetAutoEnable(bool auto_enable);
-bool Watchdog_GetAutoEnable(void);
+void System_Init(void);
+void System_Reset(void);
+void System_DelayUS(const uint32_t us);
 
-PAC5XXX_RAMFUNC void Watchdog_Feed(void);
-
-int32_t Watchdog_GetTimeout(void);
-void Watchdog_SetTimeout(int32_t new_timeout);
-
-#endif /* WATCHDOG_WATCHDOG_H_ */
+#endif /* SYSTEM_SYSTEM_H_ */

@@ -14,7 +14,7 @@
 #ifndef SSP_FUNC_H
 #define SSP_FUNC_H
 
-#include "src/common.h"
+#include "../common.hpp"
 
 #define DF_SSP_BUSY_TICK (25000u)    // use to check the busy tick
 

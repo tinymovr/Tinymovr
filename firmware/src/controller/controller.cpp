@@ -15,14 +15,23 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/encoders/MA702.h"
-#include "src/observer/observer.h"
-#include "src/adc/adc.h"
-#include "src/motor/motor.h"
-#include "src/gatedriver/gatedriver.h"
-#include "src/watchdog/watchdog.h"
+#include <src/adc/adc.hpp>
+#include <src/controller/controller.hpp>
+#include <src/encoders/MA702.hpp>
+#include <src/gatedriver/gatedriver.hpp>
+#include <src/motor/motor.hpp>
+#include <src/observer/observer.hpp>
+#include <src/watchdog/watchdog.hpp>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "src/utils/utils.h"
-#include "controller.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 PAC5XXX_RAMFUNC void CLControlStep(void);
 void CalibrateStep(void);
