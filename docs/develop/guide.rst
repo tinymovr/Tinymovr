@@ -43,6 +43,13 @@ Now you have the required PAC SDK almost ready. As a final step, there is a smal
 
     cd <tinymovr_location>/firmware/pac55xx_sdk/driver
     patch -p0 -i pac5xxx_driver_tile_socbridge.patch
+    
+Alternatively, you can also use the `Python patch package <https://pypi.org/project/patch/>`_, which is cross-platform:
+
+.. code-block:: console
+
+    cd <tinymovr_location>/firmware/pac55xx_sdk/driver
+    pythom -m patch pac5xxx_driver_tile_socbridge.patch
 
 .. _setting-up-eclipse:
 
