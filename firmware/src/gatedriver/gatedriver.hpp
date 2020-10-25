@@ -23,33 +23,15 @@ typedef enum {
 	GATEDRIVER_ENABLED = 1
 } GateDriverState;
 
-struct GateDriver_
+class Driver
 {
-    GateDriverState state;
-};
+public:
+    PAC5XXX_RAMFUNC void GateDriver_Enable(void);
+    PAC5XXX_RAMFUNC void GateDriver_Disable(void);
+    PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dc);
+private:
+    GateDriverState state = GATEDRIVER_DISABLED;
 
-void GateDriver_Init(void);
-extern PAC5XXX_RAMFUNC void GateDriver_Enable(void);
-extern PAC5XXX_RAMFUNC void GateDriver_Disable(void);
-extern PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dc);
-
-//=============================================
-// Motor Driver Duty Cycle Macro Functions
-//=============================================
-PAC5XXX_RAMFUNC static inline void m1_u_set_duty(float duty)
-{
-    uint16_t val = ((uint16_t)(duty * (ACLK_FREQ_HZ/PWM_TIMER_FREQ) )) >>1;
-    PAC55XX_TIMERA->CCTR4.CTR = val;
-}
-PAC5XXX_RAMFUNC static inline void m1_v_set_duty(float duty)
-{
-    uint16_t val = ((uint16_t)(duty * (ACLK_FREQ_HZ/PWM_TIMER_FREQ) )) >>1;
-    PAC55XX_TIMERA->CCTR5.CTR = val;
-}
-PAC5XXX_RAMFUNC static inline void m1_w_set_duty(float duty)
-{
-    uint16_t val = ((uint16_t)(duty * (ACLK_FREQ_HZ/PWM_TIMER_FREQ) )) >>1;
-    PAC55XX_TIMERA->CCTR6.CTR = val;
 }
 
 #endif /* GATEDRIVER_GATEDRIVER_H_ */

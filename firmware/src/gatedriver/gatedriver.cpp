@@ -18,16 +18,9 @@
 #include <src/common.hpp>
 #include <src/gatedriver/gatedriver.hpp>
 
-struct GateDriver_ gateDriver = 
+PAC5XXX_RAMFUNC void Driver::Enable(void)
 {
-    .state = GATEDRIVER_DISABLED
-};
-
-void GateDriver_Init(void) {}
-
-PAC5XXX_RAMFUNC void GateDriver_Enable(void)
-{
-    if (gateDriver.state == GATEDRIVER_DISABLED)
+    if (state == GATEDRIVER_DISABLED)
     {
 #ifndef DRY_RUN
         // Select PWMA peripheral for Port B
@@ -50,13 +43,13 @@ PAC5XXX_RAMFUNC void GateDriver_Enable(void)
         pac5xxx_tile_register_write(ADDR_CFGDRV4,
                 pac5xxx_tile_register_read(ADDR_CFGDRV4) | 0x1); // BBM is bit 0
 #endif
-        gateDriver.state = GATEDRIVER_ENABLED;
+        state = GATEDRIVER_ENABLED;
     }
 }
 
-PAC5XXX_RAMFUNC void GateDriver_Disable(void)
+PAC5XXX_RAMFUNC void Driver::Disable(void)
 {
-    if (gateDriver.state == GATEDRIVER_ENABLED)
+    if (state == GATEDRIVER_ENABLED)
     {
 #ifndef DRY_RUN
         // Disable driver manager and verify active - need to enable even in PAC5210 to get ENHS pin to work
@@ -74,15 +67,34 @@ PAC5XXX_RAMFUNC void GateDriver_Disable(void)
         // Turn on output enables
         PAC55XX_GPIOB->OUTMASK.w = 0x00;
 #endif
-        gateDriver.state = GATEDRIVER_DISABLED;
+        state = GATEDRIVER_DISABLED;
     }
 }
 
-PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dc)
+PAC5XXX_RAMFUNC void Driver::SetDutyCycle(struct FloatTriplet *dc)
 {
 #ifndef DRY_RUN
     m1_u_set_duty(dc->A);
     m1_v_set_duty(dc->B);
     m1_w_set_duty(dc->C);
 #endif
+}
+
+//=============================================
+// Motor Driver Duty Cycle Macro Functions
+//=============================================
+PAC5XXX_RAMFUNC static inline void m1_u_set_duty(float duty)
+{
+    uint16_t val = ((uint16_t)(duty * (ACLK_FREQ_HZ/PWM_TIMER_FREQ) )) >>1;
+    PAC55XX_TIMERA->CCTR4.CTR = val;
+}
+PAC5XXX_RAMFUNC static inline void m1_v_set_duty(float duty)
+{
+    uint16_t val = ((uint16_t)(duty * (ACLK_FREQ_HZ/PWM_TIMER_FREQ) )) >>1;
+    PAC55XX_TIMERA->CCTR5.CTR = val;
+}
+PAC5XXX_RAMFUNC static inline void m1_w_set_duty(float duty)
+{
+    uint16_t val = ((uint16_t)(duty * (ACLK_FREQ_HZ/PWM_TIMER_FREQ) )) >>1;
+    PAC55XX_TIMERA->CCTR6.CTR = val;
 }

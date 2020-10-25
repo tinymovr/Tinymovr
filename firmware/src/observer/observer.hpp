@@ -20,52 +20,42 @@
 #define OBSERVER_OBSERVER_H_
 
 #include <stdint.h>
+#include <src/common.hpp>
 
-#include "../common.hpp"
-
-struct ObserverState
+class Observer
 {
-	float pos_estimate;
-	int32_t pos_sector;
-	float pos_estimate_wrapped;
-	float vel_estimate;
-};
-
-struct ObserverConfig
-{
-	float track_bw;
-	float kp;
-	float ki;
-
-	int32_t sector_half_interval;
-
-	float pos_offset;     // offset array for each sensor
-	bool offset_calibrated;
-	int direction;      // direction 1 positive, -1 negative
-	bool direction_calibrated;
-};
-
-void Observer_Init(void);
-void Observer_Reset(void);
-PAC5XXX_RAMFUNC void Observer_UpdatePos(void);
-PAC5XXX_RAMFUNC float Observer_GetPosEstimate(void);
-PAC5XXX_RAMFUNC float Observer_GetPosDiff(float target);
-PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrapped(void);
-PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrappedRadians(void);
-PAC5XXX_RAMFUNC float Observer_GetVelEstimate(void);
-
-PAC5XXX_RAMFUNC float Observer_GetBandwidth(void);
-void Observer_SetBandwidth(float bw);
-PAC5XXX_RAMFUNC int Observer_GetDirection(void);
-void Observer_CalibrateDirection(float ref_pos); // Considers POSITIVE electrical phase
-void Observer_SetDirection(int dir);
-PAC5XXX_RAMFUNC float Observer_GetOffset(void);
-void Observer_CalibrateOffset(void);
-void Observer_SetOffset(float offset);
-
-bool Observer_Calibrated(void);
-
-struct ObserverConfig* Observer_GetConfig(void);
-void Observer_RestoreConfig(struct ObserverConfig* config_);
+public:
+	void Observer_Reset(void);
+	PAC5XXX_RAMFUNC void UpdatePosEstimate(void);
+	PAC5XXX_RAMFUNC float GetPosEstimate(void);
+	PAC5XXX_RAMFUNC float GetPosDiff(float target);
+	PAC5XXX_RAMFUNC float GetPosEstimateWrapped(void);
+	PAC5XXX_RAMFUNC float GetPosEstimateWrappedRadians(void);
+	PAC5XXX_RAMFUNC float GetVelEstimate(void);
+	PAC5XXX_RAMFUNC int GetDirection(void);
+	void Observer_CalibrateDirection(float ref_pos); // Considers POSITIVE electrical phase
+	void Observer_SetDirection(int dir);
+	PAC5XXX_RAMFUNC float Observer_GetOffset(void);
+	void Observer_CalibrateOffset(void);
+	void Observer_SetOffset(float offset);
+	bool Calibrated(void);
+private:
+	struct ObserverConfig
+	{
+		float track_bw = OBSERVER_TRACK_BW;
+		float kp = 2.0f * OBSERVER_TRACK_BW;
+		float ki = OBSERVER_TRACK_BW * OBSERVER_TRACK_BW; //0.25f * (config.kp * config.kp);
+		int32_t sector_half_interval = ENCODER_CPR * 10;
+		float pos_offset = 0.0f;     // offset array for each sensor
+		bool offset_calibrated = false;
+		int direction = 0;      // direction 1 positive, -1 negative
+		bool direction_calibrated = false;
+	};
+	ObserverConfig config;
+	float pos_estimate = 0.0f;
+	int32_t pos_sector = 0;
+	float pos_estimate_wrapped = 0.0f;
+	float vel_estimate = 0.0f;
+}
 
 #endif /* OBSERVER_OBSERVER_H_ */

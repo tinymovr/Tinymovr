@@ -54,18 +54,66 @@
 
 #define CAL_PHASE_TURNS             8
 
-// CAN
+
+// ADC ---------------------------------------------------------------
+// Current sensing multipler defined as follows:
+// meas * ONE_OVER_ADC_RES * VREF / R * ONE_OVER_ADC_GAIN
+
+// Tinymovr R3.3 (alpha2) and later have 2mOhm shunts
+// ^12 * 3.3 / 0.002 / 16 ~= 0.025177
+#define SHUNT_SCALING_FACTOR ( 0.025177f )
+
+// Tinymovr R3.2 (alpha1) and earlier have 1mOhm shunts
+// 1/2^12 * 3,3 / 0,001 / 16 ~= 0.0503
+// #define SHUNT_SCALING_FACTOR ( 0.0503f )
+
+// Inverse of sensing multiplier
+#define ONE_OVER_SHUNT_SCALING_FACTOR ( 1.0f / SHUNT_SCALING_FACTOR )
+
+// VBus scaling factor
+#define VBUS_SCALING_FACTOR ( 0.0127f )
+
+
+// CAN ---------------------------------------------------------------
+// Endpoint size in bits
 #define CAN_EP_SIZE 6
 
-// UART
+
+// UART --------------------------------------------------------------
+// UART port identifier
 #define UART_ENUM UARTB
 #define UART_REF PAC55XX_UARTB
+
+// Baud rate
 #define UART_BAUD_RATE 115200
+
+// Protocol start byte (dot)
 #define UART_ASCII_PROT_START_BYTE 0x2E
+
+// Newline char
 #define UART_NEWLINE 0x0A
+
 #define UART_BYTE_LIMIT 32
 #define UART_I_SCALING_FACTOR ( 1000.0f )
 #define UART_R_SCALING_FACTOR ( 1000.0f )
 #define UART_L_SCALING_FACTOR ( 1000.0f )
 #define ONE_OVER_UART_I_SCALING_FACTOR ( 0.001f )
 #define UART_V_SCALING_FACTOR ( 1000.0f )
+
+
+// Observer ---------------------------------------------------------
+
+#define OBSERVER_TRACK_BW ( 1000.0f )
+
+
+// Driver & Timer ---------------------------------------------------
+#define RED_DEATH_TIMET                 250         //Set rising edge death-time, if TACTL.DTGCLK is 0b, 50--> 1us
+#define FED_DEATH_TIMET                 250         //Set failling edge death-time, if TACTL.DTGCLK is 0b, 50--> 1us
+
+
+// Motor ------------------------------------------------------------
+#define MIN_PHASE_RESISTANCE ( 0.005f )
+#define MAX_PHASE_RESISTANCE ( 1.0f )
+
+#define MIN_PHASE_INDUCTANCE ( 2e-6f )
+#define MAX_PHASE_INDUCTANCE ( 5000e-6f )

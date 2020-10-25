@@ -18,40 +18,34 @@
 #ifndef MOTOR_MOTOR_H_
 #define MOTOR_MOTOR_H_
 
-#define MIN_PHASE_RESISTANCE ( 0.005f )
-#define MAX_PHASE_RESISTANCE ( 1.0f )
+#include <src/common.hpp>
 
-#define MIN_PHASE_INDUCTANCE ( 2e-6f )
-#define MAX_PHASE_INDUCTANCE ( 5000e-6f )
-
-#include "../common.hpp"
-
-struct MotorConfig
+class Motor
 {
-	uint8_t pole_pairs;
-	float phase_resistance;
-	float phase_inductance;
+public:
+	PAC5XXX_RAMFUNC uint8_t GetPolePairs(void);
+	PAC5XXX_RAMFUNC uint8_t FindPolePairs(uint16_t cpr, float start_cpr, float end_cpr, float e_angle);
+	PAC5XXX_RAMFUNC void SetPolePairs(uint8_t pairs);
 
-	bool resistance_calibrated;
-	bool inductance_calibrated;
-	bool poles_calibrated;
-};
+	PAC5XXX_RAMFUNC float GetPhaseResistance(void);
+	PAC5XXX_RAMFUNC void SetPhaseResistance(float R);
 
-void Motor_Init(void);
+	PAC5XXX_RAMFUNC float GetPhaseInductance(void);
+	PAC5XXX_RAMFUNC void SetPhaseInductance(float L);
 
-PAC5XXX_RAMFUNC uint8_t Motor_GetPolePairs(void);
-PAC5XXX_RAMFUNC uint8_t Motor_FindPolePairs(uint16_t cpr, float start_cpr, float end_cpr, float e_angle);
-PAC5XXX_RAMFUNC void Motor_SetPolePairs(uint8_t pairs);
+	PAC5XXX_RAMFUNC bool Calibrated(void);
+private:
+	struct MotorConfig
+	{
+		uint8_t pole_pairs = 7u;
+		float phase_resistance = 0.1f;
+		float phase_inductance = 1e-5f;
 
-PAC5XXX_RAMFUNC float Motor_GetPhaseResistance(void);
-PAC5XXX_RAMFUNC void Motor_SetPhaseResistance(float R);
-
-PAC5XXX_RAMFUNC float Motor_GetPhaseInductance(void);
-PAC5XXX_RAMFUNC void Motor_SetPhaseInductance(float L);
-
-PAC5XXX_RAMFUNC bool Motor_Calibrated(void);
-
-struct MotorConfig* Motor_GetConfig(void);
-void Motor_RestoreConfig(struct MotorConfig* config_);
+		bool resistance_calibrated = false;
+		bool inductance_calibrated = false;
+		bool poles_calibrated = false;
+	};
+	MotorConfig config;
+}
 
 #endif /* MOTOR_MOTOR_H_ */

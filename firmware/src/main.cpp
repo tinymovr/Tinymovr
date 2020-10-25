@@ -55,6 +55,11 @@ int main(void)
 extern "C" {
 #endif
 
+void ADC_IRQHandler(void)
+{
+  
+}
+
 void CAN_IRQHandler(void)
 {
 

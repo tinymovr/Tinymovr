@@ -20,21 +20,25 @@
 
 #include <src/common.hpp>
 
-struct WatchdogConfig
+class Watchdog
 {
-    bool auto_enable;
-    uint16_t timeout;
-};
+public:
+    Watchdog();
+    void Watchdog_SetEnabled(bool enabled);
+    bool Watchdog_GetEnabled(void);
+    void Watchdog_SetAutoEnable(bool auto_enable);
+    bool Watchdog_GetAutoEnable(void);
+    int32_t Watchdog_GetTimeout(void);
+    void Watchdog_SetTimeout(int32_t new_timeout);
+    PAC5XXX_RAMFUNC void Watchdog_Feed(void);
 
-void Watchdog_Init(void);
-void Watchdog_SetEnabled(bool enabled);
-bool Watchdog_GetEnabled(void);
-void Watchdog_SetAutoEnable(bool auto_enable);
-bool Watchdog_GetAutoEnable(void);
-
-PAC5XXX_RAMFUNC void Watchdog_Feed(void);
-
-int32_t Watchdog_GetTimeout(void);
-void Watchdog_SetTimeout(int32_t new_timeout);
+private:
+    struct WatchdogConfig
+    {
+        bool auto_enable = false;
+        uint16_t timeout = 1000; // ms
+    };
+    WatchdogConfig config;
+}
 
 #endif /* WATCHDOG_WATCHDOG_H_ */

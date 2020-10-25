@@ -21,17 +21,19 @@
 #include <src/common.hpp>
 
 class CAN;
+class UART;
 
 class System {
 
 public:
 	CAN &can;
+	UART &uart;
 
 	System(void);
 	void Loop(void);
 	void Reset(void);
 	void DelayUS(uint32_t us);
-
+	void InitTimer(void);
 };
 
 #endif /* SYSTEM_SYSTEM_HPP_ */

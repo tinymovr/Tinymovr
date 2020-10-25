@@ -16,7 +16,26 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <src/comms/can/can.hpp>
+#include <src/comms/uart/uart.hpp>
 #include <system.hpp>
+
+typedef enum
+{
+    BEFORE_ACLK_DIVIDER                 = 0,        // The DTGCLK is the clock before the TACTL.CLKDIV clock divider
+    AFTER_ACLK_DIVIDER                  = 1,        // The DTGCLK is the clock after the TACTL.CLKDIV clock divider
+}TXCTL_DTCLK_Type;
+
+typedef enum
+{
+    TIMER_SLAVE_SYNC_DISABLE            = 0,        // The timer auto reload
+    TIMER_SLAVE_SYNC_ENABLE             = 1,        // The timer single shot
+}TXCTL_SSYNC_Type;
+
+typedef enum
+{
+    AUTO_RELOAD                         = 0,        // The timer auto reload
+    SINGLE_SHOT                         = 1,        // The timer single shot
+}TXCTL_SINGLE_Type;
 
 System::System(void)
 {
@@ -77,6 +96,7 @@ System::System(void)
 
 void System::Loop(void)
 {
+    // TODO: Add control logic
 	__WFI();
 }
 
@@ -89,4 +109,24 @@ void System::Reset(void)
 void System::DelayUS(uint32_t us)
 {
     pac_delay_asm(us * 16u);
+}
+
+void System::InitTimer(void)
+{
+    // Configure Timer A Controls
+    pac5xxx_timer_clock_config(TimerA, TXCTL_CS_ACLK, TXCTL_PS_DIV1);                   // Configure timer clock input for ACLK, /1 divider
+    pac5xxx_timer_base_config(TimerA, (ACLK_FREQ_HZ/2/PWM_TIMER_FREQ), AUTO_RELOAD,
+            TxCTL_MODE_UPDOWN, TIMER_SLAVE_SYNC_DISABLE);                               // Configure timer frequency and count mode
+
+    // Configure Dead time generators
+    PAC55XX_TIMERA->CTL.DTGCLK = BEFORE_ACLK_DIVIDER;                                   // 0--> The DTGCLK is the clock before the TACTL.CLKDIV clock divider.
+                                                                                        // 1--> The DTGCLK is the clock after the TACTL.CLKDIV clock divider.
+
+    pac5xxx_dtg_config2(&(PAC55XX_TIMERA->DTGCTL0), RED_DEATH_TIMET, FED_DEATH_TIMET);  // Configure DTGA0 for phase U
+    pac5xxx_dtg_config2(&(PAC55XX_TIMERA->DTGCTL1), RED_DEATH_TIMET, FED_DEATH_TIMET);  // Configure DTGA1 for phase V
+    pac5xxx_dtg_config2(&(PAC55XX_TIMERA->DTGCTL2), RED_DEATH_TIMET, FED_DEATH_TIMET);  // Configure DTGA2 for phase W
+
+    PAC55XX_TIMERA->CCTR4.CTR = 0;
+    PAC55XX_TIMERA->CCTR5.CTR = 0;
+    PAC55XX_TIMERA->CCTR6.CTR = 0;
 }

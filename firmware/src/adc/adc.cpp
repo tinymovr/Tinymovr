@@ -18,63 +18,13 @@
 #include <src/adc/adc.hpp>
 #include "string.h"
 
-// Resistor value of diffamp AIO RC filter
-#define AIORES_VALUE                    100.0f
-
-#define AIO0to5_DIFF_AMP_MODE           0x40u
-#define AIO6789_IO_MODE                 0x00u
-#define HP_DIS_LP_EN_PR1                0x20u
-
-#define AIO_INPUT                       0x00u
-#define AIO_OUTPUT                      0x20u
-
-#define AIO_ACTIVE_H                    0x00u
-#define AIO_ACTIVE_L                    0x08u
-
-#define OFFSET_EN                       0x08u
-#define OFFSET_DIS                      0x00u
-
-#define CAL_OFFSET_EN                   0x04u
-#define CAL_OFFSET_DIS                  0x00u
-
-#define GAINx1                          (0x01u << 3)
-#define GAINx2                          (0x03u << 3)
-#define GAINx4                          (0x01u << 3)
-#define GAINx8                          (0x04u << 3)
-#define GAINx16                         (0x05u << 3)
-
-#define LP_HP_EN_1us                    0x01u
-
-#define LP54_EN                         0x04u
-#define LP32_EN                         0x02u
-#define LP10_EN                         0x01u
-
-#define LP_PROT                         (LP54_EN | LP32_EN | LP10_EN)
-
-#define LSPR1EN                         0x20u
-
-// Digital_MUX_Setting (DMUX_DOUTx_Default)
-#define DMUX_DOUTx_Default              0
-
-void ADC_AIO_Init(void);
-void ADC_DTSE_Init(void);
-
-static struct ADCState adc;
-
-static struct ADCConfig config = {
-        .Iphase_limit = 40.0f,
-        .I_filter_k = 0.6,
-        .I_phase_offset_tau = 0.2
-};
-
-// TODO: Add temp sensor ADC
 // Set the ADC Pre Mux to send AB11 Power Monitor signal to ADC0
 //    pac5xxx_tile_register_write(ADDR_ADCIN1, SIGMGR_AB10);                      // AB10 temperature
 
-void ADC_Init(void)
+ADC::ADC(void)
 {
     // Arbitrary value to avoid division by zero
-    adc.vbus = 12.0f;
+    vbus = 12.0f;
     
     // --- Begin CAFE2 Initialization
 
@@ -173,7 +123,7 @@ void ADC_Init(void)
     pac5xxx_adc_start();
 }
 
-void ADC_AIO_Init(void)
+void ADC::AIO_Init(void)
 {
     // TODO: Verify if Low-side protection has any effect
     pac5xxx_tile_register_write(ADDR_CFGAIO0, AIO0to5_DIFF_AMP_MODE | GAINx16 | LP_HP_EN_1us);
@@ -186,7 +136,7 @@ void ADC_AIO_Init(void)
     pac5xxx_tile_register_write(ADDR_CFGAIO5, HP_DIS_LP_EN_PR1 | OFFSET_EN | CAL_OFFSET_DIS | LP_HP_EN_1us);
 }
 
-void ADC_DTSE_Init(void)
+void ADC::DTSE_Init(void)
 {
     //========================================================================================================
     // Setup DTSE Sequence Trigger - See "DTSE Trigger Mapping Table" in the PAC55XX Family User's Guide
@@ -230,52 +180,43 @@ void ADC_DTSE_Init(void)
 
 }
 
-PAC5XXX_RAMFUNC float ADC_GetVBus(void)
+PAC5XXX_RAMFUNC float ADC::GetVBus(void)
 {
-    return adc.vbus;
+    return vbus;
 }
 
-PAC5XXX_RAMFUNC int16_t ADC_GetMCUTemp(void)
+PAC5XXX_RAMFUNC int16_t ADC::GetMCUTemp(void)
 {
-    return adc.temp;
+    return temp;
 }
 
-PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc)
+PAC5XXX_RAMFUNC void ADC::GetPhaseCurrents(struct FloatTriplet *phc)
 {
-    phc->A = adc.I_phase_meas.A;
-    phc->B = adc.I_phase_meas.B;
-    phc->C = adc.I_phase_meas.C;
+    phc->A = I_phase_meas.A;
+    phc->B = I_phase_meas.B;
+    phc->C = I_phase_meas.C;
 }
 
-void ADC_SetProt_callback(void (*Callback)(void))
-{
-    adc.Prot_callback = Callback;
-}
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void ADC_IRQHandler(void)
+PAC5XXX_RAMFUNC void ADC::InterruptHandler(void)
 {
     // Clear Interrupt Flag
     PAC55XX_ADC->ADCINT.ADCIRQ0IF = 1;
 
     // TODO: Try doing below transformations in integer domain
     const float I_phase_offset_k =  PWM_TIMER_PERIOD / config.I_phase_offset_tau;
-    adc.I_phase_offset.A += (((float)PAC55XX_ADC->DTSERES6.VAL * SHUNT_SCALING_FACTOR)
-        - adc.I_phase_offset.A) * I_phase_offset_k;
-    adc.I_phase_offset.B += (((float)PAC55XX_ADC->DTSERES8.VAL * SHUNT_SCALING_FACTOR)
-        - adc.I_phase_offset.B) * I_phase_offset_k;
-    adc.I_phase_offset.C += (((float)PAC55XX_ADC->DTSERES10.VAL * SHUNT_SCALING_FACTOR)
-        - adc.I_phase_offset.C) * I_phase_offset_k;
+    I_phase_offset.A += (((float)PAC55XX_ADC->DTSERES6.VAL * SHUNT_SCALING_FACTOR)
+        - I_phase_offset.A) * I_phase_offset_k;
+    I_phase_offset.B += (((float)PAC55XX_ADC->DTSERES8.VAL * SHUNT_SCALING_FACTOR)
+        - I_phase_offset.B) * I_phase_offset_k;
+    I_phase_offset.C += (((float)PAC55XX_ADC->DTSERES10.VAL * SHUNT_SCALING_FACTOR)
+        - I_phase_offset.C) * I_phase_offset_k;
 
-	const float i_a = ( ((float)PAC55XX_ADC->DTSERES14.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.A);
-	const float i_b = ( ((float)PAC55XX_ADC->DTSERES16.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.B);
-	const float i_c = ( ((float)PAC55XX_ADC->DTSERES18.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.C);
-	adc.I_phase_meas.A = ((1.0f-config.I_filter_k)*i_a) - (config.I_filter_k*(i_b + i_c));
-	adc.I_phase_meas.B = ((1.0f-config.I_filter_k)*i_b) - (config.I_filter_k*(i_a + i_c));
-	adc.I_phase_meas.C = ((1.0f-config.I_filter_k)*i_c) - (config.I_filter_k*(i_a + i_b));
+	const float i_a = ( ((float)PAC55XX_ADC->DTSERES14.VAL * SHUNT_SCALING_FACTOR) - I_phase_offset.A);
+	const float i_b = ( ((float)PAC55XX_ADC->DTSERES16.VAL * SHUNT_SCALING_FACTOR) - I_phase_offset.B);
+	const float i_c = ( ((float)PAC55XX_ADC->DTSERES18.VAL * SHUNT_SCALING_FACTOR) - I_phase_offset.C);
+	I_phase_meas.A = ((1.0f-config.I_filter_k)*i_a) - (config.I_filter_k*(i_b + i_c));
+	I_phase_meas.B = ((1.0f-config.I_filter_k)*i_b) - (config.I_filter_k*(i_a + i_c));
+	I_phase_meas.C = ((1.0f-config.I_filter_k)*i_c) - (config.I_filter_k*(i_a + i_b));
 
     // Internal MCU temperature sensor reading at FTTEMP temperature in ADC counts.
     uint16_t TTEMPS = 0;
@@ -283,27 +224,7 @@ void ADC_IRQHandler(void)
     // Temperature in oC at time of internal temperature sensor
     const int32_t FTTEMP = 27; //READ_UINT16(0x0010041E);
     const int32_t temp_val = (int32_t)(PAC55XX_ADC->DTSERES2.VAL);
-    adc.temp = ( (((FTTEMP + 273) * ((temp_val * 100) + 12288)) / (((int16_t)TTEMPS * 100) + 12288)) - 273);
+    temp = ( (((FTTEMP + 273) * ((temp_val * 100) + 12288)) / (((int16_t)TTEMPS * 100) + 12288)) - 273);
     
-    adc.vbus = ((float)PAC55XX_ADC->DTSERES4.VAL) * VBUS_SCALING_FACTOR;
+    vbus = ((float)PAC55XX_ADC->DTSERES4.VAL) * VBUS_SCALING_FACTOR;
 }
-
-void ADC1_IRQHandler(void)
-{
-    // Overcurrent protection interrupt handler
-    // Currently not used
-
-    // Clear Interrupt Flag
-    PAC55XX_ADC->ADCINT.ADCIRQ1IF = 1;
-
-    // Call protection callback
-    if (adc.Prot_callback != NULL)
-    {
-        adc.Prot_callback();
-    }
-}
-
-#ifdef __cplusplus
-}
-#endif
-

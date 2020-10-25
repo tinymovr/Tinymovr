@@ -17,17 +17,12 @@
 
 #include "watchdog.hpp"
 
-static const float ms_to_clk = 1.201;
-
-int32_t ClkValueForMs(int32_t ms);
-
-static struct WatchdogConfig config = 
+int32_t ClkValueForMs(int32_t ms)
 {
-    .auto_enable = false,
-    .timeout=1000 // ms
-};
+    return (int32_t)((float)ms * 1.201);
+}
 
-void Watchdog_Init(void)
+Watchdog::Watchdog(void)
 {
     uint16_t val = ClkValueForMs(config.timeout);
 
@@ -52,7 +47,7 @@ void Watchdog_Init(void)
     PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_READ_ONLY;
 }
 
-void Watchdog_SetEnabled(bool enabled)
+void Watchdog::SetEnabled(bool enabled)
 {
     PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_WRITE_AVALABLE;
     if (enabled)
@@ -66,12 +61,12 @@ void Watchdog_SetEnabled(bool enabled)
     PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_READ_ONLY;
 }
 
-bool Watchdog_GetEnabled(void)
+bool Watchdog::GetEnabled(void)
 {
     return PAC55XX_WWDT->WWDTCTL.EN;
 }
 
-void Watchdog_SetAutoEnable(bool auto_enable)
+void Watchdog::SetAutoEnable(bool auto_enable)
 {
     if (auto_enable)
     {
@@ -83,12 +78,12 @@ void Watchdog_SetAutoEnable(bool auto_enable)
     }
 }
 
-bool Watchdog_GetAutoEnable(void)
+bool Watchdog::GetAutoEnable(void)
 {
     return config.auto_enable;
 }
 
-PAC5XXX_RAMFUNC void Watchdog_Feed(void)
+PAC5XXX_RAMFUNC void Watchdog::Feed(void)
 {
     PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_WRITE_AVALABLE;
     // Write any value to WWDTCLEAR to start WWDT over
@@ -96,12 +91,12 @@ PAC5XXX_RAMFUNC void Watchdog_Feed(void)
     PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_READ_ONLY;
 }
 
-int32_t Watchdog_GetTimeout(void)
+int32_t Watchdog::GetTimeout(void)
 {
     return config.timeout;
 }
 
-void Watchdog_SetTimeout(int32_t new_timeout)
+void Watchdog::SetTimeout(int32_t new_timeout)
 {
     if (new_timeout > 0)
     {
@@ -118,7 +113,3 @@ void Watchdog_SetTimeout(int32_t new_timeout)
     }
 }
 
-int32_t ClkValueForMs(int32_t ms)
-{
-    return (int32_t)((float)ms * ms_to_clk);
-}
