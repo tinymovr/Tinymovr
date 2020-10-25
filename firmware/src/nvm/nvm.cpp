@@ -17,7 +17,7 @@
 
 #include <src/common.hpp>
 #include <src/nvm/nvm.hpp>
-#include <src/system/system.hpp>
+#include <src/system.hpp>
 
 #ifdef __cplusplus
 extern "C" {
@@ -91,6 +91,6 @@ void NVM_Erase(void)
 	if (Controller_GetState() == STATE_IDLE)
 	{
 		flash_erase_page(SETTINGS_PAGE);
-		System_Reset();
+		sys_.Reset();
 	}
 }

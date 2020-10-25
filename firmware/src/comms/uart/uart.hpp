@@ -33,25 +33,8 @@
 #ifndef UART_UART_INTERFACE_H_
 #define UART_UART_INTERFACE_H_
 
-#include "../common.hpp"
-
-#define UART_ENUM UARTB
-#define UART_REF PAC55XX_UARTB
-#define UART_BAUD_RATE 115200
-
- // . (dot)
-#define UART_ASCII_PROT_START_BYTE 0x2E
-
-// newline
-#define UART_NEWLINE 0x0A
-
-#define UART_BYTE_LIMIT 32
-
-#define UART_I_SCALING_FACTOR ( 1000.0f )
-#define UART_R_SCALING_FACTOR ( 1000.0f )
-#define UART_L_SCALING_FACTOR ( 1000.0f )
-#define ONE_OVER_UART_I_SCALING_FACTOR ( 0.001f )
-#define UART_V_SCALING_FACTOR ( 1000.0f )
+#include <src/common.hpp>
+#include <src/comms/com_interface.hpp>
 
 typedef enum {
     MSG_TYPE_UNKNOWN = 0,
@@ -59,9 +42,25 @@ typedef enum {
     MSG_TYPE_BINARY = 2
 } SerialMessageType;
 
-void UART_SendErrorMsg(void);
+class UART : public ComInterface
+{
+public:
+	UART(System sys_);
+	void SendMessage(char *buffer);
+private:
+	SerialMessageType msg_type = MSG_TYPE_UNKNOWN;
+	uint8_t rx_byte_count = 0;
+	uint8_t tx_byte_count = 0;
+	char rx_buffer[64] = {0};
+	char tx_buffer[64] = {0};
+	void WriteAddr(uint8_t addr, int32_t data);
+	int32_t ReadAddr(uint8_t addr);
+	void SendMessage(char *buffer);
+	void ProcessASCIIMessage();
+	void ResetRxQueue();
+	void InterruptHandler(void);
+};
 
-void UART_Init(void);
-void UART_SendMessage(char *buffer);
+
 
 #endif /* UART_UART_INTERFACE_H_ */

@@ -11,7 +11,7 @@
 //
 //=============================================================================
 
-#include "can_func.h"
+#include <src/comms/can/can_func.h>
 
 uint8_t tx_data[8] = {0,1,2,3,4,5,6,7};
 uint8_t rx_data[8];

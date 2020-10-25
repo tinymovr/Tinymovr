@@ -18,7 +18,7 @@
 #ifndef NVM_NVM_H_
 #define NVM_NVM_H_
 
-#include <src/can/can.hpp>
+#include <src/comms/can/can.hpp>
 #include <src/controller/controller.hpp>
 #include <src/motor/motor.hpp>
 #include <src/observer/observer.hpp>

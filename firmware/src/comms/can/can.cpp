@@ -15,21 +15,13 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <src/can/can.hpp>
-#include <src/can/can_endpoints.hpp>
-#include <src/system/system.hpp>
+#include <src/comms/can/can.hpp>
+#include <src/system.hpp>
 #include <src/watchdog/watchdog.hpp>
 
-void CAN_ProcessMessage(uint8_t command_id, bool rtr);
-
-static struct CANConfig config = {
-    .id = 1,
-    .kbaud_rate = CAN_BAUD_1000KHz
-};
-
-void CAN_Init(void)
+CAN::CAN(System sys_)
 {
-    CANEP_InitEndpointMap();
+    InitEndpointMap();
 
     // Configure PF4 as GPIO input
     PAC55XX_GPIOF->MODE.P4 = IO_HIGH_IMPEDENCE_INPUT;
@@ -70,25 +62,25 @@ void CAN_Init(void)
     NVIC_EnableIRQ(CAN_IRQn);
 
     pac5xxx_can_reset_mode_set(0);	// CAN reset mode inactive
-    System_DelayUS(100);
+    systm.DelayUS(100);
 }
 
-uint16_t CAN_GetkBaudRate(void)
+uint16_t CAN::GetkBaudRate(void)
 {
     return CAN_BaudTypeToInt(config.kbaud_rate);
 }
 
-void CAN_SetkBaudRate(uint16_t rate)
+void CAN::SetkBaudRate(uint16_t rate)
 {
     config.kbaud_rate = CAN_IntToBaudType(rate);
 }
 
-uint8_t CAN_GetID(void)
+uint8_t CAN::GetID(void)
 {
     return config.id;
 }
 
-void CAN_SetID(uint8_t id)
+void CAN::SetID(uint8_t id)
 {
     pac5xxx_can_reset_mode_set(1);  // CAN in reset mode, in order to configure CAN module
     config.id = id;
@@ -97,12 +89,12 @@ void CAN_SetID(uint8_t id)
     PAC55XX_CAN->AMR = 0xFFFFFF87;
     PAC55XX_CAN->ACR = config.id << (CAN_EP_SIZE - 3);
     pac5xxx_can_reset_mode_set(0);  // CAN reset mode inactive
-    System_DelayUS(100);
+    systm.DelayUS(100);
 }
 
-void CAN_ProcessMessage(uint8_t command_id, bool rtr)
+void CAN::ProcessMessage(uint8_t command_id, bool rtr)
 {
-    uint8_t (*callback)(uint8_t buffer[]) = CANEP_GetEndpoint(command_id);
+    uint8_t (*callback)(uint8_t buffer[]) = GetEndpoint(command_id);
     if (callback != NULL)
     {
         uint8_t can_msg_buffer[8] = {0};
@@ -120,7 +112,7 @@ void CAN_ProcessMessage(uint8_t command_id, bool rtr)
     rx_flag = 0;
 }
 
-void CAN_IRQHandler(void)
+void CAN::InterruptHandler(void)
 {
     buffer = PAC55XX_CAN->RXBUF;	//  read RX buffer, RX buffer bit order same as TX buffer
 
@@ -146,18 +138,8 @@ void CAN_IRQHandler(void)
         }
     }
     rx_flag = 1;
-    CAN_ProcessMessage(command_id, rtr);
+    ProcessMessage(command_id, rtr);
 
     pac5xxx_can_int_clear_RI(); // Clear RX interrupt
-}
-
-struct CANConfig* CAN_GetConfig(void)
-{
-    return &config;
-}
-
-void CAN_RestoreConfig(struct CANConfig* config_)
-{
-    config = *config_;
 }
 

@@ -15,9 +15,10 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "system.hpp"
+#include <src/comms/can/can.hpp>
+#include <system.hpp>
 
-void System_Init(void)
+System::System(void)
 {
     // --- Mandatory System Init from Qorvo
     // Set Flash Lock to allow write access to MEMCTL register for configuring clocks
@@ -74,13 +75,18 @@ void System_Init(void)
 	}
 }
 
-void System_Reset(void)
+void System::Loop(void)
+{
+	__WFI();
+}
+
+void System::Reset(void)
 {
 	pac5xxx_tile_register_write(ADDR_WATCHDOG,
 		pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
 }
 
-void System_DelayUS(uint32_t us)
+void System::DelayUS(uint32_t us)
 {
     pac_delay_asm(us * 16u);
 }

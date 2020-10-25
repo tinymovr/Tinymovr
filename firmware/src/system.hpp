@@ -15,13 +15,23 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SYSTEM_SYSTEM_H_
-#define SYSTEM_SYSTEM_H_
+#ifndef SYSTEM_SYSTEM_HPP_
+#define SYSTEM_SYSTEM_HPP_
 
 #include <src/common.hpp>
 
-void System_Init(void);
-void System_Reset(void);
-void System_DelayUS(const uint32_t us);
+class CAN;
 
-#endif /* SYSTEM_SYSTEM_H_ */
+class System {
+
+public:
+	CAN &can;
+
+	System(void);
+	void Loop(void);
+	void Reset(void);
+	void DelayUS(uint32_t us);
+
+};
+
+#endif /* SYSTEM_SYSTEM_HPP_ */

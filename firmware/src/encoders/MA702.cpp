@@ -16,13 +16,13 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <src/encoders/MA702.hpp>
-#include <src/system/system.hpp>
+#include <src/system.hpp>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "src/ssp/ssp_func.h"
+#include "src/encoders/ssp_func.h"
 
 #ifdef __cplusplus
 }
@@ -38,7 +38,7 @@ static struct MA702State state = {
 void MA_Init(void)
 {
     ssp_init(SSPD, SSP_MS_MASTER, 0, 0); // Mode 0
-    System_DelayUS(16000); // ensure 16ms sensor startup time
+    sys_.DelayUS(16000); // ensure 16ms sensor startup time
 }
 
 PAC5XXX_RAMFUNC int MA_GetAngle(void)

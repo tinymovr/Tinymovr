@@ -16,12 +16,11 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <src/adc/adc.hpp>
-#include <src/can/can_endpoints.hpp>
 #include <src/controller/controller.hpp>
 #include <src/encoders/MA702.hpp>
 #include <src/nvm/nvm.hpp>
 #include <src/observer/observer.hpp>
-#include <src/system/system.hpp>
+#include <src/system.hpp>
 #include <src/watchdog/watchdog.hpp>
 #include "string.h"
 
@@ -33,43 +32,43 @@ CANEP_Callback EPList[EP_LIST_SIZE];
 uint8_t currentIndex = 0;
 uint8_t EPMap[EP_MAP_SIZE] = {0};
 
-void CANEP_InitEndpointMap(void)
+void CAN::InitEndpointMap(void)
 {
     (void)memset(EPList, '\0', sizeof(EPList));
 
-    CANEP_AddEndpoint(&CAN_EStop, 0x002);
-    CANEP_AddEndpoint(&CAN_GetState, 0x003);
+    AddEndpoint(&CAN_EStop, 0x002);
+    AddEndpoint(&CAN_GetState, 0x003);
     // 0x004 AVAIL
-    CANEP_AddEndpoint(&CAN_GetCANConfig, 0x005);
-    CANEP_AddEndpoint(&CAN_SetCANConfig, 0x006);
-    CANEP_AddEndpoint(&CAN_SetState, 0x007);
+    AddEndpoint(&CAN_GetCANConfig, 0x005);
+    AddEndpoint(&CAN_SetCANConfig, 0x006);
+    AddEndpoint(&CAN_SetState, 0x007);
     // 0x008 AVAIL
-    CANEP_AddEndpoint(&CAN_GetEncoderEstimates, 0x009);
-    CANEP_AddEndpoint(&CAN_GetSetpoints, 0x00A);
+    AddEndpoint(&CAN_GetEncoderEstimates, 0x009);
+    AddEndpoint(&CAN_GetSetpoints, 0x00A);
     // 0x00B Reserved: Move To Pos
-    CANEP_AddEndpoint(&CAN_SetPosSetpoint, 0x00C);
-    CANEP_AddEndpoint(&CAN_SetVelSetpoint, 0x00D);
-    CANEP_AddEndpoint(&CAN_SetIqSetpoint, 0x00E);
-    CANEP_AddEndpoint(&CAN_SetLimits, 0x00F);
-    CANEP_AddEndpoint(&CAN_GetPhaseCurrents, 0x010);
+    AddEndpoint(&CAN_SetPosSetpoint, 0x00C);
+    AddEndpoint(&CAN_SetVelSetpoint, 0x00D);
+    AddEndpoint(&CAN_SetIqSetpoint, 0x00E);
+    AddEndpoint(&CAN_SetLimits, 0x00F);
+    AddEndpoint(&CAN_GetPhaseCurrents, 0x010);
     // 0x011 Reserved: Move To Pos
     // 0x012 Reserved: Move To Pos
     // 0x013 AVAIL
-    CANEP_AddEndpoint(&CAN_GetIq, 0x014);
-    CANEP_AddEndpoint(&CAN_GetLimits, 0x015);
-    CANEP_AddEndpoint(&CAN_Reset, 0x016);
-    CANEP_AddEndpoint(&CAN_GetVBus, 0x017);
-    CANEP_AddEndpoint(&CAN_GetGains, 0x018);
-    CANEP_AddEndpoint(&CAN_SetGains, 0x019);
-    CANEP_AddEndpoint(&CAN_DeviceInfo, 0x01A);
-    CANEP_AddEndpoint(&CAN_Timings, 0x01B);
-    CANEP_AddEndpoint(&CAN_SaveConfig, 0x01C);
-    CANEP_AddEndpoint(&CAN_EraseConfig, 0x01D);
-    CANEP_AddEndpoint(&CAN_GetMotorInfo, 0x01E);
+    AddEndpoint(&CAN_GetIq, 0x014);
+    AddEndpoint(&CAN_GetLimits, 0x015);
+    AddEndpoint(&CAN_Reset, 0x016);
+    AddEndpoint(&CAN_GetVBus, 0x017);
+    AddEndpoint(&CAN_GetGains, 0x018);
+    AddEndpoint(&CAN_SetGains, 0x019);
+    AddEndpoint(&CAN_DeviceInfo, 0x01A);
+    AddEndpoint(&CAN_Timings, 0x01B);
+    AddEndpoint(&CAN_SaveConfig, 0x01C);
+    AddEndpoint(&CAN_EraseConfig, 0x01D);
+    AddEndpoint(&CAN_GetMotorInfo, 0x01E);
     // 0x01F AVAIL
 }
 
-void CANEP_AddEndpoint(CANEP_Callback callback, uint8_t id)
+void CAN::AddEndpoint(CANEP_Callback callback, uint8_t id)
 {
     if (EPMap[id] == 0u)
     {
@@ -79,7 +78,7 @@ void CANEP_AddEndpoint(CANEP_Callback callback, uint8_t id)
     }
 }
 
-CANEP_Callback CANEP_GetEndpoint(uint8_t id)
+CANEP_Callback CAN::GetEndpoint(uint8_t id)
 {
     CANEP_Callback cb = NULL;
     if (EPMap[id] != 0u)
@@ -91,7 +90,7 @@ CANEP_Callback CANEP_GetEndpoint(uint8_t id)
 
 // Endpoint handlers
 
-uint8_t CAN_EStop(uint8_t buffer[])
+uint8_t CAN::CAN_EStop(uint8_t buffer[])
 {
     Controller_SetState(STATE_IDLE);
     return CANRP_Write;
@@ -108,16 +107,16 @@ uint8_t CAN_GetState(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_GetCANConfig(uint8_t buffer[])
+uint8_t CAN::CAN_GetCANConfig(uint8_t buffer[])
 {
-    uint8_t id = CAN_GetID();
-    uint16_t baudrate = CAN_GetkBaudRate();
+    uint8_t id = GetID();
+    uint16_t baudrate = GetkBaudRate();
     memcpy(&buffer[0], &id, sizeof(uint8_t));
     memcpy(&buffer[1], &baudrate, sizeof(uint16_t));
     return CANRP_Read;
 }
 
-uint8_t CAN_SetCANConfig(uint8_t buffer[])
+uint8_t CAN::CAN_SetCANConfig(uint8_t buffer[])
 {
     uint8_t id;
     uint16_t baudrate;
@@ -126,18 +125,18 @@ uint8_t CAN_SetCANConfig(uint8_t buffer[])
     CAN_ResponseType response = CANRP_NoAction;
     if (id >= 1u)
     {
-        CAN_SetID(id);
+        SetID(id);
         response = CANRP_Write;
     }
     if ((baudrate >= 50u) && (baudrate <= 1000u))
     {
-        CAN_SetkBaudRate(baudrate);
+        SetkBaudRate(baudrate);
         response = CANRP_Write;
     }
     return response;
 }
 
-uint8_t CAN_SetState(uint8_t buffer[])
+uint8_t CAN::CAN_SetState(uint8_t buffer[])
 {
 	ControlState requested_state;
 	ControlMode requested_mode;
@@ -157,7 +156,7 @@ uint8_t CAN_SetState(uint8_t buffer[])
     return response;
 }
 
-uint8_t CAN_GetEncoderEstimates(uint8_t buffer[])
+uint8_t CAN::CAN_GetEncoderEstimates(uint8_t buffer[])
 {
     float pos = Observer_GetPosEstimate();
     float vel = Observer_GetVelEstimate();
@@ -166,7 +165,7 @@ uint8_t CAN_GetEncoderEstimates(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_GetSetpoints(uint8_t buffer[])
+uint8_t CAN::CAN_GetSetpoints(uint8_t buffer[])
 {
     float pos = Controller_GetPosSetpoint();
     float vel = Controller_GetVelSetpoint();
@@ -175,7 +174,7 @@ uint8_t CAN_GetSetpoints(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_SetPosSetpoint(uint8_t buffer[])
+uint8_t CAN::CAN_SetPosSetpoint(uint8_t buffer[])
 {
     float pos;
     int16_t vel_ff;
@@ -191,7 +190,7 @@ uint8_t CAN_SetPosSetpoint(uint8_t buffer[])
     return CANRP_Write;
 }
 
-uint8_t CAN_SetVelSetpoint(uint8_t buffer[])
+uint8_t CAN::CAN_SetVelSetpoint(uint8_t buffer[])
 {
     float vel;
     float Iq_ff;
@@ -202,7 +201,7 @@ uint8_t CAN_SetVelSetpoint(uint8_t buffer[])
     return CANRP_Write;
 }
 
-uint8_t CAN_SetIqSetpoint(uint8_t buffer[])
+uint8_t CAN::CAN_SetIqSetpoint(uint8_t buffer[])
 {
     float Iq;
     memcpy(&Iq, &buffer[0], sizeof(float));
@@ -210,7 +209,7 @@ uint8_t CAN_SetIqSetpoint(uint8_t buffer[])
     return CANRP_Write;
 }
 
-uint8_t CAN_GetLimits(uint8_t buffer[])
+uint8_t CAN::CAN_GetLimits(uint8_t buffer[])
 {
     float vel_limit = Controller_GetVelLimit();
     float iq_limit = Controller_GetIqLimit();
@@ -219,7 +218,7 @@ uint8_t CAN_GetLimits(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_SetLimits(uint8_t buffer[])
+uint8_t CAN::CAN_SetLimits(uint8_t buffer[])
 {
     float vel_limit;
     float iq_limit;
@@ -230,7 +229,7 @@ uint8_t CAN_SetLimits(uint8_t buffer[])
     return CANRP_Write;
 }
 
-uint8_t CAN_GetPhaseCurrents(uint8_t buffer[])
+uint8_t CAN::CAN_GetPhaseCurrents(uint8_t buffer[])
 {
     struct FloatTriplet I_phase;
     ADC_GetPhaseCurrents(&I_phase);
@@ -243,7 +242,7 @@ uint8_t CAN_GetPhaseCurrents(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_GetIq(uint8_t buffer[])
+uint8_t CAN::CAN_GetIq(uint8_t buffer[])
 {
     float Iq_set = Controller_GetIqSetpoint();
     float Iq_est = Controller_GetIqEstimate();
@@ -252,20 +251,20 @@ uint8_t CAN_GetIq(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_Reset(uint8_t buffer[])
+uint8_t CAN::CAN_Reset(uint8_t buffer[])
 {
-    System_Reset();
+	systm.Reset();
     return CANRP_Read;
 }
 
-uint8_t CAN_GetVBus(uint8_t buffer[])
+uint8_t CAN::CAN_GetVBus(uint8_t buffer[])
 {
     const float VBus = ADC_GetVBus();
     memcpy(&buffer[0], &VBus, sizeof(float));
     return CANRP_Read;
 }
 
-uint8_t CAN_GetGains(uint8_t buffer[])
+uint8_t CAN::CAN_GetGains(uint8_t buffer[])
 {
     const float pos_gain = Controller_GetPosGain();
     const float vel_P_gain = Controller_GetVelGain();
@@ -274,7 +273,7 @@ uint8_t CAN_GetGains(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_SetGains(uint8_t buffer[])
+uint8_t CAN::CAN_SetGains(uint8_t buffer[])
 {
     float pos_gain;
     float vel_P_gain;
@@ -294,7 +293,7 @@ uint8_t CAN_SetGains(uint8_t buffer[])
     return response;
 }
 
-uint8_t CAN_DeviceInfo(uint8_t buffer[])
+uint8_t CAN::CAN_DeviceInfo(uint8_t buffer[])
 {
     const uint32_t idr = PAC55XX_INFO2->PACIDR;
     static const uint8_t v_major = VERSION_MAJOR;
@@ -309,7 +308,7 @@ uint8_t CAN_DeviceInfo(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_Timings(uint8_t buffer[])
+uint8_t CAN::CAN_Timings(uint8_t buffer[])
 {
     const uint32_t delta = Controller_GetTotalCycles();
     const uint32_t tpc = Controller_GetBusyCycles();
@@ -318,19 +317,19 @@ uint8_t CAN_Timings(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_SaveConfig(uint8_t buffer[])
+uint8_t CAN::CAN_SaveConfig(uint8_t buffer[])
 {
     NVM_SaveConfig();
     return CANRP_Write;
 }
 
-uint8_t CAN_EraseConfig(uint8_t buffer[])
+uint8_t CAN::CAN_EraseConfig(uint8_t buffer[])
 {
     NVM_Erase();
     return CANRP_Write;
 }
 
-uint8_t CAN_GetMotorInfo(uint8_t buffer[])
+uint8_t CAN::CAN_GetMotorInfo(uint8_t buffer[])
 {
     bool calibrated = Motor_Calibrated();
     uint16_t R = (uint16_t)(Motor_GetPhaseResistance() * 1000);

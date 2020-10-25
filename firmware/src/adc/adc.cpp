@@ -58,7 +58,6 @@
 
 void ADC_AIO_Init(void);
 void ADC_DTSE_Init(void);
-uint16_t adc_convert(void);
 
 static struct ADCState adc;
 
@@ -253,6 +252,10 @@ void ADC_SetProt_callback(void (*Callback)(void))
     adc.Prot_callback = Callback;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void ADC_IRQHandler(void)
 {
     // Clear Interrupt Flag
@@ -299,4 +302,8 @@ void ADC1_IRQHandler(void)
         adc.Prot_callback();
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
 
