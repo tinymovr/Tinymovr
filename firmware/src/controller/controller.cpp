@@ -17,7 +17,7 @@
 
 #include <src/adc/adc.hpp>
 #include <src/controller/controller.hpp>
-#include <src/encoders/MA702.hpp>
+#include <src/encoder/Encoder.hpp>
 #include <src/gatedriver/gatedriver.hpp>
 #include <src/motor/motor.hpp>
 #include <src/observer/observer.hpp>
@@ -33,62 +33,7 @@ extern "C" {
 }
 #endif
 
-PAC5XXX_RAMFUNC void CLControlStep(void);
-void CalibrateStep(void);
-PAC5XXX_RAMFUNC void IdleStep(void);
-PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
-    float vel_gain, float *I);
-PAC5XXX_RAMFUNC static inline void Controller_UpdateCurrentGains(void);
-
 static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
-
-static struct ControllerState state = {
-
-    .state = STATE_IDLE,
-    .mode = CTRL_CURRENT,
-    .error = ERROR_NO_ERROR,
-
-    .I_phase_meas = {0.0f, 0.0f, 0.0f},
-    .modulation_values = {0.0f, 0.0f, 0.0f},
-
-    .Iq_meas = 0.0f,
-    .Id_meas = 0.0f,
-
-    .pos_setpoint = 0.0f,
-    .vel_setpoint = 0.0f,
-    .Iq_setpoint = 0.0f,
-
-    .vel_integrator_Iq = 0.0f,
-
-    .Iq_integrator_Vq = 0.0f,
-    .Id_integrator_Vd = 0.0f,
-
-    .busy_cycles = 0,
-    .total_cycles = 0,
-    .last_timestamp = 0
-};
-
-static struct ControllerConfig config ={
-
-    .vel_limit = 300000.0f,
-    .I_limit = 10.0f,
-
-    .pos_gain = 25.0f,
-    .vel_gain = 1.0e-4f,
-    .vel_integrator_gain = 0.0f,
-    .I_bw = 800.0,
-    .I_gain = 0.0f,
-    .Iq_integrator_gain = 0.0f,
-    .Id_integrator_gain = 0.0f,
-
-    .I_cal_R_setpoint = 5.0f,
-    .I_cal_offset_setpoint = 8.0f,
-
-    .I_k = 0.3f,
-
-    .V_calib_gain = 0.0005f,
-    .V_calib_inductance = 2.0f
-};
 
 struct CalibrateState
 {
@@ -101,100 +46,105 @@ struct CalibrateState
     uint32_t current_cal_index;
 };
 
-struct CalibrateState calState = {0};
-
-void Controller_Init(void) {}
-
-void Controller_Update(void)
+PAC5XXX_RAMFUNC void Controller::HealthCheck(void)
 {
-    const uint32_t current_timestamp = ARM_CM_DWT_CYCCNT;
-    state.total_cycles = current_timestamp - state.last_timestamp;
+	const float VBus = systm.adc.GetVBus();
+	const float Iq = GetIqEstimate();
 
-    const float VBus = ADC_GetVBus();
-    const float Iq = Controller_GetIqEstimate();
-
-    Observer_UpdatePos();
-
-    if ((VBus < VBUS_LOW_THRESHOLD) && (state.state != STATE_IDLE))
-    {
-        state.error = ERROR_VBUS_UNDERVOLTAGE;
-        Controller_SetState(STATE_IDLE);
-    }
-    else if ( (Iq > (config.I_limit * I_TRIP_MARGIN)) ||
-              (Iq < -(config.I_limit * I_TRIP_MARGIN)) )
-    {
-        state.error = ERROR_OVERCURRENT;
-        Controller_SetState(STATE_IDLE);
-    }
-    else
-    {
-        ADC_GetPhaseCurrents(&(state.I_phase_meas));
-        if ((state.error != ERROR_NO_ERROR) && (state.state != STATE_IDLE))
-        {
-            Controller_SetState(STATE_IDLE);
-        }
-
-        if (state.state == STATE_CL_CONTROL)
-        {
-            CLControlStep();
-        }
-        else if (state.state == STATE_CALIBRATE)
-        {
-            CalibrateStep();
-        }
-        else // STATE_IDLE
-        {
-            IdleStep();
-        }
-        state.busy_cycles = ARM_CM_DWT_CYCCNT - current_timestamp;
-        state.last_timestamp = current_timestamp;
-    }
+	if (VBus < VBUS_LOW_THRESHOLD)
+	{
+		throw ERROR_VBUS_UNDERVOLTAGE;
+	}
+	else if ( (Iq > (config.I_limit * I_TRIP_MARGIN)) ||
+			  (Iq < -(config.I_limit * I_TRIP_MARGIN)) )
+	{
+		throw ERROR_OVERCURRENT;
+	}
 }
 
-PAC5XXX_RAMFUNC void CLControlStep(void)
+PAC5XXX_RAMFUNC void Controller::ControlLoop(void)
 {
-    float vel_setpoint = state.vel_setpoint;
-    if (state.mode >= CTRL_POSITION)
+	while (true)
+	{
+		const uint32_t current_timestamp = ARM_CM_DWT_CYCCNT;
+		total_cycles = current_timestamp - last_timestamp;
+		try
+		{
+			systm.HealthCheck();
+			systm.adc.UpdateCurrentMeas();
+			systm.adc.GetPhaseCurrents(&(I_phase_meas));
+			systm.observer.UpdateEstimates();
+			if (state == STATE_CALIBRATE)
+			{
+				CalibrateResistance();
+				CalibrateInductance();
+				CalibrateOffset();
+				CalibrateDirection();
+			}
+			else if (state == STATE_CLOSED_LOOP_CONTROL)
+			{
+				ClosedLoopControlStep();
+			}
+			else
+			{
+				IdleStep();
+			}
+		}
+		catch (ControlError e)
+		{
+			error = e;
+			SetState(STATE_IDLE);
+		}
+		busy_cycles = ARM_CM_DWT_CYCCNT - current_timestamp;
+		last_timestamp = current_timestamp;
+		systm.WaitForControlLoopInterrupt();
+	}
+}
+
+PAC5XXX_RAMFUNC void Controller::ClosedLoopControlStep(void)
+{
+    float _vel_setpoint = vel_setpoint;
+    if (mode >= CTRL_POSITION)
     {
-        const float delta_pos = Observer_GetPosDiff(state.pos_setpoint);
-        vel_setpoint += delta_pos * config.pos_gain;
+        const float delta_pos = systm.observer.GetPosDiff(pos_setpoint);
+        _vel_setpoint += delta_pos * config.pos_gain;
     }
 
-    const float vel_estimate = Observer_GetVelEstimate();
-    float Iq_setpoint = state.Iq_setpoint;
+    const float vel_estimate = systm.observer.GetVelEstimate();
+    float _Iq_setpoint = Iq_setpoint;
 
-    if (state.mode >= CTRL_VELOCITY)
+    if (mode >= CTRL_VELOCITY)
     {
-        float delta_vel = vel_setpoint - vel_estimate;
+        float delta_vel = _vel_setpoint - vel_estimate;
         // Velocity limiting will be done later on based on the estimate
-        Iq_setpoint += (delta_vel * config.vel_gain) + state.vel_integrator_Iq;
-        state.vel_integrator_Iq += delta_vel * PWM_TIMER_PERIOD * config.vel_integrator_gain;
+        _Iq_setpoint += (delta_vel * config.vel_gain) + vel_integrator_Iq;
+        vel_integrator_Iq += delta_vel * PWM_TIMER_PERIOD * config.vel_integrator_gain;
     }
     else
     {
-        state.vel_integrator_Iq = 0.0f;
+        vel_integrator_Iq = 0.0f;
     }
-    
+
     // Velocity-dependent current limiting
-    if ((config.vel_limit > 0.0f) && Controller_LimitVelocity(-config.vel_limit, config.vel_limit,
-            vel_estimate, config.vel_gain, &Iq_setpoint))
+    if ((config.vel_limit > 0.0f) && LimitVelocity(-config.vel_limit, config.vel_limit,
+            vel_estimate, config.vel_gain, &_Iq_setpoint))
     {
-        state.vel_integrator_Iq *= 0.995f;
+        vel_integrator_Iq *= 0.995f;
     }
 
     // Absolute current & velocity integrator limiting
-    if ((config.I_limit > 0.0f) && clamp(&Iq_setpoint, -config.I_limit, config.I_limit))
+    if ((config.I_limit > 0.0f) && clamp(&_Iq_setpoint, -config.I_limit, config.I_limit))
     {
-        state.vel_integrator_Iq *= 0.995f;
+        vel_integrator_Iq *= 0.995f;
     }
 
-    const float angle = Observer_GetPosEstimateWrappedRadians();
-    const float I_phase = angle * Motor_GetPolePairs();
-    const float VBus = ADC_GetVBus();
+    const float angle = systm.observer.GetPosEstimateWrappedRadians();
+    const float I_phase = angle * systm.motor.GetPolePairs();
+    const float VBus = systm.adc.GetVBus();
 
     // Clarke transform
-    const float Ialpha = state.I_phase_meas.A;
-    const float Ibeta = one_by_sqrt3 * (state.I_phase_meas.B - state.I_phase_meas.C);
+    const float Ialpha = I_phase_meas.A;
+    const float Ibeta = one_by_sqrt3 * (I_phase_meas.B - I_phase_meas.C);
 
     // Park transform
     const float c_I = fast_cos(I_phase);
@@ -202,17 +152,17 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     const float Id = (c_I * Ialpha) + (s_I * Ibeta);
     const float Iq = (c_I * Ibeta) - (s_I * Ialpha);
 
-    state.Id_meas += config.I_k * (Id - state.Id_meas);
-    state.Iq_meas += config.I_k * (Iq - state.Iq_meas);
+    Id_meas += config.I_k * (Id - Id_meas);
+    Iq_meas += config.I_k * (Iq - Iq_meas);
 
-    const float delta_Id = 0 - state.Id_meas;
-    const float delta_Iq = Iq_setpoint - state.Iq_meas;
+    const float delta_Id = 0 - Id_meas;
+    const float delta_Iq = _Iq_setpoint - Iq_meas;
 
-    state.Id_integrator_Vd += delta_Id * PWM_TIMER_PERIOD * config.Id_integrator_gain;
-    state.Iq_integrator_Vq += delta_Iq * PWM_TIMER_PERIOD * config.Iq_integrator_gain;
+    Id_integrator_Vd += delta_Id * PWM_TIMER_PERIOD * config.Id_integrator_gain;
+    Iq_integrator_Vq += delta_Iq * PWM_TIMER_PERIOD * config.Iq_integrator_gain;
 
-    const float Vd = (delta_Id * config.I_gain) + state.Id_integrator_Vd;
-    const float Vq = (delta_Iq * config.I_gain) + state.Iq_integrator_Vq;
+    const float Vd = (delta_Id * config.I_gain) + Id_integrator_Vd;
+    const float Vq = (delta_Iq * config.I_gain) + Iq_integrator_Vq;
 
     float mod_q = Vq / VBus;
     float mod_d = Vd / VBus;
@@ -224,192 +174,53 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     {
         mod_q *= dq_mod_scale_factor;
         mod_d *= dq_mod_scale_factor;
-        state.Id_integrator_Vd *= I_INTEGRATOR_DECAY_FACTOR;
-        state.Iq_integrator_Vq *= I_INTEGRATOR_DECAY_FACTOR;
+        Id_integrator_Vd *= I_INTEGRATOR_DECAY_FACTOR;
+        Iq_integrator_Vq *= I_INTEGRATOR_DECAY_FACTOR;
     }
 
     // Inverse Park transform
     float mod_a = (c_I * mod_d) - (s_I * mod_q);
     float mod_b = (c_I * mod_q) + (s_I * mod_d);
 
-    SVM(mod_a, mod_b, &state.modulation_values.A,
-        &state.modulation_values.B, &state.modulation_values.C);
-    GateDriver_SetDutyCycle(&state.modulation_values);
+    SVM(mod_a, mod_b, &modulation_values.A,
+        &modulation_values.B, &modulation_values.C);
+    systm.driver.SetDutyCycle(&modulation_values);
 }
 
-void CalibrateStep(void)
+PAC5XXX_RAMFUNC void Controller::IdleStep(void)
 {
-    Watchdog_Feed();
-
-    // Resistance
-    if (calState.current_cal_index < CAL_R_END_INDEX)
-    {
-        calState.V_setpoint += config.V_calib_gain *
-                (config.I_cal_R_setpoint - state.I_phase_meas.A);
-        const float pwm_setpoint = calState.V_setpoint / ADC_GetVBus();
-        SVM(pwm_setpoint, 0.0f, &state.modulation_values.A,
-                    &state.modulation_values.B, &state.modulation_values.C);
-    }
-    else if (calState.current_cal_index == CAL_R_END_INDEX)
-    {
-#ifndef DRY_RUN
-        const float R = fabsf(calState.V_setpoint / config.I_cal_R_setpoint);
-        if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
-        {
-            state.error = ERROR_PHASE_RESISTANCE_OUT_OF_RANGE;
-            calState.current_cal_index = 0;
-            calState.I_high = 0.0f;
-            calState.I_low = 0.0f;
-            calState.V_setpoint = 0.0f;
-            Controller_SetState(STATE_IDLE);
-        }
-        else
-        {
-            Motor_SetPhaseResistance(R);
-        }
-#else
-        Motor_SetPhaseResistance(0.5);
-#endif
-        calState.V_setpoint = 0.0f;
-    }
-
-    // Inductance
-    else if (calState.current_cal_index < CAL_L_END_INDEX)
-    {
-        if ((calState.current_cal_index & 0x2u) == 0x2u)
-        {
-            calState.I_high += state.I_phase_meas.A;
-            calState.V_setpoint = -config.V_calib_inductance;
-        }
-        else
-        {
-            calState.I_low += state.I_phase_meas.A;
-            calState.V_setpoint = config.V_calib_inductance;
-        }
-        const float pwm_setpoint = calState.V_setpoint / ADC_GetVBus();
-        SVM(pwm_setpoint, 0.0f, &state.modulation_values.A,
-                    &state.modulation_values.B, &state.modulation_values.C);
-    }
-    else if (calState.current_cal_index == CAL_L_END_INDEX)
-    {
-#ifndef DRY_RUN
-        const float num_cycles = (CAL_L_END_INDEX - CAL_R_END_INDEX) / 2;
-        const float dI_by_dt = (calState.I_high - calState.I_low) / (PWM_TIMER_PERIOD * num_cycles);
-        const float L = (config.V_calib_inductance) / dI_by_dt;
-        if ((L <= MIN_PHASE_INDUCTANCE) || (L >= MAX_PHASE_INDUCTANCE))
-        {
-            state.error = ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE;
-            calState.current_cal_index = 0;
-            calState.I_high = 0.0f;
-            calState.I_low = 0.0f;
-            calState.V_setpoint = 0.0f;
-            Controller_SetState(STATE_IDLE);
-        }
-        else
-        {
-            Motor_SetPhaseInductance(L);
-            Controller_UpdateCurrentGains();
-        }
-#else
-        Motor_SetPhaseInductance(0.005);
-#endif
-        calState.V_setpoint = 0.0f;
-    }
-
-    // Offset
-    else if (calState.current_cal_index < CAL_OFFSET_END_INDEX)
-    {
-        float pwm_setpoint = (config.I_cal_offset_setpoint * Motor_GetPhaseResistance()) / ADC_GetVBus();
-        clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
-        SVM(pwm_setpoint, 0.0f, &state.modulation_values.A,
-                    &state.modulation_values.B, &state.modulation_values.C);
-    }
-    else if (calState.current_cal_index == CAL_OFFSET_END_INDEX)
-    {
-        Observer_Reset();
-        Observer_CalibrateOffset();
-        calState.dir_initial_pos = Observer_GetPosEstimate();
-    }
-
-    // Pole Pairs & Direction
-    else if (calState.current_cal_index < CAL_DIR_END_INDEX)
-    {
-        // Ensure rotor stays at 2*Pi eangle a bit
-        const float numerator = calState.current_cal_index - CAL_OFFSET_END_INDEX;
-        const float denominator = CAL_DIR_END_INDEX - CAL_OFFSET_END_INDEX;
-        static const float end_angle = CAL_PHASE_TURNS * twopi;
-        float cur_angle = 1.2f * end_angle * (numerator/denominator);
-        clamp(&cur_angle, 0.0f, end_angle);
-        float pwm_setpoint = (config.I_cal_offset_setpoint * Motor_GetPhaseResistance()) / ADC_GetVBus();
-        clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
-        SVM(pwm_setpoint * fast_cos(cur_angle),
-            pwm_setpoint * fast_sin(cur_angle),
-            &state.modulation_values.A,
-            &state.modulation_values.B,
-            &state.modulation_values.C);
-    }
-    else if (calState.current_cal_index >= CAL_DIR_END_INDEX)
-    {
-        // Set neutral pwm immediately
-        GateDriver_SetDutyCycle(&zeroDC);
-        static const float end_angle = CAL_PHASE_TURNS * twopi;
-        if (!Motor_FindPolePairs(ENCODER_CPR, calState.dir_initial_pos, Observer_GetPosEstimate(), end_angle))
-        {
-            state.error = ERROR_INVALID_POLE_PAIRS;
-        }
-        // Direction needs to be calibrated LAST
-        Observer_CalibrateDirection(calState.dir_initial_pos);
-        calState.current_cal_index = 0;
-        calState.I_high = 0.0f;
-        calState.I_low = 0.0f;
-        Controller_SetState(STATE_IDLE);
-    }
-    else
-    {
-        // No action
-    }
-
-    if (calState.current_cal_index < CAL_DIR_END_INDEX)
-    {
-        GateDriver_SetDutyCycle(&state.modulation_values);
-    }
-    calState.current_cal_index++;
+    systm.watchdog.Feed();
 }
 
-PAC5XXX_RAMFUNC void IdleStep(void)
+PAC5XXX_RAMFUNC ControlState Controller::GetState(void)
 {
-    Watchdog_Feed();
+    return state;
 }
 
-PAC5XXX_RAMFUNC ControlState Controller_GetState(void)
+PAC5XXX_RAMFUNC void Controller::SetState(ControlState new_state)
 {
-    return state.state;
-}
-
-PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
-{
-    if (state.state == new_state)
+    if (state == new_state)
     {
         // No action
     }
     else if (new_state == STATE_IDLE)
     {
-        GateDriver_SetDutyCycle(&zeroDC);
-        GateDriver_Disable();
-        state.state = STATE_IDLE;
+    	systm.driver.SetDutyCycle(&zeroDC);
+        systm.driver.Disable();
+        state = STATE_IDLE;
     }
-    else if ((state.state == STATE_IDLE) && (state.error == ERROR_NO_ERROR))
+    else if ((state == STATE_IDLE) && (error == ERROR_NO_ERROR))
     {
-        if ((new_state == STATE_CL_CONTROL) && Controller_Calibrated())
+        if ((new_state == STATE_CLOSED_LOOP_CONTROL) && Calibrated())
         {
-            state.pos_setpoint = Observer_GetPosEstimate();
-            GateDriver_Enable();
-            state.state = STATE_CL_CONTROL;
+            pos_setpoint = systm.observer.GetPosEstimate();
+            systm.driver.Enable();
+            state = STATE_CLOSED_LOOP_CONTROL;
         }
         else if (new_state == STATE_CALIBRATE)
         {
-            GateDriver_Enable();
-            state.state = STATE_CALIBRATE;
+        	systm.driver.Enable();
+            state = STATE_CALIBRATE;
         }
         else
         {
@@ -422,28 +233,28 @@ PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
     }
 }
 
-ControlMode Controller_GetMode(void)
+ControlMode Controller::GetMode(void)
 {
-	return state.mode;
+	return mode;
 }
 
-void Controller_SetMode(ControlMode new_mode)
+void Controller::SetMode(ControlMode new_mode)
 {
-    if (new_mode == state.mode)
+    if (new_mode == mode)
     {
         // No action
     }
 	else if (new_mode == CTRL_POSITION)
 	{
-		state.mode = CTRL_POSITION;
+		mode = CTRL_POSITION;
 	}
 	else if (new_mode == CTRL_VELOCITY)
 	{
-		state.mode = CTRL_VELOCITY;
+		mode = CTRL_VELOCITY;
 	}
 	else if (new_mode == CTRL_CURRENT)
 	{
-		state.mode = CTRL_CURRENT;
+		mode = CTRL_CURRENT;
 	}
     else
     {
@@ -451,54 +262,54 @@ void Controller_SetMode(ControlMode new_mode)
     }
 }
 
-float Controller_GetPosSetpoint(void)
+float Controller::GetPosSetpoint(void)
 {
-    return state.pos_setpoint;
+    return pos_setpoint;
 }
 
-void Controller_SetPosSetpoint(float value)
+void Controller::SetPosSetpoint(float value)
 {
-    state.pos_setpoint = value;
+    pos_setpoint = value;
 }
 
-float Controller_GetVelSetpoint(void)
+float Controller::GetVelSetpoint(void)
 {
-    return state.vel_setpoint;
+    return vel_setpoint;
 }
 
-void Controller_SetVelSetpoint(float value)
+void Controller::SetVelSetpoint(float value)
 {
-    state.vel_setpoint = value;
+    vel_setpoint = value;
 }
 
-float Controller_GetIqEstimate(void)
+float Controller::GetIqEstimate(void)
 {
-    return state.Iq_meas;
+    return Iq_meas;
 }
 
-float Controller_GetIqSetpoint(void)
+float Controller::GetIqSetpoint(void)
 {
-    return state.Iq_setpoint;
+    return Iq_setpoint;
 }
 
-void Controller_SetIqSetpoint(float value)
+void Controller::SetIqSetpoint(float value)
 {
-    state.Iq_setpoint = value;
+    Iq_setpoint = value;
 }
 
-void Controller_GetModulationValues(struct FloatTriplet *dc)
+void Controller::GetModulationValues(struct FloatTriplet *dc)
 {
-    dc->A = state.modulation_values.A;
-    dc->B = state.modulation_values.B;
-    dc->C = state.modulation_values.C;
+    dc->A = modulation_values.A;
+    dc->B = modulation_values.B;
+    dc->C = modulation_values.C;
 }
 
-float Controller_GetPosGain(void)
+float Controller::GetPosGain(void)
 {
     return config.pos_gain;
 }
 
-void Controller_SetPosGain(float gain)
+void Controller::SetPosGain(float gain)
 {
     if (gain >= 0.0f)
     {
@@ -506,12 +317,12 @@ void Controller_SetPosGain(float gain)
     }
 }
 
-float Controller_GetVelGain(void)
+float Controller::GetVelGain(void)
 {
     return config.vel_gain;
 }
 
-void Controller_SetVelGain(float gain)
+void Controller::SetVelGain(float gain)
 {
     if (gain >= 0.0f)
     {
@@ -519,12 +330,12 @@ void Controller_SetVelGain(float gain)
     }
 }
 
-float Controller_GetVelIntegratorGain(void)
+float Controller::GetVelIntegratorGain(void)
 {
     return config.vel_integrator_gain;
 }
 
-void Controller_SetVelIntegratorGain(float gain)
+void Controller::SetVelIntegratorGain(float gain)
 {
     if (gain >= 0.0f)
     {
@@ -532,31 +343,31 @@ void Controller_SetVelIntegratorGain(float gain)
     }
 }
 
-float Controller_GetIqGain(void)
+float Controller::GetIqGain(void)
 {
     return config.I_gain;
 }
 
-float Controller_GetIqBandwidth(void)
+float Controller::GetIqBandwidth(void)
 {
     return config.I_bw;
 }
 
-void Controller_SetIqBandwidth(float bw)
+void Controller::SetIqBandwidth(float bw)
 {
     if (bw > 0.0f)
     {
         config.I_bw = bw;
-        Controller_UpdateCurrentGains();
+        UpdateCurrentGains();
     }
 }
 
-float Controller_GetVelLimit(void)
+float Controller::GetVelLimit(void)
 {
     return config.vel_limit;
 }
 
-void Controller_SetVelLimit(float limit)
+void Controller::SetVelLimit(float limit)
 {
     if (limit >= 0.0f)
     {
@@ -564,12 +375,12 @@ void Controller_SetVelLimit(float limit)
     }
 }
 
-float Controller_GetIqLimit(void)
+float Controller::GetIqLimit(void)
 {
     return config.I_limit;
 }
 
-void Controller_SetIqLimit(float limit)
+void Controller::SetIqLimit(float limit)
 {
     if (limit >= 0.0f)
     {
@@ -577,37 +388,27 @@ void Controller_SetIqLimit(float limit)
     }
 }
 
-PAC5XXX_RAMFUNC bool Controller_Calibrated(void)
+PAC5XXX_RAMFUNC bool Controller::Calibrated(void)
 {
-    return Motor_Calibrated() & Observer_Calibrated();
+    return systm.motor.Calibrated() & systm.observer.Calibrated();
 }
 
-uint8_t Controller_GetError(void)
+uint8_t Controller::GetError(void)
 {
-    return (uint8_t)(state.error);
+    return (uint8_t)(error);
 }
 
-uint32_t Controller_GetTotalCycles(void)
+uint32_t Controller::GetTotalCycles(void)
 {
-    return state.total_cycles;
+    return total_cycles;
 }
 
-uint32_t Controller_GetBusyCycles(void)
+uint32_t Controller::GetBusyCycles(void)
 {
-    return state.busy_cycles;
+    return busy_cycles;
 }
 
-struct ControllerConfig* Controller_GetConfig(void)
-{
-    return &config;
-}
-
-void Controller_RestoreConfig(struct ControllerConfig* config_)
-{
-    config = *config_;
-}
-
-PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
+PAC5XXX_RAMFUNC bool Controller::LimitVelocity(float min_limit, float max_limit, float vel_estimate,
     float vel_gain, float *I)
 {
     float Imax = (max_limit - vel_estimate) * vel_gain;
@@ -615,10 +416,10 @@ PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, flo
     return clamp(I, Imin, Imax);
 }
 
-PAC5XXX_RAMFUNC static inline void Controller_UpdateCurrentGains(void)
+PAC5XXX_RAMFUNC void Controller::UpdateCurrentGains(void)
 {
-    config.I_gain = config.I_bw * Motor_GetPhaseInductance();
-    float plant_pole = Motor_GetPhaseResistance() / Motor_GetPhaseInductance();
+    config.I_gain = config.I_bw * systm.motor.GetPhaseInductance();
+    float plant_pole = systm.motor.GetPhaseResistance() / systm.motor.GetPhaseInductance();
     config.Iq_integrator_gain = plant_pole * config.I_gain;
     config.Id_integrator_gain = config.Iq_integrator_gain;
 }

@@ -47,15 +47,15 @@ void UART::WriteAddr(uint8_t addr, int32_t data)
 	switch (addr)
 	{
 		case 'P': // pos setpoint
-		Controller_SetPosSetpoint(data);
+		systm.controller.SetPosSetpoint(data);
 		break;
 
 		case 'V': // vel setpoint
-		Controller_SetVelSetpoint((float)data);
+		systm.controller.SetVelSetpoint((float)data);
 		break;
 
 		case 'I': // current setpoint
-		Controller_SetIqSetpoint(data * ONE_OVER_UART_I_SCALING_FACTOR);
+		systm.controller.SetIqSetpoint(data * ONE_OVER_UART_I_SCALING_FACTOR);
 		break;
 
 		case 'U': // CAN Baud Rate
@@ -82,7 +82,7 @@ int32_t UART::ReadAddr(uint8_t addr)
 		break;
 
 		case 'e': // controller error
-		ret_val = Controller_GetError();
+		ret_val = systm.controller.GetError();
 		break;
 
 		case 'o': // encoder pos
@@ -94,7 +94,7 @@ int32_t UART::ReadAddr(uint8_t addr)
 		break;
 
 		case 'P': // pos setpoint
-		ret_val = Controller_GetPosSetpoint();
+		ret_val = systm.controller.GetPosSetpoint();
 		break;
 
 		case 'v': // vel estimate
@@ -102,15 +102,15 @@ int32_t UART::ReadAddr(uint8_t addr)
 		break;
 
 		case 'V': // vel setpoint
-		ret_val = (int32_t)Controller_GetVelSetpoint();
+		ret_val = (int32_t)systm.controller.GetVelSetpoint();
 		break;
 
 		case 'i': // current estimate
-		ret_val = (int32_t)(Controller_GetIqEstimate() * UART_I_SCALING_FACTOR);
+		ret_val = (int32_t)(systm.controller.GetIqEstimate() * UART_I_SCALING_FACTOR);
 		break;
 
 		case 'I': // current setpoint
-		ret_val = (int32_t)(Controller_GetIqSetpoint() * UART_I_SCALING_FACTOR);
+		ret_val = (int32_t)(systm.controller.GetIqSetpoint() * UART_I_SCALING_FACTOR);
 		break;
 
 		case 'd': // observer direction
@@ -134,15 +134,15 @@ int32_t UART::ReadAddr(uint8_t addr)
         break;
 
 		case 'Q': // calibrate
-		Controller_SetState(STATE_CALIBRATE);
+		systm.controller.SetState(STATE_CALIBRATE);
 		break;
 
 		case 'A': // closed loop
-		Controller_SetState(STATE_CL_CONTROL);
+		systm.controller.SetState(STATE_CLOSED_LOOP_CONTROL);
 		break;
 
 		case 'Z': // idle
-		Controller_SetState(STATE_IDLE);
+		systm.controller.SetState(STATE_IDLE);
 		break;
 
 		case 'R': // reset mcu
@@ -214,7 +214,7 @@ void UART::SendMessage(char *buffer)
 	pac5xxx_uart_int_enable_THREI2(UART_REF, 1);
 }
 
-void UART::InterruptHandler(void)
+void UART::ProcessInterrupt(void)
 {
 	uint8_t int_type = pac5xxx_uart_interrupt_identification2(UART_REF);
     uint8_t data = pac5xxx_uart_read2(UART_REF);

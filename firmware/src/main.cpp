@@ -37,7 +37,7 @@ int main(void)
     sys_ = System();
     __enable_irq();
 
-    sys_.Spin();
+    sys_.controller.ControlLoop();
 }
 
 //	MA_Init();

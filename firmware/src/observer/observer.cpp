@@ -21,7 +21,7 @@ void Observer::Reset(void)
     config.direction_calibrated = 0;
 }
 
-PAC5XXX_RAMFUNC void Observer::UpdatePosEstimate(void)
+PAC5XXX_RAMFUNC void Observer::UpdateEstimates(void)
 {
 	int new_pos_meas = systm.encoder.GetAngle();
 	const float delta_pos_est = PWM_TIMER_PERIOD * vel_estimate;

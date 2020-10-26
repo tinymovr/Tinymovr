@@ -106,7 +106,7 @@ public:
 	void SetkBaudRate(uint16_t rate);
 	uint8_t GetID(void);
 	void SetID(uint8_t id);
-	void InterruptHandler(void);
+	void ProcessInterrupt(void);
 private:
 	struct Config_t
 	{

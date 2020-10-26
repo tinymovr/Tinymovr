@@ -26,7 +26,7 @@ class Observer : public Component
 {
 public:
 	void Reset(void);
-	PAC5XXX_RAMFUNC void UpdatePosEstimate(void);
+	PAC5XXX_RAMFUNC void UpdateEstimates(void);
 	PAC5XXX_RAMFUNC float GetPosEstimate(void);
 	PAC5XXX_RAMFUNC float GetPosDiff(float target);
 	PAC5XXX_RAMFUNC float GetPosEstimateWrapped(void);

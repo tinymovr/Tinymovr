@@ -57,7 +57,7 @@ private:
 	void SendMessage(char *buffer);
 	void ProcessASCIIMessage();
 	void ResetRxQueue();
-	void InterruptHandler(void);
+	void ProcessInterrupt(void);
 };
 
 

@@ -23,6 +23,7 @@
 class ADC;
 class Encoder;
 class Observer;
+class Driver;
 class Motor;
 class CAN;
 class UART;
@@ -53,6 +54,7 @@ public:
 	ADC &adc;
 	Encoder &encoder;
 	Observer &observer;
+	Driver &driver;
 	Motor &motor;
 	UART &uart;
 	CAN &can;
@@ -60,16 +62,15 @@ public:
 	Watchdog &watchdog;
 
 	System(void);
-	void Spin(void);
 	void Reset(void);
 	void DelayUS(uint32_t us);
 	void InitTimer(void);
 
-	void HandleADCInterrupt();
-	void HandleCANInterrupt();
-	void HandleUARTInterrupt();
+	void HandleADCInterrupt(void);
+	void HandleCANInterrupt(void);
+	void HandleUARTInterrupt(void);
 
-	void WaitForControlLoopInterrupt();
+	void WaitForControlLoopInterrupt(void);
 
 private:
 	bool adc_interrupt = false;

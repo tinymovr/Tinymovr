@@ -197,7 +197,7 @@ PAC5XXX_RAMFUNC void ADC::GetPhaseCurrents(struct FloatTriplet *phc)
     phc->C = I_phase_meas.C;
 }
 
-PAC5XXX_RAMFUNC void ADC::InterruptHandler(void)
+PAC5XXX_RAMFUNC void ADC::UpdateCurrentMeas(void)
 {
     // Clear Interrupt Flag
     PAC55XX_ADC->ADCINT.ADCIRQ0IF = 1;

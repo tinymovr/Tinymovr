@@ -96,16 +96,12 @@ System::System(void)
 	encoder = Encoder();
 	observer = Observer();
 	motor = Motor();
+	driver = Driver();
 	adc = ADC();
 	can = CAN();
 	uart = UART();
 	controller = Controller();
 	watchdog = Watchdog();
-}
-
-void System::Spin(void)
-{
-    controller.idle();
 }
 
 void System::Reset(void)
@@ -139,22 +135,22 @@ void System::InitTimer(void)
     PAC55XX_TIMERA->CCTR6.CTR = 0;
 }
 
-void System::HandleADCInterrupt()
+void System::HandleADCInterrupt(void)
 {
 	adc_interrupt = true;
 }
 
-void System::HandleCANInterrupt()
+void System::HandleCANInterrupt(void)
 {
 	can_interrupt = true;
 }
 
-void System::HandleUARTInterrupt()
+void System::HandleUARTInterrupt(void)
 {
 	uart_interrupt = true;
 }
 
-void System::WaitForControlLoopInterrupt()
+void System::WaitForControlLoopInterrupt(void)
 {
 	// Control loop is synced to ADC measurements
 	while (!adc_interrupt)
@@ -163,12 +159,12 @@ void System::WaitForControlLoopInterrupt()
 		// If there are any tasks pending from other interrupts, do them now.
 		if (can_interrupt)
 		{
-			// Do stuff ...
+			can.ProcessInterrupt();
 			can_interrupt = false;
 		}
 		if (uart_interrupt)
 		{
-			// Do stuff ...
+			uart.ProcessInterrupt();
 			uart_interrupt = false;
 		}
 		// Go back to sleep

@@ -92,15 +92,15 @@ CANEP_Callback CAN::GetEndpoint(uint8_t id)
 
 uint8_t CAN::CAN_EStop(uint8_t buffer[])
 {
-    Controller_SetState(STATE_IDLE);
+	systm.controller.SetState(STATE_IDLE);
     return CANRP_Write;
 }
 
-uint8_t CAN_GetState(uint8_t buffer[])
+uint8_t CAN::CAN_GetState(uint8_t buffer[])
 {
-    uint8_t error = Controller_GetError();
-    uint8_t state = Controller_GetState();
-    uint8_t mode = Controller_GetMode();
+    uint8_t error = systm.controller.GetError();
+    uint8_t state = systm.controller.GetState();
+    uint8_t mode = systm.controller.GetMode();
     memcpy(&buffer[0], &error, sizeof(uint8_t));
     memcpy(&buffer[1], &state, sizeof(uint8_t));
     memcpy(&buffer[2], &mode, sizeof(uint8_t));
@@ -143,14 +143,14 @@ uint8_t CAN::CAN_SetState(uint8_t buffer[])
     memcpy(&requested_state, &buffer[0], sizeof(uint8_t));
     memcpy(&requested_mode, &buffer[1], sizeof(uint8_t));
     CAN_ResponseType response = CANRP_NoAction;
-    if (requested_state <= STATE_CL_CONTROL)
+    if (requested_state <= STATE_CLOSED_LOOP_CONTROL)
     {
-        Controller_SetState(requested_state);
+    	systm.controller.SetState(requested_state);
         response = CANRP_Write;
     }
     if (requested_mode <= CTRL_POSITION)
     {
-        Controller_SetMode(requested_mode);
+    	systm.controller.SetMode(requested_mode);
         response = CANRP_Write;
     }
     return response;
@@ -167,8 +167,8 @@ uint8_t CAN::CAN_GetEncoderEstimates(uint8_t buffer[])
 
 uint8_t CAN::CAN_GetSetpoints(uint8_t buffer[])
 {
-    float pos = Controller_GetPosSetpoint();
-    float vel = Controller_GetVelSetpoint();
+    float pos = systm.controller.GetPosSetpoint();
+    float vel = systm.controller.GetVelSetpoint();
     memcpy(&buffer[0], &pos, sizeof(float));
     memcpy(&buffer[4], &vel, sizeof(float));
     return CANRP_Read;
@@ -184,9 +184,9 @@ uint8_t CAN::CAN_SetPosSetpoint(uint8_t buffer[])
     memcpy(&Iq_ff, &buffer[6], sizeof(int16_t));
     float velFF_float = vel_ff * 10.0f;
     float iqFF_float = Iq_ff * 0.01f;
-    Controller_SetPosSetpoint(pos);
-    Controller_SetVelSetpoint(velFF_float);
-    Controller_SetIqSetpoint(iqFF_float);
+    systm.controller.SetPosSetpoint(pos);
+    systm.controller.SetVelSetpoint(velFF_float);
+    systm.controller.SetIqSetpoint(iqFF_float);
     return CANRP_Write;
 }
 
@@ -196,8 +196,8 @@ uint8_t CAN::CAN_SetVelSetpoint(uint8_t buffer[])
     float Iq_ff;
     memcpy(&vel, &buffer[0], sizeof(float));
     memcpy(&Iq_ff, &buffer[4], sizeof(float));
-    Controller_SetVelSetpoint(vel);
-    Controller_SetIqSetpoint(Iq_ff);
+    systm.controller.SetVelSetpoint(vel);
+    systm.controller.SetIqSetpoint(Iq_ff);
     return CANRP_Write;
 }
 
@@ -205,14 +205,14 @@ uint8_t CAN::CAN_SetIqSetpoint(uint8_t buffer[])
 {
     float Iq;
     memcpy(&Iq, &buffer[0], sizeof(float));
-    Controller_SetIqSetpoint(Iq);
+    systm.controller.SetIqSetpoint(Iq);
     return CANRP_Write;
 }
 
 uint8_t CAN::CAN_GetLimits(uint8_t buffer[])
 {
-    float vel_limit = Controller_GetVelLimit();
-    float iq_limit = Controller_GetIqLimit();
+    float vel_limit = systm.controller.GetVelLimit();
+    float iq_limit = systm.controller.GetIqLimit();
     memcpy(&buffer[0], &vel_limit, sizeof(float));
     memcpy(&buffer[4], &iq_limit, sizeof(float));
     return CANRP_Read;
@@ -224,8 +224,8 @@ uint8_t CAN::CAN_SetLimits(uint8_t buffer[])
     float iq_limit;
     memcpy(&vel_limit, &buffer[0], sizeof(float));
     memcpy(&iq_limit, &buffer[4], sizeof(float));
-    Controller_SetVelLimit(vel_limit);
-    Controller_SetIqLimit(iq_limit);
+    systm.controller.SetVelLimit(vel_limit);
+    systm.controller.SetIqLimit(iq_limit);
     return CANRP_Write;
 }
 
@@ -244,8 +244,8 @@ uint8_t CAN::CAN_GetPhaseCurrents(uint8_t buffer[])
 
 uint8_t CAN::CAN_GetIq(uint8_t buffer[])
 {
-    float Iq_set = Controller_GetIqSetpoint();
-    float Iq_est = Controller_GetIqEstimate();
+    float Iq_set = systm.controller.GetIqSetpoint();
+    float Iq_est = systm.controller.GetIqEstimate();
     memcpy(&buffer[0], &Iq_set, sizeof(float));
     memcpy(&buffer[4], &Iq_est, sizeof(float));
     return CANRP_Read;
@@ -266,8 +266,8 @@ uint8_t CAN::CAN_GetVBus(uint8_t buffer[])
 
 uint8_t CAN::CAN_GetGains(uint8_t buffer[])
 {
-    const float pos_gain = Controller_GetPosGain();
-    const float vel_P_gain = Controller_GetVelGain();
+    const float pos_gain = systm.controller.GetPosGain();
+    const float vel_P_gain = systm.controller.GetVelGain();
     memcpy(&buffer[0], &pos_gain, sizeof(float));
     memcpy(&buffer[4], &vel_P_gain, sizeof(float));
     return CANRP_Read;
@@ -282,12 +282,12 @@ uint8_t CAN::CAN_SetGains(uint8_t buffer[])
     CAN_ResponseType response = CANRP_NoAction;
     if (pos_gain > 0.0f)
     {
-        Controller_SetPosGain(pos_gain);
+    	systm.controller.SetPosGain(pos_gain);
         response = CANRP_Write;
     }
     if (vel_P_gain > 0.0f)
     {
-        Controller_SetVelGain(vel_P_gain);
+    	systm.controller.SetVelGain(vel_P_gain);
         response = CANRP_Write;
     }
     return response;
@@ -310,8 +310,8 @@ uint8_t CAN::CAN_DeviceInfo(uint8_t buffer[])
 
 uint8_t CAN::CAN_Timings(uint8_t buffer[])
 {
-    const uint32_t delta = Controller_GetTotalCycles();
-    const uint32_t tpc = Controller_GetBusyCycles();
+    const uint32_t delta = systm.controller.GetTotalCycles();
+    const uint32_t tpc = systm.controller.GetBusyCycles();
     memcpy(&buffer[0], &delta, sizeof(uint32_t));
     memcpy(&buffer[4], &tpc, sizeof(uint32_t));
     return CANRP_Read;

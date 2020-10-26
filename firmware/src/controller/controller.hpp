@@ -18,12 +18,12 @@
 #ifndef CONTROLLER_CONTROLLER_H_
 #define CONTROLLER_CONTROLLER_H_
 
-#include "src/common.hpp"
+#include "src/component.hpp"
 
 typedef enum {
 	STATE_IDLE = 0,
 	STATE_CALIBRATE = 1,
-    STATE_CL_CONTROL = 2
+    STATE_CLOSED_LOOP_CONTROL = 2
 } ControlState;
 
 typedef enum {
@@ -45,97 +45,113 @@ typedef enum {
     ERROR_INVALID_POLE_PAIRS = 8
 } ControlError;
 
-struct ControllerState
+class Controller: public Component
 {
-	// TODO: State.state is very confusing, name appropriately
-	ControlState state;
-    ControlMode mode;
-    ControlError error;
+public:
+	struct ControllerConfig
+	{
+	    float vel_limit = 300000.0f;
+	    float I_limit = 10.0f;
 
-    struct FloatTriplet I_phase_meas;
-    struct FloatTriplet modulation_values;
+	    float pos_gain = 25.0f;
+	    float vel_gain = 1.0e-4f;
+	    float vel_integrator_gain = 0.0f;
+	    float I_bw = 800.0;
+	    float I_gain = 0.0f;
+	    float Iq_integrator_gain = 0.0f;
+	    float Id_integrator_gain = 0.0f;
 
-    float Iq_meas;
-    float Id_meas;
+	    float I_cal_R_setpoint = 5.0f;
+	    float I_cal_offset_setpoint = 8.0f;
 
-    float pos_setpoint;
-    float vel_setpoint;
-    float Iq_setpoint;
+	    float I_k = 0.3f;
 
-    float vel_integrator_Iq;
+	    float V_calib_gain = 0.0005f;
+	    float V_calib_inductance = 2.0f;
+	};
 
-    float Iq_integrator_Vq;
-    float Id_integrator_Vd;
+	Controller(void);
 
-    uint32_t busy_cycles;
-    uint32_t total_cycles;
+	PAC5XXX_RAMFUNC void HealthCheck(void);
+	PAC5XXX_RAMFUNC void ControlLoop(void);
 
-    uint32_t last_timestamp;
+	PAC5XXX_RAMFUNC ControlState GetState(void);
+	PAC5XXX_RAMFUNC void SetState(ControlState new_state);
+
+	ControlMode GetMode(void);
+	void SetMode(ControlMode mode);
+
+	float GetPosSetpoint(void);
+	void SetPosSetpoint(float value);
+
+	float GetVelSetpoint(void);
+	void SetVelSetpoint(float value);
+
+	float GetIqEstimate(void);
+
+	float GetIqSetpoint(void);
+	void SetIqSetpoint(float value);
+
+	void GetModulationValues(struct FloatTriplet *dc);
+
+	float GetPosGain(void);
+	void SetPosGain(float gain);
+	float GetVelGain(void);
+	void SetVelGain(float gain);
+	float GetVelIntegratorGain(void);
+	void SetVelIntegratorGain(float gain);
+	float GetIqGain(void);
+	float GetIqBandwidth(void);
+	void SetIqBandwidth(float bw);
+
+	float GetVelLimit(void);
+	void SetVelLimit(float limit);
+	float GetIqLimit(void);
+	void SetIqLimit(float limit);
+
+	PAC5XXX_RAMFUNC bool Calibrated(void);
+	uint8_t GetError(void);
+
+	uint32_t GetTotalCycles(void);
+	uint32_t GetBusyCycles(void);
+private:
+	ControllerConfig config;
+
+	ControlState state = STATE_IDLE;
+	ControlMode mode = CTRL_CURRENT;
+	ControlError error = ERROR_NO_ERROR;
+
+	struct FloatTriplet I_phase_meas = {0.0f, 0.0f, 0.0f};
+	struct FloatTriplet modulation_values = {0.0f, 0.0f, 0.0f};
+
+	float Iq_meas = 0.0f;
+	float Id_meas = 0.0f;
+
+	float pos_setpoint = 0.0f;
+	float vel_setpoint = 0.0f;
+	float Iq_setpoint = 0.0f;
+
+	float vel_integrator_Iq = 0.0f;
+
+	float Iq_integrator_Vq = 0.0f;
+	float Id_integrator_Vd = 0.0f;
+
+	uint32_t busy_cycles = 0;
+	uint32_t total_cycles = 0;
+
+	uint32_t last_timestamp = 0;
+
+	void CalibrateResistance();
+	void CalibrateInductance();
+	void CalibrateOffset();
+	void CalibrateDirection();
+
+	void ClosedLoopControlStep();
+	void IdleStep();
+
+	PAC5XXX_RAMFUNC bool LimitVelocity(float min_limit, float max_limit, float vel_estimate,
+		    float vel_gain, float *I);
+	PAC5XXX_RAMFUNC void UpdateCurrentGains(void);
 };
-
-struct ControllerConfig
-{
-    float vel_limit;
-    float I_limit;
-
-    float pos_gain; // cpr/s / cpr
-    float vel_gain; // A / cpr/s
-    float vel_integrator_gain;
-    float I_bw; // bandwidth
-    float I_gain;   // V / A
-    float Iq_integrator_gain;
-    float Id_integrator_gain;
-
-    float I_cal_R_setpoint;
-    float I_cal_offset_setpoint;
-
-    float I_k;
-
-    float V_calib_gain;   // 1 / V
-    float V_calib_inductance; // V
-};
-
-void Controller_Init(void);
-void Controller_Update(void);
-
-PAC5XXX_RAMFUNC ControlState Controller_GetState(void);
-PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state);
-
-ControlMode Controller_GetMode(void);
-void Controller_SetMode(ControlMode mode);
-
-float Controller_GetPosSetpoint(void);
-void Controller_SetPosSetpoint(float value);
-float Controller_GetVelSetpoint(void);
-void Controller_SetVelSetpoint(float value);
-float Controller_GetIqEstimate(void);
-float Controller_GetIqSetpoint(void);
-void Controller_SetIqSetpoint(float value);
-
-void Controller_GetModulationValues(struct FloatTriplet *dc);
-
-float Controller_GetPosGain(void);
-void Controller_SetPosGain(float gain);
-float Controller_GetVelGain(void);
-void Controller_SetVelGain(float gain);
-float Controller_GetVelIntegratorGain(void);
-void Controller_SetVelIntegratorGain(float gain);
-float Controller_GetIqGain(void);
-float Controller_GetIqBandwidth(void);
-void Controller_SetIqBandwidth(float bw);
-
-float Controller_GetVelLimit(void);
-void Controller_SetVelLimit(float limit);
-float Controller_GetIqLimit(void);
-void Controller_SetIqLimit(float limit);
-
-PAC5XXX_RAMFUNC bool Controller_Calibrated(void);
-uint8_t Controller_GetError(void);
-
-uint32_t Controller_GetTotalCycles(void);
-uint32_t Controller_GetBusyCycles(void);
-
-struct ControllerConfig* Controller_GetConfig(void);
-void Controller_RestoreConfig(struct ControllerConfig* config_);
 
 #endif /* CONTROLLER_CONTROLLER_H_ */

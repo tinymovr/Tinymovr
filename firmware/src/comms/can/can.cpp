@@ -112,7 +112,7 @@ void CAN::ProcessMessage(uint8_t command_id, bool rtr)
     rx_flag = 0;
 }
 
-void CAN::InterruptHandler(void)
+void CAN::ProcessInterrupt(void)
 {
     buffer = PAC55XX_CAN->RXBUF;	//  read RX buffer, RX buffer bit order same as TX buffer
 

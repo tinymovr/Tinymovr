@@ -38,7 +38,7 @@ public:
     PAC5XXX_RAMFUNC float GetVBus(void);
     PAC5XXX_RAMFUNC int16_t GetMCUTemp(void);
     PAC5XXX_RAMFUNC void GetPhaseCurrents(struct FloatTriplet *phc);
-    PAC5XXX_RAMFUNC void InterruptHandler(void);
+    PAC5XXX_RAMFUNC void UpdateCurrentMeas(void);
 private:
     struct ADCConfig
     {
