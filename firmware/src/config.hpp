@@ -101,8 +101,10 @@
 #define UART_V_SCALING_FACTOR ( 1000.0f )
 
 
-// Observer ---------------------------------------------------------
+// Encoder & Observer ---------------------------------------------------------
 
+#define ENCODER_CPR       (8192)
+#define ENCODER_HALF_CPR  (ENCODER_CPR / 2)
 #define OBSERVER_TRACK_BW ( 1000.0f )
 
 
