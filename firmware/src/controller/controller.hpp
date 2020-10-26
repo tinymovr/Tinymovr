@@ -45,6 +45,15 @@ typedef enum {
     ERROR_INVALID_POLE_PAIRS = 8
 } ControlError;
 
+class Action
+{
+	Action(Controller c_): controller{c_} {};
+	virtual void operator () () {};
+	~Action();
+private:
+	Controller controller;
+};
+
 class Controller: public Component
 {
 public:
