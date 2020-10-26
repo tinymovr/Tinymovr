@@ -5,4 +5,4 @@
  *      Author: conta
  */
 
-ComInterface::ComInterface(System sys_) : systm(sys_) {}
+Component::Component(System sys_) : systm(sys_) {}
