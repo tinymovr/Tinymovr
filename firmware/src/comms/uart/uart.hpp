@@ -33,8 +33,7 @@
 #ifndef UART_UART_INTERFACE_H_
 #define UART_UART_INTERFACE_H_
 
-#include <src/common.hpp>
-#include <src/comms/com_interface.hpp>
+#include <src/component.hpp>
 
 typedef enum {
     MSG_TYPE_UNKNOWN = 0,
@@ -42,7 +41,7 @@ typedef enum {
     MSG_TYPE_BINARY = 2
 } SerialMessageType;
 
-class UART : public ComInterface
+class UART : public Component
 {
 public:
 	UART(System sys_);

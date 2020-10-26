@@ -18,9 +18,9 @@
 #ifndef MOTOR_MOTOR_H_
 #define MOTOR_MOTOR_H_
 
-#include <src/common.hpp>
+#include <src/component.hpp>
 
-class Motor
+class Motor : public Component
 {
 public:
 	PAC5XXX_RAMFUNC uint8_t GetPolePairs(void);
@@ -46,6 +46,6 @@ private:
 		bool poles_calibrated = false;
 	};
 	MotorConfig config;
-}
+};
 
 #endif /* MOTOR_MOTOR_H_ */

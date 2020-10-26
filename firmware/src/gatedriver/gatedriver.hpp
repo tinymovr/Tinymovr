@@ -18,20 +18,23 @@
 #ifndef GATEDRIVER_GATEDRIVER_H_
 #define GATEDRIVER_GATEDRIVER_H_
 
+#include <src/component.hpp>
+
 typedef enum {
 	GATEDRIVER_DISABLED = 0,
 	GATEDRIVER_ENABLED = 1
 } GateDriverState;
 
-class Driver
+class Driver : public Component
 {
 public:
-    PAC5XXX_RAMFUNC void GateDriver_Enable(void);
-    PAC5XXX_RAMFUNC void GateDriver_Disable(void);
-    PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dc);
+	Driver(System sys_);
+    PAC5XXX_RAMFUNC void Enable(void);
+    PAC5XXX_RAMFUNC void Disable(void);
+    PAC5XXX_RAMFUNC void SetDutyCycle(struct FloatTriplet *dc);
 private:
     GateDriverState state = GATEDRIVER_DISABLED;
 
-}
+};
 
 #endif /* GATEDRIVER_GATEDRIVER_H_ */

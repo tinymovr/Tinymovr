@@ -18,8 +18,7 @@
 #ifndef CAN_CAN_H_
 #define CAN_CAN_H_
 
-#include <src/common.hpp>
-#include <src/comms/com_interface.hpp>
+#include <src/component.hpp>
 
 #ifdef __cplusplus
 extern "C" {
@@ -99,7 +98,7 @@ typedef enum {
 } CANMsgType;
 
 
-class CAN : public ComInterface
+class CAN : public Component
 {
 public:
 	CAN(System sys_);

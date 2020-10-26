@@ -20,12 +20,12 @@
 #define OBSERVER_OBSERVER_H_
 
 #include <stdint.h>
-#include <src/common.hpp>
+#include <src/component.hpp>
 
-class Observer
+class Observer : public Component
 {
 public:
-	void Observer_Reset(void);
+	void Reset(void);
 	PAC5XXX_RAMFUNC void UpdatePosEstimate(void);
 	PAC5XXX_RAMFUNC float GetPosEstimate(void);
 	PAC5XXX_RAMFUNC float GetPosDiff(float target);
@@ -33,11 +33,13 @@ public:
 	PAC5XXX_RAMFUNC float GetPosEstimateWrappedRadians(void);
 	PAC5XXX_RAMFUNC float GetVelEstimate(void);
 	PAC5XXX_RAMFUNC int GetDirection(void);
-	void Observer_CalibrateDirection(float ref_pos); // Considers POSITIVE electrical phase
-	void Observer_SetDirection(int dir);
-	PAC5XXX_RAMFUNC float Observer_GetOffset(void);
-	void Observer_CalibrateOffset(void);
-	void Observer_SetOffset(float offset);
+	void CalibrateDirection(float ref_pos); // Considers POSITIVE electrical phase
+	void SetDirection(int dir);
+	PAC5XXX_RAMFUNC float GetOffset(void);
+	void CalibrateOffset(void);
+	void SetOffset(float offset);
+	PAC5XXX_RAMFUNC float GetBandwidth(void);
+	void SetBandwidth(float bw);
 	bool Calibrated(void);
 private:
 	struct ObserverConfig
@@ -56,6 +58,6 @@ private:
 	int32_t pos_sector = 0;
 	float pos_estimate_wrapped = 0.0f;
 	float vel_estimate = 0.0f;
-}
+};
 
 #endif /* OBSERVER_OBSERVER_H_ */

@@ -21,7 +21,7 @@
 // Set the ADC Pre Mux to send AB11 Power Monitor signal to ADC0
 //    pac5xxx_tile_register_write(ADDR_ADCIN1, SIGMGR_AB10);                      // AB10 temperature
 
-ADC::ADC(void)
+ADC::ADC(System sys_): Component(sys_)
 {
     // Arbitrary value to avoid division by zero
     vbus = 12.0f;
@@ -108,10 +108,10 @@ ADC::ADC(void)
     pac5xxx_adc_config(ADCCTL_MODE_DTSE, ADCCTL_CLKDIV_DIV8, 0);
 
     // AIO configuration
-    ADC_AIO_Init();
+    AIO_Init();
 
     // Sequencer Configuration
-    ADC_DTSE_Init();
+    DTSE_Init();
 
     // Set ADC interrupt priority and enable ADC interrupt in the NVIC
     NVIC_SetPriority(ADC0_IRQn, 1);

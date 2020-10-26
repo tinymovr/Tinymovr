@@ -17,7 +17,7 @@
 
 #include <src/adc/adc.hpp>
 #include <src/controller/controller.hpp>
-#include <src/encoders/MA702.hpp>
+#include <src/encoder/Encoder.hpp>
 #include <src/nvm/nvm.hpp>
 #include <src/observer/observer.hpp>
 #include <src/system.hpp>
@@ -158,8 +158,8 @@ uint8_t CAN::CAN_SetState(uint8_t buffer[])
 
 uint8_t CAN::CAN_GetEncoderEstimates(uint8_t buffer[])
 {
-    float pos = Observer_GetPosEstimate();
-    float vel = Observer_GetVelEstimate();
+    float pos = systm.observer.GetPosEstimate();
+    float vel = systm.observer.GetVelEstimate();
     memcpy(&buffer[0], &pos, sizeof(float));
     memcpy(&buffer[4], &vel, sizeof(float));
     return CANRP_Read;
@@ -232,7 +232,7 @@ uint8_t CAN::CAN_SetLimits(uint8_t buffer[])
 uint8_t CAN::CAN_GetPhaseCurrents(uint8_t buffer[])
 {
     struct FloatTriplet I_phase;
-    ADC_GetPhaseCurrents(&I_phase);
+    systm.adc.GetPhaseCurrents(&I_phase);
     int16_t IA = (int16_t)(I_phase.A * 1000.0f);
     int16_t IB = (int16_t)(I_phase.B * 1000.0f);
     int16_t IC = (int16_t)(I_phase.C * 1000.0f);
@@ -259,7 +259,7 @@ uint8_t CAN::CAN_Reset(uint8_t buffer[])
 
 uint8_t CAN::CAN_GetVBus(uint8_t buffer[])
 {
-    const float VBus = ADC_GetVBus();
+    const float VBus = systm.adc.GetVBus();
     memcpy(&buffer[0], &VBus, sizeof(float));
     return CANRP_Read;
 }
@@ -299,7 +299,7 @@ uint8_t CAN::CAN_DeviceInfo(uint8_t buffer[])
     static const uint8_t v_major = VERSION_MAJOR;
     static const uint8_t v_minor = VERSION_MINOR;
     static const uint8_t v_patch = VERSION_PATCH;
-    const int8_t temp = (int8_t)ADC_GetMCUTemp();
+    const int8_t temp = (int8_t)systm.adc.GetMCUTemp();
     memcpy(&buffer[0], &idr, sizeof(uint32_t));
     memcpy(&buffer[4], &v_major, sizeof(uint8_t));
     memcpy(&buffer[5], &v_minor, sizeof(uint8_t));
@@ -331,10 +331,10 @@ uint8_t CAN::CAN_EraseConfig(uint8_t buffer[])
 
 uint8_t CAN::CAN_GetMotorInfo(uint8_t buffer[])
 {
-    bool calibrated = Motor_Calibrated();
-    uint16_t R = (uint16_t)(Motor_GetPhaseResistance() * 1000);
-    uint8_t pole_pairs = Motor_GetPolePairs();
-    uint16_t L = (uint16_t)(Motor_GetPhaseInductance() * 1000000);
+    bool calibrated = systm.motor.Calibrated();
+    uint16_t R = (uint16_t)(systm.motor.GetPhaseResistance() * 1000);
+    uint8_t pole_pairs = systm.motor.GetPolePairs();
+    uint16_t L = (uint16_t)(systm.motor.GetPhaseInductance() * 1000000);
     uint16_t cpr = (uint16_t)ENCODER_CPR;
     memcpy(&buffer[0], &calibrated, sizeof(bool));
     memcpy(&buffer[1], &R, sizeof(uint16_t));

@@ -28,11 +28,11 @@
 
 
 struct NVMStruct {
-    struct MotorConfig motor_config;
-    struct ObserverConfig observer_config;
-    struct ControllerConfig controller_config;
-    struct CANConfig can_config;
-    uint32_t version;
+//    struct MotorConfig motor_config;
+//    struct ObserverConfig observer_config;
+//    struct ControllerConfig controller_config;
+//    struct CANConfig can_config;
+//    uint32_t version;
 };
 
 void NVM_Init(void);

@@ -15,14 +15,14 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "watchdog.hpp"
+#include <src/watchdog/watchdog.hpp>
 
 int32_t ClkValueForMs(int32_t ms)
 {
     return (int32_t)((float)ms * 1.201);
 }
 
-Watchdog::Watchdog(void)
+Watchdog::Watchdog(System sys_) : Component(sys_)
 {
     uint16_t val = ClkValueForMs(config.timeout);
 
@@ -41,7 +41,7 @@ Watchdog::Watchdog(void)
 
     if (config.auto_enable)
     {
-        Watchdog_SetEnabled(true);
+        SetEnabled(true);
     }
 
     PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_READ_ONLY;

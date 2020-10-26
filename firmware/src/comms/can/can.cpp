@@ -19,7 +19,7 @@
 #include <src/system.hpp>
 #include <src/watchdog/watchdog.hpp>
 
-CAN::CAN(System sys_)
+CAN::CAN(System sys_): Component(sys_)
 {
     InitEndpointMap();
 
@@ -107,7 +107,7 @@ void CAN::ProcessMessage(uint8_t command_id, bool rtr)
         {
             can_transmit(8, (config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);
         }
-        Watchdog_Feed();
+        systm.watchdog.Feed();
     }
     rx_flag = 0;
 }

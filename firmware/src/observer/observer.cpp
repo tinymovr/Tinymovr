@@ -1,6 +1,6 @@
 
 #include <src/common.hpp>
-#include <src/encoders/MA702.hpp>
+#include <src/encoder/Encoder.hpp>
 #include <src/observer/observer.hpp>
 
 #ifdef __cplusplus
@@ -23,8 +23,7 @@ void Observer::Reset(void)
 
 PAC5XXX_RAMFUNC void Observer::UpdatePosEstimate(void)
 {
-	MA_ReadAngle();
-	int new_pos_meas = MA_GetAngle();
+	int new_pos_meas = systm.encoder.GetAngle();
 	const float delta_pos_est = PWM_TIMER_PERIOD * vel_estimate;
 	const float delta_pos_meas = wrapf(new_pos_meas - pos_estimate, ENCODER_HALF_CPR);
 	const float delta_pos_error = delta_pos_meas - delta_pos_est;
@@ -100,10 +99,10 @@ PAC5XXX_RAMFUNC int Observer::GetDirection(void)
 
 void Observer::CalibrateDirection(float ref_pos)
 {
-    Observer_SetDirection(1);
-	if (Observer_GetPosEstimate() < ref_pos)
+    SetDirection(1);
+	if (GetPosEstimate() < ref_pos)
 	{
-		Observer_SetDirection(-1);
+	SetDirection(-1);
 	}
 }
 
@@ -123,7 +122,7 @@ PAC5XXX_RAMFUNC float Observer::GetOffset(void)
 
 void Observer::CalibrateOffset(void)
 {
-	Observer_SetOffset(Observer_GetPosEstimateWrapped());
+	SetOffset(GetPosEstimateWrapped());
 }
 
 void Observer::SetOffset(float offset)

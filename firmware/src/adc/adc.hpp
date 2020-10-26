@@ -18,7 +18,7 @@
 #ifndef ADC_ADC_H_
 #define ADC_ADC_H_
 
-#include <src/common.hpp>
+#include <src/component.hpp>
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,10 +31,10 @@ extern "C" {
 #endif
 
 
-class ADC
+class ADC : public Component
 {
 public:
-    ADC();
+    ADC(System sys_);
     PAC5XXX_RAMFUNC float GetVBus(void);
     PAC5XXX_RAMFUNC int16_t GetMCUTemp(void);
     PAC5XXX_RAMFUNC void GetPhaseCurrents(struct FloatTriplet *phc);
@@ -54,6 +54,6 @@ private:
 
     void AIO_Init(void);
     void DTSE_Init(void);
-}
+};
 
 #endif /* ADC_ADC_H_ */

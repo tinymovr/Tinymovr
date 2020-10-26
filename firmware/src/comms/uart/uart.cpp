@@ -19,7 +19,7 @@
 #include <src/comms/can/can.hpp>
 #include <src/comms/uart/uart.hpp>
 #include <src/controller/controller.hpp>
-#include <src/encoders/MA702.hpp>
+#include <src/encoder/Encoder.hpp>
 #include <src/motor/motor.hpp>
 #include <src/nvm/nvm.hpp>
 #include <src/observer/observer.hpp>
@@ -37,7 +37,7 @@ extern "C" {
 }
 #endif
 
-UART::UART(System sys_)
+UART::UART(System sys_): Component(sys_)
 {
 	uart_init(UART_ENUM, UART_BAUD_RATE);
 }
@@ -78,7 +78,7 @@ int32_t UART::ReadAddr(uint8_t addr)
 	switch (addr)
 	{
 		case 'b': // vbus value
-		ret_val = (int32_t)(ADC_GetVBus() * UART_V_SCALING_FACTOR);
+		ret_val = (int32_t)(systm.adc.GetVBus() * UART_V_SCALING_FACTOR);
 		break;
 
 		case 'e': // controller error
@@ -86,11 +86,11 @@ int32_t UART::ReadAddr(uint8_t addr)
 		break;
 
 		case 'o': // encoder pos
-		ret_val =  MA_GetAngle();
+		ret_val =  systm.encoder.GetAngle();
 		break;
 
 		case 'p': // pos estimate
-		ret_val = Observer_GetPosEstimate();
+		ret_val = systm.observer.GetPosEstimate();
 		break;
 
 		case 'P': // pos setpoint
@@ -98,7 +98,7 @@ int32_t UART::ReadAddr(uint8_t addr)
 		break;
 
 		case 'v': // vel estimate
-		ret_val = (int32_t)Observer_GetVelEstimate();
+		ret_val = (int32_t)systm.observer.GetVelEstimate();
 		break;
 
 		case 'V': // vel setpoint
@@ -114,15 +114,15 @@ int32_t UART::ReadAddr(uint8_t addr)
 		break;
 
 		case 'd': // observer direction
-		ret_val = Observer_GetDirection();
+		ret_val = systm.observer.GetDirection();
 		break;
 
 		case 'h': // phase resistance
-		ret_val = Motor_GetPhaseResistance() * UART_R_SCALING_FACTOR;
+		ret_val = systm.motor.GetPhaseResistance() * UART_R_SCALING_FACTOR;
 		break;
 
 		case 'l': // phase inductance
-		ret_val = Motor_GetPhaseInductance() * UART_L_SCALING_FACTOR;
+		ret_val = systm.motor.GetPhaseInductance() * UART_L_SCALING_FACTOR;
 		break;
 
 		case 'U': // CAN Baud Rate
@@ -180,7 +180,7 @@ void UART::ProcessASCIIMessage()
 		// Write operation
 		int32_t n = atol(&(rx_buffer)[2]);
 		WriteAddr(addr, n);
-		Watchdog_Feed();
+		systm.watchdog.Feed();
 	}
 	else if (len == 0)
 	{
@@ -189,7 +189,7 @@ void UART::ProcessASCIIMessage()
 		int32_t val = ReadAddr(rx_buffer[1]);
 		(void)itoa(val, msg, 10);
 		SendMessage(msg);
-		Watchdog_Feed();
+		systm.watchdog.Feed();
 	}
 	else
 	{

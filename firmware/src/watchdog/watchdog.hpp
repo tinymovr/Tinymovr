@@ -18,19 +18,19 @@
 #ifndef WATCHDOG_WATCHDOG_H_
 #define WATCHDOG_WATCHDOG_H_
 
-#include <src/common.hpp>
+#include <src/component.hpp>
 
-class Watchdog
+class Watchdog : public Component
 {
 public:
-    Watchdog();
-    void Watchdog_SetEnabled(bool enabled);
-    bool Watchdog_GetEnabled(void);
-    void Watchdog_SetAutoEnable(bool auto_enable);
-    bool Watchdog_GetAutoEnable(void);
-    int32_t Watchdog_GetTimeout(void);
-    void Watchdog_SetTimeout(int32_t new_timeout);
-    PAC5XXX_RAMFUNC void Watchdog_Feed(void);
+    Watchdog(System sys_);
+    void SetEnabled(bool enabled);
+    bool GetEnabled(void);
+    void SetAutoEnable(bool auto_enable);
+    bool GetAutoEnable(void);
+    int32_t GetTimeout(void);
+    void SetTimeout(int32_t new_timeout);
+    PAC5XXX_RAMFUNC void Feed(void);
 
 private:
     struct WatchdogConfig
@@ -39,6 +39,6 @@ private:
         uint16_t timeout = 1000; // ms
     };
     WatchdogConfig config;
-}
+};
 
 #endif /* WATCHDOG_WATCHDOG_H_ */
