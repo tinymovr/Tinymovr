@@ -18,31 +18,25 @@
 #ifndef ENCODERS_MA702_H_
 #define ENCODERS_MA702_H_
 
-#include "../common.hpp"
+#include <src/component.hpp>
 
-#define ENCODER_CPR                (8192)
-#define ENCODER_HALF_CPR           (ENCODER_CPR / 2)
-
-// MA702 commands
 typedef enum {
     MA_CMD_NOP              = 0x0000,
     MA_CMD_ANGLE            = 0x0000
 } MA702Command;
 
-struct MA702State
+class Encoder : public Component
 {
-    uint16_t angle_buffer;    // buffer for angle results from last transfer
-    MA702Command last_command;    // command sent during last Transfer
+public:
+	struct EncoderConfig
+	{
+	    uint16_t kCountsPerRev;
+	    float kRadPerRev;
+	};
+	Encoder(System sys_);
+	PAC5XXX_RAMFUNC int GetAngle(void);
+private:
+	EncoderConfig config;
 };
-
-struct MA702Config
-{
-    uint16_t kCountsPerRev;
-    float kRadPerRev;
-};
-
-void MA_Init(void);
-PAC5XXX_RAMFUNC int MA_GetAngle(void);
-PAC5XXX_RAMFUNC void MA_ReadAngle(void);
 
 #endif /* ENCODERS_MA702_H_ */

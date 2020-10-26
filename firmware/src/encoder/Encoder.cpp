@@ -15,47 +15,29 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <src/encoders/MA702.hpp>
+#include <src/encoder/Encoder.hpp>
 #include <src/system.hpp>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "src/encoders/ssp_func.h"
+#include <src/encoder/ssp_func.h>
 
 #ifdef __cplusplus
 }
 #endif
 
-PAC5XXX_RAMFUNC static inline void MA_Transfer(MA702Command cmd);
-
-static struct MA702State state = {
-        .angle_buffer = 0,
-        .last_command = MA_CMD_NOP
-};
-
-void MA_Init(void)
+Encoder::Encoder(System sys_): Component(sys_)
 {
     ssp_init(SSPD, SSP_MS_MASTER, 0, 0); // Mode 0
-    sys_.DelayUS(16000); // ensure 16ms sensor startup time
+    systm.DelayUS(16000); // ensure 16ms sensor startup time
 }
 
-PAC5XXX_RAMFUNC int MA_GetAngle(void)
-{
-    return (int) (state.angle_buffer);
-}
-
-PAC5XXX_RAMFUNC void MA_ReadAngle(void)
+PAC5XXX_RAMFUNC int Encoder::GetAngle(void)
 {
     // TODO: Make SSP reference configurable
-    MA_Transfer(MA_CMD_ANGLE);
+	ssp_write_one(SSPD, MA_CMD_ANGLE);
     while (!PAC55XX_SSPD->STAT.RNE) {}
-    state.angle_buffer = (PAC55XX_SSPD->DAT.DATA) >> 3;
-}
-
-PAC5XXX_RAMFUNC static inline void MA_Transfer(MA702Command cmd)
-{
-    ssp_write_one(SSPD, cmd);
-    state.last_command = cmd;
+    return (PAC55XX_SSPD->DAT.DATA) >> 3;
 }
