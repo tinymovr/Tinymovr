@@ -5,6 +5,10 @@
  *      Author: conta
  */
 
+void Controller::CalibrateResistance()
+{
+	systm.watchdog.Feed();
+}
 
 void CalibrateStep(void)
 {
