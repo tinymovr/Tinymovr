@@ -92,12 +92,20 @@ System::System(void)
 		ARM_CM_DWT_CYCCNT  = 0;
 		ARM_CM_DWT_CTRL   |= 1u << 0;   // Set bit 0
 	}
+
+	encoder = Encoder();
+	observer = Observer();
+	motor = Motor();
+	adc = ADC();
+	can = CAN();
+	uart = UART();
+	controller = Controller();
+	watchdog = Watchdog();
 }
 
-void System::Loop(void)
+void System::Spin(void)
 {
-    // TODO: Add control logic
-	__WFI();
+    controller.idle();
 }
 
 void System::Reset(void)
@@ -129,4 +137,42 @@ void System::InitTimer(void)
     PAC55XX_TIMERA->CCTR4.CTR = 0;
     PAC55XX_TIMERA->CCTR5.CTR = 0;
     PAC55XX_TIMERA->CCTR6.CTR = 0;
+}
+
+void System::HandleADCInterrupt()
+{
+	adc_interrupt = true;
+}
+
+void System::HandleCANInterrupt()
+{
+	can_interrupt = true;
+}
+
+void System::HandleUARTInterrupt()
+{
+	uart_interrupt = true;
+}
+
+void System::WaitForControlLoopInterrupt()
+{
+	// Control loop is synced to ADC measurements
+	while (!adc_interrupt)
+	{
+		// Received an interrupt but it's not ADC.
+		// If there are any tasks pending from other interrupts, do them now.
+		if (can_interrupt)
+		{
+			// Do stuff ...
+			can_interrupt = false;
+		}
+		if (uart_interrupt)
+		{
+			// Do stuff ...
+			uart_interrupt = false;
+		}
+		// Go back to sleep
+		__WFI();
+	}
+	adc_interrupt = false;
 }

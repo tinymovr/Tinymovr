@@ -19,7 +19,7 @@
 #include <src/comms/can/can.hpp>
 #include <src/comms/uart/uart.hpp>
 #include <src/controller/controller.hpp>
-#include <src/encoders/MA702.hpp>
+#include <src/encoder/Encoder.hpp>
 #include <src/gatedriver/gatedriver.hpp>
 #include <src/motor/motor.hpp>
 #include <src/nvm/nvm.hpp>
@@ -29,13 +29,15 @@
 #include "timer/timer.hpp"
 #include "watchdog/watchdog.hpp"
 
+System &sys_;
+
 int main(void)
 {
   	__disable_irq();
-    System sys_;
+    sys_ = System();
     __enable_irq();
 
-    sys_.Loop();
+    sys_.Spin();
 }
 
 //	MA_Init();
@@ -57,17 +59,17 @@ extern "C" {
 
 void ADC_IRQHandler(void)
 {
-  
+	sys_.HandleADCInterrupt();
 }
 
 void CAN_IRQHandler(void)
 {
-
+	sys_.HandleCANInterrupt();
 }
 
 void USARTB_IRQHandler(void)
 {
-
+	sys_.HandleUARTInterrupt();
 }
 
 #ifdef __cplusplus
