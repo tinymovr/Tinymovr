@@ -1,151 +1,143 @@
 /*
- * calibration.cpp
+ * calibrateion.cpp
  *
- *  Created on: 26 ??? 2020
+ *  Created on: 27 ??? 2020
  *      Author: conta
  */
 
-void Controller::CalibrateResistance()
-{
-	systm.watchdog.Feed();
-}
+#include <src/common.hpp>
+#include <src/adc/adc.hpp>
+#include <src/controller/controller.hpp>
+#include <src/encoder/encoder.hpp>
+#include <src/gatedriver/gatedriver.hpp>
+#include <src/motor/motor.hpp>
+#include <src/observer/observer.hpp>
+#include <src/watchdog/watchdog.hpp>
+#include <src/system.hpp>
+#include <src/utils/utils.hpp>
 
-void CalibrateStep(void)
+struct CalibrateResistance: public ControlAction
 {
-    Watchdog_Feed();
-
-    // Resistance
-    if (calState.current_cal_index < CAL_R_END_INDEX)
-    {
-        calState.V_setpoint += config.V_calib_gain *
-                (config.I_cal_R_setpoint - state.I_phase_meas.A);
-        const float pwm_setpoint = calState.V_setpoint / ADC_GetVBus();
-        SVM(pwm_setpoint, 0.0f, &state.modulation_values.A,
-                    &state.modulation_values.B, &state.modulation_values.C);
-    }
-    else if (calState.current_cal_index == CAL_R_END_INDEX)
-    {
+public:
+	static constexpr float V_gain = 0.0005f;
+	static constexpr float I_cal_R_setpoint = 5.0f;
+	float V_setpoint = 0;
+	virtual void operator () ()
+	{
+		for (int i=0; i< CAL_R_LEN; i++)
+		{
+			System::getInstance().watchdog.Feed();
+			struct FloatTriplet I_phase_meas = System::getInstance().adc.GetPhaseCurrents();
+			V_setpoint += V_gain * (I_cal_R_setpoint - I_phase_meas.A);
+			const float pwm_setpoint = V_setpoint / System::getInstance().adc.GetVBus();
+			struct FloatTriplet modulation_values;
+			SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
+			System::getInstance().driver.SetDutyCycle(&modulation_values);
+			System::getInstance().WaitForControlLoopInterrupt();
+		}
 #ifndef DRY_RUN
-        const float R = fabsf(calState.V_setpoint / config.I_cal_R_setpoint);
+        const float R = fabsf(V_setpoint / I_cal_R_setpoint);
         if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
         {
-            state.error = ERROR_PHASE_RESISTANCE_OUT_OF_RANGE;
-            calState.current_cal_index = 0;
-            calState.I_high = 0.0f;
-            calState.I_low = 0.0f;
-            calState.V_setpoint = 0.0f;
-            Controller_SetState(STATE_IDLE);
+            throw ERROR_PHASE_RESISTANCE_OUT_OF_RANGE;
         }
-        else
-        {
-            Motor_SetPhaseResistance(R);
-        }
+        System::getInstance().motor.SetPhaseResistance(R);
 #else
         Motor_SetPhaseResistance(0.5);
 #endif
-        calState.V_setpoint = 0.0f;
-    }
+	}
+};
 
-    // Inductance
-    else if (calState.current_cal_index < CAL_L_END_INDEX)
-    {
-        if ((calState.current_cal_index & 0x2u) == 0x2u)
-        {
-            calState.I_high += state.I_phase_meas.A;
-            calState.V_setpoint = -config.V_calib_inductance;
-        }
-        else
-        {
-            calState.I_low += state.I_phase_meas.A;
-            calState.V_setpoint = config.V_calib_inductance;
-        }
-        const float pwm_setpoint = calState.V_setpoint / ADC_GetVBus();
-        SVM(pwm_setpoint, 0.0f, &state.modulation_values.A,
-                    &state.modulation_values.B, &state.modulation_values.C);
-    }
-    else if (calState.current_cal_index == CAL_L_END_INDEX)
-    {
+
+struct CalibrateInductance: public ControlAction
+{
+public:
+	static constexpr float V_inductance = 2.0f;
+	float V_setpoint;
+	float I_low;
+	float I_high;
+	virtual void operator () ()
+	{
+		for (int i=0; i< CAL_L_LEN; i++)
+		{
+			System::getInstance().watchdog.Feed();
+			struct FloatTriplet I_phase_meas = System::getInstance().adc.GetPhaseCurrents();
+			if ((i & 0x2u) == 0x2u)
+			{
+				I_high += I_phase_meas.A;
+				V_setpoint = -V_inductance;
+			}
+			else
+			{
+				I_low += I_phase_meas.A;
+				V_setpoint = V_inductance;
+			}
+			const float pwm_setpoint = V_setpoint / System::getInstance().adc.GetVBus();
+			struct FloatTriplet modulation_values;
+			SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
+			System::getInstance().driver.SetDutyCycle(&modulation_values);
+			System::getInstance().WaitForControlLoopInterrupt();
+		}
 #ifndef DRY_RUN
-        const float num_cycles = (CAL_L_END_INDEX - CAL_R_END_INDEX) / 2;
-        const float dI_by_dt = (calState.I_high - calState.I_low) / (PWM_TIMER_PERIOD * num_cycles);
-        const float L = (config.V_calib_inductance) / dI_by_dt;
+        const float num_cycles = CAL_L_LEN / 2;
+        const float dI_by_dt = (I_high - I_low) / (PWM_TIMER_PERIOD * num_cycles);
+        const float L = (V_inductance) / dI_by_dt;
         if ((L <= MIN_PHASE_INDUCTANCE) || (L >= MAX_PHASE_INDUCTANCE))
         {
-            state.error = ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE;
-            calState.current_cal_index = 0;
-            calState.I_high = 0.0f;
-            calState.I_low = 0.0f;
-            calState.V_setpoint = 0.0f;
-            Controller_SetState(STATE_IDLE);
+            throw ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE;
         }
         else
         {
-            Motor_SetPhaseInductance(L);
-            Controller_UpdateCurrentGains();
+            System::getInstance().motor.SetPhaseInductance(L);
+            System::getInstance().controller.UpdateCurrentGains();
         }
 #else
-        Motor_SetPhaseInductance(0.005);
+        System::getInstance().motor.SetPhaseInductance(0.005);
 #endif
-        calState.V_setpoint = 0.0f;
-    }
+	}
+};
 
-    // Offset
-    else if (calState.current_cal_index < CAL_OFFSET_END_INDEX)
-    {
-        float pwm_setpoint = (config.I_cal_offset_setpoint * Motor_GetPhaseResistance()) / ADC_GetVBus();
-        clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
-        SVM(pwm_setpoint, 0.0f, &state.modulation_values.A,
-                    &state.modulation_values.B, &state.modulation_values.C);
-    }
-    else if (calState.current_cal_index == CAL_OFFSET_END_INDEX)
-    {
-        Observer_Reset();
-        Observer_CalibrateOffset();
-        calState.dir_initial_pos = Observer_GetPosEstimate();
-    }
 
-    // Pole Pairs & Direction
-    else if (calState.current_cal_index < CAL_DIR_END_INDEX)
-    {
-        // Ensure rotor stays at 2*Pi eangle a bit
-        const float numerator = calState.current_cal_index - CAL_OFFSET_END_INDEX;
-        const float denominator = CAL_DIR_END_INDEX - CAL_OFFSET_END_INDEX;
-        static const float end_angle = CAL_PHASE_TURNS * twopi;
-        float cur_angle = 1.2f * end_angle * (numerator/denominator);
-        clamp(&cur_angle, 0.0f, end_angle);
-        float pwm_setpoint = (config.I_cal_offset_setpoint * Motor_GetPhaseResistance()) / ADC_GetVBus();
-        clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
-        SVM(pwm_setpoint * fast_cos(cur_angle),
-            pwm_setpoint * fast_sin(cur_angle),
-            &state.modulation_values.A,
-            &state.modulation_values.B,
-            &state.modulation_values.C);
-    }
-    else if (calState.current_cal_index >= CAL_DIR_END_INDEX)
-    {
-        // Set neutral pwm immediately
-        GateDriver_SetDutyCycle(&zeroDC);
-        static const float end_angle = CAL_PHASE_TURNS * twopi;
-        if (!Motor_FindPolePairs(ENCODER_CPR, calState.dir_initial_pos, Observer_GetPosEstimate(), end_angle))
-        {
-            state.error = ERROR_INVALID_POLE_PAIRS;
-        }
-        // Direction needs to be calibrated LAST
-        Observer_CalibrateDirection(calState.dir_initial_pos);
-        calState.current_cal_index = 0;
-        calState.I_high = 0.0f;
-        calState.I_low = 0.0f;
-        Controller_SetState(STATE_IDLE);
-    }
-    else
-    {
-        // No action
-    }
-
-    if (calState.current_cal_index < CAL_DIR_END_INDEX)
-    {
-        GateDriver_SetDutyCycle(&state.modulation_values);
-    }
-    calState.current_cal_index++;
-}
+struct CalibrateOffsetDirectionAndPoles: public ControlAction
+{
+public:
+	static constexpr float I_setpoint = 8.0f;
+	float dir_initial_pos;
+	virtual void operator () ()
+	{
+		for (int i=0; i< CAL_OFFSET_LEN; i++)
+		{
+			System::getInstance().watchdog.Feed();
+			float pwm_setpoint = (I_setpoint * System::getInstance().motor.GetPhaseResistance()) / System::getInstance().adc.GetVBus();
+			clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
+			struct FloatTriplet modulation_values;
+			SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
+			System::getInstance().driver.SetDutyCycle(&modulation_values);
+			System::getInstance().WaitForControlLoopInterrupt();
+		}
+		System::getInstance().observer.Reset();
+		System::getInstance().observer.CalibrateOffset();
+		dir_initial_pos = System::getInstance().observer.GetPosEstimate();
+		for (int i=0; i< CAL_DIR_LEN; i++)
+		{
+			// Ensure rotor stays at 2*Pi eangle a bit
+			static const float end_angle = CAL_PHASE_TURNS * twopi;
+			float cur_angle = 1.2f * end_angle * (i/CAL_DIR_LEN);
+			clamp(&cur_angle, 0.0f, end_angle);
+			float pwm_setpoint = (I_setpoint * System::getInstance().motor.GetPhaseResistance()) / System::getInstance().adc.GetVBus();
+			clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
+			struct FloatTriplet modulation_values;
+			SVM(pwm_setpoint * fast_cos(cur_angle), pwm_setpoint * fast_sin(cur_angle),
+					&modulation_values.A, &modulation_values.B, &modulation_values.C);
+		}
+		// Set neutral pwm immediately
+		static const float end_angle = CAL_PHASE_TURNS * twopi;
+		if (!System::getInstance().motor.FindPolePairs(ENCODER_CPR, dir_initial_pos, System::getInstance().observer.GetPosEstimate(), end_angle))
+		{
+			throw ERROR_INVALID_POLE_PAIRS;
+		}
+		// Direction needs to be calibrated LAST
+		System::getInstance().observer.CalibrateDirection(dir_initial_pos);
+	}
+};
 

@@ -19,7 +19,7 @@
 #include <src/comms/can/can.hpp>
 #include <src/comms/uart/uart.hpp>
 #include <src/controller/controller.hpp>
-#include <src/encoder/Encoder.hpp>
+#include <src/encoder/encoder.hpp>
 #include <src/motor/motor.hpp>
 #include <src/nvm/nvm.hpp>
 #include <src/observer/observer.hpp>
@@ -31,13 +31,13 @@ extern "C" {
 #endif
 
 #include <src/comms/uart/uart_func.h>
-#include "src/utils/utils.h"
+#include <src/utils/utils.hpp>
 
 #ifdef __cplusplus
 }
 #endif
 
-UART::UART(System sys_): Component(sys_)
+UART::UART()
 {
 	uart_init(UART_ENUM, UART_BAUD_RATE);
 }
@@ -47,23 +47,23 @@ void UART::WriteAddr(uint8_t addr, int32_t data)
 	switch (addr)
 	{
 		case 'P': // pos setpoint
-		systm.controller.SetPosSetpoint(data);
+		System::getInstance().controller.SetPosSetpoint(data);
 		break;
 
 		case 'V': // vel setpoint
-		systm.controller.SetVelSetpoint((float)data);
+		System::getInstance().controller.SetVelSetpoint((float)data);
 		break;
 
 		case 'I': // current setpoint
-		systm.controller.SetIqSetpoint(data * ONE_OVER_UART_I_SCALING_FACTOR);
+		System::getInstance().controller.SetIqSetpoint(data * ONE_OVER_UART_I_SCALING_FACTOR);
 		break;
 
 		case 'U': // CAN Baud Rate
-		systm.can.SetkBaudRate(data);
+		System::getInstance().can.SetkBaudRate(data);
 		break;
 
 		case 'C': // CAN ID
-        systm.can.SetID(data);
+        System::getInstance().can.SetID(data);
         break;
 
 		default:
@@ -78,75 +78,75 @@ int32_t UART::ReadAddr(uint8_t addr)
 	switch (addr)
 	{
 		case 'b': // vbus value
-		ret_val = (int32_t)(systm.adc.GetVBus() * UART_V_SCALING_FACTOR);
+		ret_val = (int32_t)(System::getInstance().adc.GetVBus() * UART_V_SCALING_FACTOR);
 		break;
 
 		case 'e': // controller error
-		ret_val = systm.controller.GetError();
+		ret_val = System::getInstance().controller.GetError();
 		break;
 
 		case 'o': // encoder pos
-		ret_val =  systm.encoder.GetAngle();
+		ret_val =  System::getInstance().encoder.GetAngle();
 		break;
 
 		case 'p': // pos estimate
-		ret_val = systm.observer.GetPosEstimate();
+		ret_val = System::getInstance().observer.GetPosEstimate();
 		break;
 
 		case 'P': // pos setpoint
-		ret_val = systm.controller.GetPosSetpoint();
+		ret_val = System::getInstance().controller.GetPosSetpoint();
 		break;
 
 		case 'v': // vel estimate
-		ret_val = (int32_t)systm.observer.GetVelEstimate();
+		ret_val = (int32_t)System::getInstance().observer.GetVelEstimate();
 		break;
 
 		case 'V': // vel setpoint
-		ret_val = (int32_t)systm.controller.GetVelSetpoint();
+		ret_val = (int32_t)System::getInstance().controller.GetVelSetpoint();
 		break;
 
 		case 'i': // current estimate
-		ret_val = (int32_t)(systm.controller.GetIqEstimate() * UART_I_SCALING_FACTOR);
+		ret_val = (int32_t)(System::getInstance().controller.GetIqEstimate() * UART_I_SCALING_FACTOR);
 		break;
 
 		case 'I': // current setpoint
-		ret_val = (int32_t)(systm.controller.GetIqSetpoint() * UART_I_SCALING_FACTOR);
+		ret_val = (int32_t)(System::getInstance().controller.GetIqSetpoint() * UART_I_SCALING_FACTOR);
 		break;
 
 		case 'd': // observer direction
-		ret_val = systm.observer.GetDirection();
+		ret_val = System::getInstance().observer.GetDirection();
 		break;
 
 		case 'h': // phase resistance
-		ret_val = systm.motor.GetPhaseResistance() * UART_R_SCALING_FACTOR;
+		ret_val = System::getInstance().motor.GetPhaseResistance() * UART_R_SCALING_FACTOR;
 		break;
 
 		case 'l': // phase inductance
-		ret_val = systm.motor.GetPhaseInductance() * UART_L_SCALING_FACTOR;
+		ret_val = System::getInstance().motor.GetPhaseInductance() * UART_L_SCALING_FACTOR;
 		break;
 
 		case 'U': // CAN Baud Rate
-		ret_val = systm.can.GetkBaudRate();
+		ret_val = System::getInstance().can.GetkBaudRate();
 		break;
 
 		case 'C': // CAN ID
-        ret_val = systm.can.GetID();
+        ret_val = System::getInstance().can.GetID();
         break;
 
 		case 'Q': // calibrate
-		systm.controller.SetState(STATE_CALIBRATE);
+		System::getInstance().controller.SetState(STATE_CALIBRATE);
 		break;
 
 		case 'A': // closed loop
-		systm.controller.SetState(STATE_CLOSED_LOOP_CONTROL);
+		System::getInstance().controller.SetState(STATE_CLOSED_LOOP_CONTROL);
 		break;
 
 		case 'Z': // idle
-		systm.controller.SetState(STATE_IDLE);
+		System::getInstance().controller.SetState(STATE_IDLE);
 		break;
 
 		case 'R': // reset mcu
-		systm.Reset();
+		System::getInstance().Reset();
 		break;
 
 		case 'S': // save config
@@ -180,7 +180,7 @@ void UART::ProcessASCIIMessage()
 		// Write operation
 		int32_t n = atol(&(rx_buffer)[2]);
 		WriteAddr(addr, n);
-		systm.watchdog.Feed();
+		System::getInstance().watchdog.Feed();
 	}
 	else if (len == 0)
 	{
@@ -189,7 +189,7 @@ void UART::ProcessASCIIMessage()
 		int32_t val = ReadAddr(rx_buffer[1]);
 		(void)itoa(val, msg, 10);
 		SendMessage(msg);
-		systm.watchdog.Feed();
+		System::getInstance().watchdog.Feed();
 	}
 	else
 	{

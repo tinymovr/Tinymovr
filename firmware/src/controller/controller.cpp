@@ -17,38 +17,23 @@
 
 #include <src/adc/adc.hpp>
 #include <src/controller/controller.hpp>
-#include <src/encoder/Encoder.hpp>
+#include <src/encoder/encoder.hpp>
 #include <src/gatedriver/gatedriver.hpp>
 #include <src/motor/motor.hpp>
 #include <src/observer/observer.hpp>
 #include <src/watchdog/watchdog.hpp>
+#include <src/controller/calibration.cpp>
+#include <src/utils/utils.hpp>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "src/utils/utils.h"
-
-#ifdef __cplusplus
-}
-#endif
+struct CalibrateResistance;
+struct CalibrateInductance;
+struct CalibrateOffsetDirectionAndPoles;
 
 static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 
-struct CalibrateState
+void Controller::HealthCheck(void)
 {
-    float V_setpoint;
-    float I_low;
-    float I_high;
-
-    float dir_initial_pos;
-
-    uint32_t current_cal_index;
-};
-
-PAC5XXX_RAMFUNC void Controller::HealthCheck(void)
-{
-	const float VBus = systm.adc.GetVBus();
+	const float VBus = System::getInstance().adc.GetVBus();
 	const float Iq = GetIqEstimate();
 
 	if (VBus < VBUS_LOW_THRESHOLD)
@@ -62,7 +47,7 @@ PAC5XXX_RAMFUNC void Controller::HealthCheck(void)
 	}
 }
 
-PAC5XXX_RAMFUNC void Controller::ControlLoop(void)
+void Controller::ControlLoop(void)
 {
 	while (true)
 	{
@@ -70,16 +55,14 @@ PAC5XXX_RAMFUNC void Controller::ControlLoop(void)
 		total_cycles = current_timestamp - last_timestamp;
 		try
 		{
-			systm.HealthCheck();
-			systm.adc.UpdateCurrentMeas();
-			systm.adc.GetPhaseCurrents(&(I_phase_meas));
-			systm.observer.UpdateEstimates();
+			//System::getInstance().HealthCheck();
 			if (state == STATE_CALIBRATE)
 			{
-				CalibrateResistance(systm);
-				CalibrateInductance(systm);
-				CalibrateOffset(systm);
-				CalibrateDirection(systm);
+				//auto f = CalibrateResistance(System::getInstance());
+				//f();
+				//CalibrateInductance(System::getInstance())();
+				//CalibrateOffsetDirectionAndPoles(System::getInstance())();
+				SetState(STATE_IDLE);
 			}
 			else if (state == STATE_CLOSED_LOOP_CONTROL)
 			{
@@ -90,27 +73,27 @@ PAC5XXX_RAMFUNC void Controller::ControlLoop(void)
 				IdleStep();
 			}
 		}
-		catch (ControlError e)
+		catch (ControlError &e)
 		{
 			error = e;
 			SetState(STATE_IDLE);
 		}
 		busy_cycles = ARM_CM_DWT_CYCCNT - current_timestamp;
 		last_timestamp = current_timestamp;
-		systm.WaitForControlLoopInterrupt();
+		System::getInstance().WaitForControlLoopInterrupt();
 	}
 }
 
-PAC5XXX_RAMFUNC void Controller::ClosedLoopControlStep(void)
+void Controller::ClosedLoopControlStep(void)
 {
     float _vel_setpoint = vel_setpoint;
     if (mode >= CTRL_POSITION)
     {
-        const float delta_pos = systm.observer.GetPosDiff(pos_setpoint);
+        const float delta_pos = System::getInstance().observer.GetPosDiff(pos_setpoint);
         _vel_setpoint += delta_pos * config.pos_gain;
     }
 
-    const float vel_estimate = systm.observer.GetVelEstimate();
+    const float vel_estimate = System::getInstance().observer.GetVelEstimate();
     float _Iq_setpoint = Iq_setpoint;
 
     if (mode >= CTRL_VELOCITY)
@@ -138,9 +121,9 @@ PAC5XXX_RAMFUNC void Controller::ClosedLoopControlStep(void)
         vel_integrator_Iq *= 0.995f;
     }
 
-    const float angle = systm.observer.GetPosEstimateWrappedRadians();
-    const float I_phase = angle * systm.motor.GetPolePairs();
-    const float VBus = systm.adc.GetVBus();
+    const float angle = System::getInstance().observer.GetPosEstimateWrappedRadians();
+    const float I_phase = angle * System::getInstance().motor.GetPolePairs();
+    const float VBus = System::getInstance().adc.GetVBus();
 
     // Clarke transform
     const float Ialpha = I_phase_meas.A;
@@ -184,20 +167,20 @@ PAC5XXX_RAMFUNC void Controller::ClosedLoopControlStep(void)
 
     SVM(mod_a, mod_b, &modulation_values.A,
         &modulation_values.B, &modulation_values.C);
-    systm.driver.SetDutyCycle(&modulation_values);
+    System::getInstance().driver.SetDutyCycle(&modulation_values);
 }
 
-PAC5XXX_RAMFUNC void Controller::IdleStep(void)
+void Controller::IdleStep(void)
 {
-    systm.watchdog.Feed();
+    System::getInstance().watchdog.Feed();
 }
 
-PAC5XXX_RAMFUNC ControlState Controller::GetState(void)
+ControlState Controller::GetState(void)
 {
     return state;
 }
 
-PAC5XXX_RAMFUNC void Controller::SetState(ControlState new_state)
+void Controller::SetState(ControlState new_state)
 {
     if (state == new_state)
     {
@@ -205,21 +188,21 @@ PAC5XXX_RAMFUNC void Controller::SetState(ControlState new_state)
     }
     else if (new_state == STATE_IDLE)
     {
-    	systm.driver.SetDutyCycle(&zeroDC);
-        systm.driver.Disable();
+    	System::getInstance().driver.SetDutyCycle(&zeroDC);
+        System::getInstance().driver.Disable();
         state = STATE_IDLE;
     }
     else if ((state == STATE_IDLE) && (error == ERROR_NO_ERROR))
     {
         if ((new_state == STATE_CLOSED_LOOP_CONTROL) && Calibrated())
         {
-            pos_setpoint = systm.observer.GetPosEstimate();
-            systm.driver.Enable();
+            pos_setpoint = System::getInstance().observer.GetPosEstimate();
+            System::getInstance().driver.Enable();
             state = STATE_CLOSED_LOOP_CONTROL;
         }
         else if (new_state == STATE_CALIBRATE)
         {
-        	systm.driver.Enable();
+        	System::getInstance().driver.Enable();
             state = STATE_CALIBRATE;
         }
         else
@@ -388,9 +371,9 @@ void Controller::SetIqLimit(float limit)
     }
 }
 
-PAC5XXX_RAMFUNC bool Controller::Calibrated(void)
+bool Controller::Calibrated(void)
 {
-    return systm.motor.Calibrated() & systm.observer.Calibrated();
+    return System::getInstance().motor.Calibrated() & System::getInstance().observer.Calibrated();
 }
 
 uint8_t Controller::GetError(void)
@@ -408,7 +391,7 @@ uint32_t Controller::GetBusyCycles(void)
     return busy_cycles;
 }
 
-PAC5XXX_RAMFUNC bool Controller::LimitVelocity(float min_limit, float max_limit, float vel_estimate,
+bool Controller::LimitVelocity(float min_limit, float max_limit, float vel_estimate,
     float vel_gain, float *I)
 {
     float Imax = (max_limit - vel_estimate) * vel_gain;
@@ -416,10 +399,10 @@ PAC5XXX_RAMFUNC bool Controller::LimitVelocity(float min_limit, float max_limit,
     return clamp(I, Imin, Imax);
 }
 
-PAC5XXX_RAMFUNC void Controller::UpdateCurrentGains(void)
+void Controller::UpdateCurrentGains(void)
 {
-    config.I_gain = config.I_bw * systm.motor.GetPhaseInductance();
-    float plant_pole = systm.motor.GetPhaseResistance() / systm.motor.GetPhaseInductance();
+    config.I_gain = config.I_bw * System::getInstance().motor.GetPhaseInductance();
+    float plant_pole = System::getInstance().motor.GetPhaseResistance() / System::getInstance().motor.GetPhaseInductance();
     config.Iq_integrator_gain = plant_pole * config.I_gain;
     config.Id_integrator_gain = config.Iq_integrator_gain;
 }

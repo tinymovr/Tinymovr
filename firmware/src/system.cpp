@@ -15,27 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <src/comms/can/can.hpp>
-#include <src/comms/uart/uart.hpp>
-#include <system.hpp>
-
-typedef enum
-{
-    BEFORE_ACLK_DIVIDER                 = 0,        // The DTGCLK is the clock before the TACTL.CLKDIV clock divider
-    AFTER_ACLK_DIVIDER                  = 1,        // The DTGCLK is the clock after the TACTL.CLKDIV clock divider
-}TXCTL_DTCLK_Type;
-
-typedef enum
-{
-    TIMER_SLAVE_SYNC_DISABLE            = 0,        // The timer auto reload
-    TIMER_SLAVE_SYNC_ENABLE             = 1,        // The timer single shot
-}TXCTL_SSYNC_Type;
-
-typedef enum
-{
-    AUTO_RELOAD                         = 0,        // The timer auto reload
-    SINGLE_SHOT                         = 1,        // The timer single shot
-}TXCTL_SINGLE_Type;
+#include <src/system.hpp>
 
 System::System(void)
 {
@@ -92,16 +72,6 @@ System::System(void)
 		ARM_CM_DWT_CYCCNT  = 0;
 		ARM_CM_DWT_CTRL   |= 1u << 0;   // Set bit 0
 	}
-
-	encoder = Encoder();
-	observer = Observer();
-	motor = Motor();
-	driver = Driver();
-	adc = ADC();
-	can = CAN();
-	uart = UART();
-	controller = Controller();
-	watchdog = Watchdog();
 }
 
 void System::Reset(void)
@@ -170,5 +140,11 @@ void System::WaitForControlLoopInterrupt(void)
 		// Go back to sleep
 		__WFI();
 	}
+	// We have to service the control loop by updating
+	// current measurements and encoder estimates.
+	adc.UpdateCurrentMeas();
+	observer.UpdateEstimates();
+	// Finally, we clear the interrupt flag and return
+	// control to main loop.
 	adc_interrupt = false;
 }

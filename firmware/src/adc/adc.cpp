@@ -21,7 +21,7 @@
 // Set the ADC Pre Mux to send AB11 Power Monitor signal to ADC0
 //    pac5xxx_tile_register_write(ADDR_ADCIN1, SIGMGR_AB10);                      // AB10 temperature
 
-ADC::ADC(System sys_): Component(sys_)
+ADC::ADC(void)
 {
     // Arbitrary value to avoid division by zero
     vbus = 12.0f;
@@ -180,24 +180,22 @@ void ADC::DTSE_Init(void)
 
 }
 
-PAC5XXX_RAMFUNC float ADC::GetVBus(void)
+float ADC::GetVBus(void)
 {
     return vbus;
 }
 
-PAC5XXX_RAMFUNC int16_t ADC::GetMCUTemp(void)
+int16_t ADC::GetMCUTemp(void)
 {
     return temp;
 }
 
-PAC5XXX_RAMFUNC void ADC::GetPhaseCurrents(struct FloatTriplet *phc)
+struct FloatTriplet ADC::GetPhaseCurrents(void)
 {
-    phc->A = I_phase_meas.A;
-    phc->B = I_phase_meas.B;
-    phc->C = I_phase_meas.C;
+	return I_phase_meas;
 }
 
-PAC5XXX_RAMFUNC void ADC::UpdateCurrentMeas(void)
+void ADC::UpdateCurrentMeas(void)
 {
     // Clear Interrupt Flag
     PAC55XX_ADC->ADCINT.ADCIRQ0IF = 1;

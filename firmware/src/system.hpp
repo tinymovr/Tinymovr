@@ -18,17 +18,16 @@
 #ifndef SYSTEM_SYSTEM_HPP_
 #define SYSTEM_SYSTEM_HPP_
 
+#include <src/comms/can/can.hpp>
+#include <src/comms/uart/uart.hpp>
+#include <src/encoder/encoder.hpp>
+#include <src/observer/observer.hpp>
+#include <src/motor/motor.hpp>
+#include <src/gatedriver/gatedriver.hpp>
+#include <src/adc/adc.hpp>
+#include <src/controller/controller.hpp>
+#include <src/watchdog/watchdog.hpp>
 #include <src/common.hpp>
-
-class ADC;
-class Encoder;
-class Observer;
-class Driver;
-class Motor;
-class CAN;
-class UART;
-class Controller;
-class Watchdog;
 
 typedef enum
 {
@@ -51,15 +50,24 @@ typedef enum
 class System {
 
 public:
-	ADC &adc;
-	Encoder &encoder;
-	Observer &observer;
-	Driver &driver;
-	Motor &motor;
-	UART &uart;
-	CAN &can;
-	Controller &controller;
-	Watchdog &watchdog;
+	ADC adc = ADC();
+	Encoder encoder = Encoder();
+	Observer observer = Observer();
+	Driver driver = Driver();
+	Motor motor = Motor();
+	UART uart = UART();
+	CAN can = CAN();
+	Controller controller = Controller();
+	Watchdog watchdog = Watchdog();
+
+	static System& getInstance()
+	{
+		static System instance; // Guaranteed to be destroyed.
+								// Instantiated on first use.
+		return instance;
+	}
+	System(System const&) = delete;
+	void operator=(System const&) = delete;
 
 	System(void);
 	void Reset(void);

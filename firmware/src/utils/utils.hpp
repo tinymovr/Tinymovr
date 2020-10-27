@@ -29,17 +29,17 @@
 #define MACRO_MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MACRO_MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-PAC5XXX_RAMFUNC float unwrapf(float reference_val, float wrapped_val, float half_interval);
-PAC5XXX_RAMFUNC float wrapf(float unbound_val, float half_interval);
-PAC5XXX_RAMFUNC float fast_inv_sqrt(float n);
-PAC5XXX_RAMFUNC float fast_cos(float angle);
-PAC5XXX_RAMFUNC float fast_sin(float angle);
-PAC5XXX_RAMFUNC float fabsf(float x);
-PAC5XXX_RAMFUNC float floorf(float x);
-PAC5XXX_RAMFUNC float fmodf(float a, float b);
-PAC5XXX_RAMFUNC bool clamp(float *d, float min, float max);
-PAC5XXX_RAMFUNC int ltoa(int32_t value, uint8_t *sp, int radix);
-PAC5XXX_RAMFUNC char checksum(char* msg, uint8_t len);
+float unwrapf(float reference_val, float wrapped_val, float half_interval);
+float wrapf(float unbound_val, float half_interval);
+float fast_inv_sqrt(float n);
+float fast_cos(float angle);
+float fast_sin(float angle);
+float fabsf(float x);
+float floorf(float x);
+float fmodf(float a, float b);
+bool clamp(float *d, float min, float max);
+int ltoa(int32_t value, uint8_t *sp, int radix);
+char checksum(char* msg, uint8_t len);
 
 // https://github.com/madcowswe/ODrive/blob/3113aedf081cf40e942d25d3b0b36c8806f11f23/Firmware/MotorControl/utils.c
 // Released under teh following license:
@@ -66,7 +66,7 @@ PAC5XXX_RAMFUNC char checksum(char* msg, uint8_t len);
 // SOFTWARE.
 
 // Needs to be defined in header for inlining
-PAC5XXX_RAMFUNC static inline int SVM(float alpha, float beta, float* tA, float* tB, float* tC)
+static inline int SVM(float alpha, float beta, float* tA, float* tB, float* tC)
 {
     int Sextant;
 

@@ -15,9 +15,9 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/utils/utils.h"
+#include <src/utils/utils.hpp>
 
-PAC5XXX_RAMFUNC float unwrapf(float reference_val, float wrapped_val, float half_interval)
+float unwrapf(float reference_val, float wrapped_val, float half_interval)
 {
     float full_interval = half_interval * 2.0f;
 	float delta = fmodf((wrapped_val - reference_val) + half_interval, 
@@ -30,7 +30,7 @@ PAC5XXX_RAMFUNC float unwrapf(float reference_val, float wrapped_val, float half
     return reference_val + delta;
 }
 
-PAC5XXX_RAMFUNC float wrapf(float unbound_val, float half_interval)
+float wrapf(float unbound_val, float half_interval)
 {
     float full_interval = half_interval * 2.0f;
     float bound_val = unbound_val;
@@ -47,7 +47,7 @@ PAC5XXX_RAMFUNC float wrapf(float unbound_val, float half_interval)
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-PAC5XXX_RAMFUNC float fast_inv_sqrt(float n)
+float fast_inv_sqrt(float n)
 {
 	long i;
 	float x, y;
@@ -64,7 +64,7 @@ PAC5XXX_RAMFUNC float fast_inv_sqrt(float n)
 #pragma GCC diagnostic pop
 
 // based on https://github.com/divideconcept/FastTrigo/blob/master/fasttrigo.cpp
-PAC5XXX_RAMFUNC float cos_32s(float x)
+float cos_32s(float x)
 {
     const float c1= 0.99940307f;
     const float c2=-0.49558072f;
@@ -74,7 +74,7 @@ PAC5XXX_RAMFUNC float cos_32s(float x)
     return (c1 + x2*(c2 + c3 * x2));
 }
 
-PAC5XXX_RAMFUNC float fast_cos(float angle)
+float fast_cos(float angle)
 {
     //clamp to the range 0..2pi
     angle=angle-floorf(angle*invtwopi)*twopi;
@@ -86,19 +86,19 @@ PAC5XXX_RAMFUNC float fast_cos(float angle)
     return cos_32s(twopi-angle);
 }
 
-PAC5XXX_RAMFUNC float fast_sin(float angle)
+float fast_sin(float angle)
 {
     return fast_cos(halfpi-angle);
 }
 
-PAC5XXX_RAMFUNC float fabsf(float x)
+float fabsf(float x)
 {
 	union {float f; uint32_t i;} u = {x};
 	u.i &= 0x7fffffff;
 	return u.f;
 }
 
-PAC5XXX_RAMFUNC float floorf(float x)
+float floorf(float x)
 {
 	if (x >= 0.0f)
 	{
@@ -107,12 +107,12 @@ PAC5XXX_RAMFUNC float floorf(float x)
 	return (float)((int)x - 1);
 }
 
-PAC5XXX_RAMFUNC float fmodf(float a, float b)
+float fmodf(float a, float b)
 {
     return (a - b * floorf(a / b));
 }
 
-PAC5XXX_RAMFUNC bool clamp(float *d, float min, float max)
+bool clamp(float *d, float min, float max)
 {
     bool clamped = false;
     if (*d < min)
@@ -128,7 +128,7 @@ PAC5XXX_RAMFUNC bool clamp(float *d, float min, float max)
     return clamped;
 }
 
-PAC5XXX_RAMFUNC int ltoa(int32_t value, uint8_t *sp, int radix)
+int ltoa(int32_t value, uint8_t *sp, int radix)
 {
     char tmp[64];// be careful with the length of the buffer
     char *tp = tmp;
@@ -164,7 +164,7 @@ PAC5XXX_RAMFUNC int ltoa(int32_t value, uint8_t *sp, int radix)
     return len;
 }
 
-PAC5XXX_RAMFUNC char checksum(char* msg, uint8_t len)
+char checksum(char* msg, uint8_t len)
 {
     uint8_t checksum = msg[0];
     for (uint8_t i=1; i<len; i++)

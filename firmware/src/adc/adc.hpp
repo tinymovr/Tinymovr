@@ -34,11 +34,11 @@ extern "C" {
 class ADC : public Component
 {
 public:
-    ADC(System sys_);
-    PAC5XXX_RAMFUNC float GetVBus(void);
-    PAC5XXX_RAMFUNC int16_t GetMCUTemp(void);
-    PAC5XXX_RAMFUNC void GetPhaseCurrents(struct FloatTriplet *phc);
-    PAC5XXX_RAMFUNC void UpdateCurrentMeas(void);
+    ADC(void);
+    float GetVBus(void);
+    int16_t GetMCUTemp(void);
+    struct FloatTriplet GetPhaseCurrents(void);
+    void UpdateCurrentMeas(void);
 private:
     struct ADCConfig
     {

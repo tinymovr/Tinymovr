@@ -33,8 +33,8 @@ public:
 	    uint16_t kCountsPerRev;
 	    float kRadPerRev;
 	};
-	Encoder(System sys_);
-	PAC5XXX_RAMFUNC int GetAngle(void);
+	Encoder();
+	int GetAngle(void);
 private:
 	EncoderConfig config;
 };

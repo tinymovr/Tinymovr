@@ -22,23 +22,24 @@
 #include <stdint.h>
 #include <src/component.hpp>
 
+
 class Observer : public Component
 {
 public:
 	void Reset(void);
-	PAC5XXX_RAMFUNC void UpdateEstimates(void);
-	PAC5XXX_RAMFUNC float GetPosEstimate(void);
-	PAC5XXX_RAMFUNC float GetPosDiff(float target);
-	PAC5XXX_RAMFUNC float GetPosEstimateWrapped(void);
-	PAC5XXX_RAMFUNC float GetPosEstimateWrappedRadians(void);
-	PAC5XXX_RAMFUNC float GetVelEstimate(void);
-	PAC5XXX_RAMFUNC int GetDirection(void);
+	void UpdateEstimates(void);
+	float GetPosEstimate(void);
+	float GetPosDiff(float target);
+	float GetPosEstimateWrapped(void);
+	float GetPosEstimateWrappedRadians(void);
+	float GetVelEstimate(void);
+	int GetDirection(void);
 	void CalibrateDirection(float ref_pos); // Considers POSITIVE electrical phase
 	void SetDirection(int dir);
-	PAC5XXX_RAMFUNC float GetOffset(void);
+	float GetOffset(void);
 	void CalibrateOffset(void);
 	void SetOffset(float offset);
-	PAC5XXX_RAMFUNC float GetBandwidth(void);
+	float GetBandwidth(void);
 	void SetBandwidth(float bw);
 	bool Calibrated(void);
 private:

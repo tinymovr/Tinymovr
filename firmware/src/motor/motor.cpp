@@ -18,7 +18,7 @@
 #include <src/motor/motor.hpp>
 #include <src/observer/observer.hpp>
 
-PAC5XXX_RAMFUNC uint8_t Motor::FindPolePairs(uint16_t cpr, float start_cpr, float end_cpr, float e_angle)
+uint8_t Motor::FindPolePairs(uint16_t cpr, float start_cpr, float end_cpr, float e_angle)
 {
     const float pos = fabsf(end_cpr - start_cpr);
     float p_angle = twopi * pos/cpr;
@@ -35,12 +35,12 @@ PAC5XXX_RAMFUNC uint8_t Motor::FindPolePairs(uint16_t cpr, float start_cpr, floa
     return found;
 }
 
-PAC5XXX_RAMFUNC uint8_t Motor::GetPolePairs(void)
+uint8_t Motor::GetPolePairs(void)
 {
     return config.pole_pairs;
 }
 
-PAC5XXX_RAMFUNC void Motor::SetPolePairs(uint8_t pairs)
+void Motor::SetPolePairs(uint8_t pairs)
 {
     if (pairs > 1u)
     {
@@ -50,11 +50,11 @@ PAC5XXX_RAMFUNC void Motor::SetPolePairs(uint8_t pairs)
     // TODO: else error
 }
 
-PAC5XXX_RAMFUNC float Motor::GetPhaseResistance(void)
+float Motor::GetPhaseResistance(void)
 {
     return config.phase_resistance;
 }
-PAC5XXX_RAMFUNC void Motor::SetPhaseResistance(float R)
+void Motor::SetPhaseResistance(float R)
 {
     if ((R > MIN_PHASE_RESISTANCE) && (R < MAX_PHASE_RESISTANCE))
     {
@@ -64,11 +64,11 @@ PAC5XXX_RAMFUNC void Motor::SetPhaseResistance(float R)
     // TODO: else error
 }
 
-PAC5XXX_RAMFUNC float Motor::GetPhaseInductance(void)
+float Motor::GetPhaseInductance(void)
 {
     return config.phase_inductance;
 }
-PAC5XXX_RAMFUNC void Motor::SetPhaseInductance(float L)
+void Motor::SetPhaseInductance(float L)
 {
     if ((L > MIN_PHASE_INDUCTANCE) && (L < MAX_PHASE_INDUCTANCE))
     {
@@ -78,7 +78,7 @@ PAC5XXX_RAMFUNC void Motor::SetPhaseInductance(float L)
     // TODO: else error
 }
 
-PAC5XXX_RAMFUNC bool Motor::Calibrated(void)
+bool Motor::Calibrated(void)
 {
     return config.resistance_calibrated && config.inductance_calibrated && config.poles_calibrated;
 }

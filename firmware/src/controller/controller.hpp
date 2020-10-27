@@ -47,11 +47,9 @@ typedef enum {
 
 class ControlAction
 {
-	ControlAction(System sys_): systm{sys_} {};
+public:
 	virtual void operator () () {};
-	~ControlAction();
-private:
-	System systm;
+	virtual ~ControlAction();
 };
 
 class Controller: public Component
@@ -70,22 +68,16 @@ public:
 	    float Iq_integrator_gain = 0.0f;
 	    float Id_integrator_gain = 0.0f;
 
-	    float I_cal_R_setpoint = 5.0f;
-	    float I_cal_offset_setpoint = 8.0f;
-
 	    float I_k = 0.3f;
-
-	    float V_calib_gain = 0.0005f;
-	    float V_calib_inductance = 2.0f;
 	};
 
-	Controller(void);
+	ControllerConfig config;
 
-	PAC5XXX_RAMFUNC void HealthCheck(void);
-	PAC5XXX_RAMFUNC void ControlLoop(void);
+	void HealthCheck(void);
+	void ControlLoop(void);
 
-	PAC5XXX_RAMFUNC ControlState GetState(void);
-	PAC5XXX_RAMFUNC void SetState(ControlState new_state);
+	ControlState GetState(void);
+	void SetState(ControlState new_state);
 
 	ControlMode GetMode(void);
 	void SetMode(ControlMode mode);
@@ -118,13 +110,14 @@ public:
 	float GetIqLimit(void);
 	void SetIqLimit(float limit);
 
-	PAC5XXX_RAMFUNC bool Calibrated(void);
+	bool Calibrated(void);
 	uint8_t GetError(void);
 
 	uint32_t GetTotalCycles(void);
 	uint32_t GetBusyCycles(void);
+
+	void UpdateCurrentGains(void);
 private:
-	ControllerConfig config;
 
 	ControlState state = STATE_IDLE;
 	ControlMode mode = CTRL_CURRENT;
@@ -150,17 +143,11 @@ private:
 
 	uint32_t last_timestamp = 0;
 
-	void CalibrateResistance();
-	void CalibrateInductance();
-	void CalibrateOffset();
-	void CalibrateDirection();
-
 	void ClosedLoopControlStep();
 	void IdleStep();
 
-	PAC5XXX_RAMFUNC bool LimitVelocity(float min_limit, float max_limit, float vel_estimate,
+	bool LimitVelocity(float min_limit, float max_limit, float vel_estimate,
 		    float vel_gain, float *I);
-	PAC5XXX_RAMFUNC void UpdateCurrentGains(void);
 };
 
 #endif /* CONTROLLER_CONTROLLER_H_ */

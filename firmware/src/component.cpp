@@ -5,4 +5,5 @@
  *      Author: conta
  */
 
-Component::Component(System sys_) : systm(sys_) {}
+#include <src/component.hpp>
+

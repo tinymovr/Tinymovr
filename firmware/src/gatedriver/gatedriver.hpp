@@ -28,10 +28,9 @@ typedef enum {
 class Driver : public Component
 {
 public:
-	Driver(System sys_);
-    PAC5XXX_RAMFUNC void Enable(void);
-    PAC5XXX_RAMFUNC void Disable(void);
-    PAC5XXX_RAMFUNC void SetDutyCycle(struct FloatTriplet *dc);
+    void Enable(void);
+    void Disable(void);
+    void SetDutyCycle(struct FloatTriplet *dc);
 private:
     GateDriverState state = GATEDRIVER_DISABLED;
 

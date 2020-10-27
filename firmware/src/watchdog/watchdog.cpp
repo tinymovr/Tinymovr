@@ -22,7 +22,7 @@ int32_t ClkValueForMs(int32_t ms)
     return (int32_t)((float)ms * 1.201);
 }
 
-Watchdog::Watchdog(System sys_) : Component(sys_)
+Watchdog::Watchdog()
 {
     uint16_t val = ClkValueForMs(config.timeout);
 
@@ -83,7 +83,7 @@ bool Watchdog::GetAutoEnable(void)
     return config.auto_enable;
 }
 
-PAC5XXX_RAMFUNC void Watchdog::Feed(void)
+void Watchdog::Feed(void)
 {
     PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_WRITE_AVALABLE;
     // Write any value to WWDTCLEAR to start WWDT over

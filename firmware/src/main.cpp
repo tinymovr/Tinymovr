@@ -19,25 +19,22 @@
 #include <src/comms/can/can.hpp>
 #include <src/comms/uart/uart.hpp>
 #include <src/controller/controller.hpp>
-#include <src/encoder/Encoder.hpp>
+#include <src/encoder/encoder.hpp>
 #include <src/gatedriver/gatedriver.hpp>
 #include <src/motor/motor.hpp>
 #include <src/nvm/nvm.hpp>
 #include <src/observer/observer.hpp>
 #include "common.hpp"
 #include "system.hpp"
-#include "timer/timer.hpp"
 #include "watchdog/watchdog.hpp"
-
-System &sys_;
 
 int main(void)
 {
   	__disable_irq();
-    sys_ = System();
+  	System sys_;
     __enable_irq();
 
-    sys_.controller.ControlLoop();
+    System::getInstance().controller.ControlLoop();
 }
 
 //	MA_Init();
@@ -59,17 +56,17 @@ extern "C" {
 
 void ADC_IRQHandler(void)
 {
-	sys_.HandleADCInterrupt();
+    System::getInstance().HandleADCInterrupt();
 }
 
 void CAN_IRQHandler(void)
 {
-	sys_.HandleCANInterrupt();
+	System::getInstance().HandleCANInterrupt();
 }
 
 void USARTB_IRQHandler(void)
 {
-	sys_.HandleUARTInterrupt();
+	System::getInstance().HandleUARTInterrupt();
 }
 
 #ifdef __cplusplus

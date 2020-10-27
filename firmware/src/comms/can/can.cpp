@@ -19,7 +19,7 @@
 #include <src/system.hpp>
 #include <src/watchdog/watchdog.hpp>
 
-CAN::CAN(System sys_): Component(sys_)
+CAN::CAN()
 {
     InitEndpointMap();
 
@@ -62,7 +62,7 @@ CAN::CAN(System sys_): Component(sys_)
     NVIC_EnableIRQ(CAN_IRQn);
 
     pac5xxx_can_reset_mode_set(0);	// CAN reset mode inactive
-    systm.DelayUS(100);
+    System::getInstance().DelayUS(100);
 }
 
 uint16_t CAN::GetkBaudRate(void)
@@ -89,26 +89,26 @@ void CAN::SetID(uint8_t id)
     PAC55XX_CAN->AMR = 0xFFFFFF87;
     PAC55XX_CAN->ACR = config.id << (CAN_EP_SIZE - 3);
     pac5xxx_can_reset_mode_set(0);  // CAN reset mode inactive
-    systm.DelayUS(100);
+    System::getInstance().DelayUS(100);
 }
 
 void CAN::ProcessMessage(uint8_t command_id, bool rtr)
 {
-    uint8_t (*callback)(uint8_t buffer[]) = GetEndpoint(command_id);
-    if (callback != NULL)
-    {
-        uint8_t can_msg_buffer[8] = {0};
-        if ((rtr == false) && (rx_dataLen > 0u))
-        {
-            memcpy(can_msg_buffer, &rx_data, rx_dataLen);
-        }
-        uint8_t response_type = callback(can_msg_buffer);
-        if (rtr && (response_type >= CANRP_Read))
-        {
-            can_transmit(8, (config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);
-        }
-        systm.watchdog.Feed();
-    }
+//    F callback = GetEndpoint(command_id);
+//    if (callback != NULL)
+//    {
+//        uint8_t can_msg_buffer[8] = {0};
+//        if ((rtr == false) && (rx_dataLen > 0u))
+//        {
+//            memcpy(can_msg_buffer, &rx_data, rx_dataLen);
+//        }
+//        uint8_t response_type = callback(can_msg_buffer);
+//        if (rtr && (response_type >= CANRP_Read))
+//        {
+//            can_transmit(8, (config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);
+//        }
+//        System::getInstance().watchdog.Feed();
+//    }
     rx_flag = 0;
 }
 

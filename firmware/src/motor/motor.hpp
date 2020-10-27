@@ -23,17 +23,17 @@
 class Motor : public Component
 {
 public:
-	PAC5XXX_RAMFUNC uint8_t GetPolePairs(void);
-	PAC5XXX_RAMFUNC uint8_t FindPolePairs(uint16_t cpr, float start_cpr, float end_cpr, float e_angle);
-	PAC5XXX_RAMFUNC void SetPolePairs(uint8_t pairs);
+	uint8_t GetPolePairs(void);
+	uint8_t FindPolePairs(uint16_t cpr, float start_cpr, float end_cpr, float e_angle);
+	void SetPolePairs(uint8_t pairs);
 
-	PAC5XXX_RAMFUNC float GetPhaseResistance(void);
-	PAC5XXX_RAMFUNC void SetPhaseResistance(float R);
+	float GetPhaseResistance(void);
+	void SetPhaseResistance(float R);
 
-	PAC5XXX_RAMFUNC float GetPhaseInductance(void);
-	PAC5XXX_RAMFUNC void SetPhaseInductance(float L);
+	float GetPhaseInductance(void);
+	void SetPhaseInductance(float L);
 
-	PAC5XXX_RAMFUNC bool Calibrated(void);
+	bool Calibrated(void);
 private:
 	struct MotorConfig
 	{

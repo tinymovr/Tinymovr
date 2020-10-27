@@ -15,7 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <src/encoder/Encoder.hpp>
+#include <src/encoder/encoder.hpp>
 #include <src/system.hpp>
 
 #ifdef __cplusplus
@@ -28,13 +28,13 @@ extern "C" {
 }
 #endif
 
-Encoder::Encoder(System sys_): Component(sys_)
+Encoder::Encoder()
 {
     ssp_init(SSPD, SSP_MS_MASTER, 0, 0); // Mode 0
-    systm.DelayUS(16000); // ensure 16ms sensor startup time
+    System::getInstance().DelayUS(16000); // ensure 16ms sensor startup time
 }
 
-PAC5XXX_RAMFUNC int Encoder::GetAngle(void)
+int Encoder::GetAngle(void)
 {
     // TODO: Make SSP reference configurable
 	ssp_write_one(SSPD, MA_CMD_ANGLE);

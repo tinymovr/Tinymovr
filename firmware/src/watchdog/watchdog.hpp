@@ -20,17 +20,18 @@
 
 #include <src/component.hpp>
 
+
 class Watchdog : public Component
 {
 public:
-    Watchdog(System sys_);
+    Watchdog();
     void SetEnabled(bool enabled);
     bool GetEnabled(void);
     void SetAutoEnable(bool auto_enable);
     bool GetAutoEnable(void);
     int32_t GetTimeout(void);
     void SetTimeout(int32_t new_timeout);
-    PAC5XXX_RAMFUNC void Feed(void);
+    void Feed(void);
 
 private:
     struct WatchdogConfig

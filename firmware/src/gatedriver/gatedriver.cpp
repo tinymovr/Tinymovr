@@ -18,7 +18,7 @@
 #include <src/common.hpp>
 #include <src/gatedriver/gatedriver.hpp>
 
-PAC5XXX_RAMFUNC void Driver::Enable(void)
+void Driver::Enable(void)
 {
     if (state == GATEDRIVER_DISABLED)
     {
@@ -47,7 +47,7 @@ PAC5XXX_RAMFUNC void Driver::Enable(void)
     }
 }
 
-PAC5XXX_RAMFUNC void Driver::Disable(void)
+void Driver::Disable(void)
 {
     if (state == GATEDRIVER_ENABLED)
     {
@@ -74,23 +74,23 @@ PAC5XXX_RAMFUNC void Driver::Disable(void)
 //=============================================
 // Motor Driver Duty Cycle Macro Functions
 //=============================================
-PAC5XXX_RAMFUNC static inline void m1_u_set_duty(float duty)
+static inline void m1_u_set_duty(float duty)
 {
     uint16_t val = ((uint16_t)(duty * (ACLK_FREQ_HZ/PWM_TIMER_FREQ) )) >>1;
     PAC55XX_TIMERA->CCTR4.CTR = val;
 }
-PAC5XXX_RAMFUNC static inline void m1_v_set_duty(float duty)
+static inline void m1_v_set_duty(float duty)
 {
     uint16_t val = ((uint16_t)(duty * (ACLK_FREQ_HZ/PWM_TIMER_FREQ) )) >>1;
     PAC55XX_TIMERA->CCTR5.CTR = val;
 }
-PAC5XXX_RAMFUNC static inline void m1_w_set_duty(float duty)
+static inline void m1_w_set_duty(float duty)
 {
     uint16_t val = ((uint16_t)(duty * (ACLK_FREQ_HZ/PWM_TIMER_FREQ) )) >>1;
     PAC55XX_TIMERA->CCTR6.CTR = val;
 }
 
-PAC5XXX_RAMFUNC void Driver::SetDutyCycle(struct FloatTriplet *dc)
+void Driver::SetDutyCycle(struct FloatTriplet *dc)
 {
 #ifndef DRY_RUN
     m1_u_set_duty(dc->A);

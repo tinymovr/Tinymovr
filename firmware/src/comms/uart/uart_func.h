@@ -11,7 +11,7 @@
 //
 //=============================================================================
  
-#include "../common.hpp"
+#include <src/common.hpp>
 
 #ifndef UART_FUNC_H
 #define UART_FUNC_H

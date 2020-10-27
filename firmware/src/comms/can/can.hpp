@@ -101,7 +101,7 @@ typedef enum {
 class CAN : public Component
 {
 public:
-	CAN(System sys_);
+	CAN();
 	uint16_t GetkBaudRate(void);
 	void SetkBaudRate(uint16_t rate);
 	uint8_t GetID(void);
@@ -118,34 +118,6 @@ private:
 	void InitEndpointMap(void);
 	void AddEndpoint(CANEP_Callback callback, uint8_t id);
 	CANEP_Callback GetEndpoint(uint8_t id);
-
-	uint8_t CAN_EStop(uint8_t buffer[]);
-	uint8_t CAN_GetState(uint8_t buffer[]);
-
-	uint8_t CAN_GetCANConfig(uint8_t buffer[]);
-	uint8_t CAN_SetCANConfig(uint8_t buffer[]);
-	uint8_t CAN_SetState(uint8_t buffer[]);
-
-	uint8_t CAN_GetEncoderEstimates(uint8_t buffer[]);
-	uint8_t CAN_GetSetpoints(uint8_t buffer[]);
-
-	uint8_t CAN_SetPosSetpoint(uint8_t buffer[]);
-	uint8_t CAN_SetVelSetpoint(uint8_t buffer[]);
-	uint8_t CAN_SetIqSetpoint(uint8_t buffer[]);
-	uint8_t CAN_SetLimits(uint8_t buffer[]);
-	uint8_t CAN_GetPhaseCurrents(uint8_t buffer[]);
-
-	uint8_t CAN_GetIq(uint8_t buffer[]);
-	uint8_t CAN_GetLimits(uint8_t buffer[]);
-	uint8_t CAN_Reset(uint8_t buffer[]);
-	uint8_t CAN_GetVBus(uint8_t buffer[]);
-	uint8_t CAN_GetGains(uint8_t buffer[]);
-	uint8_t CAN_SetGains(uint8_t buffer[]);
-	uint8_t CAN_DeviceInfo(uint8_t buffer[]);
-	uint8_t CAN_Timings(uint8_t buffer[]);
-	uint8_t CAN_SaveConfig(uint8_t buffer[]);
-	uint8_t CAN_EraseConfig(uint8_t buffer[]);
-	uint8_t CAN_GetMotorInfo(uint8_t buffer[]);
 };
 
 #endif /* CAN_CAN_H_ */

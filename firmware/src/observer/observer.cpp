@@ -1,17 +1,9 @@
 
 #include <src/common.hpp>
-#include <src/encoder/Encoder.hpp>
+#include <src/encoder/encoder.hpp>
 #include <src/observer/observer.hpp>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "src/utils/utils.h"
-
-#ifdef __cplusplus
-}
-#endif
+#include <src/system.hpp>
+#include <src/utils/utils.hpp>
 
 void Observer::Reset(void)
 {
@@ -21,9 +13,9 @@ void Observer::Reset(void)
     config.direction_calibrated = 0;
 }
 
-PAC5XXX_RAMFUNC void Observer::UpdateEstimates(void)
+void Observer::UpdateEstimates(void)
 {
-	int new_pos_meas = systm.encoder.GetAngle();
+	int new_pos_meas = System::getInstance().encoder.GetAngle();
 	const float delta_pos_est = PWM_TIMER_PERIOD * vel_estimate;
 	const float delta_pos_meas = wrapf(new_pos_meas - pos_estimate, ENCODER_HALF_CPR);
 	const float delta_pos_error = delta_pos_meas - delta_pos_est;
@@ -47,7 +39,7 @@ PAC5XXX_RAMFUNC void Observer::UpdateEstimates(void)
 	vel_estimate += PWM_TIMER_PERIOD * config.ki * delta_pos_error;
 }
 
-PAC5XXX_RAMFUNC float Observer::GetBandwidth(void)
+float Observer::GetBandwidth(void)
 {
     return config.track_bw;
 }
@@ -60,39 +52,39 @@ void Observer::SetBandwidth(float bw)
     }
 }
 
-PAC5XXX_RAMFUNC float Observer::GetPosEstimate(void)
+float Observer::GetPosEstimate(void)
 {
 	const float primary = 2 * config.sector_half_interval * pos_sector;
 	return config.direction * (primary + pos_estimate - config.pos_offset);
 }
 
-PAC5XXX_RAMFUNC float Observer::GetPosDiff(float target)
+float Observer::GetPosDiff(float target)
 {
 	const float primary = 2 * config.sector_half_interval * pos_sector;
 	const float diff_sector = target - ((float)config.direction * primary);
 	return diff_sector - ((float)config.direction * (pos_estimate - config.pos_offset));
 }
 
-PAC5XXX_RAMFUNC float Observer::GetPosEstimateWrapped(void)
+float Observer::GetPosEstimateWrapped(void)
 {
 	// FIXME: Due to offset, returned value interval is [-pi - offset, pi - offset)
 	// However, it is correct with respect to electrical origin
 	return config.direction * (pos_estimate_wrapped - config.pos_offset);
 }
 
-PAC5XXX_RAMFUNC float Observer::GetPosEstimateWrappedRadians(void)
+float Observer::GetPosEstimateWrappedRadians(void)
 {
 	// FIXME: Same as above
 	const float est = Observer::GetPosEstimateWrapped();
 	return (est / ENCODER_CPR ) * twopi;
 }
 
-PAC5XXX_RAMFUNC float Observer::GetVelEstimate(void)
+float Observer::GetVelEstimate(void)
 {
 	return config.direction * vel_estimate;
 }
 
-PAC5XXX_RAMFUNC int Observer::GetDirection(void)
+int Observer::GetDirection(void)
 {
 	return config.direction;
 }
@@ -115,7 +107,7 @@ void Observer::SetDirection(int direction)
 	}
 }
 
-PAC5XXX_RAMFUNC float Observer::GetOffset(void)
+float Observer::GetOffset(void)
 {
 	return config.pos_offset;
 }
@@ -131,7 +123,7 @@ void Observer::SetOffset(float offset)
 	config.pos_offset = offset;
 }
 
-PAC5XXX_RAMFUNC bool Observer::Calibrated(void)
+bool Observer::Calibrated(void)
 {
 	return config.offset_calibrated && config.direction_calibrated;
 }

@@ -44,8 +44,9 @@ typedef enum {
 class UART : public Component
 {
 public:
-	UART(System sys_);
+	UART();
 	void SendMessage(char *buffer);
+	void ProcessInterrupt(void);
 private:
 	SerialMessageType msg_type = MSG_TYPE_UNKNOWN;
 	uint8_t rx_byte_count = 0;
@@ -54,10 +55,8 @@ private:
 	char tx_buffer[64] = {0};
 	void WriteAddr(uint8_t addr, int32_t data);
 	int32_t ReadAddr(uint8_t addr);
-	void SendMessage(char *buffer);
 	void ProcessASCIIMessage();
 	void ResetRxQueue();
-	void ProcessInterrupt(void);
 };
 
 
