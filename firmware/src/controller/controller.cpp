@@ -76,10 +76,10 @@ PAC5XXX_RAMFUNC void Controller::ControlLoop(void)
 			systm.observer.UpdateEstimates();
 			if (state == STATE_CALIBRATE)
 			{
-				CalibrateResistance();
-				CalibrateInductance();
-				CalibrateOffset();
-				CalibrateDirection();
+				CalibrateResistance(systm);
+				CalibrateInductance(systm);
+				CalibrateOffset(systm);
+				CalibrateDirection(systm);
 			}
 			else if (state == STATE_CLOSED_LOOP_CONTROL)
 			{
