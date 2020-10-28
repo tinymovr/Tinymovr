@@ -23,7 +23,6 @@
 #include "src/adc/adc.h"
 #include "src/nvm/nvm.h"
 #include "src/can/can.h"
-#include "src/uart/uart_func.h"
 #include "src/utils/utils.h"
 #include "src/watchdog/watchdog.h"
 #include "src/uart/uart_interface.h"
@@ -227,66 +226,62 @@ void UART_SendMessage(char *buffer)
 	pac5xxx_uart_int_enable_THREI2(UART_REF, 1);
 }
 
-void USARTB_IRQHandler(void)
+void UART_ProcessTransmitInterrupt(void)
 {
-	uint8_t int_type = pac5xxx_uart_interrupt_identification2(UART_REF);
-    uint8_t data = pac5xxx_uart_read2(UART_REF);
+	pac5xxx_uart_write2(UART_REF, state.tx_buffer[state.tx_byte_count]);
+	state.tx_byte_count++;
 
-    if (int_type == UARTIIR_INTID_TX_HOLD_EMPTY)
+	// Terminate transmission upon newline or transmit overflow
+	if ((state.tx_buffer[state.tx_byte_count - 1u] == UART_NEWLINE) ||
+			(state.tx_byte_count > UART_BYTE_LIMIT))
 	{
-		pac5xxx_uart_write2(UART_REF, state.tx_buffer[state.tx_byte_count]);
-		state.tx_byte_count++;
+		// Disable transmit interrupt
+		pac5xxx_uart_int_enable_THREI2(UART_REF, UART_INT_DISABLE);
+		// Enable receive data interrupt for next incoming message
+		pac5xxx_uart_int_enable_RDAI2(UART_REF, UART_INT_ENABLE);
+		state.tx_byte_count = 0;
+	}
+}
 
-		// Terminate transmission upon newline or transmit overflow
-        if ((state.tx_buffer[state.tx_byte_count - 1u] == UART_NEWLINE) ||
-				(state.tx_byte_count > UART_BYTE_LIMIT))
+void UART_ProcessReceiveInterrupt(void)
+{
+	uint8_t data = pac5xxx_uart_read2(UART_REF);
+	// Check first byte or return
+	if (state.rx_byte_count == 0u)
+	{
+		if (data == UART_ASCII_PROT_START_BYTE)
 		{
-			// Disable transmit interrupt
-	        pac5xxx_uart_int_enable_THREI2(UART_REF, UART_INT_DISABLE);
-			// Enable receive data interrupt for next incoming message
-			pac5xxx_uart_int_enable_RDAI2(UART_REF, UART_INT_ENABLE);
-		  	state.tx_byte_count = 0;
+			state.msg_type = MSG_TYPE_ASCII;
+		}
+		else
+		{
+			state.msg_type = MSG_TYPE_UNKNOWN;
 		}
 	}
-    else
-	{	
-		// Check first byte or return
-        if (state.rx_byte_count == 0u)
+
+	if (state.msg_type != MSG_TYPE_UNKNOWN)
+	{
+		// Store data in buffer and increment index
+		state.rx_buffer[state.rx_byte_count] = data;
+		state.rx_byte_count++;
+
+		if ((state.msg_type == MSG_TYPE_ASCII) &&
+			(state.rx_buffer[state.rx_byte_count - 1u] == UART_NEWLINE))
 		{
-        	if (data == UART_ASCII_PROT_START_BYTE)
-			{
-        		state.msg_type = MSG_TYPE_ASCII;
-			}
-        	else
-        	{
-        		state.msg_type = MSG_TYPE_UNKNOWN;
-        	}
+			UART_ProcessASCIIMessage();
+			ResetRxQueue();
+			// Disable receive data interrupt
+			pac5xxx_uart_int_enable_RDAI2(UART_REF, UART_INT_DISABLE);
+			// Reset RX FIFO, to clear RDAI interrupt
+			pac5xxx_uart_rx_fifo_reset2(UART_REF);
 		}
-
-		if (state.msg_type != MSG_TYPE_UNKNOWN)
+		else if (state.rx_byte_count > UART_BYTE_LIMIT)
 		{
-			// Store data in buffer and increment index
-			state.rx_buffer[state.rx_byte_count] = data;
-			state.rx_byte_count++;
-
-			if ((state.msg_type == MSG_TYPE_ASCII) &&
-				(state.rx_buffer[state.rx_byte_count - 1u] == UART_NEWLINE))
-			{
-				UART_ProcessASCIIMessage();
-				ResetRxQueue();
-				// Disable receive data interrupt
-				pac5xxx_uart_int_enable_RDAI2(UART_REF, UART_INT_DISABLE);
-				// Reset RX FIFO, to clear RDAI interrupt
-				pac5xxx_uart_rx_fifo_reset2(UART_REF);
-			}
-			else if (state.rx_byte_count > UART_BYTE_LIMIT)
-			{
-				ResetRxQueue();
-			}
-			else
-			{
-				// No action
-			}
+			ResetRxQueue();
+		}
+		else
+		{
+			// No action
 		}
 	}
 }

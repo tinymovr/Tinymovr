@@ -96,8 +96,7 @@ struct ControllerConfig
     float V_calib_inductance; // V
 };
 
-void Controller_Init(void);
-void Controller_Update(void);
+void Controller_ControlLoop(void);
 
 PAC5XXX_RAMFUNC ControlState Controller_GetState(void);
 PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state);

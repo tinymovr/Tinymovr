@@ -122,10 +122,9 @@ void CAN_ProcessMessage(uint8_t command_id, bool rtr)
         }
         Watchdog_Feed();
     }
-    rx_flag = 0;
 }
 
-void CAN_IRQHandler(void)
+void CAN_ProcessInterrupt(void)
 {
     buffer = PAC55XX_CAN->RXBUF;	//  read RX buffer, RX buffer bit order same as TX buffer
 
@@ -150,10 +149,7 @@ void CAN_IRQHandler(void)
             rx_data[7] = buffer >> 16;
         }
     }
-    rx_flag = 1;
     CAN_ProcessMessage(command_id, rtr);
-
-    pac5xxx_can_int_clear_RI(); // Clear RX interrupt
 }
 
 struct CANConfig* CAN_GetConfig(void)

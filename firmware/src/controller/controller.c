@@ -22,6 +22,7 @@
 #include "src/gatedriver/gatedriver.h"
 #include "src/watchdog/watchdog.h"
 #include "src/utils/utils.h"
+#include <src/scheduler/scheduler.h>
 #include "controller.h"
 
 PAC5XXX_RAMFUNC void CLControlStep(void);
@@ -94,55 +95,53 @@ struct CalibrateState
 
 struct CalibrateState calState = {0};
 
-void Controller_Init(void)
+void Controller_ControlLoop(void)
 {
-    ADC_SetDTSE_callback(Controller_Update);
-}
+	while (true)
+	{
+		const uint32_t current_timestamp = ARM_CM_DWT_CYCCNT;
+		state.total_cycles = current_timestamp - state.last_timestamp;
 
-void Controller_Update(void)
-{
-    const uint32_t current_timestamp = ARM_CM_DWT_CYCCNT;
-    state.total_cycles = current_timestamp - state.last_timestamp;
+		const float VBus = ADC_GetVBus();
+		const float Iq = Controller_GetIqEstimate();
 
-    const float VBus = ADC_GetVBus();
-    const float Iq = Controller_GetIqEstimate();
+		if ((VBus < VBUS_LOW_THRESHOLD) && (state.state != STATE_IDLE))
+		{
+			state.error = ERROR_VBUS_UNDERVOLTAGE;
+			Controller_SetState(STATE_IDLE);
+		}
+		else if ( (Iq > (config.I_limit * I_TRIP_MARGIN)) ||
+				  (Iq < -(config.I_limit * I_TRIP_MARGIN)) )
+		{
+			state.error = ERROR_OVERCURRENT;
+			Controller_SetState(STATE_IDLE);
+		}
+		else
+		{
+			ADC_GetPhaseCurrents(&(state.I_phase_meas));
+			if ((state.error != ERROR_NO_ERROR) && (state.state != STATE_IDLE))
+			{
+				Controller_SetState(STATE_IDLE);
+			}
 
-    Observer_UpdatePos();
+			if (state.state == STATE_CL_CONTROL)
+			{
+				CLControlStep();
+			}
+			else if (state.state == STATE_CALIBRATE)
+			{
+				CalibrateStep();
+			}
+			else // STATE_IDLE
+			{
+				IdleStep();
+			}
+			state.busy_cycles = ARM_CM_DWT_CYCCNT - current_timestamp;
+			state.last_timestamp = current_timestamp;
+			WaitForControlLoopInterrupt();
+		}
+	}
 
-    if ((VBus < VBUS_LOW_THRESHOLD) && (state.state != STATE_IDLE))
-    {
-        state.error = ERROR_VBUS_UNDERVOLTAGE;
-        Controller_SetState(STATE_IDLE);
-    }
-    else if ( (Iq > (config.I_limit * I_TRIP_MARGIN)) ||
-              (Iq < -(config.I_limit * I_TRIP_MARGIN)) )
-    {
-        state.error = ERROR_OVERCURRENT;
-        Controller_SetState(STATE_IDLE);
-    }
-    else
-    {
-        ADC_GetPhaseCurrents(&(state.I_phase_meas));
-        if ((state.error != ERROR_NO_ERROR) && (state.state != STATE_IDLE))
-        {
-            Controller_SetState(STATE_IDLE);
-        }
-
-        if (state.state == STATE_CL_CONTROL)
-        {
-            CLControlStep();
-        }
-        else if (state.state == STATE_CALIBRATE)
-        {
-            CalibrateStep();
-        }
-        else // STATE_IDLE
-        {
-            IdleStep();
-        }
-        state.busy_cycles = ARM_CM_DWT_CYCCNT - current_timestamp;
-        state.last_timestamp = current_timestamp;
-    }
 }
 
 PAC5XXX_RAMFUNC void CLControlStep(void)

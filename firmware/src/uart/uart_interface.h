@@ -34,6 +34,7 @@
 #define UART_UART_INTERFACE_H_
 
 #include "src/common.h"
+#include "src/uart/uart_func.h"
 
 #define UART_ENUM UARTB
 #define UART_REF PAC55XX_UARTB
@@ -63,5 +64,7 @@ void UART_SendErrorMsg(void);
 
 void UART_Init(void);
 void UART_SendMessage(char *buffer);
+void UART_ProcessTransmitInterrupt(void);
+void UART_ProcessReceiveInterrupt(void);
 
 #endif /* UART_UART_INTERFACE_H_ */

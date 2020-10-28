@@ -58,7 +58,6 @@
 
 void ADC_AIO_Init(void);
 void ADC_DTSE_Init(void);
-uint16_t adc_convert(void);
 
 static struct ADCState adc;
 
@@ -248,21 +247,8 @@ PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc)
     phc->C = adc.I_phase_meas.C;
 }
 
-void ADC_SetDTSE_callback(void (*Callback)(void))
+PAC5XXX_RAMFUNC void ADC_UpdateMeasurements(void)
 {
-    adc.DTSE_callback = Callback;
-}
-
-void ADC_SetProt_callback(void (*Callback)(void))
-{
-    adc.Prot_callback = Callback;
-}
-
-void ADC_IRQHandler(void)
-{
-    // Clear Interrupt Flag
-    PAC55XX_ADC->ADCINT.ADCIRQ0IF = 1;
-
     // TODO: Try doing below transformations in integer domain
     const float I_phase_offset_k =  PWM_TIMER_PERIOD / config.I_phase_offset_tau;
     adc.I_phase_offset.A += (((float)PAC55XX_ADC->DTSERES6.VAL * SHUNT_SCALING_FACTOR)
@@ -288,25 +274,5 @@ void ADC_IRQHandler(void)
     adc.temp = ( (((FTTEMP + 273) * ((temp_val * 100) + 12288)) / (((int16_t)TTEMPS * 100) + 12288)) - 273);
     
     adc.vbus = ((float)PAC55XX_ADC->DTSERES4.VAL) * VBUS_SCALING_FACTOR;
-
-    if (adc.DTSE_callback != NULL)
-    {
-        adc.DTSE_callback();
-    }
-}
-
-void ADC1_IRQHandler(void)
-{
-    // Overcurrent protection interrupt handler
-    // Currently not used
-
-    // Clear Interrupt Flag
-    PAC55XX_ADC->ADCINT.ADCIRQ1IF = 1;
-
-    // Call protection callback
-    if (adc.Prot_callback != NULL)
-    {
-        adc.Prot_callback();
-    }
 }
 

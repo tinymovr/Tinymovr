@@ -42,18 +42,11 @@ int main(void)
 	ADC_Init();
 	GateDriver_Init();
 	Motor_Init();
-	Controller_Init();
     CAN_Init();
     Timer_Init();
     Watchdog_Init();
     __enable_irq();
 
-    // From this point onward the main loop idles
-    // main control is through the ADC DTSE interrupt
-    // found in src/adc/adc.h
-    while(1)
-    {
-        __WFI();
-    }
+    Controller_ControlLoop();
 }
 

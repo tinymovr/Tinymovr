@@ -89,6 +89,7 @@ uint16_t CAN_GetkBaudRate(void);
 void CAN_SetkBaudRate(uint16_t rate);
 uint8_t CAN_GetID(void);
 void CAN_SetID(uint8_t id);
+void CAN_ProcessInterrupt(void);
 
 struct CANConfig* CAN_GetConfig(void);
 void CAN_RestoreConfig(struct CANConfig* config_);
