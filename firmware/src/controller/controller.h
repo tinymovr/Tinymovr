@@ -79,21 +79,14 @@ struct ControllerConfig
     float vel_ramp_limit;
     float I_limit;
 
-    float pos_gain; // cpr/s / cpr
-    float vel_gain; // A / cpr/s
+    float pos_gain;
+    float vel_gain;
     float vel_integrator_gain;
-    float I_bw; // bandwidth
-    float I_gain;   // V / A
+    float I_bw;
+    float I_gain;
     float Iq_integrator_gain;
     float Id_integrator_gain;
-
-    float I_cal_R_setpoint;
-    float I_cal_offset_setpoint;
-
     float I_k;
-
-    float V_calib_gain;   // 1 / V
-    float V_calib_inductance; // V
 };
 
 void Controller_ControlLoop(void);
@@ -134,6 +127,8 @@ uint8_t Controller_GetError(void);
 
 uint32_t Controller_GetTotalCycles(void);
 uint32_t Controller_GetBusyCycles(void);
+
+PAC5XXX_RAMFUNC void Controller_UpdateCurrentGains(void);
 
 struct ControllerConfig* Controller_GetConfig(void);
 void Controller_RestoreConfig(struct ControllerConfig* config_);

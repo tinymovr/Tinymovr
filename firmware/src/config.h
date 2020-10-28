@@ -46,10 +46,14 @@
 #define I_TRIP_MARGIN               (1.25f)
 #define VBUS_LOW_THRESHOLD          (11.0f)
 
-// Calibration timer indices
-#define CAL_R_END_INDEX             (2 * PWM_TIMER_FREQ)
-#define CAL_L_END_INDEX             (3 * PWM_TIMER_FREQ)
-#define CAL_OFFSET_END_INDEX        (4 * PWM_TIMER_FREQ)
-#define CAL_DIR_END_INDEX           (8 * PWM_TIMER_FREQ)
+// Calibration
+#define CAL_R_LEN             (2 * PWM_TIMER_FREQ)
+#define CAL_L_LEN             (1 * PWM_TIMER_FREQ)
+#define CAL_OFFSET_LEN        (1 * PWM_TIMER_FREQ)
+#define CAL_DIR_LEN           (4 * PWM_TIMER_FREQ)
 
 #define CAL_PHASE_TURNS             8
+
+#define CAL_V_GAIN (0.0005f)
+#define CAL_I_SETPOINT (5.0f)
+#define CAL_V_INDUCTANCE (2.0f)
