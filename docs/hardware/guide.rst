@@ -33,7 +33,7 @@ Board dimensions
 ****************
 
 .. image:: dimensions.png
-  :width: 400
+  :width: 800
   :alt: Tinymovr dimensions
 
 Mounting motor and Tinymovr
@@ -92,6 +92,13 @@ Connect the CAN bus header to one of the two DF-13 sockets on the board. It is n
 
 .. _alpha-erratum-1:
 
+Connector Diagram
+*****************
+
+.. image:: connectors.png
+  :width: 800
+  :alt: Tinymovr alpha connectors and pinouts
+
 Tinymovr Alpha CAN Bus Connector Erratum
 ****************************************
 
@@ -112,11 +119,11 @@ The USB Micro connector used in the CAN Bus adapter is unfortunately not very ro
 
 In addition, avoid exerting lateral forces to the connector (upwards or downwards) as they place stress on the soldered retaining flaps.
 
-In the next iteration of the adapter it will be replaced with a USB-C connector.
+The next adapter iterations (aka CANine) use a USB Type C connector and do not have this issue.
 
 .. _connecting-power:
 
 Connecting Power
 ################
 
-Tinymovr can be powered from a 12-26V power source. With the power supply off, connect the XT30 plug to the socket on the board and turn on the power supply. On Tinymovr boards equipped with a status LED, the LED should light up.
+Tinymovr can be powered from a 12-26V (3S-6S) power source. With the power supply off, connect the XT30 plug to the socket on the board and turn on the power supply. On Tinymovr boards equipped with a status LED, the LED should light up.
