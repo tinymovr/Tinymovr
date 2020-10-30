@@ -9,14 +9,14 @@
 #include <src/adc/adc.h>
 #include <src/can/can.h>
 #include <src/uart/uart_interface.h>
+#include <src/uart/uart_lowlevel.h>
 #include <src/observer/observer.h>
 
 struct SchedulerState
 {
 	bool adc_interrupt;
 	bool can_interrupt;
-	bool uart_tx_interrupt;
-	bool uart_rx_interrupt;
+	bool uart_message_interrupt;
 };
 
 struct SchedulerState state;
@@ -33,15 +33,10 @@ void WaitForControlLoopInterrupt(void)
 			CAN_ProcessInterrupt();
 			state.can_interrupt = false;
 		}
-		if (state.uart_tx_interrupt)
+		if (state.uart_message_interrupt)
 		{
-			UART_ProcessTransmitInterrupt();
-			state.uart_tx_interrupt = false;
-		}
-		if (state.uart_rx_interrupt)
-		{
-			UART_ProcessReceiveInterrupt();
-			state.uart_rx_interrupt = false;
+			UART_ProcessMessage();
+			state.uart_message_interrupt = false;
 		}
 		// Go back to sleep
 		__WFI();
@@ -67,32 +62,7 @@ void CAN_IRQHandler(void)
 	state.can_interrupt = true;
 }
 
-void USARTB_IRQHandler(void)
+void UART_ReceiveMessageHandler(void)
 {
-	uint8_t int_type =  pac5xxx_uart_interrupt_identification2(UART_REF);
-	uint8_t data;
-	switch (int_type)
-	{
-		case UARTIIR_INTID_TX_HOLD_EMPTY:
-			state.uart_tx_interrupt = true;
-			break;
-
-		case UARTIIR_INTID_RX_DATA_AVAIL:
-			data = PAC55XX_UARTB->RBR.RBR;
-			uart_read_buf[uart_read_count++] = data;
-			state.uart_rx_interrupt = true;
-			break;
-
-		case UARTIIR_INTID_RX_LINE_STATUS:
-			break;
-
-		case UARTIIR_INTID_FIFO_TIMEOUT:
-			data = PAC55XX_UARTB->RBR.RBR;
-			uart_read_buf[uart_read_count++] = data;
-			break;
-
-		default:
-			break;
-	}
-	NVIC_ClearPendingIRQ(USARTB_IRQn);
+	state.uart_message_interrupt = true;
 }

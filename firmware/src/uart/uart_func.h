@@ -20,9 +20,8 @@
 #define DF_UART_PCLK            HCLK_FREQ_HZ
 #define DF_UART_BUSY_TICK       (25000u)
 
-volatile uint8_t uart_read_buf[50];
-volatile uint8_t flag_uart_read_receive_done;
-volatile uint8_t flag_uart_write_send_done;
+volatile uint8_t uart_read_buf[48];
+volatile uint8_t uart_write_buf[48];
 volatile uint32_t uart_read_count;
 
 extern void uart_init(UART_TYPE uart, uint32_t baudrate);
