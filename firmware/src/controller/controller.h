@@ -101,7 +101,7 @@ float Controller_GetPosSetpoint(void);
 void Controller_SetPosSetpoint(float value);
 float Controller_GetVelSetpoint(void);
 void Controller_SetVelSetpoint(float value);
-float Controller_GetIqEstimate(void);
+PAC5XXX_RAMFUNC float Controller_GetIqEstimate(void);
 float Controller_GetIqSetpoint(void);
 void Controller_SetIqSetpoint(float value);
 

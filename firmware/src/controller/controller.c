@@ -311,7 +311,7 @@ void Controller_SetVelSetpoint(float value)
     state.vel_setpoint = value;
 }
 
-float Controller_GetIqEstimate(void)
+PAC5XXX_RAMFUNC float Controller_GetIqEstimate(void)
 {
     return state.Iq_meas;
 }
