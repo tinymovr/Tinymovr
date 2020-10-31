@@ -34,10 +34,8 @@
 #define UART_UART_INTERFACE_H_
 
 #include "src/common.h"
-#include "src/uart/uart_func.h"
 
-void UART_Init(void);
-void UART_ProcessMessage();
+void UART_ProcessMessage(void);
 void UART_SendInt32(int32_t val);
 
 #endif /* UART_UART_INTERFACE_H_ */

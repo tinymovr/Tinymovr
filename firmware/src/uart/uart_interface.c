@@ -34,15 +34,22 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
 	switch (addr)
 	{
 		case 'P': // pos setpoint
-		Controller_SetPosSetpoint(data);
+			Controller_SetIqSetpoint(0);
+			Controller_SetVelSetpoint(0);
+			Controller_SetPosSetpoint(data);
+			Controller_SetMode(CTRL_POSITION);
 		break;
 
 		case 'V': // vel setpoint
-		Controller_SetVelSetpoint((float)data);
+			Controller_SetIqSetpoint(0);
+			Controller_SetVelSetpoint(data);
+			Controller_SetMode(CTRL_VELOCITY);
+			Controller_SetVelSetpoint((float)data);
 		break;
 
 		case 'I': // current setpoint
-		Controller_SetIqSetpoint(data * ONE_OVER_UART_I_SCALING_FACTOR);
+			Controller_SetMode(CTRL_CURRENT);
+			Controller_SetIqSetpoint(data * ONE_OVER_UART_I_SCALING_FACTOR);
 		break;
 
 		case 'U': // CAN Baud Rate
@@ -152,18 +159,13 @@ int32_t UART_ReadAddr(uint8_t addr)
 	return ret_val;
 }
 
-void UART_Init()
-{
-    uart_init(UART_ENUM, UART_BAUD_RATE);
-}
-
-void UART_ProcessMessage()
+void UART_ProcessMessage(void)
 {
 	int8_t addr = uart_rx_msg[1];
-	int8_t len = ((int8_t)uart_msg_byte_count) - 3;
+	int8_t len = ((int8_t)uart_rx_msg_len) - 3;
 
 	// Ensure buffer is null-terminated
-	uart_msg[uart_msg_byte_count] = '\0';
+	uart_rx_msg[uart_rx_msg_len] = '\0';
 
 	if (len > 0)
 	{
@@ -187,7 +189,7 @@ void UART_ProcessMessage()
 
 void UART_SendInt32(int32_t val)
 {
-	int msg_len = (void)itoa(val, uart_tx_msg, 10);
+	(void)itoa(val, uart_tx_msg, 10);
 	for (uint8_t i=0; i<UART_BYTE_LIMIT; i++)
 	{
 		if (uart_tx_msg[i] == '\0')
@@ -196,7 +198,6 @@ void UART_SendInt32(int32_t val)
 			break;
 		}
 	}
-	uart_tx_msg_byte_count = msg_len + 1;
 	// Enable transmit interrupt to send reponse to host
 	pac5xxx_uart_int_enable_THREI2(UART_REF, 1);
 }

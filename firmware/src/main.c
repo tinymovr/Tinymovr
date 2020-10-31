@@ -18,7 +18,7 @@
 #include "src/common.h"
 #include "src/system/system.h"
 
-#include "src/uart/uart_interface.h"
+#include "src/uart/uart_lowlevel.h"
 #include "src/observer/observer.h"
 #include "src/adc/adc.h"
 #include "src/motor/motor.h"
