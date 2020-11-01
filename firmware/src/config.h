@@ -16,8 +16,8 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #define VERSION_MAJOR (0u)
-#define VERSION_MINOR (7u)
-#define VERSION_PATCH (3u)
+#define VERSION_MINOR (8u)
+#define VERSION_PATCH (0u)
 
 /// TINYMOVR CONFIGURATION OPTIONS ///
 
