@@ -24,7 +24,7 @@ ControlError CalibrateResistance(void)
 	struct FloatTriplet I_phase_meas = {0.0f};
 	struct FloatTriplet modulation_values = {0.0f};
 	ControlError e = ERROR_NO_ERROR;
-	for (int i=0; i<CAL_R_LEN; i++)
+	for (uint32_t i=0; i<CAL_R_LEN; i++)
 	{
 		ADC_GetPhaseCurrents(&I_phase_meas);
 		V_setpoint += CAL_V_GAIN * (CAL_I_SETPOINT - I_phase_meas.A);
@@ -59,7 +59,7 @@ ControlError CalibrateInductance(void)
 	struct FloatTriplet I_phase_meas = {0.0f};
 	struct FloatTriplet modulation_values = {0.0f};
 	ControlError e = ERROR_NO_ERROR;
-	for (int i=0; i<CAL_L_LEN; i++)
+	for (uint32_t i=0; i<CAL_L_LEN; i++)
 	{
 		ADC_GetPhaseCurrents(&I_phase_meas);
 		if ((i & 0x2u) == 0x2u)
@@ -104,7 +104,7 @@ ControlError CalibrateOffsetDirectionAndPolePairs(void)
 	float dir_initial_pos = 0.0f;
 	struct FloatTriplet modulation_values = {0.0f};
 	ControlError e = ERROR_NO_ERROR;
-	for (int i=0; i<CAL_OFFSET_LEN; i++)
+	for (uint32_t i=0; i<CAL_OFFSET_LEN; i++)
 	{
 		float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
 		clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
@@ -116,7 +116,7 @@ ControlError CalibrateOffsetDirectionAndPolePairs(void)
 	Observer_Reset();
 	Observer_CalibrateOffset();
 	dir_initial_pos = Observer_GetPosEstimate();
-	for (int i=0; i<CAL_DIR_LEN; i++)
+	for (uint32_t i=0; i<CAL_DIR_LEN; i++)
 	{
 		// Ensure rotor stays at 2*Pi eangle a bit
 		float factor = (float)i;

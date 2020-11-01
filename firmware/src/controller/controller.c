@@ -115,17 +115,21 @@ PAC5XXX_RAMFUNC ControlError HealthCheck(void)
 {
 	const float VBus = ADC_GetVBus();
 	const float Iq = Controller_GetIqEstimate();
-
+	ControlError e;
 	if ((VBus < VBUS_LOW_THRESHOLD) && (state.state != STATE_IDLE))
 	{
-		return ERROR_VBUS_UNDERVOLTAGE;
+		e = ERROR_VBUS_UNDERVOLTAGE;
 	}
 	else if ( (Iq > (config.I_limit * I_TRIP_MARGIN)) ||
 			  (Iq < -(config.I_limit * I_TRIP_MARGIN)) )
 	{
-		return ERROR_OVERCURRENT;
+		e = ERROR_OVERCURRENT;
 	}
-	return ERROR_NO_ERROR;
+	else
+	{
+		e = ERROR_NO_ERROR;
+	}
+	return e;
 }
 
 PAC5XXX_RAMFUNC void CLControlStep(void)
