@@ -1,4 +1,4 @@
-name: Python package
+name: Tinymovr Studio Lint/Test
 
 on: [push]
 
