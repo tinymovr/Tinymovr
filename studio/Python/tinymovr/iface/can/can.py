@@ -3,6 +3,7 @@ import can
 from typing import Tuple, Dict, List
 import serial
 from serial.tools import list_ports
+import logging
 
 from tinymovr.iface import IFace
 from tinymovr.iface.can import can_endpoints
