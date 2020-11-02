@@ -4,8 +4,13 @@ from collections import ChainMap
 from typing import Callable, List
 
 import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
+try:
+    matplotlib.use('TkAgg')
+    import matplotlib.pyplot as plt
+except ImportError:
+    # Used for headless CI
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 from flatten_dict import flatten
