@@ -15,7 +15,6 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/common.h"
 #include "src/encoders/MA702.h"
 #include "src/observer/observer.h"
 #include "src/adc/adc.h"
@@ -209,25 +208,27 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     const float Vd = (delta_Id * config.I_gain) + state.Id_integrator_Vd;
     const float Vq = (delta_Iq * config.I_gain) + state.Iq_integrator_Vq;
 
+    float mod_q = Vq / VBus;
+    float mod_d = Vd / VBus;
+
+    // dq modulation limiter
+    const float dq_mod_scale_factor = PWM_LIMIT * fast_inv_sqrt((mod_q * mod_q) + (mod_d * mod_d));
+
+    if (dq_mod_scale_factor < 1.0f)
+    {
+        mod_q *= dq_mod_scale_factor;
+        mod_d *= dq_mod_scale_factor;
+        state.Id_integrator_Vd *= I_INTEGRATOR_DECAY_FACTOR;
+        state.Iq_integrator_Vq *= I_INTEGRATOR_DECAY_FACTOR;
+    }
+
     // Inverse Park transform
-    const float Va = (c_I * Vd) - (s_I * Vq);
-    const float Vb = (c_I * Vq) + (s_I * Vd);
+    float mod_a = (c_I * mod_d) - (s_I * mod_q);
+    float mod_b = (c_I * mod_q) + (s_I * mod_d);
 
-    float mod_a = Va / VBus;
-    float mod_b = Vb / VBus;
-
-    if ((mod_a > PWM_LIMIT) && (mod_a < -PWM_LIMIT) &&
-        (mod_b > PWM_LIMIT) && (mod_b < -PWM_LIMIT))
-    {
-        state.error = ERROR_PWM_LIMIT_EXCEEDED;
-        Controller_SetState(STATE_IDLE);
-    }
-    else
-    {
-        SVM(mod_a, mod_b, &state.modulation_values.A,
-            &state.modulation_values.B, &state.modulation_values.C);
-        GateDriver_SetDutyCycle(&state.modulation_values);
-    }
+    SVM(mod_a, mod_b, &state.modulation_values.A,
+        &state.modulation_values.B, &state.modulation_values.C);
+    GateDriver_SetDutyCycle(&state.modulation_values);
 }
 
 void CalibrateStep(void)

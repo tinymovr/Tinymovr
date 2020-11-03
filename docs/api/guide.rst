@@ -1,11 +1,11 @@
-*********
-API Guide
-*********
+************
+Tinymovr API
+************
 
 Overview
 ########
 
-The Tinymovr API allows full hardware control from within Python scripts, using a hig-level interface to hardware.
+The Tinymovr API allows full hardware control from within Python scripts, using a high-level interface to hardware.
 
 Installation
 ############

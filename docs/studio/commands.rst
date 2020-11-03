@@ -142,7 +142,7 @@ Example
 setpoints
 *********
 
-| **endpoint**: ``0x09``
+| **endpoint**: ``0x0A``
 | **type**: Read-only
 
 Retrieves the position and velocity setpoints of the controller.

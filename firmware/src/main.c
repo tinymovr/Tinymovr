@@ -48,7 +48,6 @@ int main(void)
     Watchdog_Init();
     __enable_irq();
 
-    System_DelayUS(500000);
     // From this point onward the main loop idles
     // main control is through the ADC DTSE interrupt
     // found in src/adc/adc.h

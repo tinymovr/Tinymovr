@@ -5,7 +5,7 @@ Hardware Setup Guide
 ********************
 
 .. note::
-   Images in the documentation may refer to shightly different hardware versions. Where incompatibilities among hardware versions do exist, this is noted in the image caption.
+   Images in the documentation may refer to slightly different hardware versions. Where incompatibilities among hardware versions do exist, this is noted in the image caption.
 
 
 Requirements
@@ -33,7 +33,7 @@ Board dimensions
 ****************
 
 .. image:: dimensions.png
-  :width: 400
+  :width: 800
   :alt: Tinymovr dimensions
 
 Mounting motor and Tinymovr
@@ -45,10 +45,16 @@ The most important aspect of a correct setup is to ensure the controller is prop
   :width: 800
   :alt: Tinymovr and motor mechanical mounting
 
-A series of motor, PCB and magnet mount designs are available to 3D print for various kinds of motor hole patterns.
+For a 3D printable motor mount design, check out the `Tinymovr alpha dev kit mount <https://github.com/yconst/Tinymovr/tree/master/hardware/motor-stand>`_ (suitable for 40xx motors).
 
 .. note::
    For safety reasons, you should always ensure the motor & controller assembly are secured to a stable surface before operation. The motor rotor may experience high acceleration that may cause injury or damage if not secured properly.
+
+Mounting Tips
+
+* Ensure the encoder magnet is firmly attached to the motor shaft, otherwise it may slip out of sync. Use adhesive to secure if necessary.
+
+* Calibration needs to be performed without any loads on the motor. If the motor is coupled to a load, the encoder offset angle may not be determined correctly, leading to a sub-optimal setup.
 
 .. _electrical-setup:
 
@@ -86,6 +92,13 @@ Connect the CAN bus header to one of the two DF-13 sockets on the board. It is n
 
 .. _alpha-erratum-1:
 
+Connector Diagram
+*****************
+
+.. image:: connectors.png
+  :width: 800
+  :alt: Tinymovr alpha connectors and pinouts
+
 Tinymovr Alpha CAN Bus Connector Erratum
 ****************************************
 
@@ -106,11 +119,11 @@ The USB Micro connector used in the CAN Bus adapter is unfortunately not very ro
 
 In addition, avoid exerting lateral forces to the connector (upwards or downwards) as they place stress on the soldered retaining flaps.
 
-In the next iteration of the adapter it will be replaced with a USB-C connector.
+The next adapter iterations (aka CANine) use a USB Type C connector and do not have this issue.
 
 .. _connecting-power:
 
 Connecting Power
 ################
 
-Tinymovr can be powered from a 12-26V power source. With the power supply off, connect the XT30 plug to the socket on the board and turn on the power supply. On Tinymovr boards equipped with a status LED, the LED should light up.
+Tinymovr can be powered from a 12-26V (3S-6S) power source. With the power supply off, connect the XT30 plug to the socket on the board and turn on the power supply. On Tinymovr boards equipped with a status LED, the LED should light up.

@@ -17,6 +17,7 @@ Welcome to Tinymovr documentation!
    studio/commands
    studio/plotting
    api/guide
+   uart/uart
    troubleshooting
    develop/guide
 

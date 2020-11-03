@@ -47,7 +47,7 @@ static struct UART state = {
 	.tx_buffer = {0}
 };
 
-void UART_ProcessASCIIMessage(void);
+bool UART_ProcessASCIIMessage(void);
 void ResetRxQueue(void);
 
 void UART_WriteAddr(uint8_t addr, int32_t data)
@@ -55,23 +55,30 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
 	switch (addr)
 	{
 		case 'P': // pos setpoint
-		Controller_SetPosSetpoint(data);
+			Controller_SetIqSetpoint(0);
+			Controller_SetVelSetpoint(0);
+			Controller_SetPosSetpoint(data);
+			Controller_SetMode(CTRL_POSITION);
 		break;
 
 		case 'V': // vel setpoint
-		Controller_SetVelSetpoint((float)data);
+			Controller_SetIqSetpoint(0);
+			Controller_SetVelSetpoint(data);
+			Controller_SetMode(CTRL_VELOCITY);
+			Controller_SetVelSetpoint((float)data);
 		break;
 
 		case 'I': // current setpoint
-		Controller_SetIqSetpoint(data * ONE_OVER_UART_I_SCALING_FACTOR);
+			Controller_SetMode(CTRL_CURRENT);
+			Controller_SetIqSetpoint(data * ONE_OVER_UART_I_SCALING_FACTOR);
 		break;
 
 		case 'U': // CAN Baud Rate
-		CAN_SetkBaudRate(data);
+			CAN_SetkBaudRate(data);
 		break;
 
 		case 'C': // CAN ID
-        CAN_SetID(data);
+			CAN_SetID(data);
         break;
 
 		default:
@@ -86,83 +93,83 @@ int32_t UART_ReadAddr(uint8_t addr)
 	switch (addr)
 	{
 		case 'b': // vbus value
-		ret_val = (int32_t)(ADC_GetVBus() * UART_V_SCALING_FACTOR);
+			ret_val = (int32_t)(ADC_GetVBus() * UART_V_SCALING_FACTOR);
 		break;
 
 		case 'e': // controller error
-		ret_val = Controller_GetError();
+			ret_val = Controller_GetError();
 		break;
 
 		case 'o': // encoder pos
-		ret_val =  MA_GetAngle();
+			ret_val =  MA_GetAngle();
 		break;
 
 		case 'p': // pos estimate
-		ret_val = Observer_GetPosEstimate();
+			ret_val = Observer_GetPosEstimate();
 		break;
 
 		case 'P': // pos setpoint
-		ret_val = Controller_GetPosSetpoint();
+			ret_val = Controller_GetPosSetpoint();
 		break;
 
 		case 'v': // vel estimate
-		ret_val = (int32_t)Observer_GetVelEstimate();
+			ret_val = (int32_t)Observer_GetVelEstimate();
 		break;
 
 		case 'V': // vel setpoint
-		ret_val = (int32_t)Controller_GetVelSetpoint();
+			ret_val = (int32_t)Controller_GetVelSetpoint();
 		break;
 
 		case 'i': // current estimate
-		ret_val = (int32_t)(Controller_GetIqEstimate() * UART_I_SCALING_FACTOR);
+			ret_val = (int32_t)(Controller_GetIqEstimate() * UART_I_SCALING_FACTOR);
 		break;
 
 		case 'I': // current setpoint
-		ret_val = (int32_t)(Controller_GetIqSetpoint() * UART_I_SCALING_FACTOR);
+			ret_val = (int32_t)(Controller_GetIqSetpoint() * UART_I_SCALING_FACTOR);
 		break;
 
 		case 'd': // observer direction
-		ret_val = Observer_GetDirection();
+			ret_val = Observer_GetDirection();
 		break;
 
 		case 'h': // phase resistance
-		ret_val = Motor_GetPhaseResistance() * UART_R_SCALING_FACTOR;
+			ret_val = Motor_GetPhaseResistance() * UART_R_SCALING_FACTOR;
 		break;
 
 		case 'l': // phase inductance
-		ret_val = Motor_GetPhaseInductance() * UART_L_SCALING_FACTOR;
+			ret_val = Motor_GetPhaseInductance() * UART_L_SCALING_FACTOR;
 		break;
 
 		case 'U': // CAN Baud Rate
-		ret_val = CAN_GetkBaudRate();
+			ret_val = CAN_GetkBaudRate();
 		break;
 
 		case 'C': // CAN ID
-        ret_val = CAN_GetID();
+			ret_val = CAN_GetID();
         break;
 
 		case 'Q': // calibrate
-		Controller_SetState(STATE_CALIBRATE);
+			Controller_SetState(STATE_CALIBRATE);
 		break;
 
 		case 'A': // closed loop
-		Controller_SetState(STATE_CL_CONTROL);
+			Controller_SetState(STATE_CL_CONTROL);
 		break;
 
 		case 'Z': // idle
-		Controller_SetState(STATE_IDLE);
+			Controller_SetState(STATE_IDLE);
 		break;
 
 		case 'R': // reset mcu
-		System_Reset();
+			System_Reset();
 		break;
 
 		case 'S': // save config
-		NVM_SaveConfig();
+			NVM_SaveConfig();
 		break;
 
 		case 'X': // erase config
-		NVM_Erase();
+			NVM_Erase();
 		break;
 
 		default:
@@ -178,7 +185,8 @@ void UART_Init()
     uart_init(UART_ENUM, UART_BAUD_RATE);
 }
 
-void UART_ProcessASCIIMessage()
+// True if message will be returned
+bool UART_ProcessASCIIMessage()
 {
 	// We know the first byte is a start byte
 
@@ -188,6 +196,7 @@ void UART_ProcessASCIIMessage()
 	// Ensure buffer is null-terminated
 	state.rx_buffer[state.rx_byte_count] = '\0';
 
+	bool returned = false;
 	if (len > 0)
 	{
 		// Write operation
@@ -198,6 +207,7 @@ void UART_ProcessASCIIMessage()
 	else if (len == 0)
 	{
 		// Read operation
+		returned = true;
 		char msg[64];
 		int32_t val = UART_ReadAddr(state.rx_buffer[1]);
 		(void)itoa(val, msg, 10);
@@ -208,6 +218,7 @@ void UART_ProcessASCIIMessage()
 	{
 		// Error
 	}
+	return returned;
 }
 
 // TODO: Add protection for unsent messages
@@ -272,10 +283,12 @@ void USARTB_IRQHandler(void)
 			if ((state.msg_type == MSG_TYPE_ASCII) &&
 				(state.rx_buffer[state.rx_byte_count - 1u] == UART_NEWLINE))
 			{
-				UART_ProcessASCIIMessage();
+				if (UART_ProcessASCIIMessage())
+				{
+					// Will return message, disable receive data interrupt
+					pac5xxx_uart_int_enable_RDAI2(UART_REF, UART_INT_DISABLE);
+				}
 				ResetRxQueue();
-				// Disable receive data interrupt
-				pac5xxx_uart_int_enable_RDAI2(UART_REF, UART_INT_DISABLE);
 				// Reset RX FIFO, to clear RDAI interrupt
 				pac5xxx_uart_rx_fifo_reset2(UART_REF);
 			}
