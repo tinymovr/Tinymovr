@@ -28,7 +28,7 @@ class TestSetters(unittest.TestCase):
         time.sleep(0.5)
         self.tm.set_cur_setpoint(-0.5)
         time.sleep(0.5)
-        self.assertLess(abs(self.tm.encoder_estimates.velocity), 500 * ureg.ticks)
+        self.assertLess(abs(self.tm.encoder_estimates.velocity), 500 * ureg.ticks/ureg.second)
 
     def test_set_vel_control(self):
         self.tm.current_control()
