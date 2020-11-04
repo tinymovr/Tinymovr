@@ -337,11 +337,11 @@ uint8_t CAN_GetMotorInfo(uint8_t buffer[])
     uint16_t R = (uint16_t)(Motor_GetPhaseResistance() * 1000);
     uint8_t pole_pairs = Motor_GetPolePairs();
     uint16_t L = (uint16_t)(Motor_GetPhaseInductance() * 1000000);
-    uint16_t cpr = (uint16_t)ENCODER_CPR;
+    uint16_t ticks = (uint16_t)ENCODER_TICKS;
     memcpy(&buffer[0], &calibrated, sizeof(bool));
     memcpy(&buffer[1], &R, sizeof(uint16_t));
     memcpy(&buffer[3], &pole_pairs, sizeof(uint8_t));
     memcpy(&buffer[4], &L, sizeof(uint16_t));
-    memcpy(&buffer[6], &cpr, sizeof(uint16_t));
+    memcpy(&buffer[6], &ticks, sizeof(uint16_t));
     return CANRP_Read;
 }

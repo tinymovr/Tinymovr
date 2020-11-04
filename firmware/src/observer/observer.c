@@ -28,7 +28,7 @@ void Observer_Init(void)
     config.kp = 2.0f * config.track_bw;
     config.ki = 0.25f * (config.kp * config.kp);
 
-	config.sector_half_interval = ENCODER_CPR * 10;
+	config.sector_half_interval = ENCODER_TICKS * 10;
 }
 
 void Observer_Reset(void)
@@ -42,11 +42,11 @@ void Observer_Reset(void)
 PAC5XXX_RAMFUNC static inline void Observer_UpdatePosEstimate(int new_pos_meas)
 {
 	const float delta_pos_est = PWM_TIMER_PERIOD * state.vel_estimate;
-	const float delta_pos_meas = wrapf(new_pos_meas - state.pos_estimate, ENCODER_HALF_CPR);
+	const float delta_pos_meas = wrapf(new_pos_meas - state.pos_estimate, ENCODER_HALF_TICKS);
 	const float delta_pos_error = delta_pos_meas - delta_pos_est;
 	const float incr_pos = delta_pos_est + (PWM_TIMER_PERIOD * config.kp * delta_pos_error);
 	state.pos_estimate += incr_pos;
-	state.pos_estimate_wrapped = wrapf(state.pos_estimate_wrapped + incr_pos, ENCODER_HALF_CPR);
+	state.pos_estimate_wrapped = wrapf(state.pos_estimate_wrapped + incr_pos, ENCODER_HALF_TICKS);
 	if (state.pos_estimate > config.sector_half_interval)
 	{
 		state.pos_estimate -= 2 * config.sector_half_interval;
@@ -101,7 +101,7 @@ PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrappedRadians(void)
 {
 	// FIXME: Same as above
 	const float est = Observer_GetPosEstimateWrapped();
-	return (est / ENCODER_CPR ) * twopi;
+	return (est / ENCODER_TICKS ) * twopi;
 }
 
 PAC5XXX_RAMFUNC float Observer_GetVelEstimate(void)

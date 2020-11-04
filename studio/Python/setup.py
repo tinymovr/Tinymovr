@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 
 setuptools.setup(
     name="tinymovr",
-    version="0.2.5",
+    version="0.3.0",
     author="Yannis Chatzikonstantinou",
     author_email="info@tinymovr.com",
     description="Tinymovr Studio",
@@ -31,7 +31,8 @@ setuptools.setup(
         "matplotlib",
         "docopt",
         "pynumparser",
-        "flatten-dict"
+        "flatten-dict",
+        "pint"
     ],
     entry_points={
         "console_scripts": [

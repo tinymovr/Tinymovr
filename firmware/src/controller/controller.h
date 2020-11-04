@@ -79,8 +79,8 @@ struct ControllerConfig
     float vel_ramp_limit;
     float I_limit;
 
-    float pos_gain; // cpr/s / cpr
-    float vel_gain; // A / cpr/s
+    float pos_gain; // tick/s / tick
+    float vel_gain; // A / tick/s
     float vel_integrator_gain;
     float I_bw; // bandwidth
     float I_gain;   // V / A

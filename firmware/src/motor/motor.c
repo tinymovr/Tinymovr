@@ -30,10 +30,10 @@ static struct MotorConfig config = {
 
 void Motor_Init(void) {}
 
-PAC5XXX_RAMFUNC uint8_t Motor_FindPolePairs(uint16_t cpr, float start_cpr, float end_cpr, float e_angle)
+PAC5XXX_RAMFUNC uint8_t Motor_FindPolePairs(uint16_t ticks, float start_ticks, float end_ticks, float e_angle)
 {
-    const float pos = fabsf(end_cpr - start_cpr);
-    float p_angle = twopi * pos/cpr;
+    const float pos = fabsf(end_ticks- start_ticks);
+    float p_angle = twopi * pos/ticks;
     const float pairs_f = e_angle / p_angle;
     const uint8_t pairs_i = (uint8_t)floorf(pairs_f + 0.5f);
     const float residual = fabsf(pairs_f - (float)pairs_i);

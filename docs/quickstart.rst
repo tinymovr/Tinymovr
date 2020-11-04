@@ -60,7 +60,7 @@ Your Tinymovr is now ready for operation. You can view information about the att
 
     tm1.motor_info
 
-This will reveal identified motor parameters, namely: phase resistance, phase inductance, number of pole pairs and encoder CPR (fixed).
+This will reveal identified motor parameters, namely: phase resistance, phase inductance, number of pole pairs and encoder ticks.
 
 Testing Position Control Mode
 #############################

@@ -15,12 +15,15 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import copy
+from copy import copy
 import json
 #from pkg_resources import parse_version
 from tinymovr.iface import IFace
 from tinymovr.objdict import objdict
+from tinymovr.units import get_registry
+from pint import Quantity as _Q
 
+ureg = get_registry()
 
 class Tinymovr:
 
@@ -37,6 +40,7 @@ class Tinymovr:
     def __getattr__(self, _attr: str):
         attr = strip_end(_attr, "_asdict")
         eps = self.iface.get_ep_map()
+        codec = self.iface.get_codec()
         if attr in eps:
             d = eps[attr]
 
@@ -46,32 +50,34 @@ class Tinymovr:
                     assert(len(args) == 0 or len(kwargs) == 0)
                     if len(kwargs) > 0:
                         assert("labels" in d)
-                        f_args = [kwargs[k] for k in d["labels"]]
+                        inputs = [kwargs[k] if k in kwargs else
+                                  d["defaults"][k] for k in d["labels"]]
                     else:
-                        f_args = copy.copy(args)
-                    if "types" in d:
-                        slack = len(d["types"]) - len(f_args)
-                        if slack > 0:
-                            slack_defaults = d["defaults"][-slack:]
-                            f_args = f_args + slack_defaults
-                        payload = self.iface.get_codec().serialize(f_args, *d["types"])
-                        self.iface.send(self.node_id, d["ep_id"], payload=payload)
-                    else:
-                        self.iface.send(self.node_id, d["ep_id"])
+                        inputs = [args[i] if i < len(args) else
+                                  d["defaults"][k] for i, k in enumerate(d["labels"])]
+                    if "units" in d:
+                        inputs = [v.to(d["units"][i]).magnitude if isinstance(v, _Q)
+                                  else v for i, v in enumerate(inputs)]
+                    payload=None
+                    if len(inputs) > 0:                        
+                        payload = codec.serialize(inputs, *d["types"])
+                    self.iface.send(self.node_id, d["ep_id"], payload=payload)
+
                 return wrapper
 
             elif d["type"] == "r":
                 # This is a read-type endpoint
                 self.iface.send(self.node_id, d["ep_id"])
-                payload = self.iface.receive(self.node_id, d["ep_id"])
-                values = self.iface.get_codec().deserialize(payload, *d["types"])
-                if len(values) == 1:
-                    if _attr.endswith("_asdict"):
-                        return {attr: values[0]}
-                    else:    
-                        return values[0]
+                response = self.iface.receive(self.node_id, d["ep_id"])
+                outputs = codec.deserialize(response, *d["types"])
+                if "units" in d:
+                    outputs  = [v * ureg(u) for v, u in zip (outputs, d["units"])]
+                if _attr.endswith("_asdict") and len(outputs) == 1:
+                    return {attr: outputs[0]}
+                elif len(outputs) == 1:    
+                    return outputs[0]
                 else:
-                    return objdict(zip(d["labels"], values))
+                    return objdict(zip(d["labels"], outputs))
 
     def __dir__(self):
         return list(self.iface.get_ep_map().keys())

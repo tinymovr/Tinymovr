@@ -84,7 +84,7 @@ Example:
 
     tinymovr --ids=1,3,5,7-9
 
-All syntax options supported by `Pynumparser<https://pypi.org/project/pynumparser/>`_ are available.
+All syntax options supported by `Pynumparser <https://pypi.org/project/pynumparser/>`_ are available.
 
 
 ``--bustype=<bustype>``
@@ -115,8 +115,37 @@ Example:
 By default, Tinymovr Studio will use slcan as the interface, and will search for CANAble/CANtact-type devices with slcan firmware. Such is the CANine adapter supplied with Tinymovr Dev Kits.
 
 
-Using with Socketcan on Linux
-#############################
+Units
+#####
+
+Tinymovr Studio introduced physical units and quantities since v0.3.0. Units are introduced through the `Pint <https://pypi.org/project/Pint/>`_ package. Using units you will see all physical quantities that you query associated with a unit. For instance, you can do the following:
+
+.. code-block:: python
+
+    In [1]: tm1.encoder_estimates
+    Out[1]: {'position': 0.0 <Unit('tick')>, 'velocity': 0.0 <Unit('tick / second')>}
+
+You can also set quantities in any (defined) unit you wish. For instance:
+
+.. code-block:: python
+
+    In [1]: tm1.set_pos_setpoint(3.0 * ureg('rad'))
+
+The above will set the rotor position to 3 radians from the initial position. Similarly for velocity:
+
+.. code-block:: python
+
+    In [1]: tm1.set_pos_setpoint(3.0 * ureg('rad/s'))
+
+Will set velocity to 3 radians/second. If not unit is used in setting a value, the default units will be assumed, in the above cases ticks and ticks/second.
+
+The ureg object is the unit registry, and it is that which holds all unit definitions. You can use it to do all sorts of cool stuff such as doing conversions or defining your own units.
+
+For more information on units and their usage, take a look at `Pint's documentation <https://pint.readthedocs.io/en/stable/>`_
+
+
+Socketcan & Linux
+#################
 
 You can use a socketcan-enabled CAN adapter with Tinymovr Studio. The CANine adapter supplied with Tinymovr Dev Kits supports Socketcan natively with the alternative Candlelight Firmware. To connect to a Socketcan device, run Studio as follows:
 
@@ -125,8 +154,8 @@ You can use a socketcan-enabled CAN adapter with Tinymovr Studio. The CANine ada
     tinymovr --bustype=socketcan --chan=CAN0
 
 
-Using with Tinymovr in silico
-#############################
+Tinymovr in-silico
+##################
 
 Tinymovr studio implements a simplistic simulation of the actual controller, in order to facilitate validation of basic commands etc. To use the simulation mode, run Studio as follows:
 
@@ -142,8 +171,9 @@ Upgrading Firmware
 
 It is possible to upgrade the firmware in two ways: Using the bootloader through UART using the ActiveFlashLight application (Windows only), and through Eclipse using a J-Link adapter.
 
+
 Upgrading using bootloader
-**************************
+==========================
 
 For this method you will need a USB to UART adapter or similar device to connect to Tinymovr's UART interface, such as an FTDI interface or similar. Such devices are very common and inexpensive. Please follow the diagram below to correctly setup the UART interface.
 
@@ -167,7 +197,7 @@ You should now be able to use Tinymovr as usual with the new firmware.
 
 
 Upgrading using J-Link
-**********************
+======================
 
 Please see :ref:`setting-up-eclipse` and :ref:`setting-up-jlink`.
 
