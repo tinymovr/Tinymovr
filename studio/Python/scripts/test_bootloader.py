@@ -19,6 +19,7 @@ with the character indicating bootloader mode, the script will
 exit.
 '''
 
+from typing import Dict
 import time
 import serial
 import pkg_resources
