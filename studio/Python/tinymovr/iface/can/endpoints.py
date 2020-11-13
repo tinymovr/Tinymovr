@@ -96,7 +96,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "w",
         "ep_id": 0x00C,
         "types": (DataType.FLOAT, DataType.INT16, DataType.INT16),
-        "units": ("tick", "10 * tick/second", "ampere * 0.01"),
+        "units": ("tick", "decatick/second", "centiampere"),
         "defaults": {"velocity_ff": 0, "current_ff": 0},
         "labels": ("position", "velocity_ff", "current_ff")
     },
@@ -135,7 +135,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "r",
         "ep_id": 0x010,
         "types": (DataType.INT16, DataType.INT16, DataType.INT16),
-        "units": ("ampere * 1e-3", "ampere * 1e-3", "ampere * 1e-3"),
+        "units": ("milliampere", "milliampere", "milliampere"),
         "labels": ("I_A", "I_B", "I_C"),
         "from_version": "0.7.1"
     },
@@ -231,7 +231,7 @@ can_endpoints: Dict[str, Dict] = {
         "types": (DataType.UINT8, DataType.UINT16,
                   DataType.UINT8, DataType.UINT16, DataType.UINT16),
         "labels": ("calibrated", "R", "pole_pairs", "L", "encoder_ticks"),
-        "units": ("ohm * 1e-3", None, "henry * 1e-6", "ticks"),
+        "units": (None, "milliohm", "microhenry", "ticks"),
         "ser_map": {"motor": ("R", "L", "pole_pairs")}
     },
 }

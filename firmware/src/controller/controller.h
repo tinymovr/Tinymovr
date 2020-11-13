@@ -42,7 +42,8 @@ typedef enum {
 	// Keep below last to make comparisons for state change
 	ERROR_PHASE_RESISTANCE_OUT_OF_RANGE = 6,
     ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE = 7,
-    ERROR_INVALID_POLE_PAIRS = 8
+    ERROR_INVALID_POLE_PAIRS = 8,
+    ERROR_ENCODER_READING_OUT_OF_RANGE = 9
 } ControlError;
 
 struct ControllerState

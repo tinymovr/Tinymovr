@@ -161,7 +161,7 @@ Tinymovr studio implements a simplistic simulation of the actual controller, in 
 
 .. code-block:: console
 
-    tinymovr --bustype=tinymovr_test --chan=test
+    tinymovr --bustype=insilico --chan=test
 
 Basic commands such as :code:`state`, :code:`encoder_estimates`, :code:`set_pos_setpoint` work, more to be implemented soon.
 

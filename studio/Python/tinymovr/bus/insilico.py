@@ -3,6 +3,7 @@ import can
 from time import sleep
 from datetime import datetime
 from typing import Tuple, List, Dict, Union
+from tinymovr import ErrorIDs
 from tinymovr.codec import MultibyteCodec
 from tinymovr.iface.can import (create_frame, extract_node_message_id)
 from tinymovr.iface.can import can_endpoints
@@ -10,7 +11,7 @@ from tinymovr.iface.can import can_endpoints
 ENC_TICKS: int = 8192
 rad_to_ticks: float = ENC_TICKS / (2 * math.pi)
 
-class Test(can.BusABC):
+class InSilico(can.BusABC):
     '''
     A Bus subclass that implements a Tinymovr
     controller in silico
@@ -53,6 +54,7 @@ class Test(can.BusABC):
             "velocity_setpoint": 0,
             "current_setpoint": 0,
             "vbus": 12.0,
+            "calibrated": False
         }
 
     def send(self, msg: can.Message):
@@ -99,7 +101,8 @@ class Test(can.BusABC):
                 self._state["position_estimate"] = self._state["position_setpoint"]
         if self._state["state"] == 0:
             self._state["current_estimate"] = 0
-            self._state["velocity_estimate"] = 0
+            v: float = self._state["velocity_estimate"]
+            self._state["position_estimate"] += v * dt
 
     # ---- Endpoint methods -----------------------------------------
 
@@ -114,7 +117,21 @@ class Test(can.BusABC):
     def _set_state(self, payload):
         vals = self.codec.deserialize(
             payload, *can_endpoints["set_state"]["types"])
-        self._state["state"] = vals[0]
+        new_state = vals[0]
+        if new_state != self._state['state']:
+            if self._state['state'] == 0:
+                if new_state == 1:
+                    self._state["calibrated"] = True
+                elif new_state == 2 and self._state["calibrated"]:
+                    self._state['state'] = 2
+                elif new_state == 2:
+                    self._state['error'] = ErrorIDs.InvalidState
+            elif self._state['state'] == 2:
+                if new_state == 0:
+                    self._state['state'] = 0
+                else:
+                    self._state['error'] = ErrorIDs.InvalidState
+                    self._state['state'] = 0
         self._state["mode"] = vals[1]
 
     def _get_vbus(self, payload):
@@ -122,7 +139,6 @@ class Test(can.BusABC):
         gen_payload = self.codec.serialize(
             vals, *can_endpoints["Vbus"]["types"])
         self.buffer = create_frame(self.node_id, 0x17, False, gen_payload)
-
 
     def _get_device_info(self, payload):
         vals: Tuple = (0, 0, 7, 1, 25)

@@ -52,9 +52,11 @@ class Tinymovr:
                         assert("labels" in d)
                         inputs = [kwargs[k] if k in kwargs else
                                   d["defaults"][k] for k in d["labels"]]
-                    else:
+                    elif len(args) > 0:
                         inputs = [args[i] if i < len(args) else
                                   d["defaults"][k] for i, k in enumerate(d["labels"])]
+                    else:
+                        inputs = []
                     if "units" in d:
                         inputs = [v.to(d["units"][i]).magnitude if isinstance(v, _Q)
                                   else v for i, v in enumerate(inputs)]
