@@ -1,8 +1,8 @@
 
-from enum import Enum
+from enum import IntEnum
 
 
-class ErrorIDs(Enum):
+class ErrorIDs(IntEnum):
     NoError = 0
     InvalidState = 1
     IllegalValue = 2
