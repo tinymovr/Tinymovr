@@ -39,7 +39,7 @@ setuptools.setup(
             "tinymovr=tinymovr.shell:spawn_shell"
         ],
         "can.interface": [
-            "tinymovr_test=tinymovr.bus:Test",
+            "insilico=tinymovr.bus:InSilico",
         ]
     }
 )
