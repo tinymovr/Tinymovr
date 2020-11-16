@@ -8,7 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Install cppcheck
-      run: git clone https://github.com/danmar/cppcheck.git; cd cppcheck; mkdir build; cd build; cmake -B. ..; sudo make install
+      run: sudo apt-get install cppcheck
       working-directory: firmware
     - name: Run cppcheck on Tinymovr
       run: cppcheck --force --addon=cert --addon=misra --error-exitcode=1 -isrc/utils -isrc/nvm -isrc/uart -isrc/can -isrc/adc src
