@@ -21,6 +21,10 @@ This is the most straightforward method to install Tinymovr studio and have acce
 Using git clone
 ###############
 
+.. note::
+   The master branch of the Github repository represents the state of art of development, and it may contain bugs.
+   For a stable version, especially if you are starting with the project, please consider installing Tinymovr Studio using pip as shown above.
+
 First clone the Tinymovr repo to a local directory:
 
 .. code-block:: console
