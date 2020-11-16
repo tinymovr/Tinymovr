@@ -21,10 +21,7 @@
 
 PAC5XXX_RAMFUNC static inline void MA_Transfer(MA702Command cmd);
 
-static struct MA702State state = {
-        .angle_buffer = 0,
-        .last_command = MA_CMD_NOP
-};
+static struct MA702State state = { 0 };
 
 void MA_Init(void)
 {
