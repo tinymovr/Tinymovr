@@ -40,7 +40,7 @@ struct MotorConfig
 void Motor_Init(void);
 
 PAC5XXX_RAMFUNC uint8_t Motor_GetPolePairs(void);
-PAC5XXX_RAMFUNC uint8_t Motor_FindPolePairs(uint16_t cpr, float start_cpr, float end_cpr, float e_angle);
+PAC5XXX_RAMFUNC uint8_t Motor_FindPolePairs(uint16_t ticks, float start_ticks, float end_ticks, float e_angle);
 PAC5XXX_RAMFUNC void Motor_SetPolePairs(uint8_t pairs);
 
 PAC5XXX_RAMFUNC float Motor_GetPhaseResistance(void);

@@ -41,14 +41,26 @@ Mounting motor and Tinymovr
 
 The most important aspect of a correct setup is to ensure the controller is properly positioned in relation to the motor. The center of the PCB, where the encoder is located, should lie as close to the motor rotation axis as possible. In addition, the distance from the encoder magnet to the encoder IC should be less than 2mm (less than 1mm if the magnet is on the back side of the PCB).
 
-.. image:: mount.png
+.. figure:: mount.png
   :width: 800
+  :align: center
   :alt: Tinymovr and motor mechanical mounting
+  :figclass: align-center
+
+  Tinymovr and motor mechanical mounting
 
 For a 3D printable motor mount design, check out the `Tinymovr alpha dev kit mount <https://github.com/yconst/Tinymovr/tree/master/hardware/motor-stand>`_ (suitable for 40xx motors).
 
 .. note::
    For safety reasons, you should always ensure the motor & controller assembly are secured to a stable surface before operation. The motor rotor may experience high acceleration that may cause injury or damage if not secured properly.
+
+.. figure:: magnet_mount.jpg
+  :width: 800
+  :align: center
+  :alt: Left: Magnet mount directly on shaft. Right: Magnet mount using 3d-printed holder.
+  :figclass: align-center
+
+  Left: Magnet mount directly on shaft. Right: Magnet mount using 3d-printed holder.
 
 Mounting Tips
 
@@ -62,7 +74,7 @@ Electrical Setup
 ################
 
 .. warning::
-   Tinymovr Alpha users: Please see :ref:`alpha-erratum-1`.
+   Tinymovr Alpha (R3.2) users: Please see :ref:`alpha-erratum-1`.
 
 Electrical setup comprises three main parts: Motor connection, data connection and power connection. Below is a diagram with the electrical connection scheme.
 

@@ -20,8 +20,8 @@
 
 #include "src/common.h"
 
-#define ENCODER_CPR                (8192)
-#define ENCODER_HALF_CPR           (ENCODER_CPR / 2)
+#define ENCODER_TICKS                (8192)
+#define ENCODER_HALF_TICKS           (ENCODER_TICKS / 2)
 
 // MA702 commands
 typedef enum {

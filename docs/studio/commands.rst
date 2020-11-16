@@ -461,7 +461,6 @@ Argument          Description        Data Type  Data Offset
 ``R``             Phase Resistance   uint16     1
 ``pole_pairs``    Motor Pole Pairs   uint8      3
 ``L``             Phase Inductance   uint16     4
-``encoder_cpr``   Encoder CPR        uint16     6
 ===============   =================  =========  ===========
 
 Example
@@ -470,7 +469,7 @@ Example
 .. code-block:: python
 
     >>>tmx.motor_info
-    {"calibrated": 1, "R": 0.2, "pole_pairs": 11, "L": 0.00012, "encoder_cpr": 8192}
+    {"calibrated": 1, "R": 0.2, "pole_pairs": 11, "L": 0.00012, "encoder_ticks": 8192}
 
 
 timings

@@ -1,8 +1,8 @@
 
-from enum import Enum
+from enum import IntEnum
 
 
-class ErrorIDs(Enum):
+class ErrorIDs(IntEnum):
     NoError = 0
     InvalidState = 1
     IllegalValue = 2
@@ -12,7 +12,7 @@ class ErrorIDs(Enum):
     PhaseResistanceOutOfRange = 6
     PhaseInductanceOutOfRange = 7
     InvalidPolePairs = 8
-    MagneticFieldOutOfRange = 9
+    EncoderReadingOutOfRange = 9
 
 
 error_descriptions = {
@@ -25,5 +25,5 @@ error_descriptions = {
     ErrorIDs.PhaseResistanceOutOfRange: "Measured phase resistance is out of range",
     ErrorIDs.PhaseInductanceOutOfRange: "Measured phase inductance is out of range",
     ErrorIDs.InvalidPolePairs: "Pole pairs calculation did not converge to a valid value",
-    ErrorIDs.MagneticFieldOutOfRange: "The magnetic field sensed by the encoder is out of range"
+    ErrorIDs.EncoderReadingOutOfRange: "The encoder angle reading is out of range"
 }    

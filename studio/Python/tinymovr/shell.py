@@ -17,6 +17,7 @@ import logging
 import pkg_resources
 import can
 import IPython
+from IPython import get_ipython
 from traitlets.config import Config
 
 from docopt import docopt
@@ -26,6 +27,7 @@ from tinymovr import UserWrapper
 from tinymovr.iface import IFace
 from tinymovr.iface.can import CAN, guess_channel
 from tinymovr.plotter import plot
+from tinymovr.units import get_registry
 
 '''
 This program is free software: you can redistribute it and/or modify it under
@@ -86,6 +88,7 @@ def spawn_shell():
         user_ns.update(tms)
         user_ns["tms"] = list(tms.values())
         user_ns["plot"] = plot
+        user_ns["ureg"] = get_registry()
         print(shell_name + ' ' + str(version))
         print("Discovered instances: " + tms_discovered)
         print("Access Tinymovr instances as tmx, where x \
