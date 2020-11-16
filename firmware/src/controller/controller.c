@@ -31,7 +31,11 @@ PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, flo
     float vel_gain, float *I);
 PAC5XXX_RAMFUNC static inline void Controller_UpdateCurrentGains(void);
 
-static struct FloatTriplet zeroDC = { .A = 0.5f, .B = 0.5f, .C = 0.5f };
+static struct FloatTriplet zeroDC = {
+    .A = 0.5f,
+    .B = 0.5f,
+    .C = 0.5f
+};
 
 static struct ControllerState state = {
 
