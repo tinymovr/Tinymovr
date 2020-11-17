@@ -114,7 +114,7 @@ Connector Diagram
 Tinymovr Alpha CAN Bus Connector Erratum
 ****************************************
 
-The CAN Bus Adapter that comes with Tinymovr alpha has the DF-13 pins reversed and as such is not compatible with regular DF-13 cables. Alpha users are advised to use the alternative pin header on the board and the included DF-13 to 2.54mm pin converter cable to communicate with Tinymovr, as shown in the diagram below:
+The CANine v1 Adapter that comes with Tinymovr alpha has the DF-13 pins reversed and as such is not compatible with regular DF-13 cables. Alpha users are advised to use the alternative pin header on the board and the included DF-13 to 2.54mm pin converter cable to communicate with Tinymovr, as shown in the diagram below:
 
 .. image:: header.png
   :width: 300
@@ -127,7 +127,7 @@ Note above that the red wire should stay disconnected and to the left side of th
 Tinymovr Alpha USB Micro Connector Erratum
 ******************************************
 
-The USB Micro connector used in the CAN Bus adapter is unfortunately not very robust. In order to ensure that there is a good contact between the board and the USB cable, please ensure the male connector of the cable is firmly seated in the female connector of the board.
+The USB Micro connector used in the CANine v1 adapter is unfortunately not very robust. In order to ensure that there is a good contact between the board and the USB cable, please ensure the male connector of the cable is firmly seated in the female connector of the board.
 
 In addition, avoid exerting lateral forces to the connector (upwards or downwards) as they place stress on the soldered retaining flaps.
 
@@ -139,3 +139,6 @@ Connecting Power
 ################
 
 Tinymovr can be powered from a 12-26V (3S-6S) power source. With the power supply off, connect the XT30 plug to the socket on the board and turn on the power supply. On Tinymovr boards equipped with a status LED, the LED should light up.
+
+.. note::
+   Each Tinymovr board has a capacitance of around 500μF. Such capacitance can introduce significant inrush current upon power-on, especially if several boards are connected to the same power supply. To prevent damage to components from overcurrent, the use of an inrush current limiter or a current-limited power supply is advised.
