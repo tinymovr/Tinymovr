@@ -33,7 +33,7 @@ Flashing Firmware
 
 Your CANine adapter comes pre-flashed with the slcan firmware. As such you do not need to perform flashing to use it together with Tinymovr Studio on Windows, Macos or Ubuntu Linux.
 
-If you would like to upgrade the firmware, the easiest solution is to use the `canable updater<https://canable.io/updater/>`_. It is a DFU updater working directly from within the browser. Chrome and Edge are supported.
+If you would like to upgrade the firmware, the easiest solution is to use the `canable updater <https://canable.io/updater/>`_. It is a DFU updater working directly from within the browser. Chrome and Edge are supported.
 
 With the board powered off, move the BOOT DIP switch to the "ON" position. Connect your board and follow the instruction on the web page to begin the flash procedure.
 
