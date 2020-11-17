@@ -1,9 +1,8 @@
 
-
 .. _command-reference:
 
-Tinymovr Studio Command Reference
-#################################
+Studio Command Reference
+########################
 
 state
 *****

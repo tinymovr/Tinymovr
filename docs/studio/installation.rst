@@ -1,8 +1,8 @@
 .. _studio-installation:
 
-****************************
-Tinymovr Studio Installation
-****************************
+*******************
+Studio Installation
+*******************
 
 Preparation
 ###########
