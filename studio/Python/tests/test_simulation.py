@@ -30,11 +30,6 @@ def get_tm() -> Tinymovr:
 
 class TestSimulation(unittest.TestCase):
 
-    def setUp(self):
-        
-        can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
-        self.iface: IFace = CAN(can_bus)
-
     def test_get_device_info(self):
         '''
         Test getting of device info
