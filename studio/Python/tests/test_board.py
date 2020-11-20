@@ -24,11 +24,14 @@ bustype = "slcan"
 
 class TestBoard(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         channel = guess_channel(bustype_hint=bustype)
         can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
         iface: IFace = CAN(can_bus)
-        self.tm = Tinymovr(node_id=1, iface=iface)
+        cls.tm = Tinymovr(node_id=1, iface=iface)
+        cls.tm.reset()
+        time.sleep(0.1)
 
     def test_a_calibrate(self):
         '''
@@ -95,6 +98,10 @@ class TestBoard(unittest.TestCase):
 
     def tearDown(self):
         self.tm.idle()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tm.reset()
 
 
 if __name__ == '__main__':
