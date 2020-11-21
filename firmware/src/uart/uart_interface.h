@@ -35,33 +35,7 @@
 
 #include "src/common.h"
 
-#define UART_ENUM UARTB
-#define UART_REF PAC55XX_UARTB
-#define UART_BAUD_RATE 115200
-
- // . (dot)
-#define UART_ASCII_PROT_START_BYTE 0x2E
-
-// newline
-#define UART_NEWLINE 0x0A
-
-#define UART_BYTE_LIMIT 32
-
-#define UART_I_SCALING_FACTOR ( 1000.0f )
-#define UART_R_SCALING_FACTOR ( 1000.0f )
-#define UART_L_SCALING_FACTOR ( 1000000.0f )
-#define ONE_OVER_UART_I_SCALING_FACTOR ( 0.001f )
-#define UART_V_SCALING_FACTOR ( 1000.0f )
-
-typedef enum {
-    MSG_TYPE_UNKNOWN = 0,
-    MSG_TYPE_ASCII = 1,
-    MSG_TYPE_BINARY = 2
-} SerialMessageType;
-
-void UART_SendErrorMsg(void);
-
-void UART_Init(void);
-void UART_SendMessage(char *buffer);
+void UART_ProcessMessage(void);
+void UART_SendInt32(int32_t val);
 
 #endif /* UART_UART_INTERFACE_H_ */

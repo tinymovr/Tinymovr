@@ -67,11 +67,6 @@ struct ControllerState
 
     float Iq_integrator_Vq;
     float Id_integrator_Vd;
-
-    uint32_t busy_cycles;
-    uint32_t total_cycles;
-
-    uint32_t last_timestamp;
 };
 
 struct ControllerConfig
@@ -80,25 +75,17 @@ struct ControllerConfig
     float vel_ramp_limit;
     float I_limit;
 
-    float pos_gain; // tick/s / tick
-    float vel_gain; // A / tick/s
+    float pos_gain;
+    float vel_gain;
     float vel_integrator_gain;
-    float I_bw; // bandwidth
-    float I_gain;   // V / A
+    float I_bw;
+    float I_gain;
     float Iq_integrator_gain;
     float Id_integrator_gain;
-
-    float I_cal_R_setpoint;
-    float I_cal_offset_setpoint;
-
     float I_k;
-
-    float V_calib_gain;   // 1 / V
-    float V_calib_inductance; // V
 };
 
-void Controller_Init(void);
-void Controller_Update(void);
+void Controller_ControlLoop(void);
 
 PAC5XXX_RAMFUNC ControlState Controller_GetState(void);
 PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state);
@@ -110,7 +97,7 @@ float Controller_GetPosSetpoint(void);
 void Controller_SetPosSetpoint(float value);
 float Controller_GetVelSetpoint(void);
 void Controller_SetVelSetpoint(float value);
-float Controller_GetIqEstimate(void);
+PAC5XXX_RAMFUNC float Controller_GetIqEstimate(void);
 float Controller_GetIqSetpoint(void);
 void Controller_SetIqSetpoint(float value);
 
@@ -134,8 +121,7 @@ void Controller_SetIqLimit(float limit);
 PAC5XXX_RAMFUNC bool Controller_Calibrated(void);
 uint8_t Controller_GetError(void);
 
-uint32_t Controller_GetTotalCycles(void);
-uint32_t Controller_GetBusyCycles(void);
+PAC5XXX_RAMFUNC void Controller_UpdateCurrentGains(void);
 
 struct ControllerConfig* Controller_GetConfig(void);
 void Controller_RestoreConfig(struct ControllerConfig* config_);

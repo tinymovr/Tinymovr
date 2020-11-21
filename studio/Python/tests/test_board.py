@@ -39,7 +39,7 @@ class TestBoard(unittest.TestCase):
         Test encoder readings
         '''
         pos_estimates = []
-        for i in range(500):
+        for _ in range(500):
             pos_estimates.append(self.tm.encoder_estimates.position)
             time.sleep(0.001)
         # apparently the statistics lib works with quantities only
@@ -57,7 +57,7 @@ class TestBoard(unittest.TestCase):
 
         if motor_info.calibrated == 0:
             self.tm.calibrate()
-            for i in range(100):
+            for _ in range(100):
                 if self.tm.state.state == 0:
                     break
                 time.sleep(0.5)
@@ -98,28 +98,30 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(state.error, ErrorIDs.NoError)
         self.assertEqual(state.state, 2)
 
-        for i in range(10):
+        R = 14
+
+        for i in range(R):
             self.tm.set_vel_setpoint(i*20000*ticks/s)
             time.sleep(0.2)
             self.assertAlmostEqual(i*20000*ticks/s, self.tm.encoder_estimates.velocity, delta=30000*ticks/s)
             time.sleep(0.3)
 
-        for i in range(10):
-            self.tm.set_vel_setpoint((10-i)*20000*ticks/s)
+        for i in range(R):
+            self.tm.set_vel_setpoint((R-i)*20000*ticks/s)
             time.sleep(0.2)
-            self.assertAlmostEqual((10-i)*20000*ticks/s, self.tm.encoder_estimates.velocity, delta=30000*ticks/s)
+            self.assertAlmostEqual((R-i)*20000*ticks/s, self.tm.encoder_estimates.velocity, delta=30000*ticks/s)
             time.sleep(0.3)
 
-        for i in range(10):
+        for i in range(R):
             self.tm.set_vel_setpoint(-i*20000*ticks/s)
             time.sleep(0.2)
             self.assertAlmostEqual(-i*20000*ticks/s, self.tm.encoder_estimates.velocity, delta=30000*ticks/s)
             time.sleep(0.3)
 
-        for i in range(10):
-            self.tm.set_vel_setpoint((i-10)*20000*ticks/s)
+        for i in range(R):
+            self.tm.set_vel_setpoint((i-R)*20000*ticks/s)
             time.sleep(0.2)
-            self.assertAlmostEqual((i-10)*20000*ticks/s, self.tm.encoder_estimates.velocity, delta=30000*ticks/s)
+            self.assertAlmostEqual((i-R)*20000*ticks/s, self.tm.encoder_estimates.velocity, delta=30000*ticks/s)
             time.sleep(0.3)
 
     def test_e_random_pos_control(self):

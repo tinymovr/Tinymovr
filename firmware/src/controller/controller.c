@@ -22,14 +22,15 @@
 #include "src/gatedriver/gatedriver.h"
 #include "src/watchdog/watchdog.h"
 #include "src/utils/utils.h"
+#include <src/scheduler/scheduler.h>
+#include <src/controller/calibration.h>
 #include "controller.h"
 
+PAC5XXX_RAMFUNC ControlError HealthCheck(void);
 PAC5XXX_RAMFUNC void CLControlStep(void);
-void CalibrateStep(void);
 PAC5XXX_RAMFUNC void IdleStep(void);
 PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
     float vel_gain, float *I);
-PAC5XXX_RAMFUNC static inline void Controller_UpdateCurrentGains(void);
 
 static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 
@@ -53,10 +54,6 @@ static struct ControllerState state = {
 
     .Iq_integrator_Vq = 0.0f,
     .Id_integrator_Vd = 0.0f,
-
-    .busy_cycles = 0,
-    .total_cycles = 0,
-    .last_timestamp = 0
 };
 
 static struct ControllerConfig config ={
@@ -71,78 +68,58 @@ static struct ControllerConfig config ={
     .I_gain = 0.0f,
     .Iq_integrator_gain = 0.0f,
     .Id_integrator_gain = 0.0f,
-
-    .I_cal_R_setpoint = 5.0f,
-    .I_cal_offset_setpoint = 8.0f,
-
-    .I_k = 0.3f,
-
-    .V_calib_gain = 0.0005f,
-    .V_calib_inductance = 2.0f
+    .I_k = 0.3f
 };
 
-struct CalibrateState
+void Controller_ControlLoop(void)
 {
-    float V_setpoint;
-    float I_low;
-    float I_high;
+	while (true)
+	{
+		ControlError e = HealthCheck();
+		if ((e != ERROR_NO_ERROR) && (state.state != STATE_IDLE))
+		{
+			state.error = e;
+			Controller_SetState(STATE_IDLE);
+		}
 
-    float dir_initial_pos;
-
-    uint32_t current_cal_index;
-};
-
-struct CalibrateState calState = {0};
-
-void Controller_Init(void)
-{
-    ADC_SetDTSE_callback(Controller_Update);
+		if (state.state == STATE_CALIBRATE)
+		{
+			CalibrateResistance();
+			CalibrateInductance();
+			CalibrateOffsetDirectionAndPolePairs();
+			Controller_SetState(STATE_IDLE);
+		}
+		else if (state.state == STATE_CL_CONTROL)
+		{
+			CLControlStep();
+		}
+		else
+		{
+			IdleStep();
+		}
+		WaitForControlLoopInterrupt();
+	}
 }
 
-void Controller_Update(void)
+PAC5XXX_RAMFUNC ControlError HealthCheck(void)
 {
-    const uint32_t current_timestamp = ARM_CM_DWT_CYCCNT;
-    state.total_cycles = current_timestamp - state.last_timestamp;
-
-    const float VBus = ADC_GetVBus();
-    const float Iq = Controller_GetIqEstimate();
-
-    Observer_UpdatePos();
-
-    if ((VBus < VBUS_LOW_THRESHOLD) && (state.state != STATE_IDLE))
-    {
-        state.error = ERROR_VBUS_UNDERVOLTAGE;
-        Controller_SetState(STATE_IDLE);
-    }
-    else if ( (Iq > (config.I_limit * I_TRIP_MARGIN)) ||
-              (Iq < -(config.I_limit * I_TRIP_MARGIN)) )
-    {
-        state.error = ERROR_OVERCURRENT;
-        Controller_SetState(STATE_IDLE);
-    }
-    else
-    {
-        ADC_GetPhaseCurrents(&(state.I_phase_meas));
-        if ((state.error != ERROR_NO_ERROR) && (state.state != STATE_IDLE))
-        {
-            Controller_SetState(STATE_IDLE);
-        }
-
-        if (state.state == STATE_CL_CONTROL)
-        {
-            CLControlStep();
-        }
-        else if (state.state == STATE_CALIBRATE)
-        {
-            CalibrateStep();
-        }
-        else // STATE_IDLE
-        {
-            IdleStep();
-        }
-        state.busy_cycles = ARM_CM_DWT_CYCCNT - current_timestamp;
-        state.last_timestamp = current_timestamp;
-    }
+	const float VBus = ADC_GetVBus();
+	const float Iq = Controller_GetIqEstimate();
+	ControlError e;
+	if ((VBus < VBUS_LOW_THRESHOLD) && (state.state != STATE_IDLE))
+	{
+		e = ERROR_VBUS_UNDERVOLTAGE;
+	}
+	else if ( (Iq > (config.I_limit * I_TRIP_MARGIN)) ||
+			  (Iq < -(config.I_limit * I_TRIP_MARGIN)) )
+	{
+		e = ERROR_OVERCURRENT;
+	}
+	else
+	{
+		e = ERROR_NO_ERROR;
+	}
+	return e;
 }
 
 PAC5XXX_RAMFUNC void CLControlStep(void)
@@ -185,6 +162,8 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     const float angle = Observer_GetPosEstimateWrappedRadians();
     const float I_phase = angle * Motor_GetPolePairs();
     const float VBus = ADC_GetVBus();
+
+    ADC_GetPhaseCurrents(&(state.I_phase_meas));
 
     // Clarke transform
     const float Ialpha = state.I_phase_meas.A;
@@ -229,145 +208,6 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     SVM(mod_a, mod_b, &state.modulation_values.A,
         &state.modulation_values.B, &state.modulation_values.C);
     GateDriver_SetDutyCycle(&state.modulation_values);
-}
-
-void CalibrateStep(void)
-{
-    Watchdog_Feed();
-
-    // Resistance
-    if (calState.current_cal_index < CAL_R_END_INDEX)
-    {
-        calState.V_setpoint += config.V_calib_gain *
-                (config.I_cal_R_setpoint - state.I_phase_meas.A);
-        const float pwm_setpoint = calState.V_setpoint / ADC_GetVBus();
-        SVM(pwm_setpoint, 0.0f, &state.modulation_values.A,
-                    &state.modulation_values.B, &state.modulation_values.C);
-    }
-    else if (calState.current_cal_index == CAL_R_END_INDEX)
-    {
-#ifndef DRY_RUN
-        const float R = fabsf(calState.V_setpoint / config.I_cal_R_setpoint);
-        if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
-        {
-            state.error = ERROR_PHASE_RESISTANCE_OUT_OF_RANGE;
-            calState.current_cal_index = 0;
-            calState.I_high = 0.0f;
-            calState.I_low = 0.0f;
-            calState.V_setpoint = 0.0f;
-            Controller_SetState(STATE_IDLE);
-        }
-        else
-        {
-            Motor_SetPhaseResistance(R);
-        }
-#else
-        Motor_SetPhaseResistance(0.5);
-#endif
-        calState.V_setpoint = 0.0f;
-    }
-
-    // Inductance
-    else if (calState.current_cal_index < CAL_L_END_INDEX)
-    {
-        if ((calState.current_cal_index & 0x2u) == 0x2u)
-        {
-            calState.I_high += state.I_phase_meas.A;
-            calState.V_setpoint = -config.V_calib_inductance;
-        }
-        else
-        {
-            calState.I_low += state.I_phase_meas.A;
-            calState.V_setpoint = config.V_calib_inductance;
-        }
-        const float pwm_setpoint = calState.V_setpoint / ADC_GetVBus();
-        SVM(pwm_setpoint, 0.0f, &state.modulation_values.A,
-                    &state.modulation_values.B, &state.modulation_values.C);
-    }
-    else if (calState.current_cal_index == CAL_L_END_INDEX)
-    {
-#ifndef DRY_RUN
-        const float num_cycles = (CAL_L_END_INDEX - CAL_R_END_INDEX) / 2;
-        const float dI_by_dt = (calState.I_high - calState.I_low) / (PWM_TIMER_PERIOD * num_cycles);
-        const float L = (config.V_calib_inductance) / dI_by_dt;
-        if ((L <= MIN_PHASE_INDUCTANCE) || (L >= MAX_PHASE_INDUCTANCE))
-        {
-            state.error = ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE;
-            calState.current_cal_index = 0;
-            calState.I_high = 0.0f;
-            calState.I_low = 0.0f;
-            calState.V_setpoint = 0.0f;
-            Controller_SetState(STATE_IDLE);
-        }
-        else
-        {
-            Motor_SetPhaseInductance(L);
-            Controller_UpdateCurrentGains();
-        }
-#else
-        Motor_SetPhaseInductance(0.005);
-#endif
-        calState.V_setpoint = 0.0f;
-    }
-
-    // Offset
-    else if (calState.current_cal_index < CAL_OFFSET_END_INDEX)
-    {
-        float pwm_setpoint = (config.I_cal_offset_setpoint * Motor_GetPhaseResistance()) / ADC_GetVBus();
-        clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
-        SVM(pwm_setpoint, 0.0f, &state.modulation_values.A,
-                    &state.modulation_values.B, &state.modulation_values.C);
-    }
-    else if (calState.current_cal_index == CAL_OFFSET_END_INDEX)
-    {
-        Observer_Reset();
-        Observer_CalibrateOffset();
-        calState.dir_initial_pos = Observer_GetPosEstimate();
-    }
-
-    // Pole Pairs & Direction
-    else if (calState.current_cal_index < CAL_DIR_END_INDEX)
-    {
-        // Ensure rotor stays at 2*Pi eangle a bit
-        const float numerator = calState.current_cal_index - CAL_OFFSET_END_INDEX;
-        const float denominator = CAL_DIR_END_INDEX - CAL_OFFSET_END_INDEX;
-        static const float end_angle = CAL_PHASE_TURNS * twopi;
-        float cur_angle = 1.2f * end_angle * (numerator/denominator);
-        clamp(&cur_angle, 0.0f, end_angle);
-        float pwm_setpoint = (config.I_cal_offset_setpoint * Motor_GetPhaseResistance()) / ADC_GetVBus();
-        clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
-        SVM(pwm_setpoint * fast_cos(cur_angle),
-            pwm_setpoint * fast_sin(cur_angle),
-            &state.modulation_values.A,
-            &state.modulation_values.B,
-            &state.modulation_values.C);
-    }
-    else if (calState.current_cal_index >= CAL_DIR_END_INDEX)
-    {
-        // Set neutral pwm immediately
-        GateDriver_SetDutyCycle(&zeroDC);
-        static const float end_angle = CAL_PHASE_TURNS * twopi;
-        if (!Motor_FindPolePairs(ENCODER_TICKS, calState.dir_initial_pos, Observer_GetPosEstimate(), end_angle))
-        {
-            state.error = ERROR_INVALID_POLE_PAIRS;
-        }
-        // Direction needs to be calibrated LAST
-        Observer_CalibrateDirection(calState.dir_initial_pos);
-        calState.current_cal_index = 0;
-        calState.I_high = 0.0f;
-        calState.I_low = 0.0f;
-        Controller_SetState(STATE_IDLE);
-    }
-    else
-    {
-        // No action
-    }
-
-    if (calState.current_cal_index < CAL_DIR_END_INDEX)
-    {
-        GateDriver_SetDutyCycle(&state.modulation_values);
-    }
-    calState.current_cal_index++;
 }
 
 PAC5XXX_RAMFUNC void IdleStep(void)
@@ -465,7 +305,7 @@ void Controller_SetVelSetpoint(float value)
     state.vel_setpoint = value;
 }
 
-float Controller_GetIqEstimate(void)
+PAC5XXX_RAMFUNC float Controller_GetIqEstimate(void)
 {
     return state.Iq_meas;
 }
@@ -581,16 +421,6 @@ uint8_t Controller_GetError(void)
     return (uint8_t)(state.error);
 }
 
-uint32_t Controller_GetTotalCycles(void)
-{
-    return state.total_cycles;
-}
-
-uint32_t Controller_GetBusyCycles(void)
-{
-    return state.busy_cycles;
-}
-
 struct ControllerConfig* Controller_GetConfig(void)
 {
     return &config;
@@ -609,7 +439,7 @@ PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, flo
     return clamp(I, Imin, Imax);
 }
 
-PAC5XXX_RAMFUNC static inline void Controller_UpdateCurrentGains(void)
+PAC5XXX_RAMFUNC void Controller_UpdateCurrentGains(void)
 {
     config.I_gain = config.I_bw * Motor_GetPhaseInductance();
     float plant_pole = Motor_GetPhaseResistance() / Motor_GetPhaseInductance();
