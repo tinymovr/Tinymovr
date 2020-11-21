@@ -130,7 +130,7 @@ ControlError CalibrateOffsetDirectionAndPolePairs(void)
 		Watchdog_Feed();
 		WaitForControlLoopInterrupt();
 	}
-	if (!Motor_FindPolePairs(ENCODER_CPR, dir_initial_pos, Observer_GetPosEstimate(), end_angle))
+	if (!Motor_FindPolePairs(ENCODER_TICKS, dir_initial_pos, Observer_GetPosEstimate(), end_angle))
 	{
 		e = ERROR_INVALID_POLE_PAIRS;
 	}
