@@ -42,7 +42,7 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(state.error, ErrorIDs.NoError)
         self.assertEqual(state.state, 0)
         self.tm.erase_config()
-        sleep(0.2)
+        time.sleep(0.2)
         self.assertEqual(self.tm.motor_info.calibrated, 0)
         self.tm.calibrate()
         for i in range(100):
@@ -51,12 +51,12 @@ class TestBoard(unittest.TestCase):
             time.sleep(0.5)
         self.assertEqual(self.tm.motor_info.calibrated, 1)
         self.tm.save_config()
-        sleep(0.2)
+        time.sleep(0.2)
         self.tm.reset()
-        sleep(0.2)
+        time.sleep(0.2)
         self.assertEqual(self.tm.motor_info.calibrated, 1)
         self.tm.erase_config()
-        sleep(0.2)
+        time.sleep(0.2)
 
     def tearDown(self):
         self.tm.idle()
