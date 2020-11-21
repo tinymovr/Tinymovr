@@ -12,6 +12,7 @@ Welcome to Tinymovr documentation!
 
    quickstart
    hardware/guide
+   hardware/canine
    studio/installation
    studio/usage
    studio/commands

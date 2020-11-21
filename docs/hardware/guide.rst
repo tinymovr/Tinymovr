@@ -12,7 +12,7 @@ Requirements
 ############
 
 1. A 3-phase brushless motor (see below for supported types)
-2. A means to talk CAN Bus, such as the CAN Adapter included in the Dev Kit or a Canable adapter.
+2. A means to talk CAN Bus, such as CANine or a Canable-compatible adapter.
 3. A mechanical rig that ensures firm connection between the Tinymovr PCB and the brushless motor. Designs that can be 3D printed are available.
 
 Note that the Tinymovr Dev Kit includes all of the above in an assembled kit.
@@ -114,7 +114,7 @@ Connector Diagram
 Tinymovr Alpha CAN Bus Connector Erratum
 ****************************************
 
-The CAN Bus Adapter that comes with Tinymovr alpha has the DF-13 pins reversed and as such is not compatible with regular DF-13 cables. Alpha users are advised to use the alternative pin header on the board and the included DF-13 to 2.54mm pin converter cable to communicate with Tinymovr, as shown in the diagram below:
+The CANine v1 Adapter that comes with Tinymovr alpha has the DF-13 pins reversed and as such is not compatible with regular DF-13 cables. Alpha users are advised to use the alternative pin header on the board and the included DF-13 to 2.54mm pin converter cable to communicate with Tinymovr, as shown in the diagram below:
 
 .. image:: header.png
   :width: 300
@@ -127,7 +127,7 @@ Note above that the red wire should stay disconnected and to the left side of th
 Tinymovr Alpha USB Micro Connector Erratum
 ******************************************
 
-The USB Micro connector used in the CAN Bus adapter is unfortunately not very robust. In order to ensure that there is a good contact between the board and the USB cable, please ensure the male connector of the cable is firmly seated in the female connector of the board.
+The USB Micro connector used in the CANine v1 adapter is unfortunately not very robust. In order to ensure that there is a good contact between the board and the USB cable, please ensure the male connector of the cable is firmly seated in the female connector of the board.
 
 In addition, avoid exerting lateral forces to the connector (upwards or downwards) as they place stress on the soldered retaining flaps.
 
@@ -139,3 +139,6 @@ Connecting Power
 ################
 
 Tinymovr can be powered from a 12-26V (3S-6S) power source. With the power supply off, connect the XT30 plug to the socket on the board and turn on the power supply. On Tinymovr boards equipped with a status LED, the LED should light up.
+
+.. note::
+   Each Tinymovr board has a capacitance of around 500μF. Such capacitance can introduce significant inrush current upon power-on, especially if several boards are connected to the same power supply. To prevent damage to components from overcurrent, the use of an inrush current limiter or a current-limited power supply is advised.

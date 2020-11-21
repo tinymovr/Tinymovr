@@ -32,4 +32,4 @@ jobs:
     - name: Test with unittest
       run: |
         cd studio/Python
-        python -m unittest
+        python -m unittest tests/test_simulation.py
