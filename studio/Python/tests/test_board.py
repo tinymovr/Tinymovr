@@ -40,7 +40,7 @@ class TestBoard(unittest.TestCase):
         '''
         pos_estimates = []
         for i in range(500):
-            pos_readings.append(self.tm.encoder_estimates.position)
+            pos_estimates.append(self.tm.encoder_estimates.position)
             time.sleep(0.001)
         self.assertLess(st.pstdev(pos_estimates), 10 * ticks)
 
