@@ -6,6 +6,7 @@ device, which is suitable for unit testing.
 import random
 import time
 import can
+import statistics as st
 
 import tinymovr
 from tinymovr import Tinymovr, ErrorIDs
@@ -31,11 +32,21 @@ class TestBoard(unittest.TestCase):
         iface: IFace = CAN(can_bus)
         cls.tm = Tinymovr(node_id=1, iface=iface)
         cls.tm.reset()
-        time.sleep(0.1)
+        time.sleep(0.2)
 
-    def test_a_calibrate(self):
+    def test_a_encoder(self):
         '''
-        Suite of board tests for validation
+        Test encoder readings
+        '''
+        pos_estimates = []
+        for i in range(500):
+            pos_readings.append(self.tm.encoder_estimates.position)
+            time.sleep(0.001)
+        self.assertLess(st.pstdev(pos_estimates), 10 * ticks)
+
+    def test_b_calibrate(self):
+        '''
+        Test board calibration if not calibrated
         '''
         state = self.tm.state
         self.assertEqual(state.error, ErrorIDs.NoError)
@@ -52,8 +63,9 @@ class TestBoard(unittest.TestCase):
             motor_info = self.tm.motor_info
             self.assertEqual(motor_info.calibrated, 1)
 
-    def test_b_position_control(self):
+    def test_c_position_control(self):
         '''
+        Test position control
         '''
         state = self.tm.state
         self.assertEqual(state.error, ErrorIDs.NoError)
@@ -71,8 +83,9 @@ class TestBoard(unittest.TestCase):
             self.assertAlmostEqual(i*1000*ticks, self.tm.encoder_estimates.position, delta=1000*ticks)
             time.sleep(0.4)
 
-    def test_c_velocity_control(self):
+    def test_d_velocity_control(self):
         '''
+        Test velocity control
         '''
         state = self.tm.state
         self.assertEqual(state.error, ErrorIDs.NoError)
@@ -88,13 +101,44 @@ class TestBoard(unittest.TestCase):
             self.tm.set_vel_setpoint(i*20000*ticks/s)
             time.sleep(0.2)
             self.assertAlmostEqual(i*20000*ticks/s, self.tm.encoder_estimates.velocity, delta=30000*ticks/s)
-            time.sleep(0.8)
+            time.sleep(0.3)
 
         for i in range(10):
             self.tm.set_vel_setpoint((10-i)*20000*ticks/s)
             time.sleep(0.2)
             self.assertAlmostEqual((10-i)*20000*ticks/s, self.tm.encoder_estimates.velocity, delta=30000*ticks/s)
-            time.sleep(0.8)
+            time.sleep(0.3)
+
+        for i in range(10):
+            self.tm.set_vel_setpoint(-i*20000*ticks/s)
+            time.sleep(0.2)
+            self.assertAlmostEqual(-i*20000*ticks/s, self.tm.encoder_estimates.velocity, delta=30000*ticks/s)
+            time.sleep(0.3)
+
+        for i in range(10):
+            self.tm.set_vel_setpoint((i-10)*20000*ticks/s)
+            time.sleep(0.2)
+            self.assertAlmostEqual((i-10)*20000*ticks/s, self.tm.encoder_estimates.velocity, delta=30000*ticks/s)
+            time.sleep(0.3)
+
+    def test_e_random_pos_control(self):
+        '''
+        Test random positions
+        '''
+        state = self.tm.state
+        self.assertEqual(state.error, ErrorIDs.NoError)
+        self.assertEqual(state.state, 0)
+
+        self.tm.position_control()
+
+        state = self.tm.state
+        self.assertEqual(state.error, ErrorIDs.NoError)
+        self.assertEqual(state.state, 2)
+
+        for i in range(10):
+            new_pos = random.uniform(-24000, 24000)
+            self.tm.set_pos_setpoint(new_pos * ticks)
+            time.sleep(0.5)
 
     def tearDown(self):
         self.tm.idle()
