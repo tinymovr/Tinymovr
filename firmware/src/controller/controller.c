@@ -54,10 +54,6 @@ static struct ControllerState state = {
 
     .Iq_integrator_Vq = 0.0f,
     .Id_integrator_Vd = 0.0f,
-
-    .busy_cycles = 0,
-    .total_cycles = 0,
-    .last_timestamp = 0
 };
 
 static struct ControllerConfig config ={
@@ -79,9 +75,6 @@ void Controller_ControlLoop(void)
 {
 	while (true)
 	{
-		const uint32_t current_timestamp = ARM_CM_DWT_CYCCNT;
-		state.total_cycles = current_timestamp - state.last_timestamp;
-
 		ControlError e = HealthCheck();
 		if ((e != ERROR_NO_ERROR) && (state.state != STATE_IDLE))
 		{
@@ -104,9 +97,6 @@ void Controller_ControlLoop(void)
 		{
 			IdleStep();
 		}
-
-		state.busy_cycles = ARM_CM_DWT_CYCCNT - current_timestamp;
-		state.last_timestamp = current_timestamp;
 		WaitForControlLoopInterrupt();
 	}
 }
@@ -429,16 +419,6 @@ PAC5XXX_RAMFUNC bool Controller_Calibrated(void)
 uint8_t Controller_GetError(void)
 {
     return (uint8_t)(state.error);
-}
-
-uint32_t Controller_GetTotalCycles(void)
-{
-    return state.total_cycles;
-}
-
-uint32_t Controller_GetBusyCycles(void)
-{
-    return state.busy_cycles;
 }
 
 struct ControllerConfig* Controller_GetConfig(void)

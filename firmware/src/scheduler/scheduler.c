@@ -17,12 +17,22 @@ struct SchedulerState
 	bool adc_interrupt;
 	bool can_interrupt;
 	bool uart_message_interrupt;
+
+    uint32_t busy_cycles;
+    uint32_t total_cycles;
+    uint32_t busy_loop_start;
+    uint32_t total_loop_start;
 };
 
-struct SchedulerState state;
+struct SchedulerState state = {0};
 
 void WaitForControlLoopInterrupt(void)
 {
+	const uint32_t current_timestamp = ARM_CM_DWT_CYCCNT;
+	state.total_cycles = current_timestamp - state.total_loop_start;
+	state.busy_cycles = current_timestamp - state.busy_loop_start;
+	state.total_loop_start = current_timestamp;
+
 	// Control loop is synced to ADC measurements
 	while (!state.adc_interrupt)
 	{
@@ -41,6 +51,7 @@ void WaitForControlLoopInterrupt(void)
 		// Go back to sleep
 		__WFI();
 	}
+	state.busy_loop_start = ARM_CM_DWT_CYCCNT;
 	// We have to service the control loop by updating
 	// current measurements and encoder estimates.
 	ADC_UpdateMeasurements();
@@ -65,4 +76,14 @@ void CAN_IRQHandler(void)
 void UART_ReceiveMessageHandler(void)
 {
 	state.uart_message_interrupt = true;
+}
+
+uint32_t Scheduler_GetTotalCycles(void)
+{
+    return state.total_cycles;
+}
+
+uint32_t Scheduler_GetBusyCycles(void)
+{
+    return state.busy_cycles;
 }

@@ -22,6 +22,7 @@
 #include "src/encoders/MA702.h"
 #include "src/observer/observer.h"
 #include "src/controller/controller.h"
+#include "src/scheduler/scheduler.h"
 #include "src/nvm/nvm.h"
 #include "src/watchdog/watchdog.h"
 
@@ -312,10 +313,10 @@ uint8_t CAN_DeviceInfo(uint8_t buffer[])
 
 uint8_t CAN_Timings(uint8_t buffer[])
 {
-    const uint32_t delta = Controller_GetTotalCycles();
-    const uint32_t tpc = Controller_GetBusyCycles();
-    memcpy(&buffer[0], &delta, sizeof(uint32_t));
-    memcpy(&buffer[4], &tpc, sizeof(uint32_t));
+    const uint32_t total = Scheduler_GetTotalCycles();
+    const uint32_t busy = Scheduler_GetBusyCycles();
+    memcpy(&buffer[0], &total, sizeof(uint32_t));
+    memcpy(&buffer[4], &busy, sizeof(uint32_t));
     return CANRP_Read;
 }
 

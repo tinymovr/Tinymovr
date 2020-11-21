@@ -67,11 +67,6 @@ struct ControllerState
 
     float Iq_integrator_Vq;
     float Id_integrator_Vd;
-
-    uint32_t busy_cycles;
-    uint32_t total_cycles;
-
-    uint32_t last_timestamp;
 };
 
 struct ControllerConfig
@@ -125,9 +120,6 @@ void Controller_SetIqLimit(float limit);
 
 PAC5XXX_RAMFUNC bool Controller_Calibrated(void);
 uint8_t Controller_GetError(void);
-
-uint32_t Controller_GetTotalCycles(void);
-uint32_t Controller_GetBusyCycles(void);
 
 PAC5XXX_RAMFUNC void Controller_UpdateCurrentGains(void);
 
