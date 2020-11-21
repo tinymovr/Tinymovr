@@ -42,7 +42,8 @@ class TestBoard(unittest.TestCase):
         for i in range(500):
             pos_estimates.append(self.tm.encoder_estimates.position)
             time.sleep(0.001)
-        self.assertLess(st.pstdev(pos_estimates), 10 * ticks)
+        # apparently the statistics lib works with quantities only
+        self.assertLess(st.pstdev(pos_estimates) * ticks, 10 * ticks)
 
     def test_b_calibrate(self):
         '''
