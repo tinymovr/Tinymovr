@@ -222,38 +222,35 @@ PAC5XXX_RAMFUNC ControlState Controller_GetState(void)
 
 PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
 {
-    if (state.state == new_state)
-    {
-        // No action
-    }
-    else if (new_state == STATE_IDLE)
-    {
-        GateDriver_SetDutyCycle(&zeroDC);
-        GateDriver_Disable();
-        state.state = STATE_IDLE;
-    }
-    else if ((state.state == STATE_IDLE) && (state.error == ERROR_NO_ERROR))
-    {
-        if ((new_state == STATE_CL_CONTROL) && Controller_Calibrated())
-        {
-            state.pos_setpoint = Observer_GetPosEstimate();
-            GateDriver_Enable();
-            state.state = STATE_CL_CONTROL;
-        }
-        else if (new_state == STATE_CALIBRATE)
-        {
-            GateDriver_Enable();
-            state.state = STATE_CALIBRATE;
-        }
-        else
-        {
-            // No action
-        }
-    }
-    else
-    {
-        // No action
-    }
+	if (new_state != state.state)
+	{
+		if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE)
+				&& (state.error == ERROR_NO_ERROR) && Controller_Calibrated())
+		{
+			state.pos_setpoint = Observer_GetPosEstimate();
+			GateDriver_Enable();
+			state.state = STATE_CL_CONTROL;
+		}
+		else if ((new_state == STATE_CALIBRATE) && (state.state == STATE_IDLE)
+				&& (state.error == ERROR_NO_ERROR))
+		{
+			GateDriver_Enable();
+			state.state = STATE_CALIBRATE;
+		}
+		else if (new_state != STATE_IDLE)
+		{
+			GateDriver_SetDutyCycle(&zeroDC);
+			GateDriver_Disable();
+			state.state = STATE_IDLE;
+			state.error = ERROR_INVALID_STATE;
+		}
+		else // state != STATE_IDLE && new_state == STATE_IDLE
+		{
+			GateDriver_SetDutyCycle(&zeroDC);
+			GateDriver_Disable();
+			state.state = STATE_IDLE;
+		}
+	}
 }
 
 ControlMode Controller_GetMode(void)
