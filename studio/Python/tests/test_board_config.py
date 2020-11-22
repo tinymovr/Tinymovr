@@ -32,8 +32,59 @@ class TestBoard(unittest.TestCase):
         cls.tm = Tinymovr(node_id=1, iface=iface)
         cls.tm.reset()
         time.sleep(0.2)
+    
+    def test_a_state_errors(self):
+        '''
+        Test state transitions
+        WARNING: This will perform one NVRAM erase cycle.
+        '''
+        if self.tm.motor_info.calibrated == 1:
+            self.tm.erase_config()
+            time.sleep(0.2)
 
-    def test_e_save_load_config(self):
+        self.tm.reset()
+        time.sleep(0.2)
+
+        state = self.tm.state
+        self.assertEqual(state.error, ErrorIDs.NoError)
+        self.assertEqual(state.state, 0)
+        self.assertEqual(self.tm.motor_info.calibrated, 0)
+
+        self.tm.position_control()
+        self.assertEqual(self.tm.state.error, ErrorIDs.InvalidState)
+
+        self.tm.reset()
+        time.sleep(0.2)
+        
+        state = self.tm.state
+        self.assertEqual(state.error, ErrorIDs.NoError)
+        self.assertEqual(state.state, 0)
+        self.assertEqual(self.tm.motor_info.calibrated, 0)
+
+        self.tm.calibrate()
+        for _ in range(100):
+            if self.tm.state.state == 0:
+                break
+            time.sleep(0.5)
+
+        self.assertEqual(self.tm.motor_info.calibrated, 1)
+        self.assertEqual(self.tm.state.error, ErrorIDs.NoError)
+        time.sleep(0.2)
+
+        self.tm.position_control()
+        self.assertEqual(self.tm.state.error, ErrorIDs.NoError)
+        time.sleep(0.2)
+
+        self.tm.calibrate()
+        state = self.tm.state
+        self.assertEqual(state.error, ErrorIDs.InvalidState)
+        self.assertEqual(state.state, 0)
+
+        self.tm.reset()
+        time.sleep(0.2)
+
+
+    def test_b_save_load_config(self):
         '''
         Test erasing, saving and loading of config.
         WARNING: This will perform one NVRAM write and two erase cycles.
@@ -45,7 +96,7 @@ class TestBoard(unittest.TestCase):
         time.sleep(0.2)
         self.assertEqual(self.tm.motor_info.calibrated, 0)
         self.tm.calibrate()
-        for i in range(100):
+        for _ in range(100):
             if self.tm.state.state == 0:
                 break
             time.sleep(0.5)
