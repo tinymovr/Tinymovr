@@ -43,6 +43,7 @@ class InSilico(can.BusABC):
             0x0F: self._set_limits,
             0x14: self._get_Iq_estimates,
             0x15: self._get_limits,
+            0x16: self._reset,
             0x17: self._get_vbus,
             0x1A: self._get_device_info
         }
@@ -202,3 +203,19 @@ class InSilico(can.BusABC):
         gen_payload = self.codec.serialize(
             vals, *can_endpoints["limits"]["types"])
         self.buffer = create_frame(self.node_id, 0x15, False, gen_payload)
+
+    def _reset(self, payload):
+        vals = {
+            "error": 0,
+            "state": 0,
+            "mode": 0,
+            "position_estimate": 0,
+            "current_estimate": 0,
+            "position_setpoint": 0,
+            "velocity_setpoint": 0,
+            "current_setpoint": 0,
+            "velocity_limit": 200000,
+            "current_limit": 10,
+            "calibrated": False
+        }
+        self._state.update(vals)
