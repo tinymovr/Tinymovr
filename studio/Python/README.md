@@ -8,6 +8,13 @@ This is the most straightforward method to install Tinymovr studio and have acce
 
     pip install tinymovr
 
+#### Installing earlier versions
+
+The above command will install the latest version of Tinymovr Studio available on PyPI. In order to maintain backwards compatibility with existing projects, earlier versions of Tinymovr are made available. Currently, the following versions are recommended:
+
+- [Tinymovr Studio 3.1](https://pypi.org/project/tinymovr/) (latest version)
+- [Tinymovr Studio 2.7](https://pypi.org/project/tinymovr/0.2.7/) (latest version without units)
+
 ### Installing using git clone
 
 First clone the Tinymovr repo to a local directory:
