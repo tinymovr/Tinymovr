@@ -101,29 +101,35 @@ class TestBoard(unittest.TestCase):
         R = 14
 
         for i in range(R):
-            self.tm.set_vel_setpoint(i*20000*ticks/s)
+            target = i*20000*ticks/s
+            self.tm.set_vel_setpoint(target)
             time.sleep(0.2)
-            self.assertAlmostEqual(i*20000*ticks/s, self.tm.encoder_estimates.velocity, delta=30000*ticks/s)
+            velocity_pairs.append((target, self.tm.encoder_estimates.velocity))
             time.sleep(0.3)
 
         for i in range(R):
-            self.tm.set_vel_setpoint((R-i)*20000*ticks/s)
+            target = (R-i)*20000*ticks/s
+            self.tm.set_vel_setpoint(target)
             time.sleep(0.2)
-            self.assertAlmostEqual((R-i)*20000*ticks/s, self.tm.encoder_estimates.velocity, delta=30000*ticks/s)
+            velocity_pairs.append((target, self.tm.encoder_estimates.velocity))
             time.sleep(0.3)
 
         for i in range(R):
-            self.tm.set_vel_setpoint(-i*20000*ticks/s)
+            target = -i*20000*ticks/s
+            self.tm.set_vel_setpoint(target)
             time.sleep(0.2)
-            self.assertAlmostEqual(-i*20000*ticks/s, self.tm.encoder_estimates.velocity, delta=30000*ticks/s)
+            velocity_pairs.append((target, self.tm.encoder_estimates.velocity))
             time.sleep(0.3)
 
         for i in range(R):
-            self.tm.set_vel_setpoint((i-R)*20000*ticks/s)
+            target = (i-R)*20000*ticks/s
+            self.tm.set_vel_setpoint(target)
             time.sleep(0.2)
-            self.assertAlmostEqual((i-R)*20000*ticks/s, self.tm.encoder_estimates.velocity, delta=30000*ticks/s)
+            velocity_pairs.append((target, self.tm.encoder_estimates.velocity))
             time.sleep(0.3)
 
+        for target, estimate in velocity_pairs:
+            self.assertAlmostEqual(target, estimate, delta=30000*ticks/s)
     def test_e_random_pos_control(self):
         '''
         Test random positions
