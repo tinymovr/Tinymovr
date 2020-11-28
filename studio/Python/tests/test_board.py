@@ -49,34 +49,17 @@ class TestBoard(unittest.TestCase):
         '''
         Test board calibration if not calibrated
         '''
-        state = self.tm.state
-        self.assertEqual(state.error, ErrorIDs.NoError)
-        self.assertEqual(state.state, 0)
-
-        motor_info = self.tm.motor_info
-
-        if motor_info.calibrated == 0:
-            self.tm.calibrate()
-            for _ in range(100):
-                if self.tm.state.state == 0:
-                    break
-                time.sleep(0.5)
-            motor_info = self.tm.motor_info
-            self.assertEqual(motor_info.calibrated, 1)
+        self.check_state(0)
+        self.try_calibrate()
 
     def test_c_position_control(self):
         '''
         Test position control
         '''
-        state = self.tm.state
-        self.assertEqual(state.error, ErrorIDs.NoError)
-        self.assertEqual(state.state, 0)
-
+        self.check_state(0)
+        self.try_calibrate()
         self.tm.position_control()
-
-        state = self.tm.state
-        self.assertEqual(state.error, ErrorIDs.NoError)
-        self.assertEqual(state.state, 2)
+        self.check_state(2)
 
         for i in range(10):
             self.tm.set_pos_setpoint(i*1000*ticks)
@@ -88,17 +71,14 @@ class TestBoard(unittest.TestCase):
         '''
         Test velocity control
         '''
-        state = self.tm.state
-        self.assertEqual(state.error, ErrorIDs.NoError)
-        self.assertEqual(state.state, 0)
-
+        self.check_state(0)
+        self.try_calibrate()
         self.tm.velocity_control()
-
-        state = self.tm.state
-        self.assertEqual(state.error, ErrorIDs.NoError)
-        self.assertEqual(state.state, 2)
+        self.check_state(2)
 
         R = 14
+
+        velocity_pairs = []
 
         for i in range(R):
             target = i*20000*ticks/s
@@ -130,19 +110,15 @@ class TestBoard(unittest.TestCase):
 
         for target, estimate in velocity_pairs:
             self.assertAlmostEqual(target, estimate, delta=30000*ticks/s)
+
     def test_e_random_pos_control(self):
         '''
         Test random positions
         '''
-        state = self.tm.state
-        self.assertEqual(state.error, ErrorIDs.NoError)
-        self.assertEqual(state.state, 0)
-
+        self.check_state(0)
+        self.try_calibrate()
         self.tm.position_control()
-
-        state = self.tm.state
-        self.assertEqual(state.error, ErrorIDs.NoError)
-        self.assertEqual(state.state, 2)
+        self.check_state(2)
 
         for i in range(10):
             new_pos = random.uniform(-24000, 24000)
@@ -185,6 +161,21 @@ class TestBoard(unittest.TestCase):
     def tearDownClass(cls):
         cls.tm.reset()
 
+    def try_calibrate(self):
+        motor_info = self.tm.motor_info
+        if motor_info.calibrated == 0:
+            self.tm.calibrate()
+            for _ in range(100):
+                if self.tm.state.state == 0:
+                    break
+                time.sleep(0.5)
+            motor_info = self.tm.motor_info
+            self.assertEqual(motor_info.calibrated, 1)
+
+    def check_state(self, target_state, target_error=ErrorIDs.NoError):
+        state = self.tm.state
+        self.assertEqual(state.error, target_error)
+        self.assertEqual(state.state, target_state)
 
 if __name__ == '__main__':
     unittest.main()
