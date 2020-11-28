@@ -19,7 +19,10 @@ class InSilico(can.BusABC):
     def __init__(self, channel, can_filters=None, **kwargs):
         super().__init__(channel, can_filters, **kwargs)
         self.channel_info: str = "Tinymovr Test Channel"
-        self.node_id: int = 1
+        try:
+            self.node_id: int = int(channel)
+        except ValueError:
+            self.node_id: int = 1
         self.buffer: can.Message = None
         self.codec: MultibyteCodec = MultibyteCodec()
         self.Kv_SI: float = 10.
