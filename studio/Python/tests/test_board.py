@@ -129,30 +129,26 @@ class TestBoard(unittest.TestCase):
         '''
         Test limits
         '''
-        state = self.tm.state
-        self.assertEqual(state.error, ErrorIDs.NoError)
-        self.assertEqual(state.state, 0)
+        self.check_state(0)
+        self.try_calibrate()
+        self.tm.velocity_control()
+        self.check_state(2)
 
-        limits = self.tm.limits
         self.tm.set_limits(30000, 0.8)
         new_limits = self.tm.limits
-        self.assertEqual(new_limits.velocity, 30000 * ticks/s)
-        self.assertEqual(new_limits.current, 0.8 * A)
-
-        self.tm.velocity_control()
-
-        state = self.tm.state
-        self.assertEqual(state.error, ErrorIDs.NoError)
-        self.assertEqual(state.state, 1)
+        self.assertAlmostEqual(new_limits.velocity, 30000 * ticks/s, delta=1*ticks/s)
+        self.assertAlmostEqual(new_limits.current, 0.8 * A, delta=0.01 * A)
 
         self.tm.set_vel_setpoint(400000 * ticks/s)
         time.sleep(0.5)
         self.assertAlmostEqual(30000 * ticks/s, self.tm.encoder_estimates.velocity, delta=5000 * ticks/s)
+        self.tm.set_vel_setpoint(-400000 * ticks/s)
+        time.sleep(0.5)
+        self.assertAlmostEqual(-30000 * ticks/s, self.tm.encoder_estimates.velocity, delta=5000 * ticks/s)
 
         self.tm.set_vel_setpoint(0)
 
         time.sleep(0.5)
-
 
     def tearDown(self):
         self.tm.idle()
@@ -176,6 +172,7 @@ class TestBoard(unittest.TestCase):
         state = self.tm.state
         self.assertEqual(state.error, target_error)
         self.assertEqual(state.state, target_state)
+
 
 if __name__ == '__main__':
     unittest.main()
