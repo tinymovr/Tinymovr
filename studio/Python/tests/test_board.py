@@ -143,6 +143,35 @@ class TestBoard(unittest.TestCase):
             self.tm.set_pos_setpoint(new_pos * ticks)
             time.sleep(0.5)
 
+    def test_f_limits(self):
+        '''
+        Test limits
+        '''
+        state = self.tm.state
+        self.assertEqual(state.error, ErrorIDs.NoError)
+        self.assertEqual(state.state, 0)
+
+        limits = self.tm.limits
+        self.tm.set_limits(30000, 0.8)
+        new_limits = self.tm.limits
+        self.assertEqual(new_limits.velocity, 30000 * ticks/s)
+        self.assertEqual(new_limits.current, 0.8 * A)
+
+        self.tm.velocity_control()
+
+        state = self.tm.state
+        self.assertEqual(state.error, ErrorIDs.NoError)
+        self.assertEqual(state.state, 1)
+
+        self.tm.set_vel_setpoint(400000 * ticks/s)
+        sleep(0.5)
+        self.assertAlmostEqual(30000 * ticks/s, self.tm.encoder_estimates.velocity, delta=5000 * ticks/s)
+
+        self.tm.set_vel_setpoint(0)
+
+        sleep(0.5)
+
+
     def tearDown(self):
         self.tm.idle()
 
