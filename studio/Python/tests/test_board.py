@@ -164,12 +164,12 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(state.state, 1)
 
         self.tm.set_vel_setpoint(400000 * ticks/s)
-        sleep(0.5)
+        time.sleep(0.5)
         self.assertAlmostEqual(30000 * ticks/s, self.tm.encoder_estimates.velocity, delta=5000 * ticks/s)
 
         self.tm.set_vel_setpoint(0)
 
-        sleep(0.5)
+        time.sleep(0.5)
 
 
     def tearDown(self):
