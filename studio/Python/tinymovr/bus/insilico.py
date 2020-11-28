@@ -11,18 +11,19 @@ from tinymovr.iface.can import can_endpoints
 ENC_TICKS: int = 8192
 rad_to_ticks: float = ENC_TICKS / (2 * math.pi)
 
+
+
 class InSilico(can.BusABC):
     '''
     A Bus subclass that implements a Tinymovr
     controller in silico
     '''
+    states: Dict[str, Union[int, float]] = {}
+
     def __init__(self, channel, can_filters=None, **kwargs):
         super().__init__(channel, can_filters, **kwargs)
         self.channel_info: str = "Tinymovr Test Channel"
-        try:
-            self.node_id: int = int(channel)
-        except ValueError:
-            self.node_id: int = 1
+        self.node_id: int = 0
         self.buffer: can.Message = None
         self.codec: MultibyteCodec = MultibyteCodec()
         self.Kv_SI: float = 10.
@@ -30,9 +31,7 @@ class InSilico(can.BusABC):
         M: float = 0.5
         self.I: float = M * R * R # thin hoop formula
         self.TICKS: int = ENC_TICKS
-
         self.last_call_time = datetime.now()
-
         self.ep_func_map: Dict[int, callable] = {
             0x03: self._get_state,
             0x07: self._set_state,
@@ -41,34 +40,37 @@ class InSilico(can.BusABC):
             0x0C: self._set_pos_setpoint,
             0x0D: self._set_vel_setpoint,
             0x0E: self._set_cur_setpoint,
+            0x0F: self._set_limits,
             0x14: self._get_Iq_estimates,
+            0x15: self._get_limits,
             0x17: self._get_vbus,
             0x1A: self._get_device_info
         }
-
-        self._state: Dict[str, Union[int, float]] = {
-            "error": 0,
-            "state": 0,
-            "mode": 0,
-            "position_estimate": 0,
-            "velocity_estimate": 0,
-            "current_estimate": 0,
-            "position_setpoint": 0,
-            "velocity_setpoint": 0,
-            "current_setpoint": 0,
-            "vbus": 12.0,
-            "calibrated": False
-        }
+        self._state = None
 
     def send(self, msg: can.Message):
-        self._update_state()
         arbitration_id: int = msg.arbitration_id
         node_id, msg_id = extract_node_message_id(arbitration_id)
-        if node_id == self.node_id:
-            try:
-                self.ep_func_map[msg_id](msg.data)
-            except KeyError:
-                pass
+        if not node_id in self.states:
+            self.states[node_id] = {
+                "error": 0,
+                "state": 0,
+                "mode": 0,
+                "position_estimate": 0,
+                "velocity_estimate": 0,
+                "current_estimate": 0,
+                "position_setpoint": 0,
+                "velocity_setpoint": 0,
+                "current_setpoint": 0,
+                "velocity_limit": 200000,
+                "current_limit": 10,
+                "vbus": 12.0,
+                "calibrated": False
+            }
+        self.node_id = node_id
+        self._state = self.states[node_id]
+        self._update_state()
+        self.ep_func_map[msg_id](msg.data)
 
     def _recv_internal(self, timeout: float) -> can.Message:
         self._update_state()
@@ -187,3 +189,16 @@ class InSilico(can.BusABC):
         vals: List = self.codec.deserialize(
             payload, *can_endpoints["set_cur_setpoint"]["types"])
         self._state["current_setpoint"] = vals[0]
+
+    def _set_limits(self, payload):
+        vals: List = self.codec.deserialize(
+            payload, *can_endpoints["set_limits"]["types"])
+        self._state["velocity_limit"] = vals[0]
+        self._state["current_limit"] = vals[1]
+
+    def _get_limits(self, payload):
+        vals: Tuple = (self._state["velocity_limit"],
+                       self._state["current_limit"])
+        gen_payload = self.codec.serialize(
+            vals, *can_endpoints["limits"]["types"])
+        self.buffer = create_frame(self.node_id, 0x15, False, gen_payload)
