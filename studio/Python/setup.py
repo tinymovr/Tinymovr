@@ -1,6 +1,6 @@
 
 import pathlib
-import setuptools
+from setuptools import setup, find_packages
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
@@ -8,16 +8,16 @@ HERE = pathlib.Path(__file__).parent
 # The text of the README file
 README = (HERE / "README.md").read_text()
 
-setuptools.setup(
+setup(
     name="tinymovr",
-    version="0.3.0",
+    version="0.3.1",
     author="Yannis Chatzikonstantinou",
     author_email="info@tinymovr.com",
     description="Tinymovr Studio",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/yconst/Tinymovr",
-    packages=['tinymovr'],
+    packages=find_packages(include=['tinymovr', 'tinymovr.*']),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
