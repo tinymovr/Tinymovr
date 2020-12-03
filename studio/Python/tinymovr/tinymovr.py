@@ -81,9 +81,6 @@ class Tinymovr:
                 else:
                     return objdict(zip(d["labels"], outputs))
 
-    def __dir__(self):
-        return list(self.iface.get_ep_map().keys())
-
     def calibrate(self):
         self.set_state(1)
 
@@ -160,6 +157,13 @@ class Tinymovr:
         else:
             raise TypeError("Mismatch in passed arguments")
         return kwargs
+
+    def __dir__(self):
+        eps = list(self.iface.get_ep_map().keys())
+        blacklist = ['iface', 'node_id', 'fw_version']
+        self_attrs = [k for k in object.__dir__(self) if not k.startswith('_') and k not in blacklist]
+        self_attrs
+        return eps + self_attrs
 
 def strip_end(text, suffix):
     if not text.endswith(suffix):

@@ -16,3 +16,6 @@ class objdict(dict):
             del self[name]
         else:
             raise AttributeError("No such attribute: " + name)
+
+    def __dir__(self):
+        return self.keys()

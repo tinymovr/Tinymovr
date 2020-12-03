@@ -108,7 +108,7 @@ please do not interrupt.")
         print(error_descriptions[error_id] + " (error code: " + str(error_id) + ")")
 
     def __dir__(self):
-        tm_keys = self.tinymovr.__dir__()
-        self_keys = object.__dir__(self)
-        self_keys.remove("tinymovr")
-        return tm_keys + self_keys
+        tm_attrs = self.tinymovr.__dir__()
+        self_attrs = [k for k in object.__dir__(self) if not k.startswith('_')]
+        self_attrs.remove("tinymovr")
+        return sorted(list(set(tm_attrs + self_attrs)))
