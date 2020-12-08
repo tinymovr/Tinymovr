@@ -22,6 +22,7 @@ s = ureg.second
 
 bustype = "slcan"
 
+
 class TestBoard(unittest.TestCase):
 
     @classmethod

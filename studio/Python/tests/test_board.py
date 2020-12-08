@@ -1,7 +1,6 @@
 '''
-This unit test suite tests functionality of the
-Tinymovr Studio using a simulated Tinymovr
-device, which is suitable for unit testing.
+This unit test suite tests functionality
+of Tinymovr boards.
 '''
 import random
 import time
@@ -22,6 +21,7 @@ ticks = ureg.ticks
 s = ureg.second
 
 bustype = "slcan"
+
 
 class TestBoard(unittest.TestCase):
 
