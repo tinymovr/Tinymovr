@@ -20,10 +20,19 @@
 
 #include "src/common.h"
 
-#define FW_VERSION 510 // 00.05.10 / major.min.rev
+typedef enum {
+    SYSTEM_ERR_NO_ERROR        			= 0x0000,
+	SYSTEM_ERR_VBUS_UNDERVOLTAGE        = 0x0001
+} SystemError;
 
-void System_Init(void);
-void System_Reset(void);
-void System_DelayUS(const uint32_t us);
+void system_init(void);
+void system_reset(void);
+void system_delay_us(const uint32_t us);
+
+bool error_flags_exist(void);
+int* get_error_flags(void);
+uint8_t get_simple_error(void);
+void set_error_flag(int error, SystemModule module);
+PAC5XXX_RAMFUNC bool health_check(void);
 
 #endif /* SYSTEM_SYSTEM_H_ */

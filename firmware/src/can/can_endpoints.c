@@ -15,11 +15,11 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include <src/encoder/encoder.h>
 #include "string.h"
 
 #include "src/system/system.h"
 #include "src/adc/adc.h"
-#include "src/encoders/MA702.h"
 #include "src/observer/observer.h"
 #include "src/controller/controller.h"
 #include "src/scheduler/scheduler.h"
@@ -101,7 +101,7 @@ uint8_t CAN_EStop(uint8_t buffer[])
 
 uint8_t CAN_GetState(uint8_t buffer[])
 {
-    uint8_t error = Controller_GetError();
+    uint8_t error = get_simple_error();
     uint8_t state = Controller_GetState();
     uint8_t mode = Controller_GetMode();
     memcpy(&buffer[0], &error, sizeof(uint8_t));
@@ -256,7 +256,7 @@ uint8_t CAN_GetIq(uint8_t buffer[])
 
 uint8_t CAN_Reset(uint8_t buffer[])
 {
-    System_Reset();
+    system_reset();
     return CANRP_Read;
 }
 

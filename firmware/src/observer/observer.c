@@ -1,5 +1,5 @@
 
-#include <src/encoders/MA702.h>
+#include <src/encoder/encoder.h>
 #include "src/common.h"
 #include "src/utils/utils.h"
 #include "observer.h"

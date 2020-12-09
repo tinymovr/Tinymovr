@@ -90,4 +90,12 @@ struct FloatTriplet
 	float C;
 };
 
+typedef enum {
+	MODULE_SYSTEM      = 0x0000,
+	MODULE_ENCODER     = 0x0001,
+	MODULE_CONTROLLER  = 0x0002,
+	MODULE_MOTOR       = 0x0003,
+	MODULE_WATCHDOG    = 0x0004
+} SystemModule;
+
 #endif // #ifndef COMMON_H

@@ -15,7 +15,6 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/encoders/MA702.h"
 #include "src/observer/observer.h"
 #include "src/adc/adc.h"
 #include "src/motor/motor.h"
@@ -23,10 +22,10 @@
 #include "src/watchdog/watchdog.h"
 #include "src/utils/utils.h"
 #include <src/scheduler/scheduler.h>
-#include <src/controller/calibration.h>
+#include <src/encoder/encoder.h>
+#include <src/motor/calibration.h>
 #include "controller.h"
 
-PAC5XXX_RAMFUNC ControlError HealthCheck(void);
 PAC5XXX_RAMFUNC void CLControlStep(void);
 PAC5XXX_RAMFUNC void IdleStep(void);
 PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
@@ -38,7 +37,6 @@ static struct ControllerState state = {
 
     .state = STATE_IDLE,
     .mode = CTRL_CURRENT,
-    .error = ERROR_NO_ERROR,
 
     .I_phase_meas = {0.0f, 0.0f, 0.0f},
     .modulation_values = {0.0f, 0.0f, 0.0f},
@@ -75,17 +73,22 @@ void Controller_ControlLoop(void)
 {
 	while (true)
 	{
-		ControlError e = HealthCheck();
-		if ((e != ERROR_NO_ERROR) && (state.state != STATE_IDLE))
+		health_check();
+		const float Iq = Controller_GetIqEstimate();
+		if ( (Iq > (config.I_limit * I_TRIP_MARGIN)) ||
+					  (Iq < -(config.I_limit * I_TRIP_MARGIN)) )
 		{
-			state.error = e;
+			set_error_flag(CONTROLLER_ERR_OVERCURRENT, MODULE_CONTROLLER);
+		}
+		if (error_flags_exist() && (state.state != STATE_IDLE))
+		{
 			Controller_SetState(STATE_IDLE);
 		}
 
 		if (state.state == STATE_CALIBRATE)
 		{
-			CalibrateResistance();
-			CalibrateInductance();
+			CalibrateResistance() &&
+			CalibrateInductance() &&
 			CalibrateOffsetDirectionAndPolePairs();
 			Controller_SetState(STATE_IDLE);
 		}
@@ -99,27 +102,6 @@ void Controller_ControlLoop(void)
 		}
 		WaitForControlLoopInterrupt();
 	}
-}
-
-PAC5XXX_RAMFUNC ControlError HealthCheck(void)
-{
-	const float VBus = ADC_GetVBus();
-	const float Iq = Controller_GetIqEstimate();
-	ControlError e;
-	if ((VBus < VBUS_LOW_THRESHOLD) && (state.state != STATE_IDLE))
-	{
-		e = ERROR_VBUS_UNDERVOLTAGE;
-	}
-	else if ( (Iq > (config.I_limit * I_TRIP_MARGIN)) ||
-			  (Iq < -(config.I_limit * I_TRIP_MARGIN)) )
-	{
-		e = ERROR_OVERCURRENT;
-	}
-	else
-	{
-		e = ERROR_NO_ERROR;
-	}
-	return e;
 }
 
 PAC5XXX_RAMFUNC void CLControlStep(void)
@@ -225,14 +207,14 @@ PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
 	if (new_state != state.state)
 	{
 		if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE)
-				&& (state.error == ERROR_NO_ERROR) && Controller_Calibrated())
+				&& (!error_flags_exist()) && Controller_Calibrated())
 		{
 			state.pos_setpoint = Observer_GetPosEstimate();
 			GateDriver_Enable();
 			state.state = STATE_CL_CONTROL;
 		}
 		else if ((new_state == STATE_CALIBRATE) && (state.state == STATE_IDLE)
-				&& (state.error == ERROR_NO_ERROR))
+				&& (!error_flags_exist()))
 		{
 			GateDriver_Enable();
 			state.state = STATE_CALIBRATE;
@@ -242,7 +224,7 @@ PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
 			GateDriver_SetDutyCycle(&zeroDC);
 			GateDriver_Disable();
 			state.state = STATE_IDLE;
-			state.error = ERROR_INVALID_STATE;
+			set_error_flag(CONTROLLER_ERR_INVALID_STATE, MODULE_CONTROLLER);
 		}
 		else // state != STATE_IDLE && new_state == STATE_IDLE
 		{
@@ -411,11 +393,6 @@ void Controller_SetIqLimit(float limit)
 PAC5XXX_RAMFUNC bool Controller_Calibrated(void)
 {
     return Motor_Calibrated() & Observer_Calibrated();
-}
-
-uint8_t Controller_GetError(void)
-{
-    return (uint8_t)(state.error);
 }
 
 struct ControllerConfig* Controller_GetConfig(void)

@@ -17,7 +17,9 @@
 
 #include "system.h"
 
-void System_Init(void)
+uint8_t error_flags[5] = {0};
+
+void system_init(void)
 {
     // --- Mandatory System Init from Qorvo
     // Set Flash Lock to allow write access to MEMCTL register for configuring clocks
@@ -74,13 +76,45 @@ void System_Init(void)
 	}
 }
 
-void System_Reset(void)
+void system_reset(void)
 {
 	pac5xxx_tile_register_write(ADDR_WATCHDOG,
 		pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
 }
 
-void System_DelayUS(uint32_t us)
+void system_delay_us(uint32_t us)
 {
     pac_delay_asm(us * 16u);
+}
+
+bool error_flags_exist(void)
+{
+
+}
+
+int* get_error_flags(void)
+{
+
+}
+
+void set_error_flag(int error, SystemModule module)
+{
+
+}
+
+uint8_t get_simple_error(void)
+{
+
+}
+
+PAC5XXX_RAMFUNC bool health_check(void)
+{
+	const float VBus = ADC_GetVBus();
+	bool success = true;
+	if (VBus < VBUS_LOW_THRESHOLD)
+	{
+		set_error_flag(SYSTEM_ERR_VBUS_UNDERVOLTAGE, MODULE_SYSTEM);
+		success = false;
+	}
+	return success;
 }

@@ -15,9 +15,9 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include <src/encoder/encoder.h>
 #include "src/system/system.h"
 #include "src/motor/motor.h"
-#include "src/encoders/MA702.h"
 #include "src/observer/observer.h"
 #include "src/controller/controller.h"
 #include "src/adc/adc.h"
@@ -76,7 +76,7 @@ int32_t UART_ReadAddr(uint8_t addr)
 		break;
 
 		case 'e': // controller error
-		ret_val = Controller_GetError();
+		ret_val = get_simple_error();
 		break;
 
 		case 'o': // encoder pos
@@ -140,7 +140,7 @@ int32_t UART_ReadAddr(uint8_t addr)
 		break;
 
 		case 'R': // reset mcu
-		System_Reset();
+		system_reset();
 		break;
 
 		case 'S': // save config

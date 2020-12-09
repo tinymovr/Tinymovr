@@ -5,25 +5,23 @@
  *      Author: conta
  */
 
-#include <src/common.h>
-#include <src/motor/motor.h>
 #include <src/adc/adc.h>
-#include <src/encoders/MA702.h>
 #include <src/observer/observer.h>
 #include <src/gatedriver/gatedriver.h>
 #include <src/scheduler/scheduler.h>
 #include <src/watchdog/watchdog.h>
 #include <src/utils/utils.h>
-#include <src/controller/calibration.h>
+#include <src/encoder/encoder.h>
+#include <src/motor/calibration.h>
 
 static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 
-ControlError CalibrateResistance(void)
+bool CalibrateResistance(void)
 {
 	float V_setpoint = 0.0f;
 	struct FloatTriplet I_phase_meas = {0.0f};
 	struct FloatTriplet modulation_values = {0.0f};
-	ControlError e = ERROR_NO_ERROR;
+	bool success = true;
 	for (uint32_t i=0; i<CAL_R_LEN; i++)
 	{
 		ADC_GetPhaseCurrents(&I_phase_meas);
@@ -38,7 +36,8 @@ ControlError CalibrateResistance(void)
 	const float R = fabsf(V_setpoint / CAL_I_SETPOINT);
 	if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
 	{
-		e = ERROR_PHASE_RESISTANCE_OUT_OF_RANGE;
+		set_error_flag(MOTOR_ERR_PHASE_RESISTANCE_OUT_OF_RANGE, MODULE_MOTOR);
+		success = false;
 	}
 	else
 	{
@@ -48,17 +47,17 @@ ControlError CalibrateResistance(void)
         Motor_SetPhaseResistance(0.5);
 #endif
     GateDriver_SetDutyCycle(&zeroDC);
-    return e;
+    return success;
 }
 
-ControlError CalibrateInductance(void)
+bool CalibrateInductance(void)
 {
 	float V_setpoint = 0.0f;
 	float I_low = 0.0f;
 	float I_high = 0.0f;
 	struct FloatTriplet I_phase_meas = {0.0f};
 	struct FloatTriplet modulation_values = {0.0f};
-	ControlError e = ERROR_NO_ERROR;
+	bool success = true;
 	for (uint32_t i=0; i<CAL_L_LEN; i++)
 	{
 		ADC_GetPhaseCurrents(&I_phase_meas);
@@ -84,7 +83,8 @@ ControlError CalibrateInductance(void)
 	const float L = CAL_V_INDUCTANCE / dI_by_dt;
 	if ((L <= MIN_PHASE_INDUCTANCE) || (L >= MAX_PHASE_INDUCTANCE))
 	{
-		e = ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE;
+		set_error_flag(MOTOR_ERR_PHASE_INDUCTANCE_OUT_OF_RANGE, MODULE_MOTOR);
+		success = false;
 	}
 	else
 	{
@@ -95,15 +95,15 @@ ControlError CalibrateInductance(void)
     Motor_SetPhaseInductance(0.005);
 #endif
     GateDriver_SetDutyCycle(&zeroDC);
-    return e;
+    return success;
 }
 
-ControlError CalibrateOffsetDirectionAndPolePairs(void)
+bool CalibrateOffsetDirectionAndPolePairs(void)
 {
 	const float end_angle = CAL_PHASE_TURNS * twopi;
 	float dir_initial_pos = 0.0f;
 	struct FloatTriplet modulation_values = {0.0f};
-	ControlError e = ERROR_NO_ERROR;
+	bool success = true;
 	for (uint32_t i=0; i<CAL_OFFSET_LEN; i++)
 	{
 		float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
@@ -132,7 +132,8 @@ ControlError CalibrateOffsetDirectionAndPolePairs(void)
 	}
 	if (!Motor_FindPolePairs(ENCODER_TICKS, dir_initial_pos, Observer_GetPosEstimate(), end_angle))
 	{
-		e = ERROR_INVALID_POLE_PAIRS;
+		set_error_flag(MOTOR_ERR_INVALID_POLE_PAIRS, MODULE_MOTOR);
+		success = false;
 	}
 	else
 	{
@@ -140,5 +141,5 @@ ControlError CalibrateOffsetDirectionAndPolePairs(void)
 		Observer_CalibrateDirection(dir_initial_pos);
 	}
 	GateDriver_SetDutyCycle(&zeroDC);
-	return e;
+	return success;
 }
