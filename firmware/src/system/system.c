@@ -17,7 +17,8 @@
 
 #include "system.h"
 
-uint8_t error_flags[5] = {0};
+uint8_t error_flags[_MODULE_COUNT] = {0};
+uint8_t error_sum = 0;
 
 void system_init(void)
 {
@@ -87,24 +88,30 @@ void system_delay_us(uint32_t us)
     pac_delay_asm(us * 16u);
 }
 
-bool error_flags_exist(void)
+PAC5XXX_RAMFUNC bool error_flags_exist(void)
 {
-
+    return error_sum > 0;
 }
 
-int* get_error_flags(void)
+PAC5XXX_RAMFUNC int* get_error_flags(void)
 {
-
+    return error_flags;
 }
 
-void set_error_flag(int error, SystemModule module)
+PAC5XXX_RAMFUNC void error_flag_exists(uint8_t flag, SystemModule module)
 {
-
+    
 }
 
-uint8_t get_simple_error(void)
+PAC5XXX_RAMFUNC void set_error_flag(uint8_t flag, SystemModule module)
 {
+    error_flags[module] |= flag;
+    error_sum |= flag;
+}
 
+PAC5XXX_RAMFUNC uint8_t get_simple_error(void)
+{
+    // _MODULE_COUNT
 }
 
 PAC5XXX_RAMFUNC bool health_check(void)

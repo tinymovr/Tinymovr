@@ -29,10 +29,10 @@ void system_init(void);
 void system_reset(void);
 void system_delay_us(const uint32_t us);
 
-bool error_flags_exist(void);
-int* get_error_flags(void);
-uint8_t get_simple_error(void);
-void set_error_flag(int error, SystemModule module);
+PAC5XXX_RAMFUNC bool error_flags_exist(void);
+PAC5XXX_RAMFUNC int* get_error_flags(void);
+PAC5XXX_RAMFUNC uint8_t get_simple_error(void);
+PAC5XXX_RAMFUNC void set_error_flag(uint8_t error, SystemModule module);
 PAC5XXX_RAMFUNC bool health_check(void);
 
 #endif /* SYSTEM_SYSTEM_H_ */
