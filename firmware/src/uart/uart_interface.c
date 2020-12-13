@@ -15,6 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include "string.h"
 #include <src/encoder/encoder.h>
 #include "src/system/system.h"
 #include "src/motor/motor.h"
@@ -76,7 +77,8 @@ int32_t UART_ReadAddr(uint8_t addr)
 		break;
 
 		case 'e': // controller error
-		ret_val = get_simple_error();
+		{uint8_t *error_flags = get_error_flags();
+		memcpy(&ret_val, error_flags, sizeof(uint32_t));}
 		break;
 
 		case 'o': // encoder pos
