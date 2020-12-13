@@ -19,11 +19,8 @@ from copy import copy
 import json
 #from pkg_resources import parse_version
 from tinymovr.iface import IFace
-from tinymovr.objdict import objdict
-from tinymovr.units import get_registry
+from tinymovr.presenter import presenter_map
 from pint import Quantity as _Q
-
-ureg = get_registry()
 
 class Tinymovr:
 
@@ -64,22 +61,16 @@ class Tinymovr:
                     if len(inputs) > 0:                        
                         payload = codec.serialize(inputs, *d["types"])
                     self.iface.send(self.node_id, d["ep_id"], payload=payload)
-
                 return wrapper
 
             elif d["type"] == "r":
                 # This is a read-type endpoint
                 self.iface.send(self.node_id, d["ep_id"])
                 response = self.iface.receive(self.node_id, d["ep_id"])
-                outputs = codec.deserialize(response, *d["types"])
-                if "units" in d:
-                    outputs  = [v * ureg(u) for v, u in zip (outputs, d["units"])]
-                if _attr.endswith("_asdict") and len(outputs) == 1:
-                    return {attr: outputs[0]}
-                elif len(outputs) == 1:    
-                    return outputs[0]
-                else:
-                    return objdict(zip(d["labels"], outputs))
+                data = codec.deserialize(response, *d["types"])
+                if "presenter" in d:
+                    return presenter_map[d["presenter"]](_attr, data, d)
+                return presenter_map["default"](_attr, data, d)
 
     def calibrate(self):
         self.set_state(1)

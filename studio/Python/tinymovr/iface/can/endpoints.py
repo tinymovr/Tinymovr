@@ -42,7 +42,8 @@ can_endpoints: Dict[str, Dict] = {
         "type": "r",
         "ep_id": 0x003,
         "types": (DataType.UINT8, DataType.UINT8, DataType.UINT8),
-        "labels": ("error", "state", "mode")
+        "labels": ("error", "state", "mode"),
+        "presenter": "state_presenter"
     },
     "can_config":
     {
