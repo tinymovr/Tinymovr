@@ -93,25 +93,20 @@ PAC5XXX_RAMFUNC bool error_flags_exist(void)
     return error_sum > 0;
 }
 
-PAC5XXX_RAMFUNC int* get_error_flags(void)
+PAC5XXX_RAMFUNC uint8_t* get_error_flags(void)
 {
     return error_flags;
 }
 
 PAC5XXX_RAMFUNC void error_flag_exists(uint8_t flag, SystemModule module)
 {
-    
+    return (error_flags[module] & flag) > 0
 }
 
 PAC5XXX_RAMFUNC void set_error_flag(uint8_t flag, SystemModule module)
 {
     error_flags[module] |= flag;
     error_sum |= flag;
-}
-
-PAC5XXX_RAMFUNC uint8_t get_simple_error(void)
-{
-    // _MODULE_COUNT
 }
 
 PAC5XXX_RAMFUNC bool health_check(void)
