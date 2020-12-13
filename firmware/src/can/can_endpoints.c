@@ -101,12 +101,13 @@ uint8_t CAN_EStop(uint8_t buffer[])
 
 uint8_t CAN_GetState(uint8_t buffer[])
 {
-    uint8_t error = get_simple_error();
     uint8_t state = Controller_GetState();
     uint8_t mode = Controller_GetMode();
-    memcpy(&buffer[0], &error, sizeof(uint8_t));
+    uint8_t *error_flags = get_error_flags();
+    //memcpy(&buffer[0], &error, sizeof(uint8_t));
     memcpy(&buffer[1], &state, sizeof(uint8_t));
     memcpy(&buffer[2], &mode, sizeof(uint8_t));
+    memcpy(&buffer[3], &error_flags, sizeof(uint8_t) * _MODULE_COUNT);
     return CANRP_Read;
 }
 
