@@ -15,6 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include "src/adc/adc.h"
 #include "system.h"
 
 uint8_t error_flags[_MODULE_COUNT] = {0};
@@ -98,9 +99,9 @@ PAC5XXX_RAMFUNC uint8_t* get_error_flags(void)
     return error_flags;
 }
 
-PAC5XXX_RAMFUNC void error_flag_exists(uint8_t flag, SystemModule module)
+PAC5XXX_RAMFUNC bool error_flag_exists(uint8_t flag, SystemModule module)
 {
-    return (error_flags[module] & flag) > 0
+    return (error_flags[module] & flag) > 0;
 }
 
 PAC5XXX_RAMFUNC void set_error_flag(uint8_t flag, SystemModule module)

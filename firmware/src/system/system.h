@@ -30,6 +30,7 @@ void system_reset(void);
 void system_delay_us(const uint32_t us);
 
 PAC5XXX_RAMFUNC bool error_flags_exist(void);
+PAC5XXX_RAMFUNC bool error_flag_exists(uint8_t flag, SystemModule module);
 PAC5XXX_RAMFUNC uint8_t* get_error_flags(void);
 PAC5XXX_RAMFUNC void set_error_flag(uint8_t error, SystemModule module);
 PAC5XXX_RAMFUNC bool health_check(void);
