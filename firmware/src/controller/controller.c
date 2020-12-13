@@ -15,6 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include "src/system/system.h"
 #include "src/observer/observer.h"
 #include "src/adc/adc.h"
 #include "src/motor/motor.h"
@@ -87,9 +88,7 @@ void Controller_ControlLoop(void)
 
 		if (state.state == STATE_CALIBRATE)
 		{
-			CalibrateResistance() &&
-			CalibrateInductance() &&
-			CalibrateOffsetDirectionAndPolePairs();
+			(void) ((CalibrateResistance() && CalibrateInductance()) && CalibrateOffsetDirectionAndPolePairs());
 			Controller_SetState(STATE_IDLE);
 		}
 		else if (state.state == STATE_CL_CONTROL)
