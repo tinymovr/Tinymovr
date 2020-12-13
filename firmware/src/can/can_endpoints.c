@@ -15,6 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include "src/common.h"
 #include <src/encoder/encoder.h>
 #include "string.h"
 
@@ -107,7 +108,7 @@ uint8_t CAN_GetState(uint8_t buffer[])
     //memcpy(&buffer[0], &error, sizeof(uint8_t));
     memcpy(&buffer[1], &state, sizeof(uint8_t));
     memcpy(&buffer[2], &mode, sizeof(uint8_t));
-    memcpy(&buffer[3], &error_flags, sizeof(uint8_t) * _MODULE_COUNT);
+    memcpy(&buffer[3], error_flags, sizeof(uint8_t) * _MODULE_COUNT);
     return CANRP_Read;
 }
 

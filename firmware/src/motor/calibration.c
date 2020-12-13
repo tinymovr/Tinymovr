@@ -12,6 +12,8 @@
 #include <src/watchdog/watchdog.h>
 #include <src/utils/utils.h>
 #include <src/encoder/encoder.h>
+#include <src/controller/controller.h>
+#include <src/system/system.h>
 #include <src/motor/calibration.h>
 
 static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};

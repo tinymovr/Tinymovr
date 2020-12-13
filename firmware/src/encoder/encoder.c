@@ -15,9 +15,10 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <src/encoder/encoder.h>
+#include "src/common.h"
 #include "src/system/system.h"
 #include "src/ssp/ssp_func.h"
+#include <src/encoder/encoder.h>
 
 static struct MA702State state = { 0 };
 
