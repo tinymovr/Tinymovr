@@ -19,7 +19,7 @@ from copy import copy
 import json
 #from pkg_resources import parse_version
 from tinymovr.iface import IFace
-from tinymovr.presenter import presenter_map
+from tinymovr.presenter import presenter_map, strip_end
 from pint import Quantity as _Q
 
 class Tinymovr:
@@ -68,8 +68,8 @@ class Tinymovr:
                 self.iface.send(self.node_id, d["ep_id"])
                 response = self.iface.receive(self.node_id, d["ep_id"])
                 data = codec.deserialize(response, *d["types"])
-                if "presenter" in d:
-                    return presenter_map[d["presenter"]](_attr, data, d)
+                if attr in presenter_map:
+                    return presenter_map[attr](_attr, data, d)
                 return presenter_map["default"](_attr, data, d)
 
     def calibrate(self):
@@ -155,8 +155,3 @@ class Tinymovr:
         self_attrs = [k for k in object.__dir__(self) if not k.startswith('_') and k not in blacklist]
         self_attrs
         return eps + self_attrs
-
-def strip_end(text, suffix):
-    if not text.endswith(suffix):
-        return text
-    return text[:len(text)-len(suffix)]

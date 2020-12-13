@@ -1,7 +1,7 @@
 from typing import List
 
 
-class dict_obj(dict):
+class DictObj(dict):
     def __getattr__(self, name):
         if name in self:
             return self[name]

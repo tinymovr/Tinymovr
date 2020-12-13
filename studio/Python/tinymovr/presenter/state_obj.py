@@ -1,7 +1,7 @@
 from typing import List
 
 
-class state_obj(dict):
+class StateObj(dict):
     def __getattr__(self, name):
         if name in self:
             return self[name]
