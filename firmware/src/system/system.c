@@ -91,7 +91,7 @@ void system_delay_us(uint32_t us)
 
 PAC5XXX_RAMFUNC bool error_flags_exist(void)
 {
-    return error_sum > 0;
+    return error_sum > 0u;
 }
 
 PAC5XXX_RAMFUNC uint8_t* get_error_flags(void)
@@ -101,7 +101,7 @@ PAC5XXX_RAMFUNC uint8_t* get_error_flags(void)
 
 PAC5XXX_RAMFUNC bool error_flag_exists(uint8_t flag, SystemModule module)
 {
-    return (error_flags[module] & flag) > 0;
+    return (error_flags[module] & flag) > 0u;
 }
 
 PAC5XXX_RAMFUNC void set_error_flag(uint8_t flag, SystemModule module)
