@@ -10,11 +10,11 @@ class StateObj():
 
     @property
     def state(self):
-        return 
+        return self.data[1]
 
     @property
     def mode(self):
-        return self.mode
+        return self.data[2]
 
     @property
     def errors(self):
@@ -26,7 +26,9 @@ class StateObj():
 
     @property
     def error_descriptions(self):
-        return [error_descriptions[e] for e in self.errors]
+        if self.errors:
+            return [error_descriptions[e] for e in self.errors]
+        return None
 
     def __dir__(self):
         return ['state', 'mode', 'errors', 'error_descriptions']
