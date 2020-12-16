@@ -42,7 +42,7 @@ PAC5XXX_RAMFUNC void MA_ReadAngle(void)
     const int16_t delta = state.angle_buffer - new_angle;
     if ((delta > MAX_ALLOWED_DELTA) || (delta > -MAX_ALLOWED_DELTA))
     {
-    	set_error_flag(ENCODER_ERR_UNSTABLE, MODULE_ENCODER);
+    	add_error_flag(ERROR_ENCODER_READING_UNSTABLE);
     }
     state.angle_buffer = new_angle;
 }

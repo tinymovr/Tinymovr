@@ -18,8 +18,9 @@
 #include "src/adc/adc.h"
 #include "system.h"
 
-uint8_t error_flags[_MODULE_COUNT] = {0};
-uint8_t error_sum = 0;
+#define ERROR_FLAG_MAX_SIZE 5u
+uint8_t error_flags[ERROR_FLAG_MAX_SIZE] = {0};
+uint8_t error_count = 0;
 
 void system_init(void)
 {
@@ -91,7 +92,7 @@ void system_delay_us(uint32_t us)
 
 PAC5XXX_RAMFUNC bool error_flags_exist(void)
 {
-    return error_sum > 0u;
+    return error_count > 0u;
 }
 
 PAC5XXX_RAMFUNC uint8_t* get_error_flags(void)
@@ -99,15 +100,26 @@ PAC5XXX_RAMFUNC uint8_t* get_error_flags(void)
     return error_flags;
 }
 
-PAC5XXX_RAMFUNC bool error_flag_exists(uint8_t flag, SystemModule module)
+PAC5XXX_RAMFUNC void add_error_flag(uint8_t flag)
 {
-    return (error_flags[module] & flag) > 0u;
-}
-
-PAC5XXX_RAMFUNC void set_error_flag(uint8_t flag, SystemModule module)
-{
-    error_flags[module] |= flag;
-    error_sum |= flag;
+    bool add = flag > 0u;
+    uint8_t i = 0u;
+    while ((add == true) && (i < ERROR_FLAG_MAX_SIZE))
+    {
+        if (error_flags[i++] == flag)
+        {
+            add = false;
+        }
+    }
+    if (add)
+    {
+        error_flags[error_count] |= flag;
+        error_count++;
+        if (error_count >= ERROR_FLAG_MAX_SIZE)
+        {
+            error_count = 0;
+        }
+    }
 }
 
 PAC5XXX_RAMFUNC bool health_check(void)
@@ -116,7 +128,7 @@ PAC5XXX_RAMFUNC bool health_check(void)
 	bool success = true;
 	if (VBus < VBUS_LOW_THRESHOLD)
 	{
-		set_error_flag(SYSTEM_ERR_VBUS_UNDERVOLTAGE, MODULE_SYSTEM);
+		add_error_flag(ERROR_VBUS_UNDERVOLTAGE);
 		success = false;
 	}
 	return success;

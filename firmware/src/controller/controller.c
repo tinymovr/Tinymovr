@@ -79,7 +79,7 @@ void Controller_ControlLoop(void)
 		if ( (Iq > (config.I_limit * I_TRIP_MARGIN)) ||
 					  (Iq < -(config.I_limit * I_TRIP_MARGIN)) )
 		{
-			set_error_flag(CONTROLLER_ERR_OVERCURRENT, MODULE_CONTROLLER);
+			add_error_flag(ERROR_OVERCURRENT);
 		}
 		if (error_flags_exist() && (state.state != STATE_IDLE))
 		{
@@ -223,7 +223,7 @@ PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
 			GateDriver_SetDutyCycle(&zeroDC);
 			GateDriver_Disable();
 			state.state = STATE_IDLE;
-			set_error_flag(CONTROLLER_ERR_INVALID_STATE, MODULE_CONTROLLER);
+			add_error_flag(ERROR_INVALID_STATE);
 		}
 		else // state != STATE_IDLE && new_state == STATE_IDLE
 		{
