@@ -18,8 +18,8 @@ class StateObj():
 
     @property
     def errors(self):
-        if sum(self.data[3:]) > 0:
-            return [ErrorIDs[e] for e in self.data[3:] if e > 0]
+        if sum(self.data[-5:]) > 0:
+            return [ErrorIDs(e) for e in self.data[-5:] if e > 0]
         elif (self.data[0] > 0):
             return [ErrorIDs(self.data[0])]
         return None
