@@ -18,7 +18,6 @@ class StateObj():
 
     @property
     def errors(self):
-        state = self.tinymovr.state
         if sum(self.data[3:]) > 0:
             return [ErrorIDs[e] for e in self.data[3:] if e > 0]
         elif (self.data[0] > 0):

@@ -14,25 +14,15 @@ from tinymovr.iface.can import CAN, guess_channel
 from tinymovr.units import get_registry
 
 import unittest
+from tests import TMTestCase
 
 ureg = get_registry()
 A = ureg.ampere
 ticks = ureg.ticks
 s = ureg.second
 
-bustype = "slcan"
-
 
 class TestBoard(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        channel = guess_channel(bustype_hint=bustype)
-        can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
-        iface: IFace = CAN(can_bus)
-        cls.tm = Tinymovr(node_id=1, iface=iface)
-        cls.tm.reset()
-        time.sleep(0.2)
     
     def test_a_state_errors(self):
         '''
@@ -46,20 +36,16 @@ class TestBoard(unittest.TestCase):
         self.tm.reset()
         time.sleep(0.2)
 
-        state = self.tm.state
-        self.assertEqual(state.error, ErrorIDs.NoError)
-        self.assertEqual(state.state, 0)
+        self.check_state(0)
         self.assertEqual(self.tm.motor_info.calibrated, 0)
 
         self.tm.position_control()
-        self.assertEqual(self.tm.state.error, ErrorIDs.InvalidState)
+        self.check_state(0, ErrorIDs.InvalidState)
 
         self.tm.reset()
         time.sleep(0.2)
         
-        state = self.tm.state
-        self.assertEqual(state.error, ErrorIDs.NoError)
-        self.assertEqual(state.state, 0)
+        self.check_state(0)
         self.assertEqual(self.tm.motor_info.calibrated, 0)
 
         self.tm.calibrate()
@@ -69,17 +55,15 @@ class TestBoard(unittest.TestCase):
             time.sleep(0.5)
 
         self.assertEqual(self.tm.motor_info.calibrated, 1)
-        self.assertEqual(self.tm.state.error, ErrorIDs.NoError)
+        self.check_state(0)
         time.sleep(0.2)
 
         self.tm.position_control()
-        self.assertEqual(self.tm.state.error, ErrorIDs.NoError)
+        self.check_state(2)
         time.sleep(0.2)
 
         self.tm.calibrate()
-        state = self.tm.state
-        self.assertEqual(state.error, ErrorIDs.InvalidState)
-        self.assertEqual(state.state, 0)
+        self.check_state(0, ErrorIDs.InvalidState)
 
         self.tm.reset()
         time.sleep(0.2)
@@ -109,13 +93,6 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(self.tm.motor_info.calibrated, 1)
         self.tm.erase_config()
         time.sleep(0.2)
-
-    def tearDown(self):
-        self.tm.idle()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.tm.reset()
 
 
 if __name__ == '__main__':

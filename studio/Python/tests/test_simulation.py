@@ -50,9 +50,7 @@ class TestSimulation(unittest.TestCase):
         Test successful getting of correct error codes
         in various scenarios
         '''
-        state = self.tm.state
-        error_id = ErrorIDs(state.error)
-        self.assertEqual(error_id, ErrorIDs.NoError)
+        self.assertFalse(self.tm.state.errors)
         
     def test_get_error_nocalib(self):
         '''
@@ -60,20 +58,16 @@ class TestSimulation(unittest.TestCase):
         in various scenarios
         '''        
         self.tm.position_control()
-        state = self.tm.state
-        error_id = ErrorIDs(state.error)
-        self.assertEqual(error_id, ErrorIDs.InvalidState)
+        self.assertIn(ErrorIDs.InvalidState, self.tm.state.errors)
 
     def test_get_error_calib(self):
         '''
         Test successful getting of correct error codes
         in various scenarios
         '''        
-        self.tm.calibrate()
+        self.tm.calibrate() # no need to wait cause it's simulation
         self.tm.position_control()
-        state = self.tm.state
-        error_id = ErrorIDs(state.error)
-        self.assertEqual(error_id, ErrorIDs.NoError)
+        self.assertFalse(self.tm.state.errors)
 
     def test_get_encoder_estimates(self):
         estimates = self.tm.encoder_estimates
