@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from tinymovr import Tinymovr, ErrorIDs, error_descriptions
+from tinymovr import Tinymovr
 
 
 class UserWrapper:
@@ -103,9 +103,7 @@ please do not interrupt.")
         '''
         Report controller error in human-readable form
         '''
-        state = self.tinymovr.state
-        error_id = ErrorIDs(state.error)
-        print(error_descriptions[error_id] + " (error code: " + str(error_id) + ")")
+        print(self.tinymovr.state.error_descriptions)
 
     def __dir__(self):
         tm_attrs = self.tinymovr.__dir__()

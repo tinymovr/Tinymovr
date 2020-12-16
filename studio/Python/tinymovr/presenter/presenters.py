@@ -17,7 +17,7 @@ def present_default(attr, data, endpoint):
 
 
 def present_state(attr, data, endpoint):
-    return StateObj(zip(endpoint["labels"], data))
+    return StateObj(data)
 
 
 def strip_end(text, suffix):
