@@ -22,7 +22,7 @@ ticks = ureg.ticks
 s = ureg.second
 
 
-class TestBoard(unittest.TestCase):
+class TestBoardConfig(TMTestCase):
     
     def test_a_state_errors(self):
         '''
@@ -74,9 +74,7 @@ class TestBoard(unittest.TestCase):
         Test erasing, saving and loading of config.
         WARNING: This will perform one NVRAM write and two erase cycles.
         '''
-        state = self.tm.state
-        self.assertEqual(state.error, ErrorIDs.NoError)
-        self.assertEqual(state.state, 0)
+        self.check_state(0)
         self.tm.erase_config()
         time.sleep(0.2)
         self.assertEqual(self.tm.motor_info.calibrated, 0)

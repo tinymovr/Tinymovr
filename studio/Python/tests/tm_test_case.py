@@ -23,8 +23,8 @@ class TMTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         channel = guess_channel(bustype_hint=bustype)
-        can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
-        iface: IFace = CAN(can_bus)
+        cls.can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
+        iface: IFace = CAN(cls.can_bus)
         cls.tm = Tinymovr(node_id=1, iface=iface)
         cls.tm.reset()
         time.sleep(0.2)
@@ -35,6 +35,7 @@ class TMTestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.tm.reset()
+        cls.can_bus.shutdown()
 
     def try_calibrate(self):
         motor_info = self.tm.motor_info
