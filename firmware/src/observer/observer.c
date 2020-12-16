@@ -165,6 +165,6 @@ void Observer_RestoreConfig(struct ObserverConfig* config_)
 
 PAC5XXX_RAMFUNC void Observer_UpdatePos(void)
 {
-	MA_ReadAngle();
+	MA_UpdateAngle(true);
 	Observer_UpdatePosEstimate(MA_GetAngle());
 }

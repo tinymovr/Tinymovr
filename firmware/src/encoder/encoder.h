@@ -18,11 +18,12 @@
 #ifndef ENCODERS_MA702_H_
 #define ENCODERS_MA702_H_
 
+#include <stdbool.h>
 #include "src/common.h"
 
 #define ENCODER_TICKS                (8192)
 #define ENCODER_HALF_TICKS           (ENCODER_TICKS / 2)
-#define MAX_ALLOWED_DELTA			 (2048)
+#define MAX_ALLOWED_DELTA			 (1024)
 
 typedef enum {
     ENCODER_ERR_NO_ERROR        = 0x0000,
@@ -42,6 +43,6 @@ struct MA702State
 
 void MA_Init(void);
 PAC5XXX_RAMFUNC int16_t MA_GetAngle(void);
-PAC5XXX_RAMFUNC void MA_ReadAngle(void);
+PAC5XXX_RAMFUNC void MA_UpdateAngle(bool check_error);
 
 #endif /* ENCODERS_MA702_H_ */
