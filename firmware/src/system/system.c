@@ -18,7 +18,6 @@
 #include "src/adc/adc.h"
 #include "system.h"
 
-#define ERROR_FLAG_MAX_SIZE 5u
 uint8_t error_flags[ERROR_FLAG_MAX_SIZE] = {0};
 uint8_t error_count = 0;
 

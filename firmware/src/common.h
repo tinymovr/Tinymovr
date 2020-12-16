@@ -71,6 +71,8 @@
 #define READ_UINT16(address)                      (*((uint16_t *) address))
 #define READ_UINT32(address)                      (*((uint32_t *) address))
 
+#define ERROR_FLAG_MAX_SIZE 5u
+
 static const float one_by_sqrt3 = 0.57735026919f;
 static const float two_by_sqrt3 = 1.15470053838f;
 
