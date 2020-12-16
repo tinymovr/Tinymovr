@@ -41,8 +41,8 @@ can_endpoints: Dict[str, Dict] = {
         "description": "Get Tinymovr State, Control Mode and Error Code",
         "type": "r",
         "ep_id": 0x003,
-        "types": (DataType.UINT8, DataType.UINT8, DataType.UINT8),
-        "labels": ("error", "state", "mode")
+        "types": [DataType.UINT8] * 8,
+        "labels": ("error", "state", "mode", "error0", "error1", "error2", "error3", "error4")
     },
     "can_config":
     {
