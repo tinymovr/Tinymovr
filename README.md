@@ -29,7 +29,7 @@ For Tinymovr documentation, please visit the [Tinymovr docs at Readthedocs](http
 
 [Project Page](https://hackaday.io/project/168650-tinymovr-motor-controller)
 
-[Blog Posts (mirror)](https://backyardrobotics.eu/tag/tinymovr/)
+[Blog](https://hackaday.io/project/168650/logs)
 
 [BLDC-Design-Help Repository](https://github.com/ThotAlion/BLDC-design-help), with lots of useful information and Tinymovr benchmarks
 
