@@ -31,3 +31,5 @@ For Tinymovr documentation, please visit the [Tinymovr docs at Readthedocs](http
 
 [Blog Posts (mirror)](https://backyardrobotics.eu/tag/tinymovr/)
 
+[BLDC-Design-Help Repository](https://github.com/ThotAlion/BLDC-design-help), with lots of useful information and Tinymovr benchmarks
+
