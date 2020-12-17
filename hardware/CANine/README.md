@@ -5,3 +5,5 @@ This is a USB Type-C <-> CAN Bus adapter. Itself it is an adaptation of the [CAN
 This design is released under the original CANable license.
 
 This directory also includes an STL model for a 3D printable case for the adapter.
+
+There is also an [alternative case design available](https://github.com/ThotAlion/BLDC-design-help/tree/main/STL/USBCANBox) by ThotAlion.
