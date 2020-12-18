@@ -231,7 +231,7 @@ can_endpoints: Dict[str, Dict] = {
         "types": (DataType.UINT8, DataType.UINT16,
                   DataType.UINT8, DataType.UINT16, DataType.UINT16),
         "labels": ("calibrated", "R", "pole_pairs", "L", "encoder_ticks"),
-        "units": (None, "milliohm", "microhenry", "ticks"),
+        "units": (None, "milliohm", None, "microhenry", "ticks"),
         "ser_map": {"motor": ("R", "L", "pole_pairs")}
     },
 }
