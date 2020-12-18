@@ -23,7 +23,7 @@ class TMTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         channel = guess_channel(bustype_hint=bustype)
-        cls.can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
+        cls.can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel, bitrate=1000000)
         iface: IFace = CAN(cls.can_bus)
         cls.tm = Tinymovr(node_id=1, iface=iface)
         cls.tm.reset()
