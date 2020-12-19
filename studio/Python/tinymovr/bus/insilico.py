@@ -3,7 +3,7 @@ import can
 from time import sleep
 from datetime import datetime
 from typing import Tuple, List, Dict, Union
-from tinymovr import ErrorIDs
+from tinymovr.constants import ErrorIDs
 from tinymovr.codec import MultibyteCodec
 from tinymovr.iface.can import (create_frame, extract_node_message_id)
 from tinymovr.iface.can import can_endpoints
