@@ -1,7 +1,7 @@
 from typing import List
 from enum import IntEnum
 
-from tinymovr import ErrorIDs, error_descriptions
+from tinymovr.constants import ErrorIDs, error_descriptions
 
 class StateObj():
 
@@ -33,3 +33,15 @@ class StateObj():
     def __dir__(self):
         return ['state', 'mode', 'errors', 'error_descriptions']
 
+    def _repr_pretty_(self, p, cycle):
+        strings = [
+            'State: {}; Mode: {}'.format(self.data[1], self.data[2]),
+            'Errors:'
+        ]
+        if self.errors:
+            strings.extend(['  ' + str(e) + '(' + str(int(e)) + '): ' + d for e, d in zip(self.errors, self.error_descriptions)])
+        else:
+            strings.append('  None')
+        p.text('\n'.join(strings))
+
+        
