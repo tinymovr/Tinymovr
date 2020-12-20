@@ -8,7 +8,8 @@ import time
 import can
 
 import tinymovr
-from tinymovr import Tinymovr, ErrorIDs
+from tinymovr import Tinymovr
+from tinymovr.constants import ErrorIDs
 from tinymovr.iface import IFace
 from tinymovr.iface.can import CAN
 from tinymovr.units import get_registry

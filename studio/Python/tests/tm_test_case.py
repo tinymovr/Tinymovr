@@ -8,7 +8,7 @@ import can
 import statistics as st
 
 import tinymovr
-from tinymovr import Tinymovr, ErrorIDs
+from tinymovr import Tinymovr
 from tinymovr.iface import IFace
 from tinymovr.iface.can import CAN, guess_channel
 from tinymovr.units import get_registry
