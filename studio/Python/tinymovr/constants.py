@@ -3,7 +3,6 @@ from enum import IntEnum
 
 
 class ErrorIDs(IntEnum):
-    NoError = 0
     InvalidState = 1
     IllegalValue = 2
     VBusUndervoltage = 3
@@ -16,7 +15,6 @@ class ErrorIDs(IntEnum):
 
 
 error_descriptions = {
-    ErrorIDs.NoError: "No error",
     ErrorIDs.InvalidState: "Attempt to transition to invalid state",
     ErrorIDs.IllegalValue: "Illegal value passed to endpoint",
     ErrorIDs.VBusUndervoltage: "Power supply bus under low voltage threshold",

@@ -8,31 +8,22 @@ import can
 import statistics as st
 
 import tinymovr
-from tinymovr import Tinymovr, ErrorIDs
+from tinymovr import Tinymovr
+from tinymovr.constants import ErrorIDs
 from tinymovr.iface import IFace
 from tinymovr.iface.can import CAN, guess_channel
 from tinymovr.units import get_registry
 
 import unittest
+from tests import TMTestCase
 
 ureg = get_registry()
 A = ureg.ampere
 ticks = ureg.ticks
 s = ureg.second
 
-bustype = "slcan"
 
-
-class TestBoard(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        channel = guess_channel(bustype_hint=bustype)
-        can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
-        iface: IFace = CAN(can_bus)
-        cls.tm = Tinymovr(node_id=1, iface=iface)
-        cls.tm.reset()
-        time.sleep(0.2)
+class TestBoard(TMTestCase):
 
     def test_a_encoder(self):
         '''
@@ -120,7 +111,7 @@ class TestBoard(unittest.TestCase):
         self.tm.position_control()
         self.check_state(2)
 
-        for i in range(10):
+        for _ in range(10):
             new_pos = random.uniform(-24000, 24000)
             self.tm.set_pos_setpoint(new_pos * ticks)
             time.sleep(0.5)
@@ -149,29 +140,6 @@ class TestBoard(unittest.TestCase):
         self.tm.set_vel_setpoint(0)
 
         time.sleep(0.5)
-
-    def tearDown(self):
-        self.tm.idle()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.tm.reset()
-
-    def try_calibrate(self):
-        motor_info = self.tm.motor_info
-        if motor_info.calibrated == 0:
-            self.tm.calibrate()
-            for _ in range(100):
-                if self.tm.state.state == 0:
-                    break
-                time.sleep(0.5)
-            motor_info = self.tm.motor_info
-            self.assertEqual(motor_info.calibrated, 1)
-
-    def check_state(self, target_state, target_error=ErrorIDs.NoError):
-        state = self.tm.state
-        self.assertEqual(state.error, target_error)
-        self.assertEqual(state.state, target_state)
 
 
 if __name__ == '__main__':

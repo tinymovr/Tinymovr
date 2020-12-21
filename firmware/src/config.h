@@ -17,7 +17,7 @@
 
 #define VERSION_MAJOR (0u)
 #define VERSION_MINOR (8u)
-#define VERSION_PATCH (1u)
+#define VERSION_PATCH (2u)
 
 /// TINYMOVR CONFIGURATION OPTIONS ///
 

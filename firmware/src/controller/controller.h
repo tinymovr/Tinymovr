@@ -21,6 +21,12 @@
 #include "src/common.h"
 
 typedef enum {
+    CONTROLLER_ERR_NO_ERROR        = 0x0000,
+	CONTROLLER_ERR_INVALID_STATE   = 0x0001,
+	CONTROLLER_ERR_OVERCURRENT     = 0x0001
+} ControllerError;
+
+typedef enum {
 	STATE_IDLE = 0,
 	STATE_CALIBRATE = 1,
     STATE_CL_CONTROL = 2
@@ -32,26 +38,11 @@ typedef enum {
     CTRL_POSITION = 2
 } ControlMode;
 
-typedef enum {
-	ERROR_NO_ERROR = 0,
-	ERROR_INVALID_STATE = 1,
-	ERROR_ILLEGAL_VALUE = 2,
-	ERROR_VBUS_UNDERVOLTAGE = 3,
-	ERROR_OVERCURRENT = 4,
-    ERROR_PWM_LIMIT_EXCEEDED = 5,
-	// Keep below last to make comparisons for state change
-	ERROR_PHASE_RESISTANCE_OUT_OF_RANGE = 6,
-    ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE = 7,
-    ERROR_INVALID_POLE_PAIRS = 8,
-    ERROR_ENCODER_READING_OUT_OF_RANGE = 9
-} ControlError;
-
 struct ControllerState
 {
 	// TODO: State.state is very confusing, name appropriately
 	ControlState state;
     ControlMode mode;
-    ControlError error;
 
     struct FloatTriplet I_phase_meas;
     struct FloatTriplet modulation_values;
@@ -119,7 +110,6 @@ float Controller_GetIqLimit(void);
 void Controller_SetIqLimit(float limit);
 
 PAC5XXX_RAMFUNC bool Controller_Calibrated(void);
-uint8_t Controller_GetError(void);
 
 PAC5XXX_RAMFUNC void Controller_UpdateCurrentGains(void);
 

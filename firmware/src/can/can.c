@@ -75,7 +75,7 @@ void CAN_Init(void)
     NVIC_EnableIRQ(CAN_IRQn);
 
     pac5xxx_can_reset_mode_set(0);	// CAN reset mode inactive
-    System_DelayUS(100);
+    system_delay_us(100);
 }
 
 uint16_t CAN_GetkBaudRate(void)
@@ -102,7 +102,7 @@ void CAN_SetID(uint8_t id)
     PAC55XX_CAN->AMR = 0xFFFFFF87;
     PAC55XX_CAN->ACR = config.id << (CAN_EP_SIZE - 3);
     pac5xxx_can_reset_mode_set(0);  // CAN reset mode inactive
-    System_DelayUS(100);
+    system_delay_us(100);
 }
 
 void CAN_ProcessMessage(uint8_t command_id, bool rtr)
