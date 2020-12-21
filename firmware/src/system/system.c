@@ -15,9 +15,13 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include "src/adc/adc.h"
 #include "system.h"
 
-void System_Init(void)
+uint8_t error_flags[ERROR_FLAG_MAX_SIZE] = {0};
+uint8_t error_count = 0;
+
+void system_init(void)
 {
     // --- Mandatory System Init from Qorvo
     // Set Flash Lock to allow write access to MEMCTL register for configuring clocks
@@ -74,13 +78,57 @@ void System_Init(void)
 	}
 }
 
-void System_Reset(void)
+void system_reset(void)
 {
 	pac5xxx_tile_register_write(ADDR_WATCHDOG,
 		pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
 }
 
-void System_DelayUS(uint32_t us)
+void system_delay_us(uint32_t us)
 {
     pac_delay_asm(us * 16u);
+}
+
+PAC5XXX_RAMFUNC bool error_flags_exist(void)
+{
+    return error_count > 0u;
+}
+
+PAC5XXX_RAMFUNC uint8_t* get_error_flags(void)
+{
+    return error_flags;
+}
+
+PAC5XXX_RAMFUNC void add_error_flag(uint8_t flag)
+{
+    bool add = flag > 0u;
+    uint8_t i = 0u;
+    while ((add == true) && (i < ERROR_FLAG_MAX_SIZE))
+    {
+        if (error_flags[i++] == flag)
+        {
+            add = false;
+        }
+    }
+    if (add)
+    {
+        error_flags[error_count] |= flag;
+        error_count++;
+        if (error_count >= ERROR_FLAG_MAX_SIZE)
+        {
+            error_count = 0;
+        }
+    }
+}
+
+PAC5XXX_RAMFUNC bool health_check(void)
+{
+	const float VBus = ADC_GetVBus();
+	bool success = true;
+	if (VBus < VBUS_LOW_THRESHOLD)
+	{
+		add_error_flag(ERROR_VBUS_UNDERVOLTAGE);
+		success = false;
+	}
+	return success;
 }

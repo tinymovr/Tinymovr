@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from tinymovr import Tinymovr, ErrorIDs, error_descriptions
+from tinymovr import Tinymovr
 
 
 class UserWrapper:
@@ -39,7 +39,7 @@ class UserWrapper:
         Enter calibration state, perform motor and encoder calibration
         '''
         state = self.tinymovr.state
-        if state.error != 0:
+        if state.errors:
             print("Error flag present, cannot continue with calibration. \
 Please reset Tinymovr.")
         elif state.state != 0:
@@ -61,7 +61,7 @@ from the motor and hit Enter to continue")
         Enter closed loop control state and position control mode
         '''
         state = self.tinymovr.state
-        if state.error != 0:
+        if state.errors:
             print("Error flag present, cannot enable position control. \
 Please reset Tinymovr.")
         elif state.state == 1:
@@ -75,7 +75,7 @@ please do not interrupt.")
         Enter closed loop control state and velocity control mode
         '''
         state = self.tinymovr.state
-        if state.error != 0:
+        if state.errors:
             print("Error flag present, cannot enable velocity control. \
 Please reset Tinymovr.")
         elif state.state == 1:
@@ -89,7 +89,7 @@ please do not interrupt.")
         Enter closed loop control state and current control mode
         '''
         state = self.tinymovr.state
-        if state.error != 0:
+        if state.errors:
             print("Error flag present, cannot enable current control. \
 Please reset Tinymovr.")
         elif state.state == 1:
@@ -98,14 +98,6 @@ please do not interrupt.")
         else:
             self.tinymovr.current_control()
 
-    @property
-    def error(self):
-        '''
-        Report controller error in human-readable form
-        '''
-        state = self.tinymovr.state
-        error_id = ErrorIDs(state.error)
-        print(error_descriptions[error_id] + " (error code: " + str(error_id) + ")")
 
     def __dir__(self):
         tm_attrs = self.tinymovr.__dir__()

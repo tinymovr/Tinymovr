@@ -34,7 +34,7 @@ void NVM_StageData(void)
     s.observer_config = *Observer_GetConfig();
     s.controller_config = *Controller_GetConfig();
 	s.can_config = *CAN_GetConfig();
-    s.version = FW_VERSION;
+    s.version = (VERSION_MAJOR << 16) + (VERSION_MINOR << 8) + VERSION_PATCH;
     memcpy(data, &s, sizeof(struct NVMStruct));
     staged = true;
 }
@@ -67,7 +67,7 @@ bool NVM_LoadConfig(void)
 	memcpy(&s, (uint8_t *)SETTINGS_PAGE_HEX, sizeof(struct NVMStruct));
 	// TODO: Also validate checksum
 	bool loaded = false;
-	if (s.version == FW_VERSION)
+	if (s.version == ((VERSION_MAJOR << 16) + (VERSION_MINOR << 8) + VERSION_PATCH))
 	{
 		Motor_RestoreConfig(&s.motor_config);
 		Observer_RestoreConfig(&s.observer_config);
@@ -83,6 +83,6 @@ void NVM_Erase(void)
 	if (Controller_GetState() == STATE_IDLE)
 	{
 		flash_erase_page(SETTINGS_PAGE);
-		System_Reset();
+		system_reset();
 	}
 }

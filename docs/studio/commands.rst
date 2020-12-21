@@ -10,26 +10,50 @@ state
 | **endpoint**: ``0x03``
 | **type**: Read-only
 
-Retrieves the controller state, control mode and error flag.
+Retrieves an object containing the controller state, control mode and error flags.
+The object is pretty-printed if inside the Tinymovr Studio iPython environment.
 
-Arguments
----------
+This command has been revised as of firmware 0.8.2 and studio 0.3.3 to report multiple error flags if available. The above and newer versions can display up to five error flags simultaneously, and with the order that they were registered by the firmware error handler.
 
-=============  =============  =========  ===========
-Argument       Description    Data Type  Data Offset
--------------  -------------  ---------  -----------
-``error``      Error Code     uint8      0
-``state``      Control State  uint8      1
-``mode``       Control Mode   uint8      2
-=============  =============  =========  ===========
+Tinymovr Studio 0.3.3 and newer is backwards compatible with the legacy error reporting system, as such newer Studio versions can be used with older firmware. However, newer firmware (0.8.2 and later) is not compatible with older Studio versions. Make sure that you run the latest version of Studio before upgrading your firmware.
+
+Return Values
+-------------
+
+=============  ==================  =========  ===========
+Member         Description         Data Type  Data Offset
+-------------  ------------------  ---------  -----------
+``errors``     Legacy Error Flag   uint8      0
+``state``      Control State       uint8      1
+``mode``       Control Mode        uint8      2
+``errors``     1st Error Flag      uint8      3
+``...``        2nd Error Flag      uint8      4
+``...``        3rd Error Flag      uint8      5
+``...``        4th Error Flag      uint8      6
+``...``        5th Error Flag      uint8      7
+=============  ==================  =========  ===========
 
 Example
 -------
+
+Legacy system
 
 .. code-block:: python
 
     >>>tmx.state
     {"error": 0, "state": 0, "mode": 0}
+
+New system
+
+.. code-block:: python
+
+    >>>tmx.state
+    State: Idle     Mode: Position
+    Errors:
+        Invalid State (1): Attempt to transition to invalid state
+
+    >>>tmx.state.mode
+    0
 
 
 set_state()
@@ -44,7 +68,7 @@ Arguments
 ---------
 
 =============  =============  =========  ===========
-Argument       Description    Data Type  Data Offset
+Member         Description    Data Type  Data Offset
 -------------  -------------  ---------  -----------
 ``state``      Control State  uint8      1
 ``mode``       Control Mode   uint8      2
@@ -66,11 +90,11 @@ can_config
 
 Retrieves the CAN configuration.
 
-Arguments
----------
+Return Values
+-------------
 
 =============  ===========  =========  ===========
-Argument       Description  Data Type  Data Offset
+Member         Description  Data Type  Data Offset
 -------------  -----------  ---------  -----------
 ``id``         CAN Bus ID   uint8      0
 ``baud_rate``  Baud Rate    uint16     1
@@ -97,7 +121,7 @@ Arguments
 ---------
 
 =============  ===========  =========  ===========
-Argument       Description  Data Type  Data Offset
+Member         Description  Data Type  Data Offset
 -------------  -----------  ---------  -----------
 ``id``         CAN Bus ID   uint8      0
 ``baud_rate``  Baud Rate    uint16     1
@@ -119,11 +143,11 @@ encoder_estimates
 
 Retrieves the position and velocity encoder estimates.
 
-Arguments
----------
+Return Values
+-------------
 
 =============  =================   =========  ===========
-Argument       Description         Data Type  Data Offset
+Member         Description         Data Type  Data Offset
 -------------  -----------------   ---------  -----------
 ``position``   Position Estimate   float32    0
 ``velocity``   Velocity Estimate   float32    4
@@ -146,11 +170,11 @@ setpoints
 
 Retrieves the position and velocity setpoints of the controller.
 
-Arguments
----------
+Return Values
+-------------
 
 =============  =================   =========  ===========
-Argument       Description         Data Type  Data Offset
+Member         Description         Data Type  Data Offset
 -------------  -----------------   ---------  -----------
 ``position``   Position Setpoint   float32    0
 ``velocity``   Velocity Setpoint   float32    4
@@ -177,7 +201,7 @@ Arguments
 ---------
 
 =============  =================   =========  ===========
-Argument       Description         Data Type  Data Offset
+Member         Description         Data Type  Data Offset
 -------------  -----------------   ---------  -----------
 ``position``   Position Setpoint   float32    0
 ``velocity``   Velocity Setpoint   int16      4
@@ -208,7 +232,7 @@ Arguments
 ---------
 
 =============  =================   =========  ===========
-Argument       Description         Data Type  Data Offset
+Member         Description         Data Type  Data Offset
 -------------  -----------------   ---------  -----------
 ``velocity``   Velocity Setpoint   float32    0
 ``current``    Current Setpoint    float32    4
@@ -238,7 +262,7 @@ Arguments
 ---------
 
 =============  =================   =========  ===========
-Argument       Description         Data Type  Data Offset
+Member         Description         Data Type  Data Offset
 -------------  -----------------   ---------  -----------
 ``current``    Current Setpoint    float32    0
 =============  =================   =========  ===========
@@ -259,11 +283,11 @@ limits
 
 Retrieves the velocity and current limits of the controller.
 
-Arguments
----------
+Return Values
+-------------
 
 =============  =================   =========  ===========
-Argument       Description         Data Type  Data Offset
+Member         Description         Data Type  Data Offset
 -------------  -----------------   ---------  -----------
 ``velocity``   Velocity Limit      float32    0
 ``current``    Current  Limit      float32    4
@@ -290,7 +314,7 @@ Arguments
 ---------
 
 =============  =================   =========  ===========
-Argument       Description         Data Type  Data Offset
+Member         Description         Data Type  Data Offset
 -------------  -----------------   ---------  -----------
 ``velocity``   Velocity Limit      float32    0
 ``current``    Current  Limit      float32    4
@@ -312,11 +336,11 @@ gains
 
 Retrieves the position and velocity gains of the controller.
 
-Arguments
----------
+Return Values
+-------------
 
 =============  =================   =========  ===========
-Argument       Description         Data Type  Data Offset
+Member         Description         Data Type  Data Offset
 -------------  -----------------   ---------  -----------
 ``position``   Position Gain       float32    0
 ``velocity``   Velocity Gain       float32    4
@@ -343,7 +367,7 @@ Arguments
 ---------
 
 =============  =================   =========  ===========
-Argument       Description         Data Type  Data Offset
+Member         Description         Data Type  Data Offset
 -------------  -----------------   ---------  -----------
 ``position``   Position Gain       float32    0
 ``velocity``   Velocity Gain       float32    4
@@ -365,11 +389,11 @@ Iq
 
 Retrieves the current (Iq) setpoint and estimate.
 
-Arguments
----------
+Return Values
+-------------
 
 =============  =================   =========  ===========
-Argument       Description         Data Type  Data Offset
+Member         Description         Data Type  Data Offset
 -------------  -----------------   ---------  -----------
 ``setpoint``   Iq Setpoint         float32    0
 ``estimate``   Iq Estimate         float32    4
@@ -392,11 +416,11 @@ Iphase
 
 Retrieves the measured phase currents.
 
-Arguments
----------
+Return Values
+-------------
 
 =============  =================   =========  ===========
-Argument       Description         Data Type  Data Offset
+Member         Description         Data Type  Data Offset
 -------------  -----------------   ---------  -----------
 ``A``          A Phase Current     int16      0
 ``B``          B Phase Current     int16      0
@@ -420,11 +444,11 @@ device_info
 
 Retrieves device-related information.
 
-Arguments
----------
+Return Values
+-------------
 
 =============  =============  =========  ===========
-Argument       Description    Data Type  Data Offset
+Member         Description    Data Type  Data Offset
 -------------  -------------  ---------  -----------
 ``device_id``  Device ID      uint32     0
 ``fw_major``   FW Major Ver.  uint8      4
@@ -450,11 +474,11 @@ motor_info
 
 Retrieves information related to the attached motor.
 
-Arguments
----------
+Return Values
+-------------
 
 ===============   =================  =========  ===========
-Argument          Description        Data Type  Data Offset
+Member            Description        Data Type  Data Offset
 ---------------   -----------------  ---------  -----------
 ``calibrated``    Calibrated Flag    uint8      0
 ``R``             Phase Resistance   uint16     1
@@ -479,11 +503,11 @@ timings
 
 Retrieves MCU timings in each control cycle.
 
-Arguments
----------
+Return Values
+-------------
 
 ===============   =================  =========  ===========
-Argument          Description        Data Type  Data Offset
+Member            Description        Data Type  Data Offset
 ---------------   -----------------  ---------  -----------
 ``total``         Total MCU Cycles   uint32     0
 ``busy``          Busy MCU Cycles    uint32     4

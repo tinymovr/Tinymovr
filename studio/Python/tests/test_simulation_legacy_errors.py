@@ -27,9 +27,11 @@ channel = "test"
 def get_tm() -> Tinymovr:
     can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
     iface: IFace = CAN(can_bus)
-    return Tinymovr(node_id=1, iface=iface)
+    tm = Tinymovr(node_id=1, iface=iface)
+    tm.iface.bus.legacy_errors = True
+    return tm
 
-class TestSimulation(unittest.TestCase):
+class TestSimulationLegacy(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -69,51 +71,6 @@ class TestSimulation(unittest.TestCase):
         self.tm.calibrate() # no need to wait cause it's simulation
         self.tm.position_control()
         self.assertFalse(self.tm.state.errors)
-
-    def test_get_encoder_estimates(self):
-        estimates = self.tm.encoder_estimates
-        self.assertEqual(estimates.position, 0)
-        self.assertEqual(estimates.velocity, 0)
-
-    def test_set_current_control(self):
-        self.tm.calibrate()
-        self.tm.current_control()
-        self.tm.set_cur_setpoint(0.5 * A)
-        self.assertEqual(self.tm.Iq.estimate, 0.5 * A)
-        time.sleep(0.5)
-        self.tm.set_cur_setpoint(-0.5 * A)
-        self.assertEqual(self.tm.Iq.estimate, -0.5 * A)
-        time.sleep(0.5)
-        self.assertLess(abs(self.tm.encoder_estimates.velocity), 500 * ticks/s)
-
-    def test_set_current_control_nounits(self):
-        self.tm.calibrate()
-        self.tm.current_control()
-        self.tm.set_cur_setpoint(0.5)
-        self.assertEqual(self.tm.Iq.estimate.magnitude, 0.5)
-        time.sleep(0.5)
-        self.tm.set_cur_setpoint(-0.5)
-        self.assertEqual(self.tm.Iq.estimate.magnitude, -0.5)
-        time.sleep(0.5)
-        self.assertLess(abs(self.tm.encoder_estimates.velocity.magnitude), 500)
-
-    def test_set_vel_control(self):
-        self.tm.calibrate()
-        self.tm.current_control()
-        self.tm.set_vel_setpoint(1000 * ticks/s)
-        time.sleep(0.5)
-        self.tm.set_vel_setpoint(-1000 * ticks/s)
-        time.sleep(0.5)
-        self.assertLess(abs(self.tm.encoder_estimates.position), 500 * ticks)
-
-    def test_set_vel_control_nounits(self):
-        self.tm.calibrate()
-        self.tm.current_control()
-        self.tm.set_vel_setpoint(1000)
-        time.sleep(0.5)
-        self.tm.set_vel_setpoint(-1000)
-        time.sleep(0.5)
-        self.assertLess(abs(self.tm.encoder_estimates.position.magnitude), 500)
 
 
 if __name__ == '__main__':

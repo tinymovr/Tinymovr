@@ -1,5 +1,5 @@
 
-#include <src/encoders/MA702.h>
+#include <src/encoder/encoder.h>
 #include "src/common.h"
 #include "src/utils/utils.h"
 #include "observer.h"
@@ -165,6 +165,6 @@ void Observer_RestoreConfig(struct ObserverConfig* config_)
 
 PAC5XXX_RAMFUNC void Observer_UpdatePos(void)
 {
-	MA_ReadAngle();
+	MA_UpdateAngle(true);
 	Observer_UpdatePosEstimate(MA_GetAngle());
 }

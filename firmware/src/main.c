@@ -15,6 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include <src/encoder/encoder.h>
 #include "src/common.h"
 #include "src/system/system.h"
 
@@ -28,12 +29,11 @@
 #include "src/can/can.h"
 #include "src/nvm/nvm.h"
 #include "src/watchdog/watchdog.h"
-#include <src/encoders/MA702.h>
 
 int main(void)
 {
   	__disable_irq();
-    System_Init();
+    system_init();
     MA_Init();
     NVM_Init();
     NVM_LoadConfig(); // This will TRY to deserialize and import config

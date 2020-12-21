@@ -3,7 +3,7 @@ import can
 from time import sleep
 from datetime import datetime
 from typing import Tuple, List, Dict, Union
-from tinymovr import ErrorIDs
+from tinymovr.constants import ErrorIDs
 from tinymovr.codec import MultibyteCodec
 from tinymovr.iface.can import (create_frame, extract_node_message_id)
 from tinymovr.iface.can import can_endpoints
@@ -47,6 +47,7 @@ class InSilico(can.BusABC):
             0x17: self._get_vbus,
             0x1A: self._get_device_info
         }
+        self.legacy_errors = False
         self._state = None
 
     def send(self, msg: can.Message):
@@ -113,9 +114,24 @@ class InSilico(can.BusABC):
     # ---- Endpoint methods -----------------------------------------
 
     def _get_state(self, payload):
-        vals: Tuple = (self._state["error"],
-                       self._state["state"],
-                       self._state["mode"])
+        if self.legacy_errors:
+            vals: Tuple = (self._state["error"],
+                        self._state["state"],
+                        self._state["mode"],
+                        0,
+                        0,
+                        0,
+                        0,
+                        0)
+        else:
+            vals: Tuple = (0,
+                        self._state["state"],
+                        self._state["mode"],
+                        self._state["error"],
+                        0,
+                        0,
+                        0,
+                        0)
         gen_payload = self.codec.serialize(
             vals, *can_endpoints["state"]["types"])
         self.buffer = create_frame(self.node_id, 0x03, False, gen_payload)

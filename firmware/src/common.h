@@ -71,6 +71,8 @@
 #define READ_UINT16(address)                      (*((uint16_t *) address))
 #define READ_UINT32(address)                      (*((uint32_t *) address))
 
+#define ERROR_FLAG_MAX_SIZE 5u
+
 static const float one_by_sqrt3 = 0.57735026919f;
 static const float two_by_sqrt3 = 1.15470053838f;
 
@@ -89,5 +91,18 @@ struct FloatTriplet
 	float B;
 	float C;
 };
+
+typedef enum {
+	ERROR_NO_ERROR = 0,
+	ERROR_INVALID_STATE = 1,
+	ERROR_ILLEGAL_VALUE = 2,
+	ERROR_VBUS_UNDERVOLTAGE = 3,
+	ERROR_OVERCURRENT = 4,
+    ERROR_PWM_LIMIT_EXCEEDED = 5,
+	ERROR_PHASE_RESISTANCE_OUT_OF_RANGE = 6,
+    ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE = 7,
+    ERROR_INVALID_POLE_PAIRS = 8,
+    ERROR_ENCODER_READING_UNSTABLE = 9
+} Error;
 
 #endif // #ifndef COMMON_H
