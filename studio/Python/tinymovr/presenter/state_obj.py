@@ -1,7 +1,8 @@
 from typing import List
 from enum import IntEnum
 
-from tinymovr.constants import ErrorIDs, error_descriptions
+from tinymovr.constants import (ControlStates,
+    ControlModes, ErrorIDs, error_descriptions)
 
 class StateObj():
 
@@ -10,11 +11,11 @@ class StateObj():
 
     @property
     def state(self):
-        return self.data[1]
+        return ControlStates(self.data[1])
 
     @property
     def mode(self):
-        return self.data[2]
+        return ControlModes(self.data[2])
 
     @property
     def errors(self):
@@ -35,7 +36,7 @@ class StateObj():
 
     def _repr_pretty_(self, p, cycle):
         strings = [
-            'State: {}; Mode: {}'.format(self.data[1], self.data[2]),
+            'State: {}; Mode: {}'.format(str(ControlStates(self.data[1])), str(ControlModes(self.data[2]))),
             'Errors:'
         ]
         if self.errors:

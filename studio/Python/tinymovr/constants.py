@@ -1,6 +1,15 @@
 
 from enum import IntEnum
 
+class ControlStates(IntEnum):
+    Idle = 0
+    Calibration = 1
+    ClosedLoopControl = 2
+
+class ControlModes(IntEnum):
+    CurrentControl = 0
+    VelocityControl = 1
+    PositionControl = 2
 
 class ErrorIDs(IntEnum):
     InvalidState = 1
