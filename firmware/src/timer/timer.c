@@ -21,8 +21,8 @@
 void Timer_Init(void)
 {
     // Configure Timer A Controls
-    pac5xxx_timer_clock_config(TimerA, TXCTL_CS_ACLK, TXCTL_PS_DIV1);                   // Configure timer clock input for ACLK, /1 divider
-    pac5xxx_timer_base_config(TimerA, (ACLK_FREQ_HZ/2/PWM_TIMER_FREQ), AUTO_RELOAD,
+    pac5xxx_timer_clock_config(TimerA, TXCTL_CS_ACLK, TXCTL_PS_DIV);                   // Configure timer clock input for ACLK, divider
+    pac5xxx_timer_base_config(TimerA, (timer_freq_hz/2/PWM_FREQ_HZ), AUTO_RELOAD,
             TxCTL_MODE_UPDOWN, TIMER_SLAVE_SYNC_DISABLE);                               // Configure timer frequency and count mode
 
     // Configure Dead time generators

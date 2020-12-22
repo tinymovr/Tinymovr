@@ -217,7 +217,7 @@ void ADC_DTSE_Init(void)
     PAC55XX_ADC->DTSETRIGENT0TO3.TRIG1CFGIDX = 12;                      // DTSE Trigger 1 Sequence Configuration Entry Index
     PAC55XX_ADC->DTSETRIGENT0TO3.TRIG1EDGE = ADCDTSE_TRIGEDGE_RISING;   // PWMA0 rising edge
 
-    pac5xxx_timer_a_ccctr1_value_set( (ACLK_FREQ_HZ/2/PWM_TIMER_FREQ) - 2);
+    pac5xxx_timer_a_ccctr1_value_set( (timer_freq_hz/2/PWM_FREQ_HZ) - 2);
 
     //===== Setup DTSE Sequence B (sense current) - Starts at Entry 12 =====
     pac5xxx_dtse_seq_config(12, ADC0, EMUX_AIO10, 0,           0);
@@ -250,7 +250,7 @@ PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc)
 PAC5XXX_RAMFUNC void ADC_UpdateMeasurements(void)
 {
     // TODO: Try doing below transformations in integer domain
-    const float I_phase_offset_k =  PWM_TIMER_PERIOD / config.I_phase_offset_tau;
+    const float I_phase_offset_k =  PWM_PERIOD_S / config.I_phase_offset_tau;
     adc.I_phase_offset.A += (((float)PAC55XX_ADC->DTSERES6.VAL * SHUNT_SCALING_FACTOR)
         - adc.I_phase_offset.A) * I_phase_offset_k;
     adc.I_phase_offset.B += (((float)PAC55XX_ADC->DTSERES8.VAL * SHUNT_SCALING_FACTOR)

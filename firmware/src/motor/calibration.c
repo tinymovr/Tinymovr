@@ -81,7 +81,7 @@ bool CalibrateInductance(void)
 	}
 #ifndef DRY_RUN
 	const float num_cycles = CAL_L_LEN / 2;
-	const float dI_by_dt = (I_high - I_low) / (PWM_TIMER_PERIOD * num_cycles);
+	const float dI_by_dt = (I_high - I_low) / (PWM_PERIOD_S * num_cycles);
 	const float L = CAL_V_INDUCTANCE / dI_by_dt;
 	if ((L <= MIN_PHASE_INDUCTANCE) || (L >= MAX_PHASE_INDUCTANCE))
 	{
