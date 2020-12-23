@@ -17,28 +17,21 @@
 
 #define VERSION_MAJOR (0u)
 #define VERSION_MINOR (8u)
-#define VERSION_PATCH (2u)
+#define VERSION_PATCH (3u)
 
 /// TINYMOVR CONFIGURATION OPTIONS ///
 
 // Uncomment to disable live gate driver control
 // #define DRY_RUN
 
-// WARNING! PLEASE DO NOT ADJUST CLOCK DIVIDER YET!
-// LEAVE IT AT 1
-// ACLK Clock Divider
-// The ACLK clock is equal to SCLK / ACLK_PRESCALER
-// Higher ACLK_DIVIDER values mean less PWM resolution, but also
-// slightly lower power consumption.
-// Valid values are {1, 2, 3, 4, 5, 6, 7, 8}
-#define ACLK_DIVIDER				(1)
-#define ACLK_FREQ_HZ                (300000000/ACLK_DIVIDER)
+#define ACLK_FREQ_HZ                (300000000)
 #define HCLK_FREQ_HZ                (150000000)
 
-// PWM Timer Frequency (Hz).
-// Determines the PWM Timer Frequency by varying the
-// PWM timer base.
-#define PWM_TIMER_FREQ              (20000)
+// Timer clock divider
+#define TXCTL_PS_DIV                TXCTL_PS_DIV2
+
+// Desired PWM Frequency (Hz).
+#define PWM_FREQ_HZ              (20000)
 
 // Limits
 #define PWM_LIMIT                   (0.8f)
@@ -47,10 +40,10 @@
 #define VBUS_LOW_THRESHOLD          (11.0f)
 
 // Calibration
-#define CAL_R_LEN             (2 * PWM_TIMER_FREQ)
-#define CAL_L_LEN             (1 * PWM_TIMER_FREQ)
-#define CAL_OFFSET_LEN        (1 * PWM_TIMER_FREQ)
-#define CAL_DIR_LEN           (4 * PWM_TIMER_FREQ)
+#define CAL_R_LEN             (2 * PWM_FREQ_HZ)
+#define CAL_L_LEN             (1 * PWM_FREQ_HZ)
+#define CAL_OFFSET_LEN        (1 * PWM_FREQ_HZ)
+#define CAL_DIR_LEN           (4 * PWM_FREQ_HZ)
 
 #define CAL_PHASE_TURNS             8
 

@@ -41,10 +41,10 @@ void Observer_Reset(void)
 
 PAC5XXX_RAMFUNC static inline void Observer_UpdatePosEstimate(int new_pos_meas)
 {
-	const float delta_pos_est = PWM_TIMER_PERIOD * state.vel_estimate;
+	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;
 	const float delta_pos_meas = wrapf(new_pos_meas - state.pos_estimate, ENCODER_HALF_TICKS);
 	const float delta_pos_error = delta_pos_meas - delta_pos_est;
-	const float incr_pos = delta_pos_est + (PWM_TIMER_PERIOD * config.kp * delta_pos_error);
+	const float incr_pos = delta_pos_est + (PWM_PERIOD_S * config.kp * delta_pos_error);
 	state.pos_estimate += incr_pos;
 	state.pos_estimate_wrapped = wrapf(state.pos_estimate_wrapped + incr_pos, ENCODER_HALF_TICKS);
 	if (state.pos_estimate > config.sector_half_interval)
@@ -61,7 +61,7 @@ PAC5XXX_RAMFUNC static inline void Observer_UpdatePosEstimate(int new_pos_meas)
 	{
 		// No action
 	}
-	state.vel_estimate += PWM_TIMER_PERIOD * config.ki * delta_pos_error;
+	state.vel_estimate += PWM_PERIOD_S * config.ki * delta_pos_error;
 }
 
 PAC5XXX_RAMFUNC float Observer_GetBandwidth(void)

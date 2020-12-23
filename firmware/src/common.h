@@ -66,24 +66,24 @@
 #define PAC5XXX_ERROR   1
 #endif
 
-#define PWM_TIMER_PERIOD (1.0f / PWM_TIMER_FREQ)
+#define PWM_PERIOD_S                (1.0f / PWM_FREQ_HZ)
 
-#define READ_UINT16(address)                      (*((uint16_t *) address))
-#define READ_UINT32(address)                      (*((uint32_t *) address))
+#define READ_UINT16(address)        (*((uint16_t *) address))
+#define READ_UINT32(address)        (*((uint32_t *) address))
 
 #define ERROR_FLAG_MAX_SIZE 5u
 
-static const float one_by_sqrt3 = 0.57735026919f;
-static const float two_by_sqrt3 = 1.15470053838f;
-
 #define PI (3.141592f)
 
-static const float invtwopi=0.1591549f;
-static const float twopi=6.283185f;
-static const float threehalfpi=4.7123889f;
-static const float pi=PI;
-static const float halfpi=PI*0.5f;
-static const float quarterpi=PI*0.25f;
+static const float one_by_sqrt3 = 0.57735026919f;
+static const float two_by_sqrt3 = 1.15470053838f;
+static const float invtwopi = 0.1591549f;
+static const float twopi = 6.283185f;
+static const float threehalfpi = 4.7123889f;
+static const float pi = PI;
+static const float halfpi = PI*0.5f;
+static const float quarterpi = PI*0.25f;
+static const int32_t timer_freq_hz = ACLK_FREQ_HZ / (pow(2, TXCTL_PS_DIV));
 
 struct FloatTriplet
 {

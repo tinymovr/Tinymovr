@@ -120,7 +120,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         float delta_vel = vel_setpoint - vel_estimate;
         // Velocity limiting will be done later on based on the estimate
         Iq_setpoint += (delta_vel * config.vel_gain) + state.vel_integrator_Iq;
-        state.vel_integrator_Iq += delta_vel * PWM_TIMER_PERIOD * config.vel_integrator_gain;
+        state.vel_integrator_Iq += delta_vel * PWM_PERIOD_S * config.vel_integrator_gain;
     }
     else
     {
@@ -162,8 +162,8 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     const float delta_Id = 0 - state.Id_meas;
     const float delta_Iq = Iq_setpoint - state.Iq_meas;
 
-    state.Id_integrator_Vd += delta_Id * PWM_TIMER_PERIOD * config.Id_integrator_gain;
-    state.Iq_integrator_Vq += delta_Iq * PWM_TIMER_PERIOD * config.Iq_integrator_gain;
+    state.Id_integrator_Vd += delta_Id * PWM_PERIOD_S * config.Id_integrator_gain;
+    state.Iq_integrator_Vq += delta_Iq * PWM_PERIOD_S * config.Iq_integrator_gain;
 
     const float Vd = (delta_Id * config.I_gain) + state.Id_integrator_Vd;
     const float Vq = (delta_Iq * config.I_gain) + state.Iq_integrator_Vq;
