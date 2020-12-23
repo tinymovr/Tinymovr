@@ -33,6 +33,7 @@ PAC5XXX_RAMFUNC float wrapf(float unbound_val, float half_interval);
 PAC5XXX_RAMFUNC float fast_inv_sqrt(float n);
 PAC5XXX_RAMFUNC float fast_cos(float angle);
 PAC5XXX_RAMFUNC float fast_sin(float angle);
+PAC5XXX_RAMFUNC float fminf(float x, float y);
 PAC5XXX_RAMFUNC float fabsf(float x);
 PAC5XXX_RAMFUNC float floorf(float x);
 PAC5XXX_RAMFUNC float fmodf(float a, float b);

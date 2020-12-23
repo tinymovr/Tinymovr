@@ -91,6 +91,17 @@ PAC5XXX_RAMFUNC float fast_sin(float angle)
     return fast_cos(halfpi-angle);
 }
 
+PAC5XXX_RAMFUNC float fminf(float x, float y)
+{
+    if (isnan(x))
+        return y;
+    if (isnan(y))
+        return x;
+    /* handle signed zeros, see C99 Annex F.9.9.2 */
+    if (signbit(x) != signbit(y))
+        return signbit(x) ? x : y;
+    return x < y ? x : y;
+}
 
 #if __ARM_FEATURE_FMA && __ARM_FP&4 && !__SOFTFP__ && !BROKEN_VFP_ASM
 
