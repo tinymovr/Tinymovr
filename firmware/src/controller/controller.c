@@ -129,14 +129,14 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     
     // Velocity-dependent current limiting
     const float vel_limit = fminf(config.vel_limit, VEL_HARD_LIMIT);
-    if (Controller_LimitVelocity(-vel_limit, vel_limit, vel_estimate, config.vel_gain, &Iq_setpoint))
+    if (Controller_LimitVelocity(-vel_limit, vel_limit, vel_estimate, config.vel_gain, &Iq_setpoint) == true)
     {
         state.vel_integrator_Iq *= 0.995f;
     }
 
     // Absolute current & velocity integrator limiting
     const float I_limit = fminf(config.I_limit, I_HARD_LIMIT);
-    if (our_clamp(&Iq_setpoint, -I_limit, I_limit))
+    if (our_clamp(&Iq_setpoint, -I_limit, I_limit) == true)
     {
         state.vel_integrator_Iq *= 0.995f;
     }
