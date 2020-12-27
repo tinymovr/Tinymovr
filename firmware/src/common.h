@@ -22,6 +22,7 @@
 #include <math.h>
 #include <float.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 #include "pac5xxx.h"
