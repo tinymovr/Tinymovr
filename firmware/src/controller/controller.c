@@ -136,7 +136,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
 
     // Absolute current & velocity integrator limiting
     const float I_limit = fminf(config.I_limit, I_HARD_LIMIT);
-    if (clamp(&Iq_setpoint, -I_limit, I_limit))
+    if (our_clamp(&Iq_setpoint, -I_limit, I_limit))
     {
         state.vel_integrator_Iq *= 0.995f;
     }
@@ -405,12 +405,12 @@ void Controller_RestoreConfig(struct ControllerConfig* config_)
     config = *config_;
 }
 
-PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
+static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
     float vel_gain, float *I)
 {
     float Imax = (max_limit - vel_estimate) * vel_gain;
     float Imin = (min_limit - vel_estimate) * vel_gain;
-    return clamp(I, Imin, Imax);
+    return our_clamp(I, Imin, Imax);
 }
 
 PAC5XXX_RAMFUNC void Controller_UpdateCurrentGains(void)

@@ -136,7 +136,7 @@ PAC5XXX_RAMFUNC float fmodf(float a, float b)
     return (a - b * floorf(a / b));
 }
 
-PAC5XXX_RAMFUNC bool clamp(float *d, float min, float max)
+PAC5XXX_RAMFUNC bool our_clamp(float *d, float min, float max)
 {
     bool clamped = false;
     if (*d < min)
