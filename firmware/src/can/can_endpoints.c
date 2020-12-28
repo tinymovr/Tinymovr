@@ -57,7 +57,7 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_GetPhaseCurrents, 0x010);
     // 0x011 Reserved: Move To Pos
     // 0x012 Reserved: Move To Pos
-    // 0x013 AVAIL
+    CANEP_AddEndpoint(&CAN_GetIntegratorGains, 0x013);
     CANEP_AddEndpoint(&CAN_GetIq, 0x014);
     CANEP_AddEndpoint(&CAN_GetLimits, 0x015);
     CANEP_AddEndpoint(&CAN_Reset, 0x016);
@@ -69,7 +69,7 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_SaveConfig, 0x01C);
     CANEP_AddEndpoint(&CAN_EraseConfig, 0x01D);
     CANEP_AddEndpoint(&CAN_GetMotorInfo, 0x01E);
-    // 0x01F AVAIL
+    CANEP_AddEndpoint(&CAN_SetIntegratorGains, 0x01F);
 }
 
 void CANEP_AddEndpoint(CANEP_Callback callback, uint8_t id)
@@ -293,6 +293,26 @@ uint8_t CAN_SetGains(uint8_t buffer[])
     if (vel_P_gain > 0.0f)
     {
         Controller_SetVelGain(vel_P_gain);
+        response = CANRP_Write;
+    }
+    return response;
+}
+
+uint8_t CAN_GetIntegratorGains(uint8_t buffer[])
+{
+    const float vel_I_gain = Controller_GetVelIntegratorGain();
+    memcpy(&buffer[0], &vel_I_gain, sizeof(float));
+    return CANRP_Read;
+}
+
+uint8_t CAN_SetIntegratorGains(uint8_t buffer[])
+{
+    float vel_I_gain;
+    memcpy(&vel_I_gain, &buffer[0], sizeof(float));
+    CAN_ResponseType response = CANRP_NoAction;
+    if (vel_I_gain > 0.0f)
+    {
+        Controller_SetVelIntegratorGain(vel_I_gain);
         response = CANRP_Write;
     }
     return response;
