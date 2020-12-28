@@ -109,7 +109,7 @@ bool CalibrateOffsetDirectionAndPolePairs(void)
 	for (uint32_t i=0; i<CAL_OFFSET_LEN; i++)
 	{
 		float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
-		clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
+		our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
 		SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
 		GateDriver_SetDutyCycle(&modulation_values);
 		Watchdog_Feed();
@@ -123,9 +123,9 @@ bool CalibrateOffsetDirectionAndPolePairs(void)
 		// Ensure rotor stays at 2*Pi eangle a bit
 		float factor = (float)i;
 		float cur_angle = 1.2f * end_angle * (factor/CAL_DIR_LEN);
-		clamp(&cur_angle, 0.0f, end_angle);
+		our_clamp(&cur_angle, 0.0f, end_angle);
 		float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
-		clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
+		our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
 		SVM(pwm_setpoint * fast_cos(cur_angle), pwm_setpoint * fast_sin(cur_angle),
 			&modulation_values.A, &modulation_values.B, &modulation_values.C);
 		GateDriver_SetDutyCycle(&modulation_values);

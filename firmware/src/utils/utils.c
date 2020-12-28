@@ -91,12 +91,36 @@ PAC5XXX_RAMFUNC float fast_sin(float angle)
     return fast_cos(halfpi-angle);
 }
 
+PAC5XXX_RAMFUNC float fminf(float x, float y)
+{
+    if (isnan(x))
+        return y;
+    if (isnan(y))
+        return x;
+    /* handle signed zeros, see C99 Annex F.9.9.2 */
+    if (signbit(x) != signbit(y))
+        return signbit(x) ? x : y;
+    return x < y ? x : y;
+}
+
+#if __ARM_FEATURE_FMA && __ARM_FP&4 && !__SOFTFP__ && !BROKEN_VFP_ASM
+
+PAC5XXX_RAMFUNC float fabsf(float x)
+{
+    __asm__ ("vabs.f32 %0, %1" : "=t"(x) : "t"(x));
+    return x;
+}
+
+#else
+
 PAC5XXX_RAMFUNC float fabsf(float x)
 {
 	union {float f; uint32_t i;} u = {x};
 	u.i &= 0x7fffffff;
 	return u.f;
 }
+
+#endif
 
 PAC5XXX_RAMFUNC float floorf(float x)
 {
@@ -112,7 +136,7 @@ PAC5XXX_RAMFUNC float fmodf(float a, float b)
     return (a - b * floorf(a / b));
 }
 
-PAC5XXX_RAMFUNC bool clamp(float *d, float min, float max)
+PAC5XXX_RAMFUNC bool our_clamp(float *d, float min, float max)
 {
     bool clamped = false;
     if (*d < min)

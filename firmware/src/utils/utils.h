@@ -19,7 +19,6 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-#include "stdint.h"
 #include "src/common.h"
 
 #ifndef UTILS_UTILS_H_
@@ -33,10 +32,11 @@ PAC5XXX_RAMFUNC float wrapf(float unbound_val, float half_interval);
 PAC5XXX_RAMFUNC float fast_inv_sqrt(float n);
 PAC5XXX_RAMFUNC float fast_cos(float angle);
 PAC5XXX_RAMFUNC float fast_sin(float angle);
+PAC5XXX_RAMFUNC float fminf(float x, float y);
 PAC5XXX_RAMFUNC float fabsf(float x);
 PAC5XXX_RAMFUNC float floorf(float x);
 PAC5XXX_RAMFUNC float fmodf(float a, float b);
-PAC5XXX_RAMFUNC bool clamp(float *d, float min, float max);
+PAC5XXX_RAMFUNC bool our_clamp(float *d, float min, float max);
 PAC5XXX_RAMFUNC int ltoa(int32_t value, uint8_t *sp, int radix);
 PAC5XXX_RAMFUNC char checksum(char* msg, uint8_t len);
 
