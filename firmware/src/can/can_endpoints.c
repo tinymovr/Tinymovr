@@ -56,8 +56,8 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_SetLimits, 0x00F);
     CANEP_AddEndpoint(&CAN_GetPhaseCurrents, 0x010);
     // 0x011 Reserved: Move To Pos
-    // 0x012 Reserved: Move To Pos
-    CANEP_AddEndpoint(&CAN_GetIntegratorGains, 0x013);
+    CANEP_AddEndpoint(&CAN_GetIntegratorGains, 0x012);
+    CANEP_AddEndpoint(&CAN_SetIntegratorGains, 0x013);
     CANEP_AddEndpoint(&CAN_GetIq, 0x014);
     CANEP_AddEndpoint(&CAN_GetLimits, 0x015);
     CANEP_AddEndpoint(&CAN_Reset, 0x016);
@@ -69,7 +69,7 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_SaveConfig, 0x01C);
     CANEP_AddEndpoint(&CAN_EraseConfig, 0x01D);
     CANEP_AddEndpoint(&CAN_GetMotorInfo, 0x01E);
-    CANEP_AddEndpoint(&CAN_SetIntegratorGains, 0x01F);
+    // 0x01F Available
 }
 
 void CANEP_AddEndpoint(CANEP_Callback callback, uint8_t id)
