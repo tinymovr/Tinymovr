@@ -192,6 +192,26 @@ can_endpoints: Dict[str, Dict] = {
         "labels": ("position", "velocity"),
         "ser_map": {"gains": ("position", "velocity")}
     },
+    "integrator_gains":
+    {
+        "description": "Get Integrator Gains (Velocity)",
+        "type": "r",
+        "ep_id": 0x013,
+        "types": (DataType.FLOAT, ),
+        "units": ("(A*second)/tick", ),
+        "labels": ("velocity", ),
+        "ser_map": {"integrator_gains": ("velocity", )}
+    },
+    "set_integrator_gains":
+    {
+        "description": "Set Integrator Gains (Velocity)",
+        "type": "w",
+        "ep_id": 0x01F,
+        "types": (DataType.FLOAT, ),
+        "units": ("(A*second)/tick", ),
+        "labels": ("velocity", ),
+        "ser_map": {"integrator_gains": ( "velocity", )}
+    },
     "device_info":
     {
         "description": "Get Device Info",
