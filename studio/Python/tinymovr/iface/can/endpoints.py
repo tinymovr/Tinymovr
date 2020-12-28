@@ -178,7 +178,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "r",
         "ep_id": 0x018,
         "types": (DataType.FLOAT, DataType.FLOAT),
-        "units": ("tick", "tick/second"),
+        "units": ("1/second", "(A*second)/tick"),
         "labels": ("position", "velocity"),
         "ser_map": {"gains": ("position", "velocity")}
     },
@@ -188,7 +188,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "w",
         "ep_id": 0x019,
         "types": (DataType.FLOAT, DataType.FLOAT),
-        "units": ("tick", "tick/second"),
+        "units": ("1/second", "(A*second)/tick"),
         "labels": ("position", "velocity"),
         "ser_map": {"gains": ("position", "velocity")}
     },
