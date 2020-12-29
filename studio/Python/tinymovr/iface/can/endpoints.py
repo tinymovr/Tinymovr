@@ -139,7 +139,7 @@ can_endpoints: Dict[str, Dict] = {
         "labels": ("I_A", "I_B", "I_C"),
         "from_version": "0.7.1"
     },
-        "integrator_gains":
+    "integrator_gains":
     {
         "description": "Get Integrator Gains (Velocity)",
         "type": "r",
