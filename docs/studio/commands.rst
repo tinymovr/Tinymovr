@@ -381,6 +381,57 @@ Example
     >>>tmx.set_gains(position=25.0, velocity=0.00001)
 
 
+integrator_gains
+****************
+
+| **endpoint**: ``0x18``
+| **type**: Read-only
+
+Retrieves the velocity integrator gain of the controller.
+
+Return Values
+-------------
+
+=============  =========================   =========  ===========
+Member         Description                 Data Type  Data Offset
+-------------  -------------------------   ---------  -----------
+``velocity``   Velocity Integrator Gain    float32    0
+=============  =========================   =========  ===========
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.integrator_gains
+    {"velocity": 0.0001}
+
+
+set_integrator_gains()
+**********************
+
+| **endpoint**: ``0x19``
+| **type**: Write-only
+
+Sets the velocity integrator gain of the controller.
+
+Arguments
+---------
+
+=============  =========================   =========  ===========
+Member         Description                 Data Type  Data Offset
+-------------  -------------------------   ---------  -----------
+``velocity``   Velocity Integrator Gain    float32    0
+=============  =========================   =========  ===========
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.set_integrator_gains(velocity=0.0001)
+
+
 Iq
 ***
 
