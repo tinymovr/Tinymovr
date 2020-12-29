@@ -36,13 +36,21 @@ class TestBoard(TMTestCase):
         # apparently the statistics lib works with quantities only
         self.assertLess(st.pstdev(pos_estimates) * ticks, 5 * ticks)
 
-    def test_b_invalid_limits(self):
+    def test_b_invalid_values(self):
         '''
-        Test rejection of invalid limits
+        Test rejection of invalid values for limits and gains
         '''
         limits = self.tm.limits
         self.tm.set_limits(-10, -10) # invalid, should not be set
         self.assertEqual(limits, self.tm.limits)
+
+        gains = self.tm.gains
+        self.tm.set_gains(-10, -10) # invalid, should not be set
+        self.assertEqual(gains, self.tm.gains)
+
+        int_gains = self.tm.integrator_gains
+        self.tm.set_integrator_gains(-10) # invalid, should not be set
+        self.assertEqual(int_gains, self.tm.integrator_gains)
 
     def test_c_calibrate(self):
         '''
@@ -151,4 +159,4 @@ class TestBoard(TMTestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(failfast=True)
