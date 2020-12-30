@@ -13,20 +13,13 @@ from tinymovr.iface import IFace
 from tinymovr.iface.can import CAN, guess_channel
 
 import unittest
+from tests import TMTestCase
 
-bustype = "slcan"
+
 iterations = 5000
 
-class TestRates(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        channel = guess_channel(bustype_hint=bustype)
-        can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
-        iface: IFace = CAN(can_bus)
-        cls.tm = Tinymovr(node_id=1, iface=iface)
-        cls.tm.reset()
-        time.sleep(0.2)
+class TestRates(TMTestCase):
 
     def test_round_trip_time(self):
         '''
@@ -41,24 +34,6 @@ class TestRates(unittest.TestCase):
             sum += self.tm.encoder_estimates.position
         res = elapsed_time()
         print("Round-trip time (2 packets): " + str(res/iterations) + " seconds")
-
-    def tearDown(self):
-        self.tm.idle()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.tm.reset()
-
-    def try_calibrate(self):
-        motor_info = self.tm.motor_info
-        if motor_info.calibrated == 0:
-            self.tm.calibrate()
-            for _ in range(100):
-                if self.tm.state.state == 0:
-                    break
-                time.sleep(0.5)
-            motor_info = self.tm.motor_info
-            self.assertEqual(motor_info.calibrated, 1)
 
 
 def elapsed_time(prefix=''):
