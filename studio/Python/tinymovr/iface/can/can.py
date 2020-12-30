@@ -15,6 +15,7 @@ CAN_EP_MASK: int = int(math.pow(2, CAN_EP_SIZE) - 1)
 
 can_devices: Dict[str, tuple] = {
     "slcan": ("canable", "cantact"),
+    "slcanours": ("canable", "cantact"),
     "robotell": ("CP210", )
 }
 

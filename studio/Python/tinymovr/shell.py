@@ -7,7 +7,7 @@ Usage:
 
 Options:
     --ids=<ids>          CAN node IDs to search [default: 1-10]
-    --bustype=<bustype>  CAN bus type to use [default: slcan].
+    --bustype=<bustype>  CAN bus type to use [default: slcanours].
     --chan=<chan>        CAN channel (i.e. device) to use [default: auto].
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """

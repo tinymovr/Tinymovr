@@ -15,7 +15,8 @@ from tinymovr.units import get_registry
 
 import unittest
 
-bustype = "slcan"
+
+bustype = "slcanours"
 
 
 class TMTestCase(unittest.TestCase):

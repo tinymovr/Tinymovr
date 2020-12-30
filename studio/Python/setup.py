@@ -40,6 +40,7 @@ setup(
         ],
         "can.interface": [
             "insilico=tinymovr.bus:InSilico",
+            "slcanours=tinymovr.bus:slcanBusOurs"
         ]
     }
 )
