@@ -157,6 +157,15 @@ class TestBoard(TMTestCase):
 
         time.sleep(0.5)
 
+    def test_h_timings(self):
+        '''
+        Test DWT busy/total cycle timings
+        '''
+        tim = self.tm.timings
+        self.assertGreater(tim.total, 0)
+        self.assertGreater(tim.busy, 0)
+        self.assertLess(tim.busy, 3000)
+
 
 if __name__ == '__main__':
     unittest.main(failfast=True)
