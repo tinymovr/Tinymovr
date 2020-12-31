@@ -28,7 +28,7 @@ struct SchedulerState state = {0};
 
 void WaitForControlLoopInterrupt(void)
 {
-	const uint32_t current_timestamp = ARM_CM_DWT_CYCCNT;
+	const uint32_t current_timestamp = DWT->CYCCNT;
 	state.total_cycles = current_timestamp - state.total_loop_start;
 	state.busy_cycles = current_timestamp - state.busy_loop_start;
 	state.total_loop_start = current_timestamp;
@@ -51,7 +51,7 @@ void WaitForControlLoopInterrupt(void)
 		// Go back to sleep
 		__WFI();
 	}
-	state.busy_loop_start = ARM_CM_DWT_CYCCNT;
+	state.busy_loop_start = DWT->CYCCNT;
 	// We have to service the control loop by updating
 	// current measurements and encoder estimates.
 	ADC_UpdateMeasurements();

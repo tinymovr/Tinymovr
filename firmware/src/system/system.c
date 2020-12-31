@@ -71,11 +71,9 @@ void system_init(void)
 	// Vp = 10V , 440mA-540mA, Charge Pump Enable
 	pac5xxx_tile_register_write(ADDR_SYSCONF, 0x01);
 
-	if (ARM_CM_DWT_CTRL != 0) {        // See if DWT is available
-		ARM_CM_DEMCR      |= 1u << 24;  // Set bit 24
-		ARM_CM_DWT_CYCCNT  = 0;
-		ARM_CM_DWT_CTRL   |= 1u << 0;   // Set bit 0
-	}
+	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+	DWT->CYCCNT = 0;
+	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 }
 
 void system_reset(void)
