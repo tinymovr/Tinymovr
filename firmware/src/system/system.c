@@ -64,24 +64,22 @@ void system_init(void)
 
     // --- End Mandatory System Init from Qorvo
 
-	// Configure SOC Bridge for talking to CAFE
-	pac5xxx_tile_socbridge_config(1, 0);
+    // Configure SOC Bridge for talking to CAFE
+    pac5xxx_tile_socbridge_config(1, 0);
 
-	// System Configuration Power Options
-	// Vp = 10V , 440mA-540mA, Charge Pump Enable
-	pac5xxx_tile_register_write(ADDR_SYSCONF, 0x01);
+    // System Configuration Power Options
+    // Vp = 10V , 440mA-540mA, Charge Pump Enable
+    pac5xxx_tile_register_write(ADDR_SYSCONF, 0x01);
 
-	if (ARM_CM_DWT_CTRL != 0) {        // See if DWT is available
-		ARM_CM_DEMCR      |= 1u << 24;  // Set bit 24
-		ARM_CM_DWT_CYCCNT  = 0;
-		ARM_CM_DWT_CTRL   |= 1u << 0;   // Set bit 0
-	}
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    DWT->CYCCNT = 0;
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 }
 
 void system_reset(void)
 {
-	pac5xxx_tile_register_write(ADDR_WATCHDOG,
-		pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
+    pac5xxx_tile_register_write(ADDR_WATCHDOG,
+        pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
 }
 
 void system_delay_us(uint32_t us)
@@ -123,12 +121,12 @@ PAC5XXX_RAMFUNC void add_error_flag(uint8_t flag)
 
 PAC5XXX_RAMFUNC bool health_check(void)
 {
-	const float VBus = ADC_GetVBus();
-	bool success = true;
-	if (VBus < VBUS_LOW_THRESHOLD)
-	{
-		add_error_flag(ERROR_VBUS_UNDERVOLTAGE);
-		success = false;
-	}
-	return success;
+    const float VBus = ADC_GetVBus();
+    bool success = true;
+    if (VBus < VBUS_LOW_THRESHOLD)
+    {
+        add_error_flag(ERROR_VBUS_UNDERVOLTAGE);
+        success = false;
+    }
+    return success;
 }
