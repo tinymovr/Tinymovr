@@ -58,6 +58,9 @@ struct ControllerState
 
     float Iq_integrator_Vq;
     float Id_integrator_Vd;
+
+    float freq;
+    float amp;
 };
 
 struct ControllerConfig
@@ -108,6 +111,8 @@ float Controller_GetVelLimit(void);
 void Controller_SetVelLimit(float limit);
 float Controller_GetIqLimit(void);
 void Controller_SetIqLimit(float limit);
+
+void Controller_SetFreqAmp(float freq, float amp);
 
 PAC5XXX_RAMFUNC bool Controller_Calibrated(void);
 

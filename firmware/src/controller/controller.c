@@ -53,6 +53,9 @@ static struct ControllerState state = {
 
     .Iq_integrator_Vq = 0.0f,
     .Id_integrator_Vd = 0.0f,
+
+	.freq = 0.0f,
+	.amp = 0.0f
 };
 
 static struct ControllerConfig config ={
@@ -114,6 +117,11 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
 
     const float vel_estimate = Observer_GetVelEstimate();
     float Iq_setpoint = state.Iq_setpoint;
+
+    if ((state.freq > 0) && (state.amp > 0))
+    {
+    	Iq_setpoint += fast_sin( ( ((float)(DWT->CYCCNT))/HCLK_FREQ_HZ ) * state.freq * 2.0f * pi ) * (state.amp / state.freq);
+    }
 
     if (state.mode >= CTRL_VELOCITY)
     {
@@ -388,6 +396,12 @@ void Controller_SetIqLimit(float limit)
     {
         config.I_limit = limit;
     }
+}
+
+void Controller_SetFreqAmp(float freq, float amp)
+{
+	state.freq = freq;
+	state.amp = amp;
 }
 
 PAC5XXX_RAMFUNC bool Controller_Calibrated(void)

@@ -209,8 +209,13 @@ uint8_t CAN_SetVelSetpoint(uint8_t buffer[])
 uint8_t CAN_SetIqSetpoint(uint8_t buffer[])
 {
     float Iq;
+    uint16_t freq;
+    uint16_t amp;
     memcpy(&Iq, &buffer[0], sizeof(float));
+    memcpy(&freq, &buffer[4], sizeof(uint16_t));
+    memcpy(&amp, &buffer[6], sizeof(uint16_t));
     Controller_SetIqSetpoint(Iq);
+    Controller_SetFreqAmp((float)freq, (float)amp);
     return CANRP_Write;
 }
 

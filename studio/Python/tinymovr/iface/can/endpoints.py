@@ -115,9 +115,10 @@ can_endpoints: Dict[str, Dict] = {
         "description": "Set Current (Iq) Setpoint",
         "type": "w",
         "ep_id": 0x00E,
-        "types": (DataType.FLOAT,),
-        "units": ("ampere",),
-        "labels": ("current",)
+        "types": (DataType.FLOAT, DataType.UINT16, DataType.UINT16),
+        "units": ("ampere", "hertz", "ampere*hertz"),
+        "defaults": {"frequency": 0, "amplitude": 0},
+        "labels": ("current", "frequency", "amplitude")
     },
     "set_limits":
     {
