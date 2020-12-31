@@ -139,6 +139,26 @@ can_endpoints: Dict[str, Dict] = {
         "labels": ("I_A", "I_B", "I_C"),
         "from_version": "0.7.1"
     },
+    "integrator_gains":
+    {
+        "description": "Get Integrator Gains (Velocity)",
+        "type": "r",
+        "ep_id": 0x012,
+        "types": (DataType.FLOAT, ),
+        "units": ("(A*second)/tick", ),
+        "labels": ("velocity", ),
+        "ser_map": {"integrator_gains": ("velocity", )}
+    },
+    "set_integrator_gains":
+    {
+        "description": "Set Integrator Gains (Velocity)",
+        "type": "w",
+        "ep_id": 0x013,
+        "types": (DataType.FLOAT, ),
+        "units": ("(A*second)/tick", ),
+        "labels": ("velocity", ),
+        "ser_map": {"integrator_gains": ( "velocity", )}
+    },
     "Iq":
     {
         "description": "Get quadrature current setpoint and estimate",
@@ -178,7 +198,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "r",
         "ep_id": 0x018,
         "types": (DataType.FLOAT, DataType.FLOAT),
-        "units": ("tick", "tick/second"),
+        "units": ("1/second", "(A*second)/tick"),
         "labels": ("position", "velocity"),
         "ser_map": {"gains": ("position", "velocity")}
     },
@@ -188,7 +208,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "w",
         "ep_id": 0x019,
         "types": (DataType.FLOAT, DataType.FLOAT),
-        "units": ("tick", "tick/second"),
+        "units": ("1/second", "(A*second)/tick"),
         "labels": ("position", "velocity"),
         "ser_map": {"gains": ("position", "velocity")}
     },

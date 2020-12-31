@@ -52,6 +52,8 @@ uint8_t CAN_Reset(uint8_t buffer[]);
 uint8_t CAN_GetVBus(uint8_t buffer[]);
 uint8_t CAN_GetGains(uint8_t buffer[]);
 uint8_t CAN_SetGains(uint8_t buffer[]);
+uint8_t CAN_GetIntegratorGains(uint8_t buffer[]);
+uint8_t CAN_SetIntegratorGains(uint8_t buffer[]);
 uint8_t CAN_DeviceInfo(uint8_t buffer[]);
 uint8_t CAN_Timings(uint8_t buffer[]);
 uint8_t CAN_SaveConfig(uint8_t buffer[]);

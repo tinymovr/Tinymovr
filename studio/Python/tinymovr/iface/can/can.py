@@ -36,7 +36,7 @@ class CAN(IFace):
         rtr: bool = False if payload and len(payload) else True
         self.bus.send(create_frame(node_id, endpoint_id, rtr, payload))
 
-    def receive(self, node_id: int, endpoint_id: int, timeout: float=0.05):
+    def receive(self, node_id: int, endpoint_id: int, timeout: float=0.1):
         frame_id: int = create_node_id(node_id, endpoint_id)
         frame: can.Message = self.bus.recv(timeout=timeout)
         if frame:

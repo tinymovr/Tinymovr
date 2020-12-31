@@ -134,9 +134,14 @@ Example
 .P
 ==
 
-Set position setpoint (ticks).
+Get/set position setpoint (ticks).
 
 Example
+
+.. code-block:: shell
+
+    .P
+    1000
 
 .. code-block:: shell
 
@@ -145,9 +150,14 @@ Example
 .V
 ==
 
-Set velocity setpoint (ticks/s).
+Get/set velocity setpoint (ticks/s).
 
 Example
+
+.. code-block:: shell
+
+    .V
+    -10000
 
 .. code-block:: shell
 
@@ -156,13 +166,36 @@ Example
 .I
 ==
 
-Set current (Iq) setpoint (mA).
+Get/set current (Iq) setpoint (mA).
 
 Example
 
 .. code-block:: shell
 
+    .I
+    1000
+
+.. code-block:: shell
+
     .I1000
+
+.G
+==
+
+Get/set velocity integrator gain (x0.001).
+
+Note that high values (e.g. above 10) may cause instability.
+
+Example
+
+.. code-block:: shell
+
+    .G
+    2
+
+.. code-block:: shell
+
+    .G2
 
 .h
 ==
