@@ -52,6 +52,13 @@ class TestBoard(TMTestCase):
         self.tm.set_integrator_gains(-10) # invalid, should not be set
         self.assertEqual(int_gains, self.tm.integrator_gains)
 
+        # Zero vel integrator values should be allowed
+        self.tm.set_integrator_gains(0) # valid, should be set
+        self.assertEqual(self.tm.integrator_gains, 0)
+
+        # Bring it back
+        self.tm.set_integrator_gains(int_gains)
+
     def test_c_calibrate(self):
         '''
         Test board calibration if not calibrated

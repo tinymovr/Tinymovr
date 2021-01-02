@@ -310,7 +310,7 @@ uint8_t CAN_SetIntegratorGains(uint8_t buffer[])
     float vel_I_gain;
     memcpy(&vel_I_gain, &buffer[0], sizeof(float));
     CAN_ResponseType response = CANRP_NoAction;
-    if (vel_I_gain > 0.0f)
+    if (vel_I_gain >= 0.0f)
     {
         Controller_SetVelIntegratorGain(vel_I_gain);
         response = CANRP_Write;
