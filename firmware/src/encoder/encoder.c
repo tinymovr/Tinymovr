@@ -36,18 +36,22 @@ void MA_Init(void)
 
 PAC5XXX_RAMFUNC int16_t MA_GetAngle(void)
 {
-    return state.angle_buffer;
+    return state.angle;
+}
+
+PAC5XXX_RAMFUNC void MA_RequestAngle(void)
+{
+    ssp_write_one(SSPD, MA_CMD_ANGLE);
 }
 
 PAC5XXX_RAMFUNC void MA_UpdateAngle(bool check_error)
 {
-    // TODO: Make SSP reference configurable
-	ssp_write_one(SSPD, MA_CMD_ANGLE);
     while (!PAC55XX_SSPD->STAT.RNE) {}
-    const int16_t new_angle = (PAC55XX_SSPD->DAT.DATA) >> 3;
+    const int16_t angle = (PAC55XX_SSPD->DAT.DATA) >> 3;
+
     if (check_error)
     {
-    	const int16_t delta = state.angle_buffer - new_angle;
+    	const int16_t delta = state.angle - angle;
 		if ( ((delta > MAX_ALLOWED_DELTA) || (delta < -MAX_ALLOWED_DELTA)) &&
 		     ((delta > MAX_ALLOWED_DELTA_ADD) || (delta < MIN_ALLOWED_DELTA_ADD)) &&
 		     ((delta > MAX_ALLOWED_DELTA_SUB) || (delta < MIN_ALLOWED_DELTA_SUB)) )
@@ -55,5 +59,5 @@ PAC5XXX_RAMFUNC void MA_UpdateAngle(bool check_error)
 			add_error_flag(ERROR_ENCODER_READING_UNSTABLE);
 		}
     }
-    state.angle_buffer = new_angle;
+    state.angle = angle;
 }

@@ -53,6 +53,10 @@
 #define CAL_I_SETPOINT (5.0f)
 #define CAL_V_INDUCTANCE (2.0f)
 
+// Eccentricity correction lookup table size
+#define ECN_BITS (7)
+#define ECN_SIZE (2 << ECN_BITS)
+
 // UART
 #define UART_ENUM UARTB
 #define UART_REF PAC55XX_UARTB

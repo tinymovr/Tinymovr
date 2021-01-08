@@ -38,11 +38,12 @@ typedef enum {
 
 struct MA702State
 {
-	int16_t angle_buffer;    // buffer for angle results from last transfer
+	int16_t angle;
 };
 
 void MA_Init(void);
 PAC5XXX_RAMFUNC int16_t MA_GetAngle(void);
+PAC5XXX_RAMFUNC void MA_RequestAngle(void);
 PAC5XXX_RAMFUNC void MA_UpdateAngle(bool check_error);
 
 #endif /* ENCODERS_MA702_H_ */

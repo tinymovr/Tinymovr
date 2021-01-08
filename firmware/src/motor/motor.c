@@ -21,7 +21,7 @@
 static struct MotorConfig config = {
     .pole_pairs = 7u,
 	.phase_resistance = 0.1f,
-	.phase_inductance = 1e-5f,
+	.phase_inductance = 1e-5f
 
 	.resistance_calibrated = false,
 	.inductance_calibrated = false,
