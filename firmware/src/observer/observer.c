@@ -15,6 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include <string.h>
 #include <src/encoder/encoder.h>
 #include "src/common.h"
 #include "src/utils/utils.h"
@@ -42,14 +43,12 @@ void Observer_Init(void)
 
 PAC5XXX_RAMFUNC void Observer_UpdateEstimates(void)
 {
-	float angle_meas = (float)MA_GetAngle();
-	if (config.eccentricity_calibrated)
-    {
-        float off_1 = config.eccentricity_table[raw>>ECN_BITS];
-        float off_2 = config.eccentricity_table[((raw>>ECN_BITS) + 1) % ECN_SIZE];
-        float off_interp = off_1 + ((off_2 - off_1) * (raw - ((raw>>ECN_BITS)<<ECN_BITS))>>ECN_BITS);
-        angle += off_interp;
-    }
+	int16_t raw = MA_GetAngle();
+	int16_t off_1 = config.eccentricity_table[raw>>ECN_BITS];
+	int16_t off_2 = config.eccentricity_table[((raw>>ECN_BITS) + 1) % ECN_SIZE];
+	int16_t off_interp = off_1 + ((off_2 - off_1)* (raw - ((raw>>ECN_BITS)<<ECN_BITS))>>ECN_BITS);
+	float angle_meas = (float)(raw + off_interp);
+
 	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;
 	const float delta_pos_meas = wrapf(angle_meas - state.pos_estimate, ENCODER_HALF_TICKS);
 	const float delta_pos_error = delta_pos_meas - delta_pos_est;
@@ -145,18 +144,23 @@ void Observer_ClearDirection(void)
 	config.direction = 1;
 }
 
-void Encoder_ClearEccentricityTable(void)
+void Observer_ClearEccentricityTable(void)
 {
     memset(config.eccentricity_table, 0, sizeof(config.eccentricity_table));
 	config.eccentricity_calibrated = false;
 }
 
-int6_t *Encoder_GetEccentricityTablePointer(void)
+void Observer_SetEccentricityCalibrated(void)
 {
-    return state.eccentricity_table;
+	config.eccentricity_calibrated = true;
 }
 
-bool Observer_Calibrated(void)
+int16_t *Observer_GetEccentricityTablePointer(void)
+{
+    return config.eccentricity_table;
+}
+
+PAC5XXX_RAMFUNC bool Observer_Calibrated(void)
 {
 	return config.direction_calibrated & config.eccentricity_calibrated;
 }

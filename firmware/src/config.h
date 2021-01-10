@@ -54,7 +54,7 @@
 #define CAL_V_INDUCTANCE (2.0f)
 
 // Eccentricity correction lookup table size
-#define ECN_BITS (7)
+#define ECN_BITS (6)
 #define ECN_SIZE (2 << ECN_BITS)
 
 // UART

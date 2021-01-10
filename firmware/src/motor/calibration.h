@@ -24,6 +24,6 @@
 bool CalibrateResistance(void);
 bool CalibrateInductance(void);
 bool CalibrateDirectionAndPolePairs(void);
-bool CalibrateEccentricity(void);
+bool CalibrateOffsetAndEccentricity(void);
 
 #endif /* SRC_MOTOR_CALIBRATION_H_ */

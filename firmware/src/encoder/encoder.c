@@ -39,13 +39,9 @@ PAC5XXX_RAMFUNC int16_t MA_GetAngle(void)
     return state.angle;
 }
 
-PAC5XXX_RAMFUNC void MA_RequestAngle(void)
-{
-    ssp_write_one(SSPD, MA_CMD_ANGLE);
-}
-
 PAC5XXX_RAMFUNC void MA_UpdateAngle(bool check_error)
 {
+	ssp_write_one(SSPD, MA_CMD_ANGLE);
     while (!PAC55XX_SSPD->STAT.RNE) {}
     const int16_t angle = (PAC55XX_SSPD->DAT.DATA) >> 3;
 
