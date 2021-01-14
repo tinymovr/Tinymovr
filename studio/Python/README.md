@@ -4,9 +4,9 @@ This is the Python client library and application that allows easy interfacing w
 
 ### Installing using pip
 
-This is the most straightforward method to install Tinymovr studio and have access to hardware.
+This is the most straightforward method to install Tinymovr studio and have access to hardware. We use pip3 to ensure Tinymovr is installed using Python 3 (required).
 
-    pip install tinymovr
+    pip3 install tinymovr
 
 #### Installing earlier versions
 
@@ -24,7 +24,7 @@ First clone the Tinymovr repo to a local directory:
 Then cd to the cloned repo directory and install in developer mode:
 
     cd Tinymovr/studio/Python
-    pip install -e .
+    pip3 install -e .
 
 ### Launching the command line app
 
