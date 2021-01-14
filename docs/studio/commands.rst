@@ -146,12 +146,12 @@ Retrieves the position and velocity encoder estimates.
 Return Values
 -------------
 
-=============  =================   =========  ===========
-Member         Description         Data Type  Data Offset
--------------  -----------------   ---------  -----------
-``position``   Position Estimate   float32    0
-``velocity``   Velocity Estimate   float32    4
-=============  =================   =========  ===========
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``position``   Position Estimate   float32    0           ticks
+``velocity``   Velocity Estimate   float32    4           ticks/second
+=============  =================   =========  =========== ================
 
 Example
 -------
@@ -173,12 +173,12 @@ Retrieves the position and velocity setpoints of the controller.
 Return Values
 -------------
 
-=============  =================   =========  ===========
-Member         Description         Data Type  Data Offset
--------------  -----------------   ---------  -----------
-``position``   Position Setpoint   float32    0
-``velocity``   Velocity Setpoint   float32    4
-=============  =================   =========  ===========
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``position``   Position Setpoint   float32    0           tick
+``velocity``   Velocity Setpoint   float32    4           tick/second
+=============  =================   =========  =========== ================
 
 Example
 -------
@@ -195,18 +195,18 @@ set_pos_setpoint()
 | **endpoint**: ``0x0C``
 | **type**: Write-only
 
-Sets the position setpoint, and optionally velocity and current feed-forward values.
+Sets the position setpoint, and optionally velocity and current feed-forward values. Due to the fact that data types of feed-forward values are range-limited, multiples of the root units are used.
 
 Arguments
 ---------
 
-=============  =================   =========  ===========
-Member         Description         Data Type  Data Offset
--------------  -----------------   ---------  -----------
-``position``   Position Setpoint   float32    0
-``velocity``   Velocity Setpoint   int16      4
-``current``    Current Setpoint    int16      6
-=============  =================   =========  ===========
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``position``   Position Setpoint   float32    0           tick
+``velocity``   Velocity Setpoint   int16      4           decatick/second
+``current``    Current Setpoint    int16      6           centiampere
+=============  =================   =========  =========== ================
 
 Example
 -------
@@ -231,12 +231,12 @@ Sets the velocity setpoint, and optionally current feed-forward value.
 Arguments
 ---------
 
-=============  =================   =========  ===========
-Member         Description         Data Type  Data Offset
--------------  -----------------   ---------  -----------
-``velocity``   Velocity Setpoint   float32    0
-``current``    Current Setpoint    float32    4
-=============  =================   =========  ===========
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``velocity``   Velocity Setpoint   float32    0           ticks/second
+``current``    Current Setpoint    float32    4           ampere
+=============  =================   =========  =========== ================
 
 Example
 -------
@@ -261,11 +261,11 @@ Sets the current (Iq) setpoint.
 Arguments
 ---------
 
-=============  =================   =========  ===========
-Member         Description         Data Type  Data Offset
--------------  -----------------   ---------  -----------
-``current``    Current Setpoint    float32    0
-=============  =================   =========  ===========
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``current``    Current Setpoint    float32    0           amperes
+=============  =================   =========  =========== ================
 
 Example
 -------
@@ -286,12 +286,12 @@ Retrieves the velocity and current limits of the controller.
 Return Values
 -------------
 
-=============  =================   =========  ===========
-Member         Description         Data Type  Data Offset
--------------  -----------------   ---------  -----------
-``velocity``   Velocity Limit      float32    0
-``current``    Current  Limit      float32    4
-=============  =================   =========  ===========
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``velocity``   Velocity Limit      float32    0           tick/second
+``current``    Current  Limit      float32    4           ampere
+=============  =================   =========  =========== ================
 
 Example
 -------
@@ -313,12 +313,12 @@ Sets the velocity and current limits of the controller.
 Arguments
 ---------
 
-=============  =================   =========  ===========
-Member         Description         Data Type  Data Offset
--------------  -----------------   ---------  -----------
-``velocity``   Velocity Limit      float32    0
-``current``    Current  Limit      float32    4
-=============  =================   =========  ===========
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``velocity``   Velocity Limit      float32    0           tick/second
+``current``    Current  Limit      float32    4           ampere
+=============  =================   =========  =========== ================
 
 Example
 -------
@@ -339,12 +339,12 @@ Retrieves the position and velocity gains of the controller.
 Return Values
 -------------
 
-=============  =================   =========  ===========
-Member         Description         Data Type  Data Offset
--------------  -----------------   ---------  -----------
-``position``   Position Gain       float32    0
-``velocity``   Velocity Gain       float32    4
-=============  =================   =========  ===========
+=============  =================   =========  =========== ==================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ------------------
+``position``   Position Gain       float32    0           1/second
+``velocity``   Velocity Gain       float32    4           ampere*second/tick
+=============  =================   =========  =========== ==================
 
 Example
 -------
@@ -366,12 +366,12 @@ Sets the position and velocity gains of the controller.
 Arguments
 ---------
 
-=============  =================   =========  ===========
-Member         Description         Data Type  Data Offset
--------------  -----------------   ---------  -----------
-``position``   Position Gain       float32    0
-``velocity``   Velocity Gain       float32    4
-=============  =================   =========  ===========
+=============  =================   =========  =========== ==================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ------------------
+``position``   Position Gain       float32    0           1/second
+``velocity``   Velocity Gain       float32    4           ampere*second/tick
+=============  =================   =========  =========== ==================
 
 Example
 -------
@@ -392,11 +392,11 @@ Retrieves the velocity integrator gain of the controller.
 Return Values
 -------------
 
-=============  =========================   =========  ===========
-Member         Description                 Data Type  Data Offset
--------------  -------------------------   ---------  -----------
-``velocity``   Velocity Integrator Gain    float32    0
-=============  =========================   =========  ===========
+=============  =========================   =========  =========== ==================
+Member         Description                 Data Type  Data Offset Default Unit
+-------------  -------------------------   ---------  ----------- ------------------
+``velocity``   Velocity Integrator Gain    float32    0           ampere*second/tick
+=============  =========================   =========  =========== ==================
 
 Example
 -------
@@ -418,11 +418,11 @@ Sets the velocity integrator gain of the controller.
 Arguments
 ---------
 
-=============  =========================   =========  ===========
-Member         Description                 Data Type  Data Offset
--------------  -------------------------   ---------  -----------
-``velocity``   Velocity Integrator Gain    float32    0
-=============  =========================   =========  ===========
+=============  =========================   =========  =========== ==================
+Member         Description                 Data Type  Data Offset Default Unit
+-------------  -------------------------   ---------  ----------- ------------------
+``velocity``   Velocity Integrator Gain    float32    0           ampere*second/tick
+=============  =========================   =========  =========== ==================
 
 Example
 -------
@@ -443,12 +443,12 @@ Retrieves the current (Iq) setpoint and estimate.
 Return Values
 -------------
 
-=============  =================   =========  ===========
-Member         Description         Data Type  Data Offset
--------------  -----------------   ---------  -----------
-``setpoint``   Iq Setpoint         float32    0
-``estimate``   Iq Estimate         float32    4
-=============  =================   =========  ===========
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``setpoint``   Iq Setpoint         float32    0           ampere
+``estimate``   Iq Estimate         float32    4           ampere
+=============  =================   =========  =========== ================
 
 Example
 -------
@@ -470,13 +470,13 @@ Retrieves the measured phase currents.
 Return Values
 -------------
 
-=============  =================   =========  ===========
-Member         Description         Data Type  Data Offset
--------------  -----------------   ---------  -----------
-``A``          A Phase Current     int16      0
-``B``          B Phase Current     int16      0
-``C``          C Phase Current     int16      0
-=============  =================   =========  ===========
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``A``          A Phase Current     int16      0           ampere
+``B``          B Phase Current     int16      0           ampere
+``C``          C Phase Current     int16      0           ampere
+=============  =================   =========  =========== ================
 
 Example
 -------
@@ -498,15 +498,15 @@ Retrieves device-related information.
 Return Values
 -------------
 
-=============  =============  =========  ===========
-Member         Description    Data Type  Data Offset
--------------  -------------  ---------  -----------
+=============  =============  =========  =========== ================
+Member         Description    Data Type  Data Offset Default Unit
+-------------  -------------  ---------  ----------- ----------------
 ``device_id``  Device ID      uint32     0
 ``fw_major``   FW Major Ver.  uint8      4
 ``fw_minor``   FW Minor Ver.  uint8      5
 ``fw_patch``   FW Patch Ver.  uint8      6
-``temp``       MCU Temp       uint8      7
-=============  =============  =========  ===========
+``temp``       MCU Temp       uint8      7           °C
+=============  =============  =========  =========== ================
 
 Example
 -------
@@ -528,14 +528,14 @@ Retrieves information related to the attached motor.
 Return Values
 -------------
 
-===============   =================  =========  ===========
-Member            Description        Data Type  Data Offset
----------------   -----------------  ---------  -----------
+===============   =================  =========  =========== ================
+Member            Description        Data Type  Data Offset Default Unit
+---------------   -----------------  ---------  ----------- ----------------
 ``calibrated``    Calibrated Flag    uint8      0
-``R``             Phase Resistance   uint16     1
+``R``             Phase Resistance   uint16     1           milliohm
 ``pole_pairs``    Motor Pole Pairs   uint8      3
-``L``             Phase Inductance   uint16     4
-===============   =================  =========  ===========
+``L``             Phase Inductance   uint16     4           microhenry
+===============   =================  =========  =========== ================
 
 Example
 -------
