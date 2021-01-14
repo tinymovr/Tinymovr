@@ -16,7 +16,31 @@ This is the most straightforward method to install Tinymovr studio and have acce
 
 .. code-block:: console
 
+    pip3 install tinymovr
+    tinymovr
+
+You should now be looking at the Tinymovr Studio IPython interface.
+
+Anaconda Installation
+---------------------
+
+Tinymovr can be installed inside a Virtualenv or Anaconda environment. 
+
+With Anaconda, create a new environment:
+
+.. code-block:: console
+
+    conda create --name tinymovr python=3.7 -y
+    conda activate tinymovr
+
+Alternatively you can use any Python version >= 3.6.
+
+Then simply install and run Tinymovr:
+
+.. code-block:: console
+
     pip install tinymovr
+    tinymovr
 
 Using git clone
 ###############
@@ -36,4 +60,4 @@ Then cd to the cloned repo directory and install in developer mode:
 .. code-block:: console
 
     cd Tinymovr/studio/Python
-    pip install -e .
+    pip3 install -e .
