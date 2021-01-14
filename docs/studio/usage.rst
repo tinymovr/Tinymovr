@@ -118,7 +118,9 @@ By default, Tinymovr Studio will use slcan as the interface, and will search for
 Units
 #####
 
-Tinymovr Studio introduced physical units and quantities since v0.3.0. Units are introduced through the `Pint <https://pypi.org/project/Pint/>`_ package. Using units you will see all physical quantities that you query associated with a unit. For instance, you can do the following:
+Tinymovr Studio introduced physical units and quantities since v0.3.0. Units are introduced through the `Pint <https://pypi.org/project/Pint/>`_ package. Using units you will see all values that you query associated with a unit, which forms a physical quantity.
+
+With units, you can do the following:
 
 .. code-block:: python
 
@@ -139,7 +141,25 @@ The above will set the rotor position to 3 radians from the initial position. Si
 
 Will set velocity to 3 radians/second. If not unit is used in setting a value, the default units will be assumed, in the above cases ticks and ticks/second.
 
-The ureg object is the unit registry, and it is that which holds all unit definitions. You can use it to do all sorts of cool stuff such as doing conversions or defining your own units.
+The ureg object is the unit registry, and it is that which holds all unit definitions. You can use it to do all sorts of cool stuff such as doing conversions, defining your own shortcuts or even new units.
+
+For instance, to define a few frequently used shortcuts in a program:
+
+.. code-block:: python
+
+    from tinymovr.units import get_registry
+    ureg = get_registry()
+    mA = ureg.milliampere
+    rad = ureg.radian
+    s = ureg.second
+
+Then you can use the defined shortcuts to intuitively set values, such as a position setpoint with velocity and current feed-forwards:
+
+.. code-block:: python
+
+    tm.set_pos_setpoint(2*PI * rad, 0 * rad/s, 1500 * mA)
+
+Take a look at the :ref:`command-reference` to find out about default units used in each command.
 
 For more information on units and their usage, take a look at `Pint's documentation <https://pint.readthedocs.io/en/stable/>`_
 
