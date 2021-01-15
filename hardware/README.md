@@ -7,5 +7,6 @@ The following are currently available:
 [Eagle schematic and board files and case STL for CAN Adapter](./CANine/)
 [STL files for the Tinymovr alpha Dev Kit](./DevKit_alpha/)
 [STL and STEP files for the Tinymovr alpha2 Dev Kit](./DevKit_alpha2/)
+[Miscellaneous STL files](./misc/), like a [jig for centering encoder magnets](./misc/magnet_jig.stl)
 
 Unless otherwise specified, all designs are released under the GNU General Public License V3 or later.
