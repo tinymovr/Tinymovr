@@ -33,32 +33,37 @@ void WaitForControlLoopInterrupt(void)
 	state.busy_cycles = current_timestamp - state.busy_loop_start;
 	state.total_loop_start = current_timestamp;
 
-	// Control loop is synced to ADC measurements
 	while (!state.adc_interrupt)
 	{
-		// Received an interrupt but it's not ADC.
-		// If there are any tasks pending from other interrupts, do them now.
 		if (state.can_interrupt)
 		{
-			CAN_ProcessInterrupt();
+			// Handle CAN
 			state.can_interrupt = false;
+			CAN_ProcessInterrupt();
 		}
-		if (state.uart_message_interrupt)
+		else if (state.uart_message_interrupt)
 		{
-			UART_ProcessMessage();
+			// Handle UART
 			state.uart_message_interrupt = false;
+			UART_ProcessMessage();
 		}
-		// Go back to sleep
-		__WFI();
+		else
+		{
+			// Go back to sleep
+			// We need to disable interrupts here
+            // to ensure we don't miss a wakeup call.
+			__disable_irq();
+			__WFI();
+			__enable_irq();
+		}
 	}
+	state.adc_interrupt = false;
 	state.busy_loop_start = DWT->CYCCNT;
 	// We have to service the control loop by updating
 	// current measurements and encoder estimates.
 	ADC_UpdateMeasurements();
 	Observer_UpdatePos();
-	// Finally, we clear the interrupt flag and return
-	// control to main loop.
-	state.adc_interrupt = false;
+	// At this point control is returned to main loop.
 }
 
 void ADC_IRQHandler(void)
