@@ -45,6 +45,8 @@ class InSilico(can.BusABC):
             0x15: self._get_limits,
             0x16: self._reset,
             0x17: self._get_vbus,
+            0x18: self._get_gains,
+            0x19: self._set_gains,
             0x1A: self._get_device_info
         }
         self.legacy_errors = False
@@ -66,6 +68,8 @@ class InSilico(can.BusABC):
                 "current_setpoint": 0,
                 "velocity_limit": 200000,
                 "current_limit": 10,
+                "position_gain": 20,
+                "velocity_gain": 1e-5,
                 "vbus": 12.0,
                 "calibrated": False
             }
@@ -219,6 +223,19 @@ class InSilico(can.BusABC):
         gen_payload = self.codec.serialize(
             vals, *can_endpoints["limits"]["types"])
         self.buffer = create_frame(self.node_id, 0x15, False, gen_payload)
+
+    def _set_gains(self, payload):
+        vals: List = self.codec.deserialize(
+            payload, *can_endpoints["set_gains"]["types"])
+        self._state["position_gain"] = vals[0]
+        self._state["velocity_gain"] = vals[1]
+
+    def _get_gains(self, payload):
+        vals: Tuple = (self._state["position_gain"],
+                       self._state["velocity_gain"])
+        gen_payload = self.codec.serialize(
+            vals, *can_endpoints["gains"]["types"])
+        self.buffer = create_frame(self.node_id, 0x18, False, gen_payload)
 
     def _reset(self, payload):
         vals = {
