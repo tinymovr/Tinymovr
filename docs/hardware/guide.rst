@@ -49,6 +49,8 @@ The most important aspect of a correct setup is to ensure the controller is prop
 
   Tinymovr and motor mechanical mounting
 
+A `3D printable encoder magnet jig <https://github.com/yconst/Tinymovr/blob/master/hardware/misc/magnet_jig.stl>`_ is available, suitable for 6mm disc magnets and 14, 19, 25 and 30mm motor hole diameters.
+
 For a 3D printable motor mount design, check out the `Tinymovr alpha dev kit mount <https://github.com/yconst/Tinymovr/tree/master/hardware/motor-stand>`_ (suitable for 40xx motors).
 
 .. note::
