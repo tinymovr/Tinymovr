@@ -24,8 +24,6 @@
 #include "src/can/can_func.h"
 #include "src/can/can.h"
 
-void CAN_ProcessMessage(uint8_t command_id, bool rtr);
-
 static struct CANConfig config = {
     .id = 1,
     .kbaud_rate = CAN_BAUD_1000KHz
@@ -105,25 +103,6 @@ void CAN_SetID(uint8_t id)
     system_delay_us(100);
 }
 
-void CAN_ProcessMessage(uint8_t command_id, bool rtr)
-{
-    uint8_t (*callback)(uint8_t buffer[]) = CANEP_GetEndpoint(command_id);
-    if (callback != NULL)
-    {
-        uint8_t can_msg_buffer[8] = {0};
-        if ((rtr == false) && (rx_dataLen > 0u))
-        {
-            memcpy(can_msg_buffer, &rx_data, rx_dataLen);
-        }
-        uint8_t response_type = callback(can_msg_buffer);
-        if (rtr && (response_type >= CANRP_Read))
-        {
-            can_transmit(8, (config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);
-        }
-        Watchdog_Feed();
-    }
-}
-
 void CAN_ProcessInterrupt(void)
 {
     buffer = PAC55XX_CAN->RXBUF;	//  read RX buffer, RX buffer bit order same as TX buffer
@@ -149,7 +128,23 @@ void CAN_ProcessInterrupt(void)
             rx_data[7] = buffer >> 16;
         }
     }
-    CAN_ProcessMessage(command_id, rtr);
+    
+    // Process message
+    uint8_t (*callback)(uint8_t buffer[]) = CANEP_GetEndpoint(command_id);
+    if (callback != NULL)
+    {
+        uint8_t can_msg_buffer[8] = {0};
+        if ((rtr == false) && (rx_dataLen > 0u))
+        {
+            memcpy(can_msg_buffer, &rx_data, rx_dataLen);
+        }
+        uint8_t response_type = callback(can_msg_buffer);
+        if (rtr && (response_type >= CANRP_Read))
+        {
+            can_transmit(8, (config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);
+        }
+        Watchdog_Feed();
+    }
 }
 
 struct CANConfig* CAN_GetConfig(void)

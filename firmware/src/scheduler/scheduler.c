@@ -28,43 +28,45 @@ struct SchedulerState state = {0};
 
 void WaitForControlLoopInterrupt(void)
 {
-	const uint32_t current_timestamp = DWT->CYCCNT;
-	state.total_cycles = current_timestamp - state.total_loop_start;
-	state.busy_cycles = current_timestamp - state.busy_loop_start;
-	state.total_loop_start = current_timestamp;
-
-	// Control loop is synced to ADC measurements
+	state.busy_cycles = DWT->CYCCNT - state.busy_loop_start;
 	while (!state.adc_interrupt)
 	{
-		// Received an interrupt but it's not ADC.
-		// If there are any tasks pending from other interrupts, do them now.
 		if (state.can_interrupt)
 		{
-			CAN_ProcessInterrupt();
+			// Handle CAN
 			state.can_interrupt = false;
+			CAN_ProcessInterrupt();
 		}
-		if (state.uart_message_interrupt)
+		else if (state.uart_message_interrupt)
 		{
-			UART_ProcessMessage();
+			// Handle UART
 			state.uart_message_interrupt = false;
+			UART_ProcessMessage();
 		}
-		// Go back to sleep
-		__WFI();
+		else
+		{
+			// Go back to sleep
+			__DSB();
+			__ISB();
+			__WFI();
+		}
 	}
+	state.adc_interrupt = false;
 	state.busy_loop_start = DWT->CYCCNT;
 	// We have to service the control loop by updating
 	// current measurements and encoder estimates.
 	ADC_UpdateMeasurements();
 	Observer_UpdatePos();
-	// Finally, we clear the interrupt flag and return
-	// control to main loop.
-	state.adc_interrupt = false;
+	// At this point control is returned to main loop.
 }
 
 void ADC_IRQHandler(void)
 {
 	PAC55XX_ADC->ADCINT.ADCIRQ0IF = 1;
     state.adc_interrupt = true;
+    const uint32_t current_timestamp = DWT->CYCCNT;
+    state.total_cycles = current_timestamp - state.total_loop_start;
+    state.total_loop_start = current_timestamp;
 }
 
 void CAN_IRQHandler(void)
