@@ -44,7 +44,7 @@ class TMTestCase(unittest.TestCase):
             for _ in range(100):
                 if self.tm.state.state == 0:
                     break
-                time.sleep(0.5)
+                time.sleep(0.2)
             motor_info = self.tm.motor_info
             self.assertEqual(motor_info.calibrated, 1)
 
