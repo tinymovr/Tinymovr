@@ -28,11 +28,7 @@ struct SchedulerState state = {0};
 
 void WaitForControlLoopInterrupt(void)
 {
-	const uint32_t current_timestamp = DWT->CYCCNT;
-	state.total_cycles = current_timestamp - state.total_loop_start;
-	state.busy_cycles = current_timestamp - state.busy_loop_start;
-	state.total_loop_start = current_timestamp;
-
+	state.busy_cycles = DWT->CYCCNT - state.busy_loop_start;
 	while (!state.adc_interrupt)
 	{
 		if (state.can_interrupt)
@@ -50,11 +46,9 @@ void WaitForControlLoopInterrupt(void)
 		else
 		{
 			// Go back to sleep
-			// We need to disable interrupts here
-            // to ensure we don't miss a wakeup call.
-			__disable_irq();
+			__DSB();
+			__ISB();
 			__WFI();
-			__enable_irq();
 		}
 	}
 	state.adc_interrupt = false;
@@ -70,6 +64,9 @@ void ADC_IRQHandler(void)
 {
 	PAC55XX_ADC->ADCINT.ADCIRQ0IF = 1;
     state.adc_interrupt = true;
+    const uint32_t current_timestamp = DWT->CYCCNT;
+    state.total_cycles = current_timestamp - state.total_loop_start;
+    state.total_loop_start = current_timestamp;
 }
 
 void CAN_IRQHandler(void)
