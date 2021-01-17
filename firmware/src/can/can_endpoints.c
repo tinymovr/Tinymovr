@@ -68,8 +68,8 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_Timings, 0x01B);
     CANEP_AddEndpoint(&CAN_SaveConfig, 0x01C);
     CANEP_AddEndpoint(&CAN_EraseConfig, 0x01D);
-    CANEP_AddEndpoint(&CAN_GetMotorInfo, 0x01E);
-    // 0x01F Available
+    CANEP_AddEndpoint(&CAN_GetMotorConfig, 0x01E);
+    CANEP_AddEndpoint(&CAN_SetMotorConfig, 0x01F);
 }
 
 void CANEP_AddEndpoint(CANEP_Callback callback, uint8_t id)
@@ -354,17 +354,42 @@ uint8_t CAN_EraseConfig(uint8_t buffer[])
     return CANRP_Write;
 }
 
-uint8_t CAN_GetMotorInfo(uint8_t buffer[])
+uint8_t CAN_GetMotorConfig(uint8_t buffer[])
 {
-    bool calibrated = Motor_Calibrated();
-    uint16_t R = (uint16_t)(Motor_GetPhaseResistance() * 1000);
+    bool calibrated = motor_is_calibrated();
+    bool gimbal = motor_is_gimbal();
+    uint8_t flags = calibrated & (gimbal << 1);
+    uint16_t R = (uint16_t)(Motor_GetPhaseResistance() * 1e+3);
     uint8_t pole_pairs = Motor_GetPolePairs();
-    uint16_t L = (uint16_t)(Motor_GetPhaseInductance() * 1000000);
+    uint16_t L = (uint16_t)(Motor_GetPhaseInductance() * 1e+6);
     uint16_t ticks = (uint16_t)ENCODER_TICKS;
-    memcpy(&buffer[0], &calibrated, sizeof(bool));
+    memcpy(&buffer[0], &flags, sizeof(uint8_t));
     memcpy(&buffer[1], &R, sizeof(uint16_t));
     memcpy(&buffer[3], &pole_pairs, sizeof(uint8_t));
     memcpy(&buffer[4], &L, sizeof(uint16_t));
     memcpy(&buffer[6], &ticks, sizeof(uint16_t));
     return CANRP_Read;
+}
+
+uint8_t CAN_SetMotorConfig(uint8_t buffer[])
+{
+    uint8_t flags;
+    uint16_t R;
+    uint16_t L;
+    memcpy(&flags, &buffer[0], sizeof(uint8_t));
+    memcpy(&R, &buffer[1], sizeof(uint16_t));
+    memcpy(&L, &buffer[3], sizeof(uint16_t));
+
+    CAN_ResponseType response = CANRP_NoAction;
+
+    if ((R > 0) && (L > 0))
+    {
+        bool is_gimbal = (bool)(flags & 0x1);
+        motor_set_is_gimbal(is_gimbal);
+        Motor_SetPhaseResistance(((float)R) * 1e-3);
+        Motor_SetPhaseInductance(((float)L) * 1e-6);
+
+        response = CANRP_Write;
+    }
+    return response;
 }
