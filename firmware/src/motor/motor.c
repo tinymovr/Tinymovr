@@ -25,7 +25,9 @@ static struct MotorConfig config = {
 
 	.resistance_calibrated = false,
 	.inductance_calibrated = false,
-	.poles_calibrated = false
+	.poles_calibrated = false,
+
+    .is_gimbal = false
 };
 
 void Motor_Init(void) {}
@@ -90,9 +92,19 @@ PAC5XXX_RAMFUNC void Motor_SetPhaseInductance(float L)
     // TODO: else error
 }
 
-PAC5XXX_RAMFUNC bool Motor_Calibrated(void)
+PAC5XXX_RAMFUNC bool motor_is_calibrated(void)
 {
     return config.resistance_calibrated && config.inductance_calibrated && config.poles_calibrated;
+}
+
+PAC5XXX_RAMFUNC bool motor_is_gimbal(void)
+{
+    return config.is_gimbal;
+}
+
+PAC5XXX_RAMFUNC void motor_set_is_gimbal(bool gimbal)
+{
+    config.is_gimbal = gimbal;
 }
 
 struct MotorConfig* Motor_GetConfig(void)
