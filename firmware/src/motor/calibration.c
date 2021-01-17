@@ -113,10 +113,15 @@ bool CalibrateOffsetDirectionAndPolePairs(void)
 	const float end_angle = CAL_PHASE_TURNS * twopi;
 	float dir_initial_pos = 0.0f;
 	struct FloatTriplet modulation_values = {0.0f};
+	float I_setpoint = CAL_I_SETPOINT;
+	if (motor_is_gimbal() == true)
+	{
+		I_setpoint = CAL_I_SETPOINT_GIMBAL;
+	}
 	bool success = true;
 	for (uint32_t i=0; i<CAL_OFFSET_LEN; i++)
 	{
-		float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
+		float pwm_setpoint = (I_setpoint * Motor_GetPhaseResistance()) / ADC_GetVBus();
 		our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
 		SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
 		GateDriver_SetDutyCycle(&modulation_values);
@@ -132,7 +137,7 @@ bool CalibrateOffsetDirectionAndPolePairs(void)
 		float factor = (float)i;
 		float cur_angle = 1.2f * end_angle * (factor/CAL_DIR_LEN);
 		our_clamp(&cur_angle, 0.0f, end_angle);
-		float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
+		float pwm_setpoint = (I_setpoint * Motor_GetPhaseResistance()) / ADC_GetVBus();
 		our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
 		SVM(pwm_setpoint * fast_cos(cur_angle), pwm_setpoint * fast_sin(cur_angle),
 			&modulation_values.A, &modulation_values.B, &modulation_values.C);
