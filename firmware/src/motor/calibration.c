@@ -20,83 +20,91 @@ static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 
 bool CalibrateResistance(void)
 {
-	float V_setpoint = 0.0f;
-	struct FloatTriplet I_phase_meas = {0.0f};
-	struct FloatTriplet modulation_values = {0.0f};
 	bool success = true;
-	for (uint32_t i=0; i<CAL_R_LEN; i++)
+	if (!motor_is_gimbal())
 	{
-		ADC_GetPhaseCurrents(&I_phase_meas);
-		V_setpoint += CAL_V_GAIN * (CAL_I_SETPOINT - I_phase_meas.A);
-		const float pwm_setpoint = V_setpoint / ADC_GetVBus();
-		SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
-		GateDriver_SetDutyCycle(&modulation_values);
-		Watchdog_Feed();
-		WaitForControlLoopInterrupt();
-	}
+		float V_setpoint = 0.0f;
+		struct FloatTriplet I_phase_meas = {0.0f};
+		struct FloatTriplet modulation_values = {0.0f};
+		
+		for (uint32_t i=0; i<CAL_R_LEN; i++)
+		{
+			ADC_GetPhaseCurrents(&I_phase_meas);
+			V_setpoint += CAL_V_GAIN * (CAL_I_SETPOINT - I_phase_meas.A);
+			const float pwm_setpoint = V_setpoint / ADC_GetVBus();
+			SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
+			GateDriver_SetDutyCycle(&modulation_values);
+			Watchdog_Feed();
+			WaitForControlLoopInterrupt();
+		}
 #ifndef DRY_RUN
-	const float R = fabsf(V_setpoint / CAL_I_SETPOINT);
-	if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
-	{
-		add_error_flag(ERROR_PHASE_RESISTANCE_OUT_OF_RANGE);
-		success = false;
-	}
-	else
-	{
-		Motor_SetPhaseResistance(R);
-	}
+		const float R = fabsf(V_setpoint / CAL_I_SETPOINT);
+		if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
+		{
+			add_error_flag(ERROR_PHASE_RESISTANCE_OUT_OF_RANGE);
+			success = false;
+		}
+		else
+		{
+			Motor_SetPhaseResistance(R);
+		}
 #else
-        Motor_SetPhaseResistance(0.5);
+			Motor_SetPhaseResistance(0.5);
 #endif
-    GateDriver_SetDutyCycle(&zeroDC);
+		GateDriver_SetDutyCycle(&zeroDC);
+	}
     return success;
 }
 
 bool CalibrateInductance(void)
 {
-	float V_setpoint = 0.0f;
-	float I_low = 0.0f;
-	float I_high = 0.0f;
-	struct FloatTriplet I_phase_meas = {0.0f};
-	struct FloatTriplet modulation_values = {0.0f};
 	bool success = true;
-	for (uint32_t i=0; i<CAL_L_LEN; i++)
+	if (!motor_is_gimbal())
 	{
-		ADC_GetPhaseCurrents(&I_phase_meas);
-		if ((i & 0x2u) == 0x2u)
+		float V_setpoint = 0.0f;
+		float I_low = 0.0f;
+		float I_high = 0.0f;
+		struct FloatTriplet I_phase_meas = {0.0f};
+		struct FloatTriplet modulation_values = {0.0f};
+		
+		for (uint32_t i=0; i<CAL_L_LEN; i++)
 		{
-			I_high += I_phase_meas.A;
-			V_setpoint = -CAL_V_INDUCTANCE;
+			ADC_GetPhaseCurrents(&I_phase_meas);
+			if ((i & 0x2u) == 0x2u)
+			{
+				I_high += I_phase_meas.A;
+				V_setpoint = -CAL_V_INDUCTANCE;
+			}
+			else
+			{
+				I_low += I_phase_meas.A;
+				V_setpoint = CAL_V_INDUCTANCE;
+			}
+			const float pwm_setpoint = V_setpoint / ADC_GetVBus();
+			SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
+			GateDriver_SetDutyCycle(&modulation_values);
+			Watchdog_Feed();
+			WaitForControlLoopInterrupt();
+		}
+#ifndef DRY_RUN
+		const float num_cycles = CAL_L_LEN / 2;
+		const float dI_by_dt = (I_high - I_low) / (PWM_PERIOD_S * num_cycles);
+		const float L = CAL_V_INDUCTANCE / dI_by_dt;
+		if ((L <= MIN_PHASE_INDUCTANCE) || (L >= MAX_PHASE_INDUCTANCE))
+		{
+			add_error_flag(ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE);
+			success = false;
 		}
 		else
 		{
-			I_low += I_phase_meas.A;
-			V_setpoint = CAL_V_INDUCTANCE;
+			Motor_SetPhaseInductance(L);
+			Controller_UpdateCurrentGains();
 		}
-		const float pwm_setpoint = V_setpoint / ADC_GetVBus();
-		SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
-		GateDriver_SetDutyCycle(&modulation_values);
-		Watchdog_Feed();
-		WaitForControlLoopInterrupt();
-	}
-#ifndef DRY_RUN
-	const float num_cycles = CAL_L_LEN / 2;
-	const float dI_by_dt = (I_high - I_low) / (PWM_PERIOD_S * num_cycles);
-	const float L = CAL_V_INDUCTANCE / dI_by_dt;
-	if ((L <= MIN_PHASE_INDUCTANCE) || (L >= MAX_PHASE_INDUCTANCE))
-	{
-		add_error_flag(ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE);
-		success = false;
-	}
-	else
-	{
-		Motor_SetPhaseInductance(L);
-		Controller_UpdateCurrentGains();
-	}
 #else
-    Motor_SetPhaseInductance(0.005);
+		Motor_SetPhaseInductance(0.005);
 #endif
-    GateDriver_SetDutyCycle(&zeroDC);
+		GateDriver_SetDutyCycle(&zeroDC);
+	}
     return success;
 }
 
