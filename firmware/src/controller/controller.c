@@ -142,33 +142,43 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     }
 
     const float angle = Observer_GetPosEstimateWrappedRadians();
-    const float I_phase = angle * Motor_GetPolePairs();
+    const float e_phase = angle * Motor_GetPolePairs();
+    const float e_phase_vel = vel_estimate * Motor_GetPolePairs();
     const float VBus = ADC_GetVBus();
 
-    ADC_GetPhaseCurrents(&(state.I_phase_meas));
+    float Vd, Vq;
+    if (motor_is_gimbal())
+    {
+        Vd = - e_phase_vel * Motor_GetInductance() * Iq_setpoint;
+        Vq = Motor_GetResistance() * Iq_setpoint * fast_cos(e_phase + halfpi);
+    }
+    else
+    {
+        ADC_GetPhaseCurrents(&(state.I_phase_meas));
 
-    // Clarke transform
-    const float Ialpha = state.I_phase_meas.A;
-    const float Ibeta = one_by_sqrt3 * (state.I_phase_meas.B - state.I_phase_meas.C);
+        // Clarke transform
+        const float Ialpha = state.I_phase_meas.A;
+        const float Ibeta = one_by_sqrt3 * (state.I_phase_meas.B - state.I_phase_meas.C);
 
-    // Park transform
-    const float c_I = fast_cos(I_phase);
-    const float s_I = fast_sin(I_phase);
-    const float Id = (c_I * Ialpha) + (s_I * Ibeta);
-    const float Iq = (c_I * Ibeta) - (s_I * Ialpha);
+        // Park transform
+        const float c_I = fast_cos(e_phase);
+        const float s_I = fast_sin(e_phase);
+        const float Id = (c_I * Ialpha) + (s_I * Ibeta);
+        const float Iq = (c_I * Ibeta) - (s_I * Ialpha);
 
-    state.Id_meas += config.I_k * (Id - state.Id_meas);
-    state.Iq_meas += config.I_k * (Iq - state.Iq_meas);
+        state.Id_meas += config.I_k * (Id - state.Id_meas);
+        state.Iq_meas += config.I_k * (Iq - state.Iq_meas);
 
-    const float delta_Id = 0 - state.Id_meas;
-    const float delta_Iq = Iq_setpoint - state.Iq_meas;
+        const float delta_Id = 0 - state.Id_meas;
+        const float delta_Iq = Iq_setpoint - state.Iq_meas;
 
-    state.Id_integrator_Vd += delta_Id * PWM_PERIOD_S * config.Id_integrator_gain;
-    state.Iq_integrator_Vq += delta_Iq * PWM_PERIOD_S * config.Iq_integrator_gain;
+        state.Id_integrator_Vd += delta_Id * PWM_PERIOD_S * config.Id_integrator_gain;
+        state.Iq_integrator_Vq += delta_Iq * PWM_PERIOD_S * config.Iq_integrator_gain;
 
-    const float Vd = (delta_Id * config.I_gain) + state.Id_integrator_Vd;
-    const float Vq = (delta_Iq * config.I_gain) + state.Iq_integrator_Vq;
-
+        Vd = (delta_Id * config.I_gain) + state.Id_integrator_Vd;
+        Vq = (delta_Iq * config.I_gain) + state.Iq_integrator_Vq;
+    }
+    
     float mod_q = Vq / VBus;
     float mod_d = Vd / VBus;
 
@@ -392,7 +402,7 @@ void Controller_SetIqLimit(float limit)
 
 PAC5XXX_RAMFUNC bool Controller_Calibrated(void)
 {
-    return Motor_Calibrated() & Observer_Calibrated();
+    return motor_is_calibrated() & Observer_Calibrated();
 }
 
 struct ControllerConfig* Controller_GetConfig(void)
