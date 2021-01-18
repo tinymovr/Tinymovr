@@ -39,14 +39,14 @@ class TMTestCase(unittest.TestCase):
 
     def try_calibrate(self):
         motor_config = self.tm.motor_config
-        if motor_config.calibrated == 0:
+        if motor_config.flags == 0:
             self.tm.calibrate()
             for _ in range(100):
                 if self.tm.state.state == 0:
                     break
                 time.sleep(0.2)
             motor_config = self.tm.motor_config
-            self.assertEqual(motor_config.calibrated, 1)
+            self.assertEqual(motor_config.flags, 1)
 
     def check_state(self, target_state, target_error=None):
         state = self.tm.state
