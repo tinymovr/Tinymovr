@@ -70,7 +70,7 @@ PAC5XXX_RAMFUNC float Motor_GetPhaseResistance(void)
 }
 PAC5XXX_RAMFUNC void Motor_SetPhaseResistance(float R)
 {
-    if ((R > MIN_PHASE_RESISTANCE) && (R < MAX_PHASE_RESISTANCE))
+    if ((R > MIN_PHASE_RESISTANCE) && ((R < MAX_PHASE_RESISTANCE) || motor_is_gimbal()))
     {
         config.phase_resistance = R;
         config.resistance_calibrated = true;
@@ -84,7 +84,7 @@ PAC5XXX_RAMFUNC float Motor_GetPhaseInductance(void)
 }
 PAC5XXX_RAMFUNC void Motor_SetPhaseInductance(float L)
 {
-    if ((L > MIN_PHASE_INDUCTANCE) && (L < MAX_PHASE_INDUCTANCE))
+    if ((L > MIN_PHASE_INDUCTANCE) && ((L < MAX_PHASE_INDUCTANCE) || motor_is_gimbal()))
     {
         config.phase_inductance = L;
         config.inductance_calibrated = true;
