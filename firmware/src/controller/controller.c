@@ -142,7 +142,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     }
 
     const float e_phase = Observer_GetPosEstimateWrappedRadians() * Motor_GetPolePairs();
-    const float e_phase_vel = vel_estimate * Motor_GetPolePairs();
+    const float e_phase_vel = Observer_GetVelEstimateRadians() * Motor_GetPolePairs();
     const float c_I = fast_cos(e_phase);
     const float s_I = fast_sin(e_phase);
     const float VBus = ADC_GetVBus();
@@ -150,8 +150,8 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     float Vd; float Vq;
     if (motor_is_gimbal() == true)
     {
-        Vd = - e_phase_vel * Motor_GetInductance() * Iq_setpoint;
-        Vq = Motor_GetResistance() * Iq_setpoint * fast_cos(e_phase + halfpi);
+        Vd = - e_phase_vel * Motor_GetPhaseInductance() * Iq_setpoint;
+        Vq = Motor_GetPhaseResistance() * Iq_setpoint;
     }
     else
     {
