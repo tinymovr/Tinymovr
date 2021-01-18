@@ -50,19 +50,19 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
 
         case 'I': // current setpoint
             Controller_SetMode(CTRL_CURRENT);
-            Controller_SetIqSetpoint(data * ONE_OVER_UART_I_SCALING_FACTOR);
+            Controller_SetIqSetpoint((float)data * ONE_OVER_UART_I_SCALING_FACTOR);
         break;
 
         case 'G': // velocity integrator gain
-            Controller_SetVelIntegratorGain(data * ONE_OVER_UART_VEL_INT_SCALING_FACTOR);
+            Controller_SetVelIntegratorGain((float)data * ONE_OVER_UART_VEL_INT_SCALING_FACTOR);
         break;
 
         case 'H': // phase resistance
-            ret_val = Motor_GetPhaseResistance() * ONE_OVER_UART_R_SCALING_FACTOR;
+            Motor_SetPhaseResistance((float)data * ONE_OVER_UART_R_SCALING_FACTOR);
         break;
 
         case 'L': // phase inductance
-            ret_val = Motor_GetPhaseInductance() * ONE_OVER_UART_L_SCALING_FACTOR;
+            Motor_SetPhaseInductance((float)data * ONE_OVER_UART_L_SCALING_FACTOR);
         break;
 
         case 'M': // Set is motor gimbal?
