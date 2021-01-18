@@ -66,7 +66,7 @@ bool CalibrateInductance(void)
 		float I_high = 0.0f;
 		struct FloatTriplet I_phase_meas = {0.0f};
 		struct FloatTriplet modulation_values = {0.0f};
-		
+
 		for (uint32_t i=0; i<CAL_L_LEN; i++)
 		{
 			ADC_GetPhaseCurrents(&I_phase_meas);
