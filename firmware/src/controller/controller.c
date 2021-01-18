@@ -141,9 +141,10 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         state.vel_integrator_Iq *= 0.995f;
     }
 
-    const float angle = Observer_GetPosEstimateWrappedRadians();
-    const float e_phase = angle * Motor_GetPolePairs();
+    const float e_phase = Observer_GetPosEstimateWrappedRadians() * Motor_GetPolePairs();
     const float e_phase_vel = vel_estimate * Motor_GetPolePairs();
+    const float c_I = fast_cos(e_phase);
+    const float s_I = fast_sin(e_phase);
     const float VBus = ADC_GetVBus();
 
     float Vd; float Vq;
@@ -161,8 +162,6 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         const float Ibeta = one_by_sqrt3 * (state.I_phase_meas.B - state.I_phase_meas.C);
 
         // Park transform
-        const float c_I = fast_cos(e_phase);
-        const float s_I = fast_sin(e_phase);
         const float Id = (c_I * Ialpha) + (s_I * Ibeta);
         const float Iq = (c_I * Ibeta) - (s_I * Ialpha);
 
