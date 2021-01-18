@@ -52,6 +52,7 @@ PAC5XXX_RAMFUNC float Observer_GetPosDiff(float target);
 PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrapped(void);
 PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrappedRadians(void);
 PAC5XXX_RAMFUNC float Observer_GetVelEstimate(void);
+PAC5XXX_RAMFUNC float Observer_GetVelEstimateRadians(void);
 
 PAC5XXX_RAMFUNC float Observer_GetBandwidth(void);
 void Observer_SetBandwidth(float bw);
