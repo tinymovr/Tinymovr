@@ -517,7 +517,7 @@ Example
     {"device_id": 99999, "fw_major": 0, "fw_minor": 7, "fw_patch": 1, "temp": 45}
 
 
-motor_info
+motor_config
 ***********
 
 | **endpoint**: ``0x1E``
@@ -542,7 +542,7 @@ Example
 
 .. code-block:: python
 
-    >>>tmx.motor_info
+    >>>tmx.motor_config
     {"calibrated": 1, "R": 0.2, "pole_pairs": 11, "L": 0.00012, "encoder_ticks": 8192}
 
 
