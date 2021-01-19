@@ -555,24 +555,24 @@ Example
 
 
 motor_config
-***********
+************
 
 | **endpoint**: ``0x1E``
 | **type**: Read-only
 
-Retrieves information related to the attached motor.
+Retrieves attached motor config.
 
 Return Values
 -------------
 
-===============   =================  =========  =========== ================
-Member            Description        Data Type  Data Offset Default Unit
----------------   -----------------  ---------  ----------- ----------------
-``calibrated``    Calibrated Flag    uint8      0
-``R``             Phase Resistance   uint16     1           milliohm
-``pole_pairs``    Motor Pole Pairs   uint8      3
-``L``             Phase Inductance   uint16     4           microhenry
-===============   =================  =========  =========== ================
+===============   ==================  =========  =========== ================
+Member            Description         Data Type  Data Offset Default Unit
+---------------   ------------------  ---------  ----------- ----------------
+``flags``         Calibrated, Gimbal  uint8      0
+``R``             Phase Resistance    uint16     1           milliohm
+``pole_pairs``    Motor Pole Pairs    uint8      3
+``L``             Phase Inductance    uint16     4           microhenry
+===============   ==================  =========  =========== ================
 
 Example
 -------
@@ -580,7 +580,34 @@ Example
 .. code-block:: python
 
     >>>tmx.motor_config
-    {"calibrated": 1, "R": 0.2, "pole_pairs": 11, "L": 0.00012, "encoder_ticks": 8192}
+    {"flags": 1, "R": 200, "pole_pairs": 11, "L": 100}
+
+
+set_motor_config
+****************
+
+| **endpoint**: ``0x1F``
+| **type**: Write-only
+
+Sets attached motor properties.
+
+Arguments
+---------
+
+===============   ==================  =========  =========== ================
+Member            Description         Data Type  Data Offset Default Unit
+---------------   ------------------  ---------  ----------- ----------------
+``flags``         Gimbal              uint8      0
+``R``             Phase Resistance    uint16     1           milliohm
+``L``             Phase Inductance    uint16     3           microhenry
+===============   ==================  =========  =========== ================
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.set_motor_config(1, 5000, 2000)
 
 
 timings
