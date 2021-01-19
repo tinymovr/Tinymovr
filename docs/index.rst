@@ -12,13 +12,13 @@ Welcome to Tinymovr documentation!
 
    quickstart
    hardware/guide
-   hardware/canine
    studio/installation
    studio/usage
-   studio/commands
    studio/plotting
    api/guide
    uart/uart
+   hardware/gimbal
+   hardware/canine
    troubleshooting
    develop/guide
 

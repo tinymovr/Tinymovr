@@ -15,7 +15,7 @@ Requirements
 2. A means to talk CAN Bus, such as CANine or a Canable-compatible adapter.
 3. A mechanical rig that ensures firm connection between the Tinymovr PCB and the brushless motor. Designs that can be 3D printed are available.
 
-Note that the Tinymovr Dev Kit includes all of the above in an assembled kit.
+Note that the Tinymovr Dev Kit includes all of the above in a ready to use kit.
 
 
 Supported Motor Types
