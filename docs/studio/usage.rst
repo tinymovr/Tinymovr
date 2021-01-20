@@ -159,7 +159,7 @@ Then you can use the defined shortcuts to intuitively set values, such as a posi
 
     tm.set_pos_setpoint(2*PI * rad, 0 * rad/s, 1500 * mA)
 
-Take a look at the :ref:`command-reference` to find out about default units used in each command.
+Take a look at the :ref:`api-reference` for default units used in each command.
 
 For more information on units and their usage, take a look at `Pint's documentation <https://pint.readthedocs.io/en/stable/>`_
 

@@ -46,7 +46,7 @@ Your Tinymovr is now ready for operation. You can view information about the att
 
 .. code-block:: python
 
-    tm1.motor_info
+    tm1.motor_config
 
 This will reveal identified motor parameters, namely: phase resistance, phase inductance, number of pole pairs and encoder ticks.
 

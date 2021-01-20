@@ -92,21 +92,23 @@ PAC5XXX_RAMFUNC float Observer_GetPosDiff(float target)
 
 PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrapped(void)
 {
-	// FIXME: Due to offset, returned value interval is [-pi - offset, pi - offset)
-	// However, it is correct with respect to electrical origin
 	return config.direction * (state.pos_estimate_wrapped - config.pos_offset);
 }
 
 PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrappedRadians(void)
 {
-	// FIXME: Same as above
-	const float est = Observer_GetPosEstimateWrapped();
-	return (est / ENCODER_TICKS ) * twopi;
+	return (Observer_GetPosEstimateWrapped() / ENCODER_TICKS ) * twopi;
 }
 
 PAC5XXX_RAMFUNC float Observer_GetVelEstimate(void)
 {
 	return config.direction * state.vel_estimate;
+}
+
+PAC5XXX_RAMFUNC float Observer_GetVelEstimateRadians(void)
+{
+	return (Observer_GetVelEstimate() / ENCODER_TICKS ) * twopi;
+
 }
 
 PAC5XXX_RAMFUNC int Observer_GetDirection(void)

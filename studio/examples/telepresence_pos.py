@@ -22,8 +22,8 @@ def main():
     tm1 = Tinymovr(node_id=1, iface=iface)
     tm2 = Tinymovr(node_id=2, iface=iface)
 
-    assert(tm1.motor_info.calibrated == 1)
-    assert(tm2.motor_info.calibrated == 1)
+    assert(tm1.motor_config.flags == 1)
+    assert(tm2.motor_config.flags == 1)
 
     tm1.set_limits(300000, 25)
     tm2.set_limits(300000, 25)

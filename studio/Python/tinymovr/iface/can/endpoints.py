@@ -242,16 +242,26 @@ can_endpoints: Dict[str, Dict] = {
         "type": "w",
         "ep_id": 0x01D
     },
-    "motor_info":
+    "motor_config":
     {
-        "description": "Get Attached Motor Info (Calibrated, \
+        "description": "Get Motor Configuration (Flags (calibrated, is_gimbal), \
                         Resistance, Pole Pairs, Inductance, Encoder Ticks)",
         "type": "r",
         "ep_id": 0x01E,
         "types": (DataType.UINT8, DataType.UINT16,
                   DataType.UINT8, DataType.UINT16, DataType.UINT16),
-        "labels": ("calibrated", "R", "pole_pairs", "L", "encoder_ticks"),
+        "labels": ("flags", "R", "pole_pairs", "L", "encoder_ticks"),
         "units": (None, "milliohm", None, "microhenry", "ticks"),
         "ser_map": {"motor": ("R", "L", "pole_pairs")}
+    },
+    "set_motor_config":
+    {
+        "description": "Set Motor Configuration (Flags (is_gimbal), Resistance, Inductance)",
+        "type": "w",
+        "ep_id": 0x01F,
+        "types": (DataType.UINT8, DataType.UINT16, DataType.UINT16),
+        "labels": ("flags", "R", "L"),
+        "units": (None, "milliohm", "microhenry"),
+        "ser_map": {"motor": ("R", "L")}
     },
 }

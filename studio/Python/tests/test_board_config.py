@@ -30,7 +30,7 @@ class TestBoardConfig(TMTestCase):
         Test state transitions
         WARNING: This will perform one NVRAM erase cycle.
         '''
-        if self.tm.motor_info.calibrated == 1:
+        if self.tm.motor_config.flags == 1:
             self.tm.erase_config()
             time.sleep(0.2)
 
@@ -38,7 +38,7 @@ class TestBoardConfig(TMTestCase):
         time.sleep(0.2)
 
         self.check_state(0)
-        self.assertEqual(self.tm.motor_info.calibrated, 0)
+        self.assertEqual(self.tm.motor_config.flags, 0)
 
         self.tm.position_control()
         self.check_state(0, ErrorIDs.InvalidState)
@@ -47,7 +47,7 @@ class TestBoardConfig(TMTestCase):
         time.sleep(0.2)
         
         self.check_state(0)
-        self.assertEqual(self.tm.motor_info.calibrated, 0)
+        self.assertEqual(self.tm.motor_config.flags, 0)
 
         self.tm.calibrate()
         for _ in range(100):
@@ -55,7 +55,7 @@ class TestBoardConfig(TMTestCase):
                 break
             time.sleep(0.5)
 
-        self.assertEqual(self.tm.motor_info.calibrated, 1)
+        self.assertEqual(self.tm.motor_config.flags, 1)
         self.check_state(0)
         time.sleep(0.2)
 
@@ -78,18 +78,18 @@ class TestBoardConfig(TMTestCase):
         self.check_state(0)
         self.tm.erase_config()
         time.sleep(0.2)
-        self.assertEqual(self.tm.motor_info.calibrated, 0)
+        self.assertEqual(self.tm.motor_config.flags, 0)
         self.tm.calibrate()
         for _ in range(100):
             if self.tm.state.state == 0:
                 break
             time.sleep(0.5)
-        self.assertEqual(self.tm.motor_info.calibrated, 1)
+        self.assertEqual(self.tm.motor_config.flags, 1)
         self.tm.save_config()
         time.sleep(0.2)
         self.tm.reset()
         time.sleep(0.2)
-        self.assertEqual(self.tm.motor_info.calibrated, 1)
+        self.assertEqual(self.tm.motor_config.flags, 1)
         self.tm.erase_config()
         time.sleep(0.2)
 
