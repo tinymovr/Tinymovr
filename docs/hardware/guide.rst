@@ -102,7 +102,7 @@ The connection can be achieved in two ways. Either by soldering the motor leads 
 Connecting Data
 ###############
 
-Connect the CAN bus header to one of the two DF-13 sockets on the board. It is not important which one you choose. If this is a terminal node in the CAN network, flip the DIP switch labelled "CAN 120R" to on to enable the 120Ohm termination resistor.
+Connect the CAN bus header to one of the two DF-13 sockets on the board. It is not important which one you choose. If this is a terminal node in the CAN network, flip the DIP switch labelled "CAN 120R" to on to enable the 120Ohm termination resistor. In small setups with a few nodes and short wires, it is enough to enable just a single termination resistor, either on one Tinymovr board or on the CAN adapter.
 
 .. _alpha-erratum-1:
 
