@@ -19,13 +19,11 @@ Enabling Gimbal Mode
 --------------------
 
 .. warning::
-   Although tested, gimbal mode is still experimental. Please ensure all safety precautions, and use at your own risk!
+   * Although tested, gimbal mode is still experimental. Please ensure all safety precautions, and use at your own risk!
 
-.. warning::
-   DO NOT perform calibration on a gimbal motor without setting gimbal mode first! There is a risk of damaging the motor and board.
-
-.. warning::
-   Using arbitrary resistance and inductance settings can damage your motor, as can using gimbal mode with a high-current motor.
+   * DO NOT perform calibration on a gimbal motor without setting gimbal mode first! There is a risk of damaging the motor and board.
+   
+   * Using arbitrary resistance and inductance settings can damage your motor, as can using gimbal mode with a high-current motor.
 
 To enable gimbal mode, set the motor config as follows:
 
