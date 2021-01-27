@@ -17,6 +17,7 @@ Welcome to Tinymovr documentation!
    studio/plotting
    api/guide
    uart/uart
+   interfaces/interfaces
    hardware/gimbal
    hardware/canine
    troubleshooting

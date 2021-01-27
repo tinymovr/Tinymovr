@@ -1,9 +1,31 @@
-******************
-UART Communication
-******************
+**********
+Interfaces
+**********
 
-Overview
-########
+
+CAN Bus
+-------
+
+CAN Bus is the primary interface for communicating with Tinymovr. The physical and data link interface adheres to the CAN 2.0 standard. Tinymovr exposes to CAN all communication endpoints defined in firmware.
+
+Data rate
+#########
+
+By default, the CAN baud rate is set to 1Mbit/s. This is customizable both through CAN as well as through UART. See :ref:`api-can-config`. Possible values are 125kbit/s, 250kbit/s, 500kbit/s and 1Mbit/s.
+
+Addressing
+##########
+
+The 11-bit identifier of the CAN frame is used for device and endpoint identification. The 5 least significant bits of the identifier are reserved for endpoints, and the 6 most significant bits for device identification. This suggests that the total number of addressable endpoints in a single device are 32, and the total number of addressable devices are 64. 
+
+API
+###
+
+For a detailed description, please see :ref:`api-reference`.
+
+
+UART
+----
 
 As an alternative to CAN Bus, Tinymovr offers UART-based (serial) communication. The protocol is much simpler than can and mainly designed for troubleshooting or testing in the absence of CAN hardware.
 
