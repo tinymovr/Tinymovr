@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install sphinx
+        pip install sphinx sphinxcontrib.yt
     - name: Build docs
       run: |
         cd docs

@@ -41,6 +41,9 @@ The above code block will instantiate a Tinymovr with CAN bus id of 1 and calibr
 API Reference
 #############
 
+.. note::
+    Where "float32" is mentioned, an IEEE 754, 32-bit floating point representation is assumed.
+
 state
 *****
 
@@ -118,6 +121,7 @@ Example
 
     >>>tmx.set_state(state=0, mode=0)
 
+.. _api-can-config:
 
 can_config
 **********
@@ -442,6 +446,11 @@ Example
 
     >>>tmx.integrator_gains
     {"velocity": 0.0001}
+
+Video
+-----
+
+.. youtube:: JhWzUg3yQ8c
 
 
 set_integrator_gains()
