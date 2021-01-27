@@ -443,6 +443,11 @@ Example
     >>>tmx.integrator_gains
     {"velocity": 0.0001}
 
+Video
+-----
+
+.. youtube:: JhWzUg3yQ8c
+
 
 set_integrator_gains()
 **********************
