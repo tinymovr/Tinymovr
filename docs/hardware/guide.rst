@@ -15,7 +15,7 @@ Requirements
 2. A means to talk CAN Bus, such as CANine or a Canable-compatible adapter.
 3. A mechanical rig that ensures firm connection between the Tinymovr PCB and the brushless motor. Designs that can be 3D printed are available.
 
-Note that the Tinymovr Dev Kit includes all of the above in an assembled kit.
+Note that the Tinymovr Dev Kit includes all of the above in a ready to use kit.
 
 
 Supported Motor Types
@@ -39,7 +39,7 @@ Board dimensions
 Mounting motor and Tinymovr
 ***************************
 
-The most important aspect of a correct setup is to ensure the controller is properly positioned in relation to the motor. The center of the PCB, where the encoder is located, should lie as close to the motor rotation axis as possible. In addition, the distance from the encoder magnet to the encoder IC should be less than 2mm (less than 1mm if the magnet is on the back side of the PCB).
+The most important aspect of a correct setup is to ensure the controller is properly positioned in relation to the motor. The center of the PCB, where the encoder is located, should lie as close to the motor rotation axis as possible. In addition, the distance from the encoder magnet to the encoder IC should be less than 2mm (less than 1mm if you are mounting the PCB packwards, i.e. the encoder IC is facing away from the magnet).
 
 .. figure:: mount.png
   :width: 800
@@ -48,6 +48,8 @@ The most important aspect of a correct setup is to ensure the controller is prop
   :figclass: align-center
 
   Tinymovr and motor mechanical mounting
+
+A `3D printable encoder magnet jig <https://github.com/yconst/Tinymovr/blob/master/hardware/misc/magnet_jig.stl>`_ is available, suitable for 6mm disc magnets and 14, 19, 25 and 30mm motor hole diameters.
 
 For a 3D printable motor mount design, check out the `Tinymovr alpha dev kit mount <https://github.com/yconst/Tinymovr/tree/master/hardware/motor-stand>`_ (suitable for 40xx motors).
 
@@ -67,6 +69,8 @@ Mounting Tips
 * Ensure the encoder magnet is firmly attached to the motor shaft, otherwise it may slip out of sync. Use adhesive to secure if necessary.
 
 * Calibration needs to be performed without any loads on the motor. If the motor is coupled to a load, the encoder offset angle may not be determined correctly, leading to a sub-optimal setup.
+
+* Adjust your termination resistor DIP switch (if needed) before putting together your actuator, to avoid needing to disassemble it for adjustment later on. See also :ref:`connecting-data`.
 
 .. _electrical-setup:
 
@@ -100,7 +104,7 @@ The connection can be achieved in two ways. Either by soldering the motor leads 
 Connecting Data
 ###############
 
-Connect the CAN bus header to one of the two DF-13 sockets on the board. It is not important which one you choose. If this is a terminal node in the CAN network, flip the DIP switch labelled "CAN 120R" to on to enable the 120Ohm termination resistor.
+Connect the CAN bus header to one of the two DF-13 sockets on the board. It is not important which one you choose. If this is a terminal node in the CAN network, flip the DIP switch labelled "CAN 120R" to on to enable the 120Ohm termination resistor. In small setups with a few nodes and short wires, it is enough to enable just a single termination resistor, either on one Tinymovr board or on the CAN adapter.
 
 .. _alpha-erratum-1:
 

@@ -14,23 +14,11 @@ Before proceeding to the next steps, ensure your Tinymovr is powered up.
 Installing and Launching Studio
 ###############################
 
-It is advised to use an Anaconda environment with Python >=3.7. You can check you Python version as follows:
+Tinymovr can be installed simply using pip. Python 3.6 or greater is required.
 
 .. code-block:: console
 
-    python --version
-
-Should output something like:
-
-.. code-block:: console
-
-    Python 3.7.6
-
-Once you have your environment ready, issue the following:
-
-.. code-block:: console
-
-    pip install tinymovr
+    pip3 install tinymovr
     tinymovr
 
 You should now be looking at the Tinymovr Studio IPython interface.
@@ -58,7 +46,7 @@ Your Tinymovr is now ready for operation. You can view information about the att
 
 .. code-block:: python
 
-    tm1.motor_info
+    tm1.motor_config
 
 This will reveal identified motor parameters, namely: phase resistance, phase inductance, number of pole pairs and encoder ticks.
 

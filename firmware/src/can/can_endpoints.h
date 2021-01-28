@@ -58,4 +58,5 @@ uint8_t CAN_DeviceInfo(uint8_t buffer[]);
 uint8_t CAN_Timings(uint8_t buffer[]);
 uint8_t CAN_SaveConfig(uint8_t buffer[]);
 uint8_t CAN_EraseConfig(uint8_t buffer[]);
-uint8_t CAN_GetMotorInfo(uint8_t buffer[]);
+uint8_t CAN_GetMotorConfig(uint8_t buffer[]);
+uint8_t CAN_SetMotorConfig(uint8_t buffer[]);

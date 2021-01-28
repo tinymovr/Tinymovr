@@ -17,7 +17,7 @@
 
 #define VERSION_MAJOR (0u)
 #define VERSION_MINOR (8u)
-#define VERSION_PATCH (3u)
+#define VERSION_PATCH (4u)
 
 /// TINYMOVR CONFIGURATION OPTIONS ///
 
@@ -51,6 +51,7 @@
 
 #define CAL_V_GAIN (0.0005f)
 #define CAL_I_SETPOINT (5.0f)
+#define CAL_I_SETPOINT_GIMBAL (0.7f)
 #define CAL_V_INDUCTANCE (2.0f)
 
 // Eccentricity correction lookup table size
@@ -65,6 +66,8 @@
 #define UART_I_SCALING_FACTOR ( 1000.0f )
 #define UART_R_SCALING_FACTOR ( 1000.0f )
 #define UART_L_SCALING_FACTOR ( 1000.0f )
+#define ONE_OVER_UART_R_SCALING_FACTOR ( 0.001f )
+#define ONE_OVER_UART_L_SCALING_FACTOR ( 0.001f )
 #define UART_VEL_INT_SCALING_FACTOR ( 1000.0f )
 #define ONE_OVER_UART_I_SCALING_FACTOR ( 0.001f )
 #define ONE_OVER_UART_VEL_INT_SCALING_FACTOR ( 0.001f )

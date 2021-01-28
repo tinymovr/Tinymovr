@@ -27,6 +27,10 @@ Hardware Configuration
   :alt: CANine hardware configuration diagram
   :figclass: align-center
 
+CAN Termination Resistor
+########################
+
+CANine includes a termination resistor to ease the setup of a CAN Bus network. If CANine is a terminal node in the network, you should enable the 120Ohm termination resistor via the onboard DIP switch. In small setups with a few nodes and short wires, it is enough to enable just a single termination resistor, either on the CANine or on a single Tinymovr.
 
 Flashing Firmware
 #################

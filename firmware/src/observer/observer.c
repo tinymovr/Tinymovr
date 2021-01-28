@@ -105,14 +105,18 @@ PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrapped(void)
 
 PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrappedRadians(void)
 {
-	// FIXME: Same as above
-	const float est = Observer_GetPosEstimateWrapped();
-	return (est / ENCODER_TICKS ) * twopi;
+	return (Observer_GetPosEstimateWrapped() / ENCODER_TICKS ) * twopi;
 }
 
 PAC5XXX_RAMFUNC float Observer_GetVelEstimate(void)
 {
 	return config.direction * state.vel_estimate;
+}
+
+PAC5XXX_RAMFUNC float Observer_GetVelEstimateRadians(void)
+{
+	return (Observer_GetVelEstimate() / ENCODER_TICKS ) * twopi;
+
 }
 
 PAC5XXX_RAMFUNC int Observer_GetDirection(void)

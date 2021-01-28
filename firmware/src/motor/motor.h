@@ -42,6 +42,8 @@ struct MotorConfig
 	bool resistance_calibrated;
 	bool inductance_calibrated;
 	bool poles_calibrated;
+
+	bool is_gimbal;
 };
 
 void Motor_Init(void);
@@ -56,7 +58,10 @@ PAC5XXX_RAMFUNC void Motor_SetPhaseResistance(float R);
 PAC5XXX_RAMFUNC float Motor_GetPhaseInductance(void);
 PAC5XXX_RAMFUNC void Motor_SetPhaseInductance(float L);
 
-PAC5XXX_RAMFUNC bool Motor_Calibrated(void);
+PAC5XXX_RAMFUNC bool motor_is_calibrated(void);
+
+PAC5XXX_RAMFUNC bool motor_is_gimbal(void);
+PAC5XXX_RAMFUNC void motor_set_is_gimbal(bool gimbal);
 
 struct MotorConfig* Motor_GetConfig(void);
 void Motor_RestoreConfig(struct MotorConfig* config_);
