@@ -172,11 +172,10 @@ bool CalibrateDirectionAndPolePairs(void)
     return success;
 }
 
-// Size below is an arbitrary large number ie > ECN_SIZE * npp
-int16_t error_ticks[ECN_SIZE * 24] = {0};
-
 bool CalibrateOffsetAndEccentricity(void)
 {
+    // Size below is an arbitrary large number ie > ECN_SIZE * npp
+    int16_t error_ticks[ECN_SIZE * 24];
     const int npp = Motor_GetPolePairs();
     const int n = ECN_SIZE * npp;
     const int nconv = 50;                                                          
