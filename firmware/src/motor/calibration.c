@@ -32,7 +32,7 @@ bool CalibrateResistance(void)
 {
     bool success = true;
     if (!motor_is_gimbal())
-	{
+    {
         float V_setpoint = 0.0f;
         struct FloatTriplet I_phase_meas = {0.0f};
         struct FloatTriplet modulation_values = {0.0f};
@@ -58,10 +58,10 @@ bool CalibrateResistance(void)
             Motor_SetPhaseResistance(R);
         }
 #else
-		Motor_SetPhaseResistance(0.5);
+        Motor_SetPhaseResistance(0.5);
 #endif
-		GateDriver_SetDutyCycle(&zeroDC);
-	}
+        GateDriver_SetDutyCycle(&zeroDC);
+    }
     return success;
 }
 
@@ -69,7 +69,7 @@ bool CalibrateInductance(void)
 {
     bool success = true;
     if (!motor_is_gimbal())
-	{
+    {
         float V_setpoint = 0.0f;
         float I_low = 0.0f;
         float I_high = 0.0f;
@@ -110,10 +110,10 @@ bool CalibrateInductance(void)
             Controller_UpdateCurrentGains();
         }
 #else
-		Motor_SetPhaseInductance(0.005);
+        Motor_SetPhaseInductance(0.005);
 #endif
-		GateDriver_SetDutyCycle(&zeroDC);
-	}
+        GateDriver_SetDutyCycle(&zeroDC);
+    }
     return success;
 }
 
@@ -156,18 +156,18 @@ bool CalibrateDirectionAndPolePairs(void)
     }
     // Go back to start
     for (uint32_t i=0; i<CAL_DIR_LEN; i++)
-	{
-		const float factor = (float)i;
-		float cur_angle = end_angle * (1.0f - factor/CAL_DIR_LEN);
-		our_clamp(&cur_angle, 0.0f, end_angle);
-		float pwm_setpoint = (I_setpoint * Motor_GetPhaseResistance()) / ADC_GetVBus();
-		our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
-		SVM(pwm_setpoint * fast_cos(cur_angle), pwm_setpoint * fast_sin(cur_angle),
-			&modulation_values.A, &modulation_values.B, &modulation_values.C);
-		GateDriver_SetDutyCycle(&modulation_values);
-		Watchdog_Feed();
-		WaitForControlLoopInterrupt();
-	}
+    {
+        const float factor = (float)i;
+        float cur_angle = end_angle * (1.0f - factor/CAL_DIR_LEN);
+        our_clamp(&cur_angle, 0.0f, end_angle);
+        float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
+        our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
+        SVM(pwm_setpoint * fast_cos(cur_angle), pwm_setpoint * fast_sin(cur_angle),
+            &modulation_values.A, &modulation_values.B, &modulation_values.C);
+        GateDriver_SetDutyCycle(&modulation_values);
+        Watchdog_Feed();
+        WaitForControlLoopInterrupt();
+    }
     GateDriver_SetDutyCycle(&zeroDC);
     return success;
 }
@@ -198,7 +198,7 @@ bool CalibrateOffsetAndEccentricity(void)
     {
         for (uint8_t j=0; j<nconv; j++)
         {
-        	e_pos_ref += delta;
+            e_pos_ref += delta;
             float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
             our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
             SVM(pwm_setpoint * fast_cos(e_pos_ref), pwm_setpoint * fast_sin(e_pos_ref),
@@ -216,7 +216,7 @@ bool CalibrateOffsetAndEccentricity(void)
     {
         for (uint8_t j=0; j<nconv; j++)
         {
-        	e_pos_ref -= delta;
+            e_pos_ref -= delta;
             float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
             our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
             SVM(pwm_setpoint * fast_cos(e_pos_ref), pwm_setpoint * fast_sin(e_pos_ref),
@@ -234,27 +234,27 @@ bool CalibrateOffsetAndEccentricity(void)
     // FIR and map measurements to lut
     for (int i=0; i<ECN_SIZE; i++)
     {
-    	int32_t acc = 0;
-		for (int j=0; j<ECN_SIZE; j++)
-		{
-			int16_t read_idx = -ECN_SIZE/2 + j + i*npp;
-			if (read_idx < 0)
-			{
-				read_idx += n;
-			}
-			else if (read_idx > n - 1)
-			{
-				read_idx -= n;
-			}
-			acc += error_ticks[read_idx];
-		}
-		acc /= ECN_SIZE;
-		int16_t write_idx = i + (offset_raw>>ECN_BITS);
-		if (write_idx > (ECN_SIZE - 1))
-		{
-			write_idx -= ECN_SIZE;
-		}
-		lut[write_idx] = (int16_t)acc;
+        int32_t acc = 0;
+        for (int j=0; j<ECN_SIZE; j++)
+        {
+            int16_t read_idx = -ECN_SIZE/2 + j + i*npp;
+            if (read_idx < 0)
+            {
+                read_idx += n;
+            }
+            else if (read_idx > n - 1)
+            {
+                read_idx -= n;
+            }
+            acc += error_ticks[read_idx];
+        }
+        acc /= ECN_SIZE;
+        int16_t write_idx = i + (offset_raw>>ECN_BITS);
+        if (write_idx > (ECN_SIZE - 1))
+        {
+            write_idx -= ECN_SIZE;
+        }
+        lut[write_idx] = (int16_t)acc;
     }
     // Wait a while for the observer to settle
     // TODO: This is a bit of a hack, can be improved!
