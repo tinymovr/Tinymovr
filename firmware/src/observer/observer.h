@@ -38,10 +38,10 @@ struct ObserverConfig
 
 	int32_t sector_half_interval;
 
-	int direction;      // direction 1 positive, -1 negative
 	bool direction_calibrated;
+	int direction;      // direction 1 positive, -1 negative
+	bool eccentricity_calibrated;
 	int16_t eccentricity_table[ECN_SIZE];
-    bool eccentricity_calibrated;
 };
 
 void Observer_Init(void);

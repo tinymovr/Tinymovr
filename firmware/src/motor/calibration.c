@@ -158,9 +158,9 @@ bool CalibrateDirectionAndPolePairs(void)
     for (uint32_t i=0; i<CAL_DIR_LEN; i++)
     {
         const float factor = (float)i;
-        float cur_angle = end_angle * (1.0f - factor/CAL_DIR_LEN);
+        float cur_angle = end_angle * (1.0f - (factor / CAL_DIR_LEN));
         our_clamp(&cur_angle, 0.0f, end_angle);
-        float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
+        float pwm_setpoint = (I_setpoint * Motor_GetPhaseResistance()) / ADC_GetVBus();
         our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
         SVM(pwm_setpoint * fast_cos(cur_angle), pwm_setpoint * fast_sin(cur_angle),
             &modulation_values.A, &modulation_values.B, &modulation_values.C);
@@ -175,10 +175,10 @@ bool CalibrateDirectionAndPolePairs(void)
 bool CalibrateOffsetAndEccentricity(void)
 {
     // Size below is an arbitrary large number ie > ECN_SIZE * npp
-    int16_t error_ticks[ECN_SIZE * 24];
-    const int npp = Motor_GetPolePairs();
-    const int n = ECN_SIZE * npp;
-    const int nconv = 50;                                                          
+    int16_t error_ticks[2048];
+    const int16_t npp = Motor_GetPolePairs();
+    const int16_t n = ECN_SIZE * npp;
+    const int16_t nconv = 50;                                                          
     const float delta = 2 * PI * npp / (n * nconv);
     const float e_pos_to_ticks = ((float)ENCODER_TICKS)/(2 * PI * npp);
     float e_pos_ref = 0.f;
@@ -188,15 +188,15 @@ bool CalibrateOffsetAndEccentricity(void)
     // Wait a while for the observer to settle
     // TODO: This is a bit of a hack, can be improved!
     int16_t offset_raw = MA_GetAngle();
-    for (int i=0; i<1000; i++)
+    for (int16_t i=0; i<1000; i++)
     {
         Watchdog_Feed();
         WaitForControlLoopInterrupt();
     }
     // Perform measuerments, store only mean of F + B error
-    for (uint32_t i=0; i<n; i++)
+    for (int16_t i=0; i<n; i++)
     {
-        for (uint8_t j=0; j<nconv; j++)
+        for (int16_t j=0; j<nconv; j++)
         {
             e_pos_ref += delta;
             float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
@@ -208,13 +208,13 @@ bool CalibrateOffsetAndEccentricity(void)
             WaitForControlLoopInterrupt();
         }
         WaitForControlLoopInterrupt();
-        const float pos_meas = Observer_GetPosEstimate();
-        error_ticks[i] = (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
+        const float error = ((e_pos_ref * e_pos_to_ticks) - Observer_GetPosEstimate());
+        error_ticks[i] = (int16_t)error;
     }
     offset_raw = (offset_raw + MA_GetAngle()) / 2;
-    for (uint32_t i=0; i<n; i++)
+    for (int16_t i=0; i<n; i++)
     {
-        for (uint8_t j=0; j<nconv; j++)
+        for (int16_t j=0; j<nconv; j++)
         {
             e_pos_ref -= delta;
             float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
@@ -226,39 +226,44 @@ bool CalibrateOffsetAndEccentricity(void)
             WaitForControlLoopInterrupt();
         }
         WaitForControlLoopInterrupt();
-        const float pos_meas = Observer_GetPosEstimate();
-        error_ticks[n-i-1] = (int16_t)(0.5f * ((float)error_ticks[n-i-1] + e_pos_ref * e_pos_to_ticks - pos_meas));
+        const float error = ((0.5f * ((float)error_ticks[n-i-1]) + (e_pos_ref * e_pos_to_ticks) - Observer_GetPosEstimate()));
+        error_ticks[n-i-1] = (int16_t)error;
     }
     GateDriver_SetDutyCycle(&zeroDC);
 
     // FIR and map measurements to lut
-    for (int i=0; i<ECN_SIZE; i++)
+    for (int16_t i=0; i<ECN_SIZE; i++)
     {
         int32_t acc = 0;
-        for (int j=0; j<ECN_SIZE; j++)
+        for (int16_t j=0; j<ECN_SIZE; j++)
         {
-            int16_t read_idx = -ECN_SIZE/2 + j + i*npp;
-            if (read_idx < 0)
+            int16_t _idx = -(ECN_SIZE / 2) + j + (i * npp);
+            int16_t read_idx;
+            if (_idx < 0)
             {
-                read_idx += n;
+                read_idx = _idx + n;
             }
-            else if (read_idx > n - 1)
+            else if (_idx > (n - 1))
             {
-                read_idx -= n;
+                read_idx = _idx - n;
+            }
+            else
+            {
+                read_idx = _idx;
             }
             acc += error_ticks[read_idx];
         }
-        acc /= ECN_SIZE;
+        int16_t offset_val = acc / ECN_SIZE;
         int16_t write_idx = i + (offset_raw>>ECN_BITS);
         if (write_idx > (ECN_SIZE - 1))
         {
             write_idx -= ECN_SIZE;
         }
-        lut[write_idx] = (int16_t)acc;
+        lut[write_idx] = offset_val;
     }
     // Wait a while for the observer to settle
     // TODO: This is a bit of a hack, can be improved!
-    for (int i=0; i<1000; i++)
+    for (int16_t i=0; i<1000; i++)
     {
         Watchdog_Feed();
         WaitForControlLoopInterrupt();

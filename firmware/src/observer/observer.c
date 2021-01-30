@@ -43,14 +43,14 @@ void Observer_Init(void)
 
 PAC5XXX_RAMFUNC void Observer_UpdateEstimates(void)
 {
-	int16_t raw = MA_GetAngle();
-	int16_t off_1 = config.eccentricity_table[raw>>ECN_BITS];
-	int16_t off_2 = config.eccentricity_table[((raw>>ECN_BITS) + 1) % ECN_SIZE];
-	int16_t off_interp = off_1 + ((off_2 - off_1)* (raw - ((raw>>ECN_BITS)<<ECN_BITS))>>ECN_BITS);
-	float angle_meas = (float)(raw + off_interp);
+	const int16_t raw = MA_GetAngle();
+	const int16_t off_1 = config.eccentricity_table[raw>>ECN_BITS];
+	const int16_t off_2 = config.eccentricity_table[((raw>>ECN_BITS) + 1) % ECN_SIZE];
+	const int16_t off_interp = off_1 + ((off_2 - off_1)* (raw - ((raw>>ECN_BITS)<<ECN_BITS))>>ECN_BITS);
+	const int16_t angle_meas = raw + off_interp;
 
 	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;
-	const float delta_pos_meas = wrapf(angle_meas - state.pos_estimate, ENCODER_HALF_TICKS);
+	const float delta_pos_meas = wrapf((float)angle_meas - state.pos_estimate, ENCODER_HALF_TICKS);
 	const float delta_pos_error = delta_pos_meas - delta_pos_est;
 	const float incr_pos = delta_pos_est + (PWM_PERIOD_S * config.kp * delta_pos_error);
 	state.pos_estimate += incr_pos;
@@ -88,7 +88,7 @@ void Observer_SetBandwidth(float bw)
 PAC5XXX_RAMFUNC float Observer_GetPosEstimate(void)
 {
 	const float primary = 2 * config.sector_half_interval * state.pos_sector;
-	return config.direction * (primary + state.pos_estimate);
+	return (float)config.direction * (primary + state.pos_estimate);
 }
 
 PAC5XXX_RAMFUNC float Observer_GetPosDiff(float target)
@@ -150,7 +150,7 @@ void Observer_ClearDirection(void)
 
 void Observer_ClearEccentricityTable(void)
 {
-    memset(config.eccentricity_table, 0, sizeof(config.eccentricity_table));
+    (void)memset(config.eccentricity_table, 0, sizeof(config.eccentricity_table));
 	config.eccentricity_calibrated = false;
 }
 
