@@ -237,19 +237,19 @@ bool CalibrateOffsetAndEccentricity(void)
         int32_t acc = 0;
         for (int16_t j=0; j<ECN_SIZE; j++)
         {
-            int16_t _idx = -(ECN_SIZE / 2) + j + (i * npp);
+            int16_t raw_idx = -(ECN_SIZE / 2) + j + (i * npp);
             int16_t read_idx;
-            if (_idx < 0)
+            if (raw_idx < 0)
             {
-                read_idx = _idx + n;
+                read_idx = raw_idx + n;
             }
             else if (_idx > (n - 1))
             {
-                read_idx = _idx - n;
+                read_idx = raw_idx - n;
             }
             else
             {
-                read_idx = _idx;
+                read_idx = raw_idx;
             }
             acc += error_ticks[read_idx];
         }
