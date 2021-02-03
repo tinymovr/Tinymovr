@@ -104,6 +104,9 @@ set_state()
 
 Sets the controller state and control mode.
 
+.. note::
+    Results of calibration are not automatically saved to Non-Volatile Memory (NVM). You need to issue a ``save_config`` command after calibration is finished to save calibration data to NVM.
+
 Arguments
 ---------
 
@@ -695,6 +698,9 @@ save_config()
 | **type**: Write-only
 
 Saves board configuration to Non-Volatile Memory.
+
+.. note::
+    Saving config to NVM only works when Tinymovr is in idle mode, otherwise the command is ignored.
 
 Arguments
 ---------
