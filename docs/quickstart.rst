@@ -23,6 +23,30 @@ Tinymovr can be installed simply using pip. Python 3.6 or greater is required.
 
 You should now be looking at the Tinymovr Studio IPython interface.
 
+Installing on Raspberry Pi
+##########################
+
+Installation on Raspberry Pi requires a few additional steps.
+
+.. code-block:: console
+
+    sudo apt update
+    sudo apt install python3-pip python3-numpy libopenjp2-7 libtiff5
+    pip3 install tinymovr
+
+You may also need to append a directory to your PATH variable:
+
+.. code-block:: console
+
+    echo 'export PATH="/home/pi/.local/bin:$PATH"' >> ~/.bashrc
+    source ~/.bashrc
+
+Now you should be able to run Tinymovr Studio:
+
+.. code-block:: console
+
+    tinymovr
+
 Checking Functionality and Calibrating
 ######################################
 
