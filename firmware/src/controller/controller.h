@@ -43,6 +43,7 @@ struct ControllerState
 	// TODO: State.state is very confusing, name appropriately
 	ControlState state;
     ControlMode mode;
+    bool is_calibrating;
 
     struct FloatTriplet I_phase_meas;
     struct FloatTriplet modulation_values;
