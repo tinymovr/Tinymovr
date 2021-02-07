@@ -186,12 +186,18 @@ class TestBoard(TMTestCase):
         time.sleep(0.1)
         # Test if idle command works (it should be ignored because we're calibrating)
         self.tm.idle()
+        time.sleep(0.1)
+        self.assertEqual(self.tm.state.state, 1)
+        # Same for closed loop control command
+        self.tm.idle()
+        time.sleep(0.1)
         self.assertEqual(self.tm.state.state, 1)
         # Wait for calibration to finish
-        time.sleep(15)
+        self.wait_for_calibration()
         # Now state transitions should work
         self.assertEqual(self.tm.state.state, 0)
         self.tm.position_control()
+        time.sleep(0.1)
         self.assertEqual(self.tm.state.state, 2)
         self.tm.idle()
 
