@@ -30,6 +30,11 @@
 #include "src/nvm/nvm.h"
 #include "src/watchdog/watchdog.h"
 
+int test_div(int lho, int rho)
+{
+    return lho/rho;
+}
+
 int main(void)
 {
   	__disable_irq();
@@ -46,6 +51,11 @@ int main(void)
     Timer_Init();
     Watchdog_Init();
     __enable_irq();
+
+    int a = 10;
+    int b = 0;
+    volatile int c = 1;
+    c = test_div(a, b);
 
     Controller_ControlLoop();
 }

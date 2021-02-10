@@ -16,6 +16,7 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "src/adc/adc.h"
+#include "src/utils/utils.h"
 #include "system.h"
 
 uint8_t error_flags[ERROR_FLAG_MAX_SIZE] = {0};
@@ -71,9 +72,13 @@ void system_init(void)
     // Vp = 10V , 440mA-540mA, Charge Pump Enable
     pac5xxx_tile_register_write(ADDR_SYSCONF, 0x01);
 
+    // Configure reporting of mcu cycles
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
     DWT->CYCCNT = 0;
     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+
+    // Configure error handling
+    SCB->CCR |= 0x10;
 }
 
 void system_reset(void)
@@ -129,4 +134,11 @@ PAC5XXX_RAMFUNC bool health_check(void)
         success = false;
     }
     return success;
+}
+
+void HardFault_Handler(void)
+{
+	printErrorMsg("In Hard Fault Handler\n");
+	__ASM volatile("BKPT #01");
+	while (1);
 }
