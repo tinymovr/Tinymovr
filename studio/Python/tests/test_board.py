@@ -173,6 +173,34 @@ class TestBoard(TMTestCase):
         self.assertGreater(tim.busy, 0)
         self.assertLess(tim.busy, 3000)
 
+    def test_i_states(self):
+        '''
+        Test state transitions
+        '''
+        self.tm.reset()
+        time.sleep(0.1)
+        # Ensure we're idle
+        self.check_state(0)
+        # Start calibration
+        self.tm.calibrate()
+        time.sleep(0.1)
+        # Test if idle command works (it should be ignored because we're calibrating)
+        self.tm.idle()
+        time.sleep(0.1)
+        self.assertEqual(self.tm.state.state, 1)
+        # Same for closed loop control command
+        self.tm.idle()
+        time.sleep(0.1)
+        self.assertEqual(self.tm.state.state, 1)
+        # Wait for calibration to finish
+        self.wait_for_calibration()
+        # Now state transitions should work
+        self.assertEqual(self.tm.state.state, 0)
+        self.tm.position_control()
+        time.sleep(0.1)
+        self.assertEqual(self.tm.state.state, 2)
+        self.tm.idle()
+
 
 if __name__ == '__main__':
     unittest.main(failfast=True)

@@ -38,6 +38,7 @@ static struct ControllerState state = {
 
     .state = STATE_IDLE,
     .mode = CTRL_CURRENT,
+    .is_calibrating = false,
 
     .I_phase_meas = {0.0f, 0.0f, 0.0f},
     .modulation_values = {0.0f, 0.0f, 0.0f},
@@ -88,7 +89,9 @@ void Controller_ControlLoop(void)
 
 		if (state.state == STATE_CALIBRATE)
 		{
+			state.is_calibrating = true;
 			(void) ((CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && CalibrateOffsetAndEccentricity());
+			state.is_calibrating = false;
 			Controller_SetState(STATE_IDLE);
 		}
 		else if (state.state == STATE_CL_CONTROL)
@@ -213,7 +216,7 @@ PAC5XXX_RAMFUNC ControlState Controller_GetState(void)
 
 PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
 {
-	if (new_state != state.state)
+	if ((new_state != state.state) && (state.is_calibrating == false))
 	{
 		if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE)
 				&& (!error_flags_exist()) && Controller_Calibrated())

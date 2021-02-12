@@ -54,7 +54,11 @@ from the motor and hit Enter to continue")
         '''
         Enter idle state
         '''
-        self.tinymovr.set_state(0)
+        if self.tinymovr.state.state == 1:
+            print("Tinymovr is currently calibrating, \
+please do not interrupt.")
+        else:
+            self.tinymovr.set_state(0)
 
     def position_control(self):
         '''

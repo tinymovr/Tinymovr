@@ -62,6 +62,4 @@ You can now calibrate the motor. Calibration will bypass resistance and inductan
 Controlling the Motor
 ---------------------
 
-.. youtube:: YM__oxuWL3o
-
 Gimbal mode has identical functionality as the regular mode. Position, velocity and current control modes are supported. Note that you may have to tune the control gains to achieve optimal performance.
