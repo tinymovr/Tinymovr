@@ -1,3 +1,9 @@
+--- pac55xx_sdk/driver/pac5xxx_driver_system.c
++++ pac55xx_sdk/driver/pac5xxx_driver_system.c
+@@ -16 +16 @@
+-#include "PAC5XXX_driver_system.h"
++#include "pac5xxx_driver_system.h"
+
 --- pac55xx_sdk/boot_gcc/startup_pac55xx_gcc.c
 +++ pac55xx_sdk/boot_gcc/startup_pac55xx_gcc.c
 @@ -22 +22 @@
