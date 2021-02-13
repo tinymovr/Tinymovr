@@ -11,11 +11,11 @@ jobs:
       run: sudo apt-get install cppcheck
       working-directory: firmware
     - name: Run cppcheck on Tinymovr
-      run: cppcheck --force --addon=cert --addon=misra --error-exitcode=1 -isrc/utils -isrc/nvm -isrc/uart -isrc/can -isrc/adc src
+      run: cppcheck --force --addon=cert --error-exitcode=1 -isrc/utils -isrc/nvm -isrc/uart -isrc/can -isrc/adc src
       working-directory: firmware
-    # - name: Install gcc-arm-none-eabi
-    #   run: sudo apt install gcc-arm-none-eabi
-    #   working-directory: firmware
-    # - name: Build Tinymovr
-    #   run: make
-    #   working-directory: firmware
+    - name: Install gcc-arm-none-eabi
+      run: sudo apt install gcc-arm-none-eabi
+      working-directory: firmware
+    - name: Build Tinymovr
+      run: make
+      working-directory: firmware
