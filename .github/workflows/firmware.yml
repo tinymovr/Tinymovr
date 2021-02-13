@@ -36,7 +36,7 @@ jobs:
 
     - name: Patch deps dir
       run: |
-        pythom -m patch patch.patch
+        python -m patch patch.patch
       working-directory: firmware/pac55xx_sdk 
 
     - name: Build Tinymovr
