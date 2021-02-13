@@ -45,7 +45,8 @@
 #define CAL_R_LEN             (2 * PWM_FREQ_HZ)
 #define CAL_L_LEN             (1 * PWM_FREQ_HZ)
 #define CAL_OFFSET_LEN        (1 * PWM_FREQ_HZ)
-#define CAL_DIR_LEN           (4 * PWM_FREQ_HZ)
+#define CAL_STAY_LEN          (PWM_FREQ_HZ / 2)
+#define CAL_DIR_LEN           (3 * PWM_FREQ_HZ)
 
 #define CAL_PHASE_TURNS             8
 
