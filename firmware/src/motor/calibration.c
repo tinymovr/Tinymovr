@@ -28,6 +28,7 @@
 
 static inline void set_epos_and_wait(float angle, float I_setpoint);
 static inline float get_I_setpoint(void);
+static inline void wait_a_while(void);
 static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 
 bool CalibrateResistance(void)
@@ -176,14 +177,8 @@ bool CalibrateOffsetAndEccentricity(void)
     const float I_setpoint = get_I_setpoint();
     Observer_ClearEccentricityTable();
     int16_t *lut = Observer_GetEccentricityTablePointer();
-    // Wait a while for the observer to settle
-    // TODO: This is a bit of a hack, can be improved!
+    wait_a_while();
     int16_t offset_raw = MA_GetAngle();
-    for (int i=0; i<1000; i++)
-    {
-        Watchdog_Feed();
-        WaitForControlLoopInterrupt();
-    }
     // Perform measuerments, store only mean of F + B error
     for (uint32_t i=0; i<n; i++)
     {
@@ -211,10 +206,10 @@ bool CalibrateOffsetAndEccentricity(void)
     GateDriver_SetDutyCycle(&zeroDC);
 
     // FIR and map measurements to lut
-    for (int i=0; i<ECN_SIZE; i++)
+    for (int16_t i=0; i<ECN_SIZE; i++)
     {
         int32_t acc = 0;
-        for (int j=0; j<ECN_SIZE; j++)
+        for (int16_t j=0; j<ECN_SIZE; j++)
         {
             int16_t read_idx = -ECN_SIZE/2 + j + i*npp;
             if (read_idx < 0)
@@ -235,13 +230,7 @@ bool CalibrateOffsetAndEccentricity(void)
         }
         lut[write_idx] = (int16_t)acc;
     }
-    // Wait a while for the observer to settle
-    // TODO: This is a bit of a hack, can be improved!
-    for (int i=0; i<1000; i++)
-    {
-        Watchdog_Feed();
-        WaitForControlLoopInterrupt();
-    }
+    wait_a_while();
     Observer_SetEccentricityCalibrated();
     return true;
 }
@@ -266,4 +255,15 @@ static inline float get_I_setpoint(void)
 		I_setpoint = CAL_I_SETPOINT_GIMBAL;
 	}
 	return I_setpoint;
+}
+
+static inline void wait_a_while(void)
+{
+	// Wait a while for the observer to settle
+	// TODO: This is a bit of a hack, can be improved!
+	for (int i=0; i<1000; i++)
+	{
+		Watchdog_Feed();
+		WaitForControlLoopInterrupt();
+	}
 }
