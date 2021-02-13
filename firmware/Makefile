@@ -66,11 +66,15 @@ OBJECTS := $(addprefix $(BUILDDIR)/,$(SOURCES:%.c=%.o))
 all: release
 
 # Debug target
-debug: CFLAGS += -DDEBUG -g
-debug: release
+debug: CFLAGS += -DDEBUG -g3
+debug: binary
 
 # Release target
-release: $(HEX) $(ELF)
+release: CFLAGS += -g0
+release: binary
+
+# Release target
+binary: $(HEX) $(ELF)
 
 # Objcopy
 $(HEX): $(ELF)
