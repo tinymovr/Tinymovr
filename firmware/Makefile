@@ -89,4 +89,4 @@ $(BUILDDIR)/%.o: %.c
 # Clean
 .PHONY : clean
 clean :
-	-rm release $(OBJECTS)
+	-rm $(OBJECTS)
