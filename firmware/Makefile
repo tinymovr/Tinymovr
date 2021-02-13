@@ -1,7 +1,7 @@
 SOURCEDIR := .
 BUILDDIR := $(SOURCEDIR)/build
-ELF := $(BUILDDIR)/executable.elf
-HEX := $(BUILDDIR)/executable.hex
+ELF := $(BUILDDIR)/tinymovr_fw.elf
+HEX := $(BUILDDIR)/tinymovr_fw.hex
 OBJDIR = $(BUILDDIR)/obj
 ALLDIRS = $(shell find $(SOURCEDIR) -maxdepth 3 -type d \
 			-not -path "./.git/*" \
@@ -29,7 +29,6 @@ CFLAGS += -Wlogical-op
 CFLAGS += -Waggregate-return
 CFLAGS += -Wdouble-promotion
 CFLAGS += -Wstrict-prototypes
-CFLAGS += -g
 CFLAGS += -std=gnu11
 CFLAGS += $(foreach d, $(ALLDIRS), -I$d)
 
@@ -48,7 +47,6 @@ LDFLAGS += -Wlogical-op
 LDFLAGS += -Waggregate-return
 LDFLAGS += -Wdouble-promotion
 LDFLAGS += -Wstrict-prototypes
-LDFLAGS += -g
 LDFLAGS += -Tpac55xx.ld
 LDFLAGS += -std=gnu11
 LDFLAGS += -nostartfiles
@@ -65,7 +63,18 @@ SOURCES := $(shell find $(SOURCEDIR) -name '*.c')
 OBJECTS := $(addprefix $(BUILDDIR)/,$(SOURCES:%.c=%.o))
 
 # All targets
-all: $(HEX) $(ELF)
+all: release
+
+# Debug target
+debug: CFLAGS += -DDEBUG -g3
+debug: binary
+
+# Release target
+release: CFLAGS += -g0
+release: binary
+
+# Release target
+binary: $(HEX) $(ELF)
 
 # Objcopy
 $(HEX): $(ELF)
@@ -80,3 +89,8 @@ $(ELF): $(OBJECTS)
 $(BUILDDIR)/%.o: %.c
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -I$(HEADERDIR) -I$(dir $<) -c $< -o $@
+
+# Clean
+.PHONY : clean
+clean :
+	-rm $(OBJECTS)

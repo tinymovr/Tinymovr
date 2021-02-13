@@ -47,8 +47,8 @@ Then:
 
 .. code-block:: console
 
-    cd <tinymovr_location>/firmware/pac55xx_sdk
-    python3 -m patch patch.patch
+    cd <tinymovr_location>/firmware
+    python3 -m patch sdk_patch.patch
 
 Done.
 
