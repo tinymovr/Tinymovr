@@ -40,9 +40,13 @@ jobs:
       working-directory: firmware 
 
     - name: Build Debug
-      run: make debug
+      run: |
+        make debug
+        make clean
       working-directory: firmware
 
     - name: Build Release
-      run: make release
+      run: |
+        make release
+        make clean
       working-directory: firmware

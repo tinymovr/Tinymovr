@@ -1,7 +1,7 @@
 SOURCEDIR := .
 BUILDDIR := $(SOURCEDIR)/build
-ELF := $(BUILDDIR)/executable.elf
-HEX := $(BUILDDIR)/executable.hex
+ELF := $(BUILDDIR)/tinymovr_fw.elf
+HEX := $(BUILDDIR)/tinymovr_fw.hex
 OBJDIR = $(BUILDDIR)/obj
 ALLDIRS = $(shell find $(SOURCEDIR) -maxdepth 3 -type d \
 			-not -path "./.git/*" \
@@ -85,3 +85,8 @@ $(ELF): $(OBJECTS)
 $(BUILDDIR)/%.o: %.c
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -I$(HEADERDIR) -I$(dir $<) -c $< -o $@
+
+# Clean
+.PHONY : clean
+clean :
+	-rm edit $(OBJECTS)
