@@ -1,5 +1,5 @@
---- pac55xx_sdk/driver/pac5xxx_driver_socbridge.c
-+++ pac55xx_sdk/driver/pac5xxx_driver_socbridge.c
+--- pac55xx_sdk/driver/pac5xxx_driver_socbridge.h
++++ pac55xx_sdk/driver/pac5xxx_driver_socbridge.h
 @@ -25 +25 @@
 -#include "pac5XXX.h"
 +#include "pac5xxx.h"
