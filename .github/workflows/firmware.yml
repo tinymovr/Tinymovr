@@ -39,6 +39,10 @@ jobs:
         python -m patch sdk_patch.patch
       working-directory: firmware 
 
-    - name: Build Tinymovr
-      run: make
+    - name: Build Debug
+      run: make debug
+      working-directory: firmware
+
+    - name: Build Release
+      run: make release
       working-directory: firmware

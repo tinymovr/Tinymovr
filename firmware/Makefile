@@ -29,7 +29,6 @@ CFLAGS += -Wlogical-op
 CFLAGS += -Waggregate-return
 CFLAGS += -Wdouble-promotion
 CFLAGS += -Wstrict-prototypes
-CFLAGS += -g
 CFLAGS += -std=gnu11
 CFLAGS += $(foreach d, $(ALLDIRS), -I$d)
 
@@ -48,7 +47,6 @@ LDFLAGS += -Wlogical-op
 LDFLAGS += -Waggregate-return
 LDFLAGS += -Wdouble-promotion
 LDFLAGS += -Wstrict-prototypes
-LDFLAGS += -g
 LDFLAGS += -Tpac55xx.ld
 LDFLAGS += -std=gnu11
 LDFLAGS += -nostartfiles
@@ -65,7 +63,14 @@ SOURCES := $(shell find $(SOURCEDIR) -name '*.c')
 OBJECTS := $(addprefix $(BUILDDIR)/,$(SOURCES:%.c=%.o))
 
 # All targets
-all: $(HEX) $(ELF)
+all: release
+
+# Debug target
+debug: CFLAGS += -DDEBUG -g
+debug: release
+
+# Release target
+release: $(HEX) $(ELF)
 
 # Objcopy
 $(HEX): $(ELF)
