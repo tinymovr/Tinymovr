@@ -45,7 +45,8 @@
 #define CAL_R_LEN             (2 * PWM_FREQ_HZ)
 #define CAL_L_LEN             (1 * PWM_FREQ_HZ)
 #define CAL_OFFSET_LEN        (1 * PWM_FREQ_HZ)
-#define CAL_DIR_LEN           (4 * PWM_FREQ_HZ)
+#define CAL_STAY_LEN          (PWM_FREQ_HZ / 2)
+#define CAL_DIR_LEN           (3 * PWM_FREQ_HZ)
 
 #define CAL_PHASE_TURNS             8
 
@@ -53,6 +54,10 @@
 #define CAL_I_SETPOINT (5.0f)
 #define CAL_I_SETPOINT_GIMBAL (0.7f)
 #define CAL_V_INDUCTANCE (2.0f)
+
+// Eccentricity correction lookup table size
+#define ECN_BITS (6)
+#define ECN_SIZE (2 << ECN_BITS)
 
 // UART
 #define UART_ENUM UARTB

@@ -38,15 +38,14 @@ struct ObserverConfig
 
 	int32_t sector_half_interval;
 
-	float pos_offset;     // offset array for each sensor
-	bool offset_calibrated;
-	int direction;      // direction 1 positive, -1 negative
 	bool direction_calibrated;
+	int direction;      // direction 1 positive, -1 negative
+	bool eccentricity_calibrated;
+	int16_t eccentricity_table[ECN_SIZE];
 };
 
 void Observer_Init(void);
-void Observer_Reset(void);
-PAC5XXX_RAMFUNC void Observer_UpdatePos(void);
+PAC5XXX_RAMFUNC void Observer_UpdateEstimates(void);
 PAC5XXX_RAMFUNC float Observer_GetPosEstimate(void);
 PAC5XXX_RAMFUNC float Observer_GetPosDiff(float target);
 PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrapped(void);
@@ -59,11 +58,11 @@ void Observer_SetBandwidth(float bw);
 PAC5XXX_RAMFUNC int Observer_GetDirection(void);
 void Observer_CalibrateDirection(float ref_pos); // Considers POSITIVE electrical phase
 void Observer_SetDirection(int dir);
-PAC5XXX_RAMFUNC float Observer_GetOffset(void);
-void Observer_CalibrateOffset(void);
-void Observer_SetOffset(float offset);
+void Observer_ClearEccentricityTable(void);
+void Observer_SetEccentricityCalibrated(void);
+int16_t *Observer_GetEccentricityTablePointer(void);
 
-bool Observer_Calibrated(void);
+PAC5XXX_RAMFUNC bool Observer_Calibrated(void);
 
 struct ObserverConfig* Observer_GetConfig(void);
 void Observer_RestoreConfig(struct ObserverConfig* config_);

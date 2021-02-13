@@ -357,9 +357,9 @@ uint8_t CAN_EraseConfig(uint8_t buffer[])
 uint8_t CAN_GetMotorConfig(uint8_t buffer[])
 {
     uint8_t flags = (motor_is_calibrated() == true) | ((motor_is_gimbal() == true) << 1);
-    uint16_t R = (uint16_t)(Motor_GetPhaseResistance() * 1e+3);
+    uint16_t R = (uint16_t)(Motor_GetPhaseResistance() * 1e+3f);
     uint8_t pole_pairs = Motor_GetPolePairs();
-    uint16_t L = (uint16_t)(Motor_GetPhaseInductance() * 1e+6);
+    uint16_t L = (uint16_t)(Motor_GetPhaseInductance() * 1e+6f);
     uint16_t ticks = (uint16_t)ENCODER_TICKS;
     memcpy(&buffer[0], &flags, sizeof(uint8_t));
     memcpy(&buffer[1], &R, sizeof(uint16_t));
@@ -384,8 +384,8 @@ uint8_t CAN_SetMotorConfig(uint8_t buffer[])
     {
         bool is_gimbal = (bool)(flags & 0x1);
         motor_set_is_gimbal(is_gimbal);
-        Motor_SetPhaseResistance(((float)R) * 1e-3);
-        Motor_SetPhaseInductance(((float)L) * 1e-6);
+        Motor_SetPhaseResistance(((float)R) * 1e-3f);
+        Motor_SetPhaseInductance(((float)L) * 1e-6f);
 
         response = CANRP_Write;
     }

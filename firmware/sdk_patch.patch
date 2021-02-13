@@ -1,7 +1,23 @@
-diff --git pac5xxx_driver_tile_socbridge.c pac5xxx_driver_tile_socbridge.c
-index f99ced2..630212e 100644
---- pac5xxx_driver_tile_socbridge.c
-+++ pac5xxx_driver_tile_socbridge.c
+--- pac55xx_sdk/driver/pac5xxx_driver_socbridge.h
++++ pac55xx_sdk/driver/pac5xxx_driver_socbridge.h
+@@ -25 +25 @@
+-#include "pac5XXX.h"
++#include "pac5xxx.h"
+
+--- pac55xx_sdk/driver/pac5xxx_driver_system.c
++++ pac55xx_sdk/driver/pac5xxx_driver_system.c
+@@ -16 +16 @@
+-#include "PAC5XXX_driver_system.h"
++#include "pac5xxx_driver_system.h"
+
+--- pac55xx_sdk/boot_gcc/startup_pac55xx_gcc.c
++++ pac55xx_sdk/boot_gcc/startup_pac55xx_gcc.c
+@@ -22 +22 @@
+-#define STACK_SIZE      0x000000C0                  //Stack size (in Words)
++#define STACK_SIZE      0x00000C00                  //Stack size (in Words)
+
+--- pac55xx_sdk/driver/pac5xxx_driver_tile_socbridge.c
++++ pac55xx_sdk/driver/pac5xxx_driver_tile_socbridge.c
 @@ -27,7 +27,8 @@ RAMFUNC_TILE void pac5xxx_tile_socbridge_config(int enable, int int_enable)
  }
  
