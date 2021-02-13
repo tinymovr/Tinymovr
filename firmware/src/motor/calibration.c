@@ -26,6 +26,8 @@
 #include <src/system/system.h>
 #include <src/motor/calibration.h>
 
+static inline void set_epos_and_wait(float angle, float I_setpoint);
+static inline float get_I_setpoint(void);
 static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 
 bool CalibrateResistance(void)
@@ -122,51 +124,40 @@ bool CalibrateDirectionAndPolePairs(void)
     // Note that, in order to generate the error table,
     // we read the unwrapped positions given by the
     // observer, but we generate and use the error table
-    // before the observer, at the encoder.
-
-    const float end_angle = CAL_PHASE_TURNS * twopi;
-    float dir_initial_pos = 0.0f;
-    struct FloatTriplet modulation_values = {0.0f};
+    // before the observer, at the encoder read.
+    const float epos_target = CAL_PHASE_TURNS * twopi;
+    const float I_setpoint = get_I_setpoint();
     bool success = true;
-    dir_initial_pos = Observer_GetPosEstimate();
-    // Go to target ecycles
+    // Stay a bit at starting epos
+	for (uint32_t i=0; i<CAL_STAY_LEN; i++)
+	{
+		set_epos_and_wait(0, I_setpoint);
+	}
+    const float epos_start = Observer_GetPosEstimate();
+    // Move to target epos
     for (uint32_t i=0; i<CAL_DIR_LEN; i++)
     {
-        // Ensure rotor stays at 2*Pi eangle a bit
-        const float factor = (float)i;
-        float cur_angle = 1.2f * end_angle * (factor/CAL_DIR_LEN);
-        our_clamp(&cur_angle, 0.0f, end_angle);
-        float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
-        our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
-        SVM(pwm_setpoint * fast_cos(cur_angle), pwm_setpoint * fast_sin(cur_angle),
-            &modulation_values.A, &modulation_values.B, &modulation_values.C);
-        GateDriver_SetDutyCycle(&modulation_values);
-        Watchdog_Feed();
-        WaitForControlLoopInterrupt();
+        set_epos_and_wait(epos_target * ((float)i/CAL_DIR_LEN), I_setpoint);
     }
+    // Stay a bit at target epos
+	for (uint32_t i=0; i<CAL_STAY_LEN; i++)
+	{
+		set_epos_and_wait(epos_target, I_setpoint);
+	}
     // Try to calibrate
-    if (!Motor_FindPolePairs(ENCODER_TICKS, dir_initial_pos, Observer_GetPosEstimate(), end_angle))
+    if (!Motor_FindPolePairs(ENCODER_TICKS, epos_start, Observer_GetPosEstimate(), epos_target))
     {
         add_error_flag(ERROR_INVALID_POLE_PAIRS);
         success = false;
     }
     else
     {
-        Observer_CalibrateDirection(dir_initial_pos);
+        Observer_CalibrateDirection(epos_start);
     }
-    // Go back to start
+    // Go back to start epos
     for (uint32_t i=0; i<CAL_DIR_LEN; i++)
     {
-        const float factor = (float)i;
-        float cur_angle = end_angle * (1.0f - (factor / CAL_DIR_LEN));
-        our_clamp(&cur_angle, 0.0f, end_angle);
-        float pwm_setpoint = (I_setpoint * Motor_GetPhaseResistance()) / ADC_GetVBus();
-        our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
-        SVM(pwm_setpoint * fast_cos(cur_angle), pwm_setpoint * fast_sin(cur_angle),
-            &modulation_values.A, &modulation_values.B, &modulation_values.C);
-        GateDriver_SetDutyCycle(&modulation_values);
-        Watchdog_Feed();
-        WaitForControlLoopInterrupt();
+        set_epos_and_wait(epos_target * (1.0f - ((float)i/CAL_DIR_LEN)), I_setpoint);
     }
     GateDriver_SetDutyCycle(&zeroDC);
     return success;
@@ -175,99 +166,104 @@ bool CalibrateDirectionAndPolePairs(void)
 bool CalibrateOffsetAndEccentricity(void)
 {
     // Size below is an arbitrary large number ie > ECN_SIZE * npp
-    int16_t error_ticks[2048];
+    int16_t error_ticks[ECN_SIZE * 24];
     const int16_t npp = Motor_GetPolePairs();
     const int16_t n = ECN_SIZE * npp;
-    const int16_t nconv = 50;                                                          
+    const int16_t nconv = 50;
     const float delta = 2 * PI * npp / (n * nconv);
     const float e_pos_to_ticks = ((float)ENCODER_TICKS)/(2 * PI * npp);
     float e_pos_ref = 0.f;
-    struct FloatTriplet modulation_values = {0.0f};
+    const float I_setpoint = get_I_setpoint();
     Observer_ClearEccentricityTable();
     int16_t *lut = Observer_GetEccentricityTablePointer();
     // Wait a while for the observer to settle
     // TODO: This is a bit of a hack, can be improved!
     int16_t offset_raw = MA_GetAngle();
-    for (int16_t i=0; i<1000; i++)
+    for (int i=0; i<1000; i++)
     {
         Watchdog_Feed();
         WaitForControlLoopInterrupt();
     }
     // Perform measuerments, store only mean of F + B error
-    for (int16_t i=0; i<n; i++)
+    for (uint32_t i=0; i<n; i++)
     {
-        for (int16_t j=0; j<nconv; j++)
+        for (uint8_t j=0; j<nconv; j++)
         {
             e_pos_ref += delta;
-            float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
-            our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
-            SVM(pwm_setpoint * fast_cos(e_pos_ref), pwm_setpoint * fast_sin(e_pos_ref),
-                &modulation_values.A, &modulation_values.B, &modulation_values.C);
-            GateDriver_SetDutyCycle(&modulation_values);
-            Watchdog_Feed();
-            WaitForControlLoopInterrupt();
+            set_epos_and_wait(e_pos_ref, I_setpoint);
         }
         WaitForControlLoopInterrupt();
-        const float error = ((e_pos_ref * e_pos_to_ticks) - Observer_GetPosEstimate());
-        error_ticks[i] = (int16_t)error;
+        const float pos_meas = Observer_GetPosEstimate();
+        error_ticks[i] = (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
     }
     offset_raw = (offset_raw + MA_GetAngle()) / 2;
-    for (int16_t i=0; i<n; i++)
+    for (uint32_t i=0; i<n; i++)
     {
-        for (int16_t j=0; j<nconv; j++)
+        for (uint8_t j=0; j<nconv; j++)
         {
             e_pos_ref -= delta;
-            float pwm_setpoint = (CAL_I_SETPOINT * Motor_GetPhaseResistance()) / ADC_GetVBus();
-            our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
-            SVM(pwm_setpoint * fast_cos(e_pos_ref), pwm_setpoint * fast_sin(e_pos_ref),
-                &modulation_values.A, &modulation_values.B, &modulation_values.C);
-            GateDriver_SetDutyCycle(&modulation_values);
-            Watchdog_Feed();
-            WaitForControlLoopInterrupt();
+            set_epos_and_wait(e_pos_ref, I_setpoint);
         }
         WaitForControlLoopInterrupt();
-        const float error = ((0.5f * ((float)error_ticks[n-i-1]) + (e_pos_ref * e_pos_to_ticks) - Observer_GetPosEstimate()));
-        error_ticks[n-i-1] = (int16_t)error;
+        const float pos_meas = Observer_GetPosEstimate();
+        error_ticks[n-i-1] = (int16_t)(0.5f * ((float)error_ticks[n-i-1] + e_pos_ref * e_pos_to_ticks - pos_meas));
     }
     GateDriver_SetDutyCycle(&zeroDC);
 
     // FIR and map measurements to lut
-    for (int16_t i=0; i<ECN_SIZE; i++)
+    for (int i=0; i<ECN_SIZE; i++)
     {
         int32_t acc = 0;
-        for (int16_t j=0; j<ECN_SIZE; j++)
+        for (int j=0; j<ECN_SIZE; j++)
         {
-            int16_t raw_idx = -(ECN_SIZE / 2) + j + (i * npp);
-            int16_t read_idx;
-            if (raw_idx < 0)
+            int16_t read_idx = -ECN_SIZE/2 + j + i*npp;
+            if (read_idx < 0)
             {
-                read_idx = raw_idx + n;
+                read_idx += n;
             }
-            else if (_idx > (n - 1))
+            else if (read_idx > n - 1)
             {
-                read_idx = raw_idx - n;
-            }
-            else
-            {
-                read_idx = raw_idx;
+                read_idx -= n;
             }
             acc += error_ticks[read_idx];
         }
-        int16_t offset_val = acc / ECN_SIZE;
+        acc /= ECN_SIZE;
         int16_t write_idx = i + (offset_raw>>ECN_BITS);
         if (write_idx > (ECN_SIZE - 1))
         {
             write_idx -= ECN_SIZE;
         }
-        lut[write_idx] = offset_val;
+        lut[write_idx] = (int16_t)acc;
     }
     // Wait a while for the observer to settle
     // TODO: This is a bit of a hack, can be improved!
-    for (int16_t i=0; i<1000; i++)
+    for (int i=0; i<1000; i++)
     {
         Watchdog_Feed();
         WaitForControlLoopInterrupt();
     }
     Observer_SetEccentricityCalibrated();
     return true;
+}
+
+static inline void set_epos_and_wait(float angle, float I_setpoint)
+{
+	struct FloatTriplet modulation_values = {0.0f};
+	float pwm_setpoint = (I_setpoint * Motor_GetPhaseResistance()) / ADC_GetVBus();
+	our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
+	SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),
+		&modulation_values.A, &modulation_values.B, &modulation_values.C);
+	GateDriver_SetDutyCycle(&modulation_values);
+	Watchdog_Feed();
+	WaitForControlLoopInterrupt();
+}
+
+static inline float get_I_setpoint(void)
+{
+	float I_setpoint = CAL_I_SETPOINT;
+	if (motor_is_gimbal() == true)
+	{
+		I_setpoint = CAL_I_SETPOINT_GIMBAL;
+	}
+	return I_setpoint;
 }
