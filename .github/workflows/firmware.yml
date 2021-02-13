@@ -36,8 +36,8 @@ jobs:
 
     - name: Patch deps dir
       run: |
-        python -m patch patch.patch
-      working-directory: firmware/pac55xx_sdk 
+        python -m patch sdk_patch.patch
+      working-directory: firmware 
 
     - name: Build Tinymovr
       run: make
