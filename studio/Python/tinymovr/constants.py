@@ -10,6 +10,7 @@ class ControlModes(IntEnum):
     CurrentControl = 0
     VelocityControl = 1
     PositionControl = 2
+    TrajectoryControl = 3
 
 class ErrorIDs(IntEnum):
     InvalidState = 1

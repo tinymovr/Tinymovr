@@ -27,7 +27,7 @@
 #include <src/motor/calibration.h>
 #include <src/controller/controller.h>
 
-PAC5XXX_RAMFUNC void CLControlStep(void);
+void CLControlStep(void);
 PAC5XXX_RAMFUNC void IdleStep(void);
 PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
     float vel_gain, float *I);
@@ -108,15 +108,16 @@ void Controller_ControlLoop(void)
 	}
 }
 
-PAC5XXX_RAMFUNC void CLControlStep(void)
+void CLControlStep(void)
 {
     if (state.mode >= CTRL_TRAJECTORY)
     {
-        state.t_plan += ;
+        state.t_plan += PWM_PERIOD_S;
         // WARN: Updating the setpoints directly is a bit risky!
         if (!planner_evaluate(state.t_plan, motion_plan, &state.pos_setpoint, &state.vel_setpoint))
         {
-            Controller_SetState(STATE_CL_CONTROL, CTRL_POSITION);
+        	// Drop to position mode on error or completion
+            Controller_SetMode(CTRL_POSITION);
         }
     }
 
@@ -259,25 +260,24 @@ ControlMode Controller_GetMode(void)
 
 void Controller_SetMode(ControlMode new_mode)
 {
-    if (new_mode == state.mode)
+    if (new_mode != state.mode)
     {
-        // No action
-    }
-	else if (new_mode == CTRL_POSITION)
-	{
-		state.mode = CTRL_POSITION;
-	}
-	else if (new_mode == CTRL_VELOCITY)
-	{
-		state.mode = CTRL_VELOCITY;
-	}
-	else if (new_mode == CTRL_CURRENT)
-	{
-		state.mode = CTRL_CURRENT;
-	}
-    else
-    {
-        // No action
+		if (new_mode == CTRL_TRAJECTORY)
+		{
+			state.mode = CTRL_TRAJECTORY;
+		}
+		else if (new_mode == CTRL_POSITION)
+		{
+			state.mode = CTRL_POSITION;
+		}
+		else if (new_mode == CTRL_VELOCITY)
+		{
+			state.mode = CTRL_VELOCITY;
+		}
+		else if (new_mode == CTRL_CURRENT)
+		{
+			state.mode = CTRL_CURRENT;
+		}
     }
 }
 
@@ -410,7 +410,7 @@ void Controller_SetIqLimit(float limit)
 void controller_set_motion_plan(MotionPlan *mp)
 {
     motion_plan = mp;
-    state->t_plan = 0.0f;
+    state.t_plan = 0.0f;
 }
 
 PAC5XXX_RAMFUNC bool Controller_Calibrated(void)
