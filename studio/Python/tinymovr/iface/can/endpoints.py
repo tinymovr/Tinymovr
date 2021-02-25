@@ -90,6 +90,15 @@ can_endpoints: Dict[str, Dict] = {
         "units": ("tick", "tick/second"),
         "labels": ("position", "velocity")
     },
+    "move_to":
+    {
+        "description": "Move to position using trajectory planner",
+        "type": "w",
+        "ep_id": 0x00B,
+        "types": (DataType.FLOAT, DataType.UINT16, DataType.UINT8, DataType.UINT8),
+        "units": ("tick", "millisecond", None, None),
+        "labels": ("target_position", "total_time", "acc_fraction", "dec_fraction")
+    },
     "set_pos_setpoint":
     {
         "description": "Set Position Setpoint",

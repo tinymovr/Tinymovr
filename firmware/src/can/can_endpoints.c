@@ -49,7 +49,7 @@ void CANEP_InitEndpointMap(void)
     // 0x008 AVAIL
     CANEP_AddEndpoint(&CAN_GetEncoderEstimates, 0x009);
     CANEP_AddEndpoint(&CAN_GetSetpoints, 0x00A);
-    // 0x00B Reserved: Move To Pos
+    CANEP_AddEndpoint(&CAN_MoveToPos, 0x00B);
     CANEP_AddEndpoint(&CAN_SetPosSetpoint, 0x00C);
     CANEP_AddEndpoint(&CAN_SetVelSetpoint, 0x00D);
     CANEP_AddEndpoint(&CAN_SetIqSetpoint, 0x00E);
@@ -177,6 +177,27 @@ uint8_t CAN_GetSetpoints(uint8_t buffer[])
     memcpy(&buffer[0], &pos, sizeof(float));
     memcpy(&buffer[4], &vel, sizeof(float));
     return CANRP_Read;
+}
+
+uint8_t CAN_MoveToPos(uint8_t buffer[])
+{
+    float target_pos;
+    uint16_t t_tot_int;
+    uint8_t p_acc;
+    uint8_t p_dec;
+    uint8_t response = CANRP_NoAction;
+    memcpy(&target_pos, &buffer[0], sizeof(float));
+    memcpy(&t_tot_int, &buffer[4], sizeof(uint16_t));
+    memcpy(&p_acc, &buffer[6], sizeof(uint8_t));
+    memcpy(&p_dec, &buffer[7], sizeof(uint8_t));
+    float t_tot = ((float)t_tot_int) * 1e-3f;
+    float t_acc = t_tot * ((float)p_acc/256.f);
+    float t_dec = t_tot * ((float)p_dec/256.f);
+    if (planner_move_to(target_pos, t_tot, t_acc, t_dec))
+    {
+        response = CANRP_Write;
+    }
+    return response;
 }
 
 uint8_t CAN_SetPosSetpoint(uint8_t buffer[])

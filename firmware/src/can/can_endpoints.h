@@ -40,6 +40,8 @@ uint8_t CAN_SetState(uint8_t buffer[]);
 uint8_t CAN_GetEncoderEstimates(uint8_t buffer[]);
 uint8_t CAN_GetSetpoints(uint8_t buffer[]);
 
+uint8_t CAN_MoveToPos(uint8_t buffer[]);
+
 uint8_t CAN_SetPosSetpoint(uint8_t buffer[]);
 uint8_t CAN_SetVelSetpoint(uint8_t buffer[]);
 uint8_t CAN_SetIqSetpoint(uint8_t buffer[]);
