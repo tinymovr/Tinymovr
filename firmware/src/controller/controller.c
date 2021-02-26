@@ -27,7 +27,7 @@
 #include <src/motor/calibration.h>
 #include <src/controller/controller.h>
 
-void CLControlStep(void);
+PAC5XXX_RAMFUNC void CLControlStep(void);
 PAC5XXX_RAMFUNC void IdleStep(void);
 PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
     float vel_gain, float *I);
@@ -108,7 +108,7 @@ void Controller_ControlLoop(void)
 	}
 }
 
-void CLControlStep(void)
+PAC5XXX_RAMFUNC void CLControlStep(void)
 {
     if (state.mode >= CTRL_TRAJECTORY)
     {
