@@ -45,6 +45,6 @@ typedef struct
 
 bool planner_move_to(float p_target, float deltat_tot, float deltat_acc, float deltat_dec);
 bool planner_prepare_plan(float p_target, float deltat_tot, float deltat_acc, float deltat_dec, MotionPlan *plan);
-bool planner_evaluate(float t, MotionPlan *plan, float *pos, float *vel);
+PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan, float *pos, float *vel);
 
 #endif /* CONTROLLER_TRAJECTORY_PLANNER_H_ */
