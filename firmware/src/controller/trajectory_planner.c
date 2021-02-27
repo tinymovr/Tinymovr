@@ -1,6 +1,7 @@
 
 #include <src/system/system.h>
 #include <src/controller/controller.h>
+#include <src/utils/utils.h>
 #include <src/controller/trajectory_planner.h>
 
 static MotionPlan motion_plan = {0};
@@ -24,9 +25,14 @@ bool planner_prepare_plan(float p_target, float deltat_tot, float deltat_acc, fl
     float S = p_target - p_0;
     float v_0 = Controller_GetVelSetpoint();
     float deltat_cruise = deltat_tot - deltat_acc - deltat_dec;
+    float v_cruise = (S - 0.5f * deltat_acc * v_0) / (0.5f * deltat_acc + deltat_cruise + 0.5f * deltat_dec);
     if (deltat_tot < 0 || deltat_acc < 0 || deltat_dec < 0 || deltat_cruise < 0.0f)
     {
     	add_error_flag(ERROR_PLANNER_INVALID_INPUT);
+    }
+    else if (fabsf(v_cruise) > Controller_GetVelLimit())
+    {
+    	add_error_flag(ERROR_PLANNER_VCRUISE_OVER_LIMIT);
     }
     else if (S != 0.0f)
 	{
@@ -34,7 +40,6 @@ bool planner_prepare_plan(float p_target, float deltat_tot, float deltat_acc, fl
 	}
     if (response == true)
     {
-		float v_cruise = (S - 0.5f * deltat_acc * v_0) / (0.5f * deltat_acc + deltat_cruise + 0.5f * deltat_dec);
 		float acc = (v_cruise - v_0) / deltat_acc;
 		float dec = - v_cruise / deltat_dec;
 		// Assign everything
