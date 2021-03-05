@@ -131,13 +131,13 @@ You can also set quantities in any (defined) unit you wish. For instance:
 
 .. code-block:: python
 
-    In [1]: tm1.set_pos_setpoint(3.0 * ureg('rad'))
+    In [1]: tm1.set_pos_setpoint(2.0 * ureg('rad'))
 
-The above will set the rotor position to 3 radians from the initial position. Similarly for velocity:
+The above will set the rotor position to 2 radians from the initial position. Similarly for velocity:
 
 .. code-block:: python
 
-    In [1]: tm1.set_pos_setpoint(3.0 * ureg('rad/s'))
+    In [1]: tm1.set_vel_setpoint(2.0 * ureg('rad/s'))
 
 Will set velocity to 3 radians/second. If not unit is used in setting a value, the default units will be assumed, in the above cases ticks and ticks/second.
 
