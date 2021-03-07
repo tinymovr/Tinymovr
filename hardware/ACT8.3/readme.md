@@ -15,6 +15,7 @@ The following Bill of Materials is recommended:
 - 1x 6705ZZ 25x32x4mm bearing
 - 1x 6703ZZ 17x23x4mm bearing
 - 2x 693ZZ 3x8x4mm bearings
+- 2x GT2 158mm length 6mm width belts
 - 1x GT2 Timing Pulley 12 teeth 4mm bore 6mm belt width
 - 10x M2 threaded inserts
 - 6x M2 bolts, 20mm length
