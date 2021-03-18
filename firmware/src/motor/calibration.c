@@ -135,6 +135,7 @@ bool CalibrateDirectionAndPolePairs(void)
 		set_epos_and_wait(0, I_setpoint);
 	}
     const float epos_start = Observer_GetPosEstimate();
+    float epos_end = 0;
     // Move to target epos
     for (uint32_t i=0; i<CAL_DIR_LEN; i++)
     {
@@ -153,7 +154,7 @@ bool CalibrateDirectionAndPolePairs(void)
     }
     else
     {
-        Observer_CalibrateDirection(epos_start);
+    	epos_end = Observer_GetPosEstimate();
     }
     // Go back to start epos
     for (uint32_t i=0; i<CAL_DIR_LEN; i++)
@@ -161,6 +162,10 @@ bool CalibrateDirectionAndPolePairs(void)
         set_epos_and_wait(epos_target * (1.0f - ((float)i/CAL_DIR_LEN)), I_setpoint);
     }
     GateDriver_SetDutyCycle(&zeroDC);
+    if (success && epos_start > epos_end)
+	{
+    	motor_set_phases_swapped(true);
+	}
     return success;
 }
 
@@ -261,7 +266,7 @@ static inline void wait_a_while(void)
 {
 	// Wait a while for the observer to settle
 	// TODO: This is a bit of a hack, can be improved!
-	for (int i=0; i<1000; i++)
+	for (int i=0; i<5000; i++)
 	{
 		Watchdog_Feed();
 		WaitForControlLoopInterrupt();
