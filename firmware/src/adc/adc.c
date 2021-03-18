@@ -15,8 +15,9 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "string.h"
-#include "adc.h"
+#include <string.h>
+#include <src/motor/motor.h>
+#include <src/adc/adc.h>
 
 // Resistor value of diffamp AIO RC filter
 #define AIORES_VALUE                    100.0f
@@ -243,8 +244,16 @@ PAC5XXX_RAMFUNC int16_t ADC_GetMCUTemp(void)
 PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc)
 {
     phc->A = adc.I_phase_meas.A;
-    phc->B = adc.I_phase_meas.B;
-    phc->C = adc.I_phase_meas.C;
+    if (motor_phases_swapped())
+    {
+    	phc->B = adc.I_phase_meas.C;
+    	phc->C = adc.I_phase_meas.B;
+    }
+    else
+    {
+    	phc->B = adc.I_phase_meas.B;
+    	phc->C = adc.I_phase_meas.C;
+    }
 }
 
 PAC5XXX_RAMFUNC void ADC_UpdateMeasurements(void)

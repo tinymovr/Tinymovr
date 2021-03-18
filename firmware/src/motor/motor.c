@@ -27,6 +27,7 @@ static struct MotorConfig config = {
 	.inductance_calibrated = false,
 	.poles_calibrated = false,
 
+	.phases_swapped = false,
     .is_gimbal = false
 };
 
@@ -90,6 +91,16 @@ PAC5XXX_RAMFUNC void Motor_SetPhaseInductance(float L)
         config.inductance_calibrated = true;
     }
     // TODO: else error
+}
+
+PAC5XXX_RAMFUNC bool motor_phases_swapped(void)
+{
+	return config.phases_swapped;
+}
+
+PAC5XXX_RAMFUNC void motor_set_phases_swapped(bool swapped)
+{
+	config.phases_swapped = swapped;
 }
 
 PAC5XXX_RAMFUNC bool motor_is_calibrated(void)
