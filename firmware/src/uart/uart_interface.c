@@ -129,10 +129,6 @@ int32_t UART_ReadAddr(uint8_t addr)
             ret_val = (int32_t)(Controller_GetVelIntegratorGain() * UART_VEL_INT_SCALING_FACTOR);
         break;
 
-        case 'd': // observer direction
-            ret_val = Observer_GetDirection();
-        break;
-
         case 'h': // phase resistance
             ret_val = Motor_GetPhaseResistance() * UART_R_SCALING_FACTOR;
         break;

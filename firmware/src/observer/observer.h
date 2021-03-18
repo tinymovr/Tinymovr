@@ -38,8 +38,6 @@ struct ObserverConfig
 
 	int32_t sector_half_interval;
 
-	bool direction_calibrated;
-	int direction;      // direction 1 positive, -1 negative
 	bool eccentricity_calibrated;
 	int16_t eccentricity_table[ECN_SIZE];
 };
@@ -55,9 +53,6 @@ PAC5XXX_RAMFUNC float Observer_GetVelEstimateRadians(void);
 
 PAC5XXX_RAMFUNC float Observer_GetBandwidth(void);
 void Observer_SetBandwidth(float bw);
-PAC5XXX_RAMFUNC int Observer_GetDirection(void);
-void Observer_CalibrateDirection(float ref_pos); // Considers POSITIVE electrical phase
-void Observer_SetDirection(int dir);
 void Observer_ClearEccentricityTable(void);
 void Observer_SetEccentricityCalibrated(void);
 int16_t *Observer_GetEccentricityTablePointer(void);
