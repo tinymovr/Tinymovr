@@ -29,9 +29,10 @@ struct GateDriver_
 };
 
 void GateDriver_Init(void);
-extern PAC5XXX_RAMFUNC void GateDriver_Enable(void);
-extern PAC5XXX_RAMFUNC void GateDriver_Disable(void);
-extern PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dc);
+PAC5XXX_RAMFUNC void GateDriver_Enable(void);
+PAC5XXX_RAMFUNC void GateDriver_Disable(void);
+PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dc);
+
 
 //=============================================
 // Motor Driver Duty Cycle Macro Functions
