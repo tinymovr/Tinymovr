@@ -15,11 +15,16 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from copy import copy
+import pkg_resources
+from packaging import version
 import json
 from tinymovr.iface import IFace
 from tinymovr.presenter import presenter_map, strip_end
 from tinymovr.constants import ControlStates, ControlModes
 from pint import Quantity as _Q
+
+
+min_fw_version = "0.8.0"
 
 
 class Tinymovr:
@@ -31,6 +36,17 @@ class Tinymovr:
         self.fw_version = ".".join(
             [str(di.fw_major), str(di.fw_minor), str(di.fw_patch)]
         )
+        assert version.parse(self.fw_version) >= version.parse(
+            min_fw_version
+        ), "Min FW version requirement ({}) not satisfied!".format(min_fw_version)
+
+        msv = self.min_studio_version
+        msv_str = ".".join(
+            [str(msv.fw_major), str(msv.fw_minor), str(msv.fw_patch)]
+        )
+        sv = pkg_resources.require("tinymovr")[0].version
+        assert version.parse(sv) >= version.parse(msv_str), "Min Studio version requirement ({}) not satisfied!".format(msv_str)
+
 
     def __getattr__(self, _attr: str):
         attr = strip_end(_attr, "_asdict")
