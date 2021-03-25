@@ -17,12 +17,9 @@ import logging
 import pkg_resources
 import can
 import IPython
-from IPython import get_ipython
 from traitlets.config import Config
-
 from docopt import docopt
 import pynumparser
-
 from tinymovr import UserWrapper
 from tinymovr.iface import IFace
 from tinymovr.iface.can_bus import CANBus, guess_channel
