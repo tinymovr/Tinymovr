@@ -1,4 +1,4 @@
-![C/C++ CI](https://github.com/yconst/Tinymovr-Firmware/workflows/C/C++%20CI/badge.svg)
+![FW Check Build](https://github.com/yconst/tinymovr/workflows/Tinymovr%20Firmware%20Check%2FBuild/badge.svg)
 
 Firmware for the Tinymovr R3 platform (PAC5527).
 
