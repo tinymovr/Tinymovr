@@ -34,6 +34,7 @@ class InSilico(can.BusABC):
         self.last_call_time = datetime.now()
         self.ep_func_map: Dict[int, callable] = {
             0x03: self._get_state,
+            0x04: self._get_min_studio_version,
             0x07: self._set_state,
             0x09: self._get_encoder_estimates,
             0x0A: self._get_setpoints,
@@ -145,6 +146,11 @@ class InSilico(can.BusABC):
         gen_payload = self.codec.serialize(vals, *can_endpoints["state"]["types"])
         self.buffer = create_frame(self.node_id, 0x03, False, gen_payload)
 
+    def _get_min_studio_version(self, payload):
+        vals: Tuple = (0, 3, 7)
+        gen_payload = self.codec.serialize(vals, *can_endpoints["min_studio_version"]["types"])
+        self.buffer = create_frame(self.node_id, 0x04, False, gen_payload)
+
     def _set_state(self, payload):
         vals = self.codec.deserialize(payload, *can_endpoints["set_state"]["types"])
         new_state = vals[0]
@@ -170,7 +176,7 @@ class InSilico(can.BusABC):
         self.buffer = create_frame(self.node_id, 0x17, False, gen_payload)
 
     def _get_device_info(self, payload):
-        vals: Tuple = (0, 0, 7, 1, 25)
+        vals: Tuple = (0, 0, 8, 5, 25)
         gen_payload = self.codec.serialize(vals, *can_endpoints["device_info"]["types"])
         self.buffer = create_frame(self.node_id, 0x1A, False, gen_payload)
 
