@@ -4,14 +4,11 @@ of Tinymovr boards.
 '''
 import random
 import time
-import can
 import statistics as st
 
 import tinymovr
 from tinymovr import Tinymovr
 from tinymovr.constants import ErrorIDs
-from tinymovr.iface import IFace
-from tinymovr.iface.can import CAN, guess_channel
 from tinymovr.units import get_registry
 
 import unittest

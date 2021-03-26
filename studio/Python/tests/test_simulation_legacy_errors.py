@@ -11,7 +11,7 @@ import tinymovr
 from tinymovr import Tinymovr
 from tinymovr.constants import ErrorIDs
 from tinymovr.iface import IFace
-from tinymovr.iface.can import CAN
+from tinymovr.iface.can_bus import CANBus
 from tinymovr.units import get_registry
 
 import unittest
@@ -24,12 +24,11 @@ s = ureg.second
 bustype = "insilico"
 channel = "test"
 
+
 def get_tm() -> Tinymovr:
     can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
-    iface: IFace = CAN(can_bus)
-    tm = Tinymovr(node_id=1, iface=iface)
-    tm.iface.bus.legacy_errors = True
-    return tm
+    iface: IFace = CANBus(can_bus)
+    return Tinymovr(node_id=1, iface=iface)
 
 class TestSimulationLegacy(unittest.TestCase):
 
