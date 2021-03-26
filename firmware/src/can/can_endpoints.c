@@ -120,6 +120,7 @@ uint8_t CAN_GetMinStudioVersion(uint8_t buffer[])
     memcpy(&buffer[0], &v_major, sizeof(uint8_t));
     memcpy(&buffer[1], &v_minor, sizeof(uint8_t));
     memcpy(&buffer[2], &v_patch, sizeof(uint8_t));
+    return CANRP_Read;
 }
 
 uint8_t CAN_GetCANConfig(uint8_t buffer[])
