@@ -5,19 +5,19 @@ from datetime import datetime
 from typing import Tuple, List, Dict, Union
 from tinymovr.constants import ErrorIDs
 from tinymovr.codec import MultibyteCodec
-from tinymovr.iface.can import (create_frame, extract_node_message_id)
-from tinymovr.iface.can import can_endpoints
+from tinymovr.iface.can_bus import create_frame, extract_node_message_id
+from tinymovr.iface.can_bus import can_endpoints
 
 ENC_TICKS: int = 8192
 rad_to_ticks: float = ENC_TICKS / (2 * math.pi)
 
 
-
 class InSilico(can.BusABC):
-    '''
+    """
     A Bus subclass that implements a Tinymovr
     controller in silico
-    '''
+    """
+
     states: Dict[str, Union[int, float]] = {}
 
     def __init__(self, channel, can_filters=None, **kwargs):
@@ -26,14 +26,15 @@ class InSilico(can.BusABC):
         self.node_id: int = 0
         self.buffer: can.Message = None
         self.codec: MultibyteCodec = MultibyteCodec()
-        self.Kv_SI: float = 10.
+        self.Kv_SI: float = 10.0
         R: float = 0.05
         M: float = 0.5
-        self.I: float = M * R * R # thin hoop formula
+        self.I: float = M * R * R  # thin hoop formula
         self.TICKS: int = ENC_TICKS
         self.last_call_time = datetime.now()
         self.ep_func_map: Dict[int, callable] = {
             0x03: self._get_state,
+            0x04: self._get_min_studio_version,
             0x07: self._set_state,
             0x09: self._get_encoder_estimates,
             0x0A: self._get_setpoints,
@@ -47,7 +48,7 @@ class InSilico(can.BusABC):
             0x17: self._get_vbus,
             0x18: self._get_gains,
             0x19: self._set_gains,
-            0x1A: self._get_device_info
+            0x1A: self._get_device_info,
         }
         self.legacy_errors = False
         self._state = None
@@ -71,7 +72,7 @@ class InSilico(can.BusABC):
                 "position_gain": 20,
                 "velocity_gain": 1e-5,
                 "vbus": 12.0,
-                "calibrated": False
+                "calibrated": False,
             }
         self.node_id = node_id
         self._state = self.states[node_id]
@@ -100,7 +101,9 @@ class InSilico(can.BusABC):
                 v: float = self._state["velocity_estimate"]
                 a: float = torque / self.I
                 self._state["velocity_estimate"] += a * rad_to_ticks * dt
-                self._state["position_estimate"] += (v + 0.5 * a * rad_to_ticks * dt) * dt
+                self._state["position_estimate"] += (
+                    v + 0.5 * a * rad_to_ticks * dt
+                ) * dt
             elif self._state["mode"] == 1:
                 self._state["current_estimate"] = 0
                 v: float = self._state["velocity_estimate"]
@@ -119,122 +122,130 @@ class InSilico(can.BusABC):
 
     def _get_state(self, payload):
         if self.legacy_errors:
-            vals: Tuple = (self._state["error"],
-                        self._state["state"],
-                        self._state["mode"],
-                        0,
-                        0,
-                        0,
-                        0,
-                        0)
+            vals: Tuple = (
+                self._state["error"],
+                self._state["state"],
+                self._state["mode"],
+                0,
+                0,
+                0,
+                0,
+                0,
+            )
         else:
-            vals: Tuple = (0,
-                        self._state["state"],
-                        self._state["mode"],
-                        self._state["error"],
-                        0,
-                        0,
-                        0,
-                        0)
-        gen_payload = self.codec.serialize(
-            vals, *can_endpoints["state"]["types"])
+            vals: Tuple = (
+                0,
+                self._state["state"],
+                self._state["mode"],
+                self._state["error"],
+                0,
+                0,
+                0,
+                0,
+            )
+        gen_payload = self.codec.serialize(vals, *can_endpoints["state"]["types"])
         self.buffer = create_frame(self.node_id, 0x03, False, gen_payload)
 
+    def _get_min_studio_version(self, payload):
+        vals: Tuple = (0, 3, 7)
+        gen_payload = self.codec.serialize(vals, *can_endpoints["min_studio_version"]["types"])
+        self.buffer = create_frame(self.node_id, 0x04, False, gen_payload)
+
     def _set_state(self, payload):
-        vals = self.codec.deserialize(
-            payload, *can_endpoints["set_state"]["types"])
+        vals = self.codec.deserialize(payload, *can_endpoints["set_state"]["types"])
         new_state = vals[0]
-        if new_state != self._state['state']:
-            if self._state['state'] == 0:
+        if new_state != self._state["state"]:
+            if self._state["state"] == 0:
                 if new_state == 1:
                     self._state["calibrated"] = True
                 elif new_state == 2 and self._state["calibrated"]:
-                    self._state['state'] = 2
+                    self._state["state"] = 2
                 elif new_state == 2:
-                    self._state['error'] = ErrorIDs.InvalidState
-            elif self._state['state'] == 2:
+                    self._state["error"] = ErrorIDs.InvalidState
+            elif self._state["state"] == 2:
                 if new_state == 0:
-                    self._state['state'] = 0
+                    self._state["state"] = 0
                 else:
-                    self._state['error'] = ErrorIDs.InvalidState
-                    self._state['state'] = 0
+                    self._state["error"] = ErrorIDs.InvalidState
+                    self._state["state"] = 0
         self._state["mode"] = vals[1]
 
     def _get_vbus(self, payload):
         vals: Tuple = (self._state["vbus"],)
-        gen_payload = self.codec.serialize(
-            vals, *can_endpoints["Vbus"]["types"])
+        gen_payload = self.codec.serialize(vals, *can_endpoints["Vbus"]["types"])
         self.buffer = create_frame(self.node_id, 0x17, False, gen_payload)
 
     def _get_device_info(self, payload):
-        vals: Tuple = (0, 0, 7, 1, 25)
-        gen_payload = self.codec.serialize(
-            vals, *can_endpoints["device_info"]["types"])
+        vals: Tuple = (0, 0, 8, 5, 25)
+        gen_payload = self.codec.serialize(vals, *can_endpoints["device_info"]["types"])
         self.buffer = create_frame(self.node_id, 0x1A, False, gen_payload)
 
     def _get_encoder_estimates(self, payload):
-        vals: Tuple = (self._state["position_estimate"],
-                       self._state["velocity_estimate"])
+        vals: Tuple = (
+            self._state["position_estimate"],
+            self._state["velocity_estimate"],
+        )
         gen_payload = self.codec.serialize(
-            vals, *can_endpoints["encoder_estimates"]["types"])
+            vals, *can_endpoints["encoder_estimates"]["types"]
+        )
         self.buffer = create_frame(self.node_id, 0x09, False, gen_payload)
 
     def _get_setpoints(self, payload):
-        vals: Tuple = (self._state["position_setpoint"],
-                       self._state["velocity_setpoint"])
-        gen_payload = self.codec.serialize(
-            vals, *can_endpoints["setpoints"]["types"])
+        vals: Tuple = (
+            self._state["position_setpoint"],
+            self._state["velocity_setpoint"],
+        )
+        gen_payload = self.codec.serialize(vals, *can_endpoints["setpoints"]["types"])
         self.buffer = create_frame(self.node_id, 0x0A, False, gen_payload)
-    
+
     def _get_Iq_estimates(self, payload):
-        vals: Tuple = (self._state["current_estimate"],
-                       self._state["current_setpoint"])
-        gen_payload = self.codec.serialize(
-            vals, *can_endpoints["Iq"]["types"])
+        vals: Tuple = (self._state["current_estimate"], self._state["current_setpoint"])
+        gen_payload = self.codec.serialize(vals, *can_endpoints["Iq"]["types"])
         self.buffer = create_frame(self.node_id, 0x14, False, gen_payload)
 
     def _set_pos_setpoint(self, payload):
         vals: List = self.codec.deserialize(
-            payload, *can_endpoints["set_pos_setpoint"]["types"])
+            payload, *can_endpoints["set_pos_setpoint"]["types"]
+        )
         self._state["position_setpoint"] = vals[0]
         self._state["velocity_setpoint"] = vals[1]
         self._state["current_setpoint"] = vals[2]
 
     def _set_vel_setpoint(self, payload):
         vals: List = self.codec.deserialize(
-            payload, *can_endpoints["set_vel_setpoint"]["types"])
+            payload, *can_endpoints["set_vel_setpoint"]["types"]
+        )
         self._state["velocity_setpoint"] = vals[0]
         self._state["current_setpoint"] = vals[1]
 
     def _set_cur_setpoint(self, payload):
         vals: List = self.codec.deserialize(
-            payload, *can_endpoints["set_cur_setpoint"]["types"])
+            payload, *can_endpoints["set_cur_setpoint"]["types"]
+        )
         self._state["current_setpoint"] = vals[0]
 
     def _set_limits(self, payload):
         vals: List = self.codec.deserialize(
-            payload, *can_endpoints["set_limits"]["types"])
+            payload, *can_endpoints["set_limits"]["types"]
+        )
         self._state["velocity_limit"] = vals[0]
         self._state["current_limit"] = vals[1]
 
     def _get_limits(self, payload):
-        vals: Tuple = (self._state["velocity_limit"],
-                       self._state["current_limit"])
-        gen_payload = self.codec.serialize(
-            vals, *can_endpoints["limits"]["types"])
+        vals: Tuple = (self._state["velocity_limit"], self._state["current_limit"])
+        gen_payload = self.codec.serialize(vals, *can_endpoints["limits"]["types"])
         self.buffer = create_frame(self.node_id, 0x15, False, gen_payload)
 
     def _set_gains(self, payload):
         vals: List = self.codec.deserialize(
-            payload, *can_endpoints["set_gains"]["types"])
+            payload, *can_endpoints["set_gains"]["types"]
+        )
         self._state["position_gain"] = vals[0]
         self._state["velocity_gain"] = vals[1]
 
     def _get_gains(self, payload):
-        vals: Tuple = (self._state["position_gain"],
-                       self._state["velocity_gain"])
-        gen_payload = self.codec.serialize(
-            vals, *can_endpoints["gains"]["types"])
+        vals: Tuple = (self._state["position_gain"], self._state["velocity_gain"])
+        gen_payload = self.codec.serialize(vals, *can_endpoints["gains"]["types"])
         self.buffer = create_frame(self.node_id, 0x18, False, gen_payload)
 
     def _reset(self, payload):
@@ -249,6 +260,6 @@ class InSilico(can.BusABC):
             "current_setpoint": 0,
             "velocity_limit": 200000,
             "current_limit": 10,
-            "calibrated": False
+            "calibrated": False,
         }
         self._state.update(vals)

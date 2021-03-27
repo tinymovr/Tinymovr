@@ -42,7 +42,7 @@ void CANEP_InitEndpointMap(void)
 
     CANEP_AddEndpoint(&CAN_EStop, 0x002);
     CANEP_AddEndpoint(&CAN_GetState, 0x003);
-    // 0x004 AVAIL
+    CANEP_AddEndpoint(&CAN_GetMinStudioVersion, 0x004);
     CANEP_AddEndpoint(&CAN_GetCANConfig, 0x005);
     CANEP_AddEndpoint(&CAN_SetCANConfig, 0x006);
     CANEP_AddEndpoint(&CAN_SetState, 0x007);
@@ -109,6 +109,17 @@ uint8_t CAN_GetState(uint8_t buffer[])
     memcpy(&buffer[1], &state, sizeof(uint8_t));
     memcpy(&buffer[2], &mode, sizeof(uint8_t));
     memcpy(&buffer[3], error_flags, sizeof(uint8_t) * ERROR_FLAG_MAX_SIZE);
+    return CANRP_Read;
+}
+
+uint8_t CAN_GetMinStudioVersion(uint8_t buffer[])
+{
+    static const uint8_t v_major = STUDIO_MIN_VERSION_MAJOR;
+    static const uint8_t v_minor = STUDIO_MIN_VERSION_MINOR;
+    static const uint8_t v_patch = STUDIO_MIN_VERSION_PATCH;
+    memcpy(&buffer[0], &v_major, sizeof(uint8_t));
+    memcpy(&buffer[1], &v_minor, sizeof(uint8_t));
+    memcpy(&buffer[2], &v_patch, sizeof(uint8_t));
     return CANRP_Read;
 }
 

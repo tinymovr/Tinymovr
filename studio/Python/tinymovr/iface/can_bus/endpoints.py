@@ -44,6 +44,14 @@ can_endpoints: Dict[str, Dict] = {
         "types": [DataType.UINT8] * 8,
         "labels": ("error", "state", "mode", "error0", "error1", "error2", "error3", "error4")
     },
+    "min_studio_version":
+    {
+        "description": "Get the minimum Studio Version required by the Firmware",
+        "type": "r",
+        "ep_id": 0x004,
+        "types": (DataType.UINT8, DataType.UINT8, DataType.UINT8),
+        "labels": ("fw_major", "fw_minor", "fw_patch")
+    },
     "can_config":
     {
         "description": "Get CAN Config",

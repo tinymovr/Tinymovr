@@ -15,9 +15,15 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+// Firmware Version
 #define VERSION_MAJOR (0u)
 #define VERSION_MINOR (8u)
-#define VERSION_PATCH (6u)
+#define VERSION_PATCH (7u)
+
+// Required Studio version
+#define STUDIO_MIN_VERSION_MAJOR (0u)
+#define STUDIO_MIN_VERSION_MINOR (3u)
+#define STUDIO_MIN_VERSION_PATCH (7u)
 
 /// TINYMOVR CONFIGURATION OPTIONS ///
 
