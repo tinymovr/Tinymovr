@@ -125,8 +125,8 @@ uint8_t CAN_GetMinStudioVersion(uint8_t buffer[])
 
 uint8_t CAN_GetCANConfig(uint8_t buffer[])
 {
-    uint8_t id = CAN_GetID();
-    uint16_t baudrate = CAN_GetkBaudRate();
+    uint8_t id = CAN_get_ID();
+    uint16_t baudrate = CAN_get_kbit_rate();
     memcpy(&buffer[0], &id, sizeof(uint8_t));
     memcpy(&buffer[1], &baudrate, sizeof(uint16_t));
     return CANRP_Read;
@@ -141,12 +141,12 @@ uint8_t CAN_SetCANConfig(uint8_t buffer[])
     CAN_ResponseType response = CANRP_NoAction;
     if (id >= 1u)
     {
-        CAN_SetID(id);
+        CAN_set_ID(id);
         response = CANRP_Write;
     }
     if ((baudrate >= 50u) && (baudrate <= 1000u))
     {
-        CAN_SetkBaudRate(baudrate);
+        CAN_set_kbit_rate(baudrate);
         response = CANRP_Write;
     }
     return response;

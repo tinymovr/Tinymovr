@@ -33,7 +33,7 @@ void NVM_StageData(void)
 	s.motor_config = *Motor_GetConfig();
     s.observer_config = *Observer_GetConfig();
     s.controller_config = *Controller_GetConfig();
-	s.can_config = *CAN_GetConfig();
+	s.can_config = *CAN_get_config();
     s.version = (VERSION_MAJOR << 16) + (VERSION_MINOR << 8) + VERSION_PATCH;
     memcpy(data, &s, sizeof(struct NVMStruct));
     staged = true;
@@ -72,7 +72,7 @@ bool NVM_LoadConfig(void)
 		Motor_RestoreConfig(&s.motor_config);
 		Observer_RestoreConfig(&s.observer_config);
 		Controller_RestoreConfig(&s.controller_config);
-		CAN_RestoreConfig(&s.can_config);
+		CAN_restore_config(&s.can_config);
 		loaded = true;
 	}
 	return loaded;

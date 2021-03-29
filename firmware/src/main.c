@@ -42,7 +42,7 @@ int main(void)
 	ADC_Init();
 	GateDriver_Init();
 	Motor_Init();
-    CAN_Init();
+    CAN_init();
     Timer_Init();
     Watchdog_Init();
     __enable_irq();
