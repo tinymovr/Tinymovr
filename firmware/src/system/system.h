@@ -25,8 +25,14 @@ typedef enum {
 	SYSTEM_ERR_VBUS_UNDERVOLTAGE        = 0x0001
 } SystemError;
 
+typedef enum {
+	BOARD_REV_3                         = 0,
+	BOARD_REV_5                         = 1
+} BoardRevision;
+
 void system_init(void);
 void system_reset(void);
+BoardRevision system_board_revision(void);
 void system_delay_us(const uint32_t us);
 
 PAC5XXX_RAMFUNC bool error_flags_exist(void);

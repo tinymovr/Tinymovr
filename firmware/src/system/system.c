@@ -20,6 +20,7 @@
 
 uint8_t error_flags[ERROR_FLAG_MAX_SIZE] = {0};
 uint8_t error_count = 0;
+BoardRevision board_rev;
 
 void system_init(void)
 {
@@ -71,6 +72,14 @@ void system_init(void)
     // Vp = 10V , 440mA-540mA, Charge Pump Enable
     pac5xxx_tile_register_write(ADDR_SYSCONF, 0x01);
 
+    // Board revision check
+    // Configure PF7 as GPIO input with pulldown
+	PAC55XX_GPIOF->MODE.P7 = IO_HIGH_IMPEDENCE_INPUT;
+	PAC55XX_GPIOF->OUTMASK.P7 = 1;
+	PAC55XX_SCC->PFMUXSEL.P7 = 0;
+	PAC55XX_SCC->PFPDEN.P7 = 1;
+    board_rev = PAC55XX_GPIOF->IN.P7;
+
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
     DWT->CYCCNT = 0;
     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
@@ -80,6 +89,11 @@ void system_reset(void)
 {
     pac5xxx_tile_register_write(ADDR_WATCHDOG,
         pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
+}
+
+BoardRevision system_board_revision(void)
+{
+	return board_rev;
 }
 
 void system_delay_us(uint32_t us)
