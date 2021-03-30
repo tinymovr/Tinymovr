@@ -4,13 +4,10 @@ on the bus. Measurement is performed while Tinymovr
 is in position control mode.
 '''
 import time
-import can
 
 import tinymovr
 from tinymovr import Tinymovr
 from tinymovr.constants import ErrorIDs
-from tinymovr.iface import IFace
-from tinymovr.iface.can import CAN, guess_channel
 
 import unittest
 from tests import TMTestCase

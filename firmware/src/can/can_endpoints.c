@@ -42,7 +42,7 @@ void CANEP_InitEndpointMap(void)
 
     CANEP_AddEndpoint(&CAN_EStop, 0x002);
     CANEP_AddEndpoint(&CAN_GetState, 0x003);
-    // 0x004 AVAIL
+    CANEP_AddEndpoint(&CAN_GetMinStudioVersion, 0x004);
     CANEP_AddEndpoint(&CAN_GetCANConfig, 0x005);
     CANEP_AddEndpoint(&CAN_SetCANConfig, 0x006);
     CANEP_AddEndpoint(&CAN_SetState, 0x007);
@@ -112,10 +112,21 @@ uint8_t CAN_GetState(uint8_t buffer[])
     return CANRP_Read;
 }
 
+uint8_t CAN_GetMinStudioVersion(uint8_t buffer[])
+{
+    static const uint8_t v_major = STUDIO_MIN_VERSION_MAJOR;
+    static const uint8_t v_minor = STUDIO_MIN_VERSION_MINOR;
+    static const uint8_t v_patch = STUDIO_MIN_VERSION_PATCH;
+    memcpy(&buffer[0], &v_major, sizeof(uint8_t));
+    memcpy(&buffer[1], &v_minor, sizeof(uint8_t));
+    memcpy(&buffer[2], &v_patch, sizeof(uint8_t));
+    return CANRP_Read;
+}
+
 uint8_t CAN_GetCANConfig(uint8_t buffer[])
 {
-    uint8_t id = CAN_GetID();
-    uint16_t baudrate = CAN_GetkBaudRate();
+    uint8_t id = CAN_get_ID();
+    uint16_t baudrate = CAN_get_kbit_rate();
     memcpy(&buffer[0], &id, sizeof(uint8_t));
     memcpy(&buffer[1], &baudrate, sizeof(uint16_t));
     return CANRP_Read;
@@ -130,12 +141,12 @@ uint8_t CAN_SetCANConfig(uint8_t buffer[])
     CAN_ResponseType response = CANRP_NoAction;
     if (id >= 1u)
     {
-        CAN_SetID(id);
+        CAN_set_ID(id);
         response = CANRP_Write;
     }
     if ((baudrate >= 50u) && (baudrate <= 1000u))
     {
-        CAN_SetkBaudRate(baudrate);
+        CAN_set_kbit_rate(baudrate);
         response = CANRP_Write;
     }
     return response;
@@ -357,9 +368,9 @@ uint8_t CAN_EraseConfig(uint8_t buffer[])
 uint8_t CAN_GetMotorConfig(uint8_t buffer[])
 {
     uint8_t flags = (motor_is_calibrated() == true) | ((motor_is_gimbal() == true) << 1);
-    uint16_t R = (uint16_t)(Motor_GetPhaseResistance() * 1e+3);
+    uint16_t R = (uint16_t)(Motor_GetPhaseResistance() * 1e+3f);
     uint8_t pole_pairs = Motor_GetPolePairs();
-    uint16_t L = (uint16_t)(Motor_GetPhaseInductance() * 1e+6);
+    uint16_t L = (uint16_t)(Motor_GetPhaseInductance() * 1e+6f);
     uint16_t ticks = (uint16_t)ENCODER_TICKS;
     memcpy(&buffer[0], &flags, sizeof(uint8_t));
     memcpy(&buffer[1], &R, sizeof(uint16_t));
@@ -384,8 +395,8 @@ uint8_t CAN_SetMotorConfig(uint8_t buffer[])
     {
         bool is_gimbal = (bool)(flags & 0x1);
         motor_set_is_gimbal(is_gimbal);
-        Motor_SetPhaseResistance(((float)R) * 1e-3);
-        Motor_SetPhaseInductance(((float)L) * 1e-6);
+        Motor_SetPhaseResistance(((float)R) * 1e-3f);
+        Motor_SetPhaseInductance(((float)L) * 1e-6f);
 
         response = CANRP_Write;
     }

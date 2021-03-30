@@ -38,7 +38,7 @@ typedef enum {
 
 struct MA702State
 {
-	int16_t angle_buffer;    // buffer for angle results from last transfer
+	int16_t angle;
 };
 
 void MA_Init(void);

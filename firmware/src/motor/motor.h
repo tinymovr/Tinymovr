@@ -43,6 +43,7 @@ struct MotorConfig
 	bool inductance_calibrated;
 	bool poles_calibrated;
 
+	bool phases_swapped;
 	bool is_gimbal;
 };
 
@@ -57,6 +58,9 @@ PAC5XXX_RAMFUNC void Motor_SetPhaseResistance(float R);
 
 PAC5XXX_RAMFUNC float Motor_GetPhaseInductance(void);
 PAC5XXX_RAMFUNC void Motor_SetPhaseInductance(float L);
+
+PAC5XXX_RAMFUNC bool motor_phases_swapped(void);
+PAC5XXX_RAMFUNC void motor_set_phases_swapped(bool swapped);
 
 PAC5XXX_RAMFUNC bool motor_is_calibrated(void);
 

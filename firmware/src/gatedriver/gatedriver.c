@@ -15,8 +15,9 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/common.h"
-#include "gatedriver.h"
+#include <src/common.h>
+#include <src/motor/motor.h>
+#include <src/gatedriver/gatedriver.h>
 
 struct GateDriver_ gateDriver = 
 {
@@ -78,11 +79,19 @@ PAC5XXX_RAMFUNC void GateDriver_Disable(void)
     }
 }
 
-PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dc)
+PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dutycycles)
 {
 #ifndef DRY_RUN
-    m1_u_set_duty(dc->A);
-    m1_v_set_duty(dc->B);
-    m1_w_set_duty(dc->C);
+	m1_u_set_duty(dutycycles->A);
+	if (motor_phases_swapped())
+	{
+		m1_v_set_duty(dutycycles->C);
+		m1_w_set_duty(dutycycles->B);
+	}
+	else
+	{
+		m1_v_set_duty(dutycycles->B);
+		m1_w_set_duty(dutycycles->C);
+	}
 #endif
 }

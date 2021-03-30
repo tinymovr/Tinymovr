@@ -89,9 +89,9 @@ void Controller_ControlLoop(void)
 
 		if (state.state == STATE_CALIBRATE)
 		{
-            state.is_calibrating = true;
-			(void) ((CalibrateResistance() && CalibrateInductance()) && CalibrateOffsetDirectionAndPolePairs());
-            state.is_calibrating = false;
+			state.is_calibrating = true;
+			(void) ((CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && CalibrateOffsetAndEccentricity());
+			state.is_calibrating = false;
 			Controller_SetState(STATE_IDLE);
 		}
 		else if (state.state == STATE_CL_CONTROL)

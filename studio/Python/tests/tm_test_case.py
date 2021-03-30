@@ -1,7 +1,7 @@
-'''
+"""
 This unit test suite tests functionality
 of Tinymovr boards.
-'''
+"""
 import random
 import time
 import can
@@ -10,7 +10,7 @@ import statistics as st
 import tinymovr
 from tinymovr import Tinymovr
 from tinymovr.iface import IFace
-from tinymovr.iface.can import CAN, guess_channel
+from tinymovr.iface.can_bus import CANBus, guess_channel
 from tinymovr.units import get_registry
 
 import unittest
@@ -19,12 +19,13 @@ bustype = "slcan"
 
 
 class TMTestCase(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         channel = guess_channel(bustype_hint=bustype)
-        cls.can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel, bitrate=1000000)
-        iface: IFace = CAN(cls.can_bus)
+        cls.can_bus: can.Bus = can.Bus(
+            bustype=bustype, channel=channel, bitrate=1000000
+        )
+        iface: IFace = CANBus(cls.can_bus)
         cls.tm = Tinymovr(node_id=1, iface=iface)
         cls.tm.reset()
         time.sleep(0.2)
@@ -59,4 +60,3 @@ class TMTestCase(unittest.TestCase):
         else:
             self.assertFalse(state.errors)
         self.assertEqual(state.state, target_state)
-

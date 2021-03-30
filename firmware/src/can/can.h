@@ -84,14 +84,14 @@ struct CANConfig
     uint8_t kbaud_rate;
 };
 
-void CAN_Init(void);
-uint16_t CAN_GetkBaudRate(void);
-void CAN_SetkBaudRate(uint16_t rate);
-uint8_t CAN_GetID(void);
-void CAN_SetID(uint8_t id);
-void CAN_ProcessInterrupt(void);
+void CAN_init(void);
+uint16_t CAN_get_kbit_rate(void);
+void CAN_set_kbit_rate(uint16_t rate);
+uint8_t CAN_get_ID(void);
+void CAN_set_ID(uint8_t id);
+void CAN_process_interrupt(void);
 
-struct CANConfig* CAN_GetConfig(void);
-void CAN_RestoreConfig(struct CANConfig* config_);
+struct CANConfig* CAN_get_config(void);
+void CAN_restore_config(struct CANConfig* config_);
 
 #endif /* CAN_CAN_H_ */

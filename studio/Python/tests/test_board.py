@@ -4,14 +4,11 @@ of Tinymovr boards.
 '''
 import random
 import time
-import can
 import statistics as st
 
 import tinymovr
 from tinymovr import Tinymovr
 from tinymovr.constants import ErrorIDs
-from tinymovr.iface import IFace
-from tinymovr.iface.can import CAN, guess_channel
 from tinymovr.units import get_registry
 
 import unittest
@@ -178,26 +175,26 @@ class TestBoard(TMTestCase):
         Test state transitions
         '''
         self.tm.reset()
-        time.sleep(0.1)
+        time.sleep(0.5)
         # Ensure we're idle
         self.check_state(0)
         # Start calibration
         self.tm.calibrate()
-        time.sleep(0.1)
+        time.sleep(0.5)
         # Test if idle command works (it should be ignored because we're calibrating)
         self.tm.idle()
-        time.sleep(0.1)
+        time.sleep(0.5)
         self.assertEqual(self.tm.state.state, 1)
         # Same for closed loop control command
-        self.tm.idle()
-        time.sleep(0.1)
+        self.tm.position_control()
+        time.sleep(0.5)
         self.assertEqual(self.tm.state.state, 1)
         # Wait for calibration to finish
         self.wait_for_calibration()
         # Now state transitions should work
         self.assertEqual(self.tm.state.state, 0)
         self.tm.position_control()
-        time.sleep(0.1)
+        time.sleep(0.5)
         self.assertEqual(self.tm.state.state, 2)
         self.tm.idle()
 

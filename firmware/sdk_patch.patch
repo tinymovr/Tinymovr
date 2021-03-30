@@ -1,0 +1,40 @@
+--- pac55xx_sdk/driver/pac5xxx_driver_socbridge.h
++++ pac55xx_sdk/driver/pac5xxx_driver_socbridge.h
+@@ -25 +25 @@
+-#include "pac5XXX.h"
++#include "pac5xxx.h"
+
+--- pac55xx_sdk/driver/pac5xxx_driver_system.c
++++ pac55xx_sdk/driver/pac5xxx_driver_system.c
+@@ -16 +16 @@
+-#include "PAC5XXX_driver_system.h"
++#include "pac5xxx_driver_system.h"
+
+--- pac55xx_sdk/boot_gcc/startup_pac55xx_gcc.c
++++ pac55xx_sdk/boot_gcc/startup_pac55xx_gcc.c
+@@ -22 +22 @@
+-#define STACK_SIZE      0x000000C0                  //Stack size (in Words)
++#define STACK_SIZE      0x00000C00                  //Stack size (in Words)
+
+--- pac55xx_sdk/driver/pac5xxx_driver_tile_socbridge.c
++++ pac55xx_sdk/driver/pac5xxx_driver_tile_socbridge.c
+@@ -27,7 +27,8 @@ RAMFUNC_TILE void pac5xxx_tile_socbridge_config(int enable, int int_enable)
+ }
+ 
+ // To optimize only the tile write, force function in RAM by replacing RAMFUNC_TILE with PAC5XXX_RAMFUNC
+-RAMFUNC_TILE void pac5xxx_tile_register_write(uint8_t address, uint8_t data)
++//RAMFUNC_TILE void pac5xxx_tile_register_write(uint8_t address, uint8_t data)
++PAC5XXX_RAMFUNC void pac5xxx_tile_register_write(uint8_t address, uint8_t data)
+ {
+     volatile unsigned int data_read;
+ 
+@@ -49,7 +50,8 @@ RAMFUNC_TILE void pac5xxx_tile_register_write(uint8_t address, uint8_t data)
+ }
+ 
+ // To optimize only the tile read, force function in RAM by replacing RAMFUNC_TILE with PAC5XXX_RAMFUNC
+-RAMFUNC_TILE uint8_t pac5xxx_tile_register_read(uint8_t address)
++//RAMFUNC_TILE uint8_t pac5xxx_tile_register_read(uint8_t address)
++PAC5XXX_RAMFUNC uint8_t pac5xxx_tile_register_read(uint8_t address)
+ {
+     uint8_t data;
+ 

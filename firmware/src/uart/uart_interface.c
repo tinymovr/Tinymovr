@@ -70,11 +70,11 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
         break;
         
         case 'U': // CAN Baud Rate
-            CAN_SetkBaudRate((uint16_t)data);
+            CAN_set_kbit_rate((uint16_t)data);
         break;
 
         case 'C': // CAN ID
-            CAN_SetID((uint8_t)data);
+            CAN_set_ID((uint8_t)data);
         break;
 
         default:
@@ -129,10 +129,6 @@ int32_t UART_ReadAddr(uint8_t addr)
             ret_val = (int32_t)(Controller_GetVelIntegratorGain() * UART_VEL_INT_SCALING_FACTOR);
         break;
 
-        case 'd': // observer direction
-            ret_val = Observer_GetDirection();
-        break;
-
         case 'h': // phase resistance
             ret_val = Motor_GetPhaseResistance() * UART_R_SCALING_FACTOR;
         break;
@@ -142,11 +138,11 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
         case 'U': // CAN Baud Rate
-            ret_val = CAN_GetkBaudRate();
+            ret_val = CAN_get_kbit_rate();
         break;
 
         case 'C': // CAN ID
-            ret_val = CAN_GetID();
+            ret_val = CAN_get_ID();
         break;
 
         case 'm': // Is motor gimbal?

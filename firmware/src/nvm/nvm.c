@@ -23,47 +23,33 @@
 #include "src/nvm/nvm.h"
 
 static struct NVMStruct s;
-static uint8_t data[sizeof(struct NVMStruct)];
-static bool staged = false;
 
 void NVM_Init(void) {}
 
-void NVM_StageData(void)
-{
-	s.motor_config = *Motor_GetConfig();
-    s.observer_config = *Observer_GetConfig();
-    s.controller_config = *Controller_GetConfig();
-	s.can_config = *CAN_GetConfig();
-    s.version = (VERSION_MAJOR << 16) + (VERSION_MINOR << 8) + VERSION_PATCH;
-    memcpy(data, &s, sizeof(struct NVMStruct));
-    staged = true;
-}
-
-bool NVM_CommitData(void)
+bool NVM_SaveConfig(void)
 {
 	bool commited = false;
-	if (staged && Controller_GetState() == STATE_IDLE)
+	uint8_t data[sizeof(struct NVMStruct)];
+	s.motor_config = *Motor_GetConfig();
+	s.observer_config = *Observer_GetConfig();
+	s.controller_config = *Controller_GetConfig();
+	s.can_config = *CAN_get_config();
+	s.version = (VERSION_MAJOR << 16) + (VERSION_MINOR << 8) + VERSION_PATCH;
+	memcpy(data, &s, sizeof(struct NVMStruct));
+	if (Controller_GetState() == STATE_IDLE)
 	{
 		uint8_t* dataBuffer = data;
 		__disable_irq();
 		flash_erase_page(SETTINGS_PAGE);
 		flash_write((uint8_t *)SETTINGS_PAGE_HEX, dataBuffer, sizeof(struct NVMStruct));
 		__enable_irq();
-		staged = false;
 		commited = true;
 	}
 	return commited;
 }
 
-bool NVM_SaveConfig(void)
-{
-	NVM_StageData();
-	return NVM_CommitData();
-}
-
 bool NVM_LoadConfig(void)
 {
-	staged = false;
 	memcpy(&s, (uint8_t *)SETTINGS_PAGE_HEX, sizeof(struct NVMStruct));
 	// TODO: Also validate checksum
 	bool loaded = false;
@@ -72,7 +58,7 @@ bool NVM_LoadConfig(void)
 		Motor_RestoreConfig(&s.motor_config);
 		Observer_RestoreConfig(&s.observer_config);
 		Controller_RestoreConfig(&s.controller_config);
-		CAN_RestoreConfig(&s.can_config);
+		CAN_restore_config(&s.can_config);
 		loaded = true;
 	}
 	return loaded;

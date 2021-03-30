@@ -6,16 +6,47 @@ jobs:
   check-and-build-tinymovr:
     runs-on: 'ubuntu-20.04'
     steps:
-    - uses: actions/checkout@v1
-    - name: Install cppcheck
-      run: sudo apt-get install cppcheck
-      working-directory: firmware
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get install cppcheck
+        python -m pip install --upgrade pip
+        python -m pip install patch
+
     - name: Run cppcheck on Tinymovr
-      run: cppcheck --force --addon=cert --addon=misra --error-exitcode=1 -isrc/utils -isrc/nvm -isrc/uart -isrc/can -isrc/adc src
+      run: cppcheck --force --addon=cert --error-exitcode=1 -isrc/utils -isrc/nvm -isrc/uart -isrc/can -isrc/adc src
       working-directory: firmware
-    # - name: Install gcc-arm-none-eabi
-    #   run: sudo apt install gcc-arm-none-eabi
-    #   working-directory: firmware
-    # - name: Build Tinymovr
-    #   run: make
-    #   working-directory: firmware
+
+    - name: Install gcc-arm-none-eabi
+      run: sudo apt install gcc-arm-none-eabi
+
+    - name: Clone Qorvo deps
+      uses: actions/checkout@v2
+      with: 
+        repository: yconst/qorvo-deps
+        token: ${{ secrets.ACCESS_TOKEN }}
+        path: 'firmware/pac55xx_sdk'
+        clean: false
+
+    - name: Patch deps dir
+      run: |
+        python -m patch sdk_patch.patch
+      working-directory: firmware 
+
+    - name: Build Debug
+      run: |
+        make debug
+        make clean
+      working-directory: firmware
+
+    - name: Build Release
+      run: |
+        make release
+        make clean
+      working-directory: firmware

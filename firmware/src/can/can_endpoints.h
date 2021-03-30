@@ -32,7 +32,7 @@ CANEP_Callback CANEP_GetEndpoint(uint8_t id);
 
 uint8_t CAN_EStop(uint8_t buffer[]);
 uint8_t CAN_GetState(uint8_t buffer[]);
-
+uint8_t CAN_GetMinStudioVersion(uint8_t buffer[]);
 uint8_t CAN_GetCANConfig(uint8_t buffer[]);
 uint8_t CAN_SetCANConfig(uint8_t buffer[]);
 uint8_t CAN_SetState(uint8_t buffer[]);
