@@ -74,11 +74,17 @@ class TestBoardConfig(TMTestCase):
         self.assertEqual(self.tm.motor_config.flags, 0)
         self.try_calibrate()
         self.assertEqual(self.tm.motor_config.flags, 1)
+        R = self.tm.motor_config.R
+        L = self.tm.motor_config.L
+        pole_pairs = self.tm.motor_config.pole_pairs
         self.tm.save_config()
         time.sleep(0.2)
         self.tm.reset()
         time.sleep(0.2)
         self.assertEqual(self.tm.motor_config.flags, 1)
+        self.assertAlmostEqual(R, self.tm.motor_config.R)
+        self.assertAlmostEqual(L, self.tm.motor_config.L)
+        self.assertAlmostEqual(pole_pairs, self.tm.motor_config.pole_pairs)
         self.tm.erase_config()
         time.sleep(0.2)
 
