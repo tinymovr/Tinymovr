@@ -28,7 +28,6 @@
 #include "src/timer/timer.h"
 #include "src/can/can.h"
 #include "src/nvm/nvm.h"
-#include "src/watchdog/watchdog.h"
 
 int test_div(int lho, int rho)
 {
@@ -49,13 +48,7 @@ int main(void)
 	Motor_Init();
     CAN_init();
     Timer_Init();
-    Watchdog_Init();
     __enable_irq();
-
-    int a = 10;
-    int b = 0;
-    volatile int c = 1;
-    c = test_div(a, b);
 
     Controller_ControlLoop();
 }

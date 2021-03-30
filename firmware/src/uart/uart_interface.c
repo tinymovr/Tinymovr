@@ -25,7 +25,6 @@
 #include "src/nvm/nvm.h"
 #include "src/can/can.h"
 #include "src/utils/utils.h"
-#include "src/watchdog/watchdog.h"
 #include "src/uart/uart_lowlevel.h"
 #include "src/uart/uart_interface.h"
 
@@ -194,14 +193,12 @@ void UART_ProcessMessage(void)
         // Write operation
         int32_t n = atol(&(uart_rx_msg)[2]);
         UART_WriteAddr(addr, n);
-        Watchdog_Feed();
     }
     else if (len == 0)
     {
         // Read operation
         int32_t val = UART_ReadAddr(uart_rx_msg[1]);
         UART_SendInt32(val);
-        Watchdog_Feed();
     }
     else
     {

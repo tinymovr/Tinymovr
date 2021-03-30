@@ -19,7 +19,6 @@
 #include <src/observer/observer.h>
 #include <src/gatedriver/gatedriver.h>
 #include <src/scheduler/scheduler.h>
-#include <src/watchdog/watchdog.h>
 #include <src/utils/utils.h>
 #include <src/encoder/encoder.h>
 #include <src/controller/controller.h>
@@ -46,7 +45,6 @@ bool CalibrateResistance(void)
             const float pwm_setpoint = V_setpoint / ADC_GetVBus();
             SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
             GateDriver_SetDutyCycle(&modulation_values);
-            Watchdog_Feed();
             WaitForControlLoopInterrupt();
         }
 #ifndef DRY_RUN
@@ -95,7 +93,6 @@ bool CalibrateInductance(void)
             const float pwm_setpoint = V_setpoint / ADC_GetVBus();
             SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
             GateDriver_SetDutyCycle(&modulation_values);
-            Watchdog_Feed();
             WaitForControlLoopInterrupt();
         }
 #ifndef DRY_RUN
@@ -248,7 +245,6 @@ static inline void set_epos_and_wait(float angle, float I_setpoint)
 	SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),
 		&modulation_values.A, &modulation_values.B, &modulation_values.C);
 	GateDriver_SetDutyCycle(&modulation_values);
-	Watchdog_Feed();
 	WaitForControlLoopInterrupt();
 }
 
@@ -268,7 +264,6 @@ static inline void wait_a_while(void)
 	// TODO: This is a bit of a hack, can be improved!
 	for (int i=0; i<5000; i++)
 	{
-		Watchdog_Feed();
 		WaitForControlLoopInterrupt();
 	}
 }

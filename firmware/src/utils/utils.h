@@ -198,12 +198,4 @@ PAC5XXX_RAMFUNC static inline int SVM(float alpha, float beta, float* tA, float*
     return result_valid ? 0 : -1;
 }
 
-static inline void printErrorMsg(const char * errMsg)
-{
-   while(*errMsg != '\0'){
-      ITM_SendChar(*errMsg);
-      ++errMsg;
-   }
-}
-
 #endif /* UTILS_UTILS_H_ */
