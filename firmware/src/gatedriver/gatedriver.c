@@ -41,9 +41,9 @@ PAC5XXX_RAMFUNC void GateDriver_Enable(void)
         PAC55XX_GPIOB->OUTMASK.w = 0x00;
 
         // Set slew rate
-        // 01000100: push: 650mA pull: 650mA
-        pac5xxx_tile_register_write(ADDR_DRVILIMLS, 0x44);
-        pac5xxx_tile_register_write(ADDR_DRVILIMHS, 0x44);
+        // 01000101: push: 750mA pull: 750mA
+        pac5xxx_tile_register_write(ADDR_DRVILIMLS, 0x45);
+        pac5xxx_tile_register_write(ADDR_DRVILIMHS, 0x45);
 
         // Enable driver manager and verify active - need to enable even in PAC5210 to get ENHS pin to work
         pac5xxx_tile_register_write(ADDR_ENDRV, 1);

@@ -25,7 +25,6 @@
 #include "src/controller/controller.h"
 #include "src/scheduler/scheduler.h"
 #include "src/nvm/nvm.h"
-#include "src/watchdog/watchdog.h"
 
 #include "src/can/can_endpoints.h"
 

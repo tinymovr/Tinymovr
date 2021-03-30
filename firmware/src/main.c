@@ -28,7 +28,11 @@
 #include "src/timer/timer.h"
 #include "src/can/can.h"
 #include "src/nvm/nvm.h"
-#include "src/watchdog/watchdog.h"
+
+int test_div(int lho, int rho)
+{
+    return lho/rho;
+}
 
 int main(void)
 {
@@ -44,7 +48,6 @@ int main(void)
 	Motor_Init();
     CAN_init();
     Timer_Init();
-    Watchdog_Init();
     __enable_irq();
 
     Controller_ControlLoop();

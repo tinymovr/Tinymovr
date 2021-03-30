@@ -18,7 +18,6 @@
 #include "string.h"
 
 #include "src/system/system.h"
-#include "src/watchdog/watchdog.h"
 
 #include "src/can/can_endpoints.h"
 #include "src/can/can_func.h"
@@ -154,7 +153,6 @@ void CAN_process_interrupt(void)
         {
             can_transmit(8, (config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);
         }
-        Watchdog_Feed();
     }
 }
 

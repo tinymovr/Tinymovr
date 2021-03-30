@@ -20,7 +20,6 @@
 #include "src/adc/adc.h"
 #include "src/motor/motor.h"
 #include "src/gatedriver/gatedriver.h"
-#include "src/watchdog/watchdog.h"
 #include "src/utils/utils.h"
 #include <src/scheduler/scheduler.h>
 #include <src/encoder/encoder.h>
@@ -206,7 +205,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
 
 PAC5XXX_RAMFUNC void IdleStep(void)
 {
-    Watchdog_Feed();
+    //pass
 }
 
 PAC5XXX_RAMFUNC ControlState Controller_GetState(void)
