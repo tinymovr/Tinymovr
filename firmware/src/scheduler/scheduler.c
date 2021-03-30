@@ -46,7 +46,7 @@ void WaitForControlLoopInterrupt(void)
 		{
 			// Handle CAN
 			state.can_interrupt = false;
-			CAN_ProcessInterrupt();
+			CAN_process_interrupt();
 		}
 		else if (state.uart_message_interrupt)
 		{

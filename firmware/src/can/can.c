@@ -29,7 +29,7 @@ static struct CANConfig config = {
     .kbaud_rate = CAN_BAUD_1000KHz
 };
 
-void CAN_Init(void)
+void CAN_init(void)
 {
     CANEP_InitEndpointMap();
 
@@ -87,22 +87,22 @@ void CAN_Init(void)
     system_delay_us(100);
 }
 
-uint16_t CAN_GetkBaudRate(void)
+uint16_t CAN_get_kbit_rate(void)
 {
     return CAN_BaudTypeToInt(config.kbaud_rate);
 }
 
-void CAN_SetkBaudRate(uint16_t rate)
+void CAN_set_kbit_rate(uint16_t rate)
 {
     config.kbaud_rate = CAN_IntToBaudType(rate);
 }
 
-uint8_t CAN_GetID(void)
+uint8_t CAN_get_ID(void)
 {
     return config.id;
 }
 
-void CAN_SetID(uint8_t id)
+void CAN_set_ID(uint8_t id)
 {
     pac5xxx_can_reset_mode_set(1);  // CAN in reset mode, in order to configure CAN module
     config.id = id;
@@ -114,7 +114,7 @@ void CAN_SetID(uint8_t id)
     system_delay_us(100);
 }
 
-void CAN_ProcessInterrupt(void)
+void CAN_process_interrupt(void)
 {
     buffer = PAC55XX_CAN->RXBUF;	//  read RX buffer, RX buffer bit order same as TX buffer
 
@@ -158,12 +158,12 @@ void CAN_ProcessInterrupt(void)
     }
 }
 
-struct CANConfig* CAN_GetConfig(void)
+struct CANConfig* CAN_get_config(void)
 {
     return &config;
 }
 
-void CAN_RestoreConfig(struct CANConfig* config_)
+void CAN_restore_config(struct CANConfig* config_)
 {
     config = *config_;
 }
