@@ -172,5 +172,6 @@ void HardFault_Handler(void)
 		}
 	}
 	__ASM volatile("BKPT #01");
-	while(1);
+	while(1)
+	{};
 }
