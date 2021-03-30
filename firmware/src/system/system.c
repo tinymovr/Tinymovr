@@ -15,9 +15,10 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/adc/adc.h"
-#include "src/utils/utils.h"
-#include "system.h"
+#include <src/adc/adc.h>
+#include <src/utils/utils.h>
+#include <src/rtt/SEGGER_RTT.h>
+#include <src/system/system.h>
 
 uint8_t error_flags[ERROR_FLAG_MAX_SIZE] = {0};
 uint8_t error_count = 0;
@@ -150,9 +151,26 @@ PAC5XXX_RAMFUNC bool health_check(void)
     return success;
 }
 
+void printUsageErrorMsg(uint32_t CFSRValue)
+{
+	SEGGER_RTT_WriteString(0, "Usage fault: ");
+	CFSRValue >>= 16;                  // right shift to lsb
+	if((CFSRValue & (1 << 9)) != 0) {
+		SEGGER_RTT_WriteString(0, "Divide by zero\r\n");
+	}
+}
+
 void HardFault_Handler(void)
 {
-	printErrorMsg("In Hard Fault Handler\n");
+	SEGGER_RTT_WriteString(0, "In Hard Fault Handler\r\n");
+	SEGGER_RTT_printf(0, "SCB->HFSR = 0x%08x\r\n", SCB->HFSR);
+	if ((SCB->HFSR & (1 << 30)) != 0) {
+		SEGGER_RTT_WriteString(0, "Forced Hard Fault\r\n");
+		SEGGER_RTT_printf(0, "SCB->CFSR = 0x%08x\r\n", SCB->CFSR );
+		if((SCB->CFSR & 0xFFFF0000) != 0) {
+			printUsageErrorMsg(SCB->CFSR);
+		}
+	}
 	__ASM volatile("BKPT #01");
-	while (1);
+	while(1);
 }
