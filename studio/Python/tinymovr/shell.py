@@ -10,7 +10,7 @@ Options:
     --bustype=<bustype>  CAN bus type to use [default: slcan].
     --chan=<chan>        CAN channel (i.e. device) to use [default: auto].
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
-    --no-version-check   Disable firmware and Tinymovr version compatibility check.
+    --no-version-check   Disable firmware-studio version compatibility check.
 """
 
 from typing import Dict
