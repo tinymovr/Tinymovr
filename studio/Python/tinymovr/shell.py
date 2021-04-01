@@ -1,7 +1,7 @@
 """Tinymovr Shell Utility
 
 Usage:
-    tinymovr [--ids=<ids>] [--bustype=<bustype>] [--chan=<chan>] [--bitrate=<bitrate>]
+    tinymovr [--ids=<ids>] [--bustype=<bustype>] [--chan=<chan>] [--bitrate=<bitrate>] [--no-version-check]
     tinymovr -h | --help
     tinymovr --version
 
@@ -10,6 +10,7 @@ Options:
     --bustype=<bustype>  CAN bus type to use [default: slcan].
     --chan=<chan>        CAN channel (i.e. device) to use [default: auto].
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
+    --no-version-check   Disable firmware and Tinymovr version compatibility check.
 """
 
 from typing import Dict
@@ -38,7 +39,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-shell_name = "Tinymovr Shell Utility"
+shell_name = "Tinymovr Studio"
 base_name = "tm"
 
 
@@ -53,10 +54,11 @@ def spawn_shell():
 
     num_parser = pynumparser.NumberSequence(limits=(0, 16))
     node_ids = num_parser(arguments["--ids"])
-
+    
     bustype: str = arguments["--bustype"]
     channel: str = arguments["--chan"]
     bitrate: int = int(arguments["--bitrate"])
+    do_version_check: bool = not arguments["--no-version-check"]
     if channel == "auto":
         channel = guess_channel(bustype_hint=bustype)
     can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
@@ -65,7 +67,7 @@ def spawn_shell():
     tms: Dict = {}
     for node_id in node_ids:
         try:
-            tm: UserWrapper = UserWrapper(node_id=node_id, iface=iface)
+            tm: UserWrapper = UserWrapper(node_id=node_id, iface=iface, version_check=do_version_check)
             tm_name: str = base_name + str(node_id)
             logger.info("Connected to " + tm_name)
             tms[tm_name] = tm
