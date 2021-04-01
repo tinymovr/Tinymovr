@@ -31,8 +31,8 @@ class UserWrapper:
     states, with errors displayed if checks fail.
     """
 
-    def __init__(self, **kwargs):
-        self.tinymovr = Tinymovr(**kwargs)
+    def __init__(self, *args, **kwargs):
+        self.tinymovr = Tinymovr(*args, **kwargs)
 
     def __getattr__(self, attr):
         return getattr(self.tinymovr, attr)

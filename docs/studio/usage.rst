@@ -22,6 +22,12 @@ Discovery
 Tinymovr Studio uses a polling mechanism to discover Tinymovr nodes in the CAN network. Upon launching the app, by default the first ten nodes are scanned. The ones that are present are available through the variable handle 'tmx', where x the device index. To specify the scan range, take a look at :ref:`command-line-options`.
 
 
+Compatibility
+#############
+
+Tinymovr Studio includes by default a version check to determine compatibility of firmware with studio version. This is performed each time a node is discovered, and prior to initializing the tinymovr object. Compatibility is determined through comparison of versions with minimun requirements embedded in both firmware and studio. If you wish to disable version check (e.g. for backwards compatibility), you can use the ``--no-version-check`` command line argument. Please note that unexpected things can happen if you combine incompatible firmware and studio versions.
+
+
 Issuing Commands
 ################
 
@@ -113,6 +119,11 @@ Example:
     tinymovr --bustype=robotell --chan=COM3
 
 By default, Tinymovr Studio will use slcan as the interface, and will search for CANAble/CANtact-type devices with slcan firmware. Such is the CANine adapter supplied with Tinymovr Dev Kits.
+
+``--no-version-check``
+======================
+
+Disables the firmware-studio version compatibility check that is performed by default when discovering a Tinymovr node.
 
 
 Units
