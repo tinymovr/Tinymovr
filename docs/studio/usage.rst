@@ -23,7 +23,7 @@ Tinymovr Studio uses a polling mechanism to discover Tinymovr nodes in the CAN n
 
 
 Compatibility
-#########
+#############
 
 Tinymovr Studio includes by default a version check to determine compatibility of firmware with studio version. This is performed each time a node is discovered, and prior to initializing the tinymovr object. Compatibility is determined through comparison of versions with minimun requirements embedded in both firmware and studio. If you wish to disable version check (e.g. for backwards compatibility), you can use the ``--no-version-check`` command line argument. Please note that unexpected things can happen if you combine incompatible firmware and studio versions.
 
