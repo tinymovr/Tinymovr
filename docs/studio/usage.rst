@@ -121,7 +121,7 @@ Example:
 By default, Tinymovr Studio will use slcan as the interface, and will search for CANAble/CANtact-type devices with slcan firmware. Such is the CANine adapter supplied with Tinymovr Dev Kits.
 
 ``--no-version-check``
-=================
+======================
 
 Disables the firmware-studio version compatibility check that is performed by default when discovering a Tinymovr node.
 
