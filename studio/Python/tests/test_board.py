@@ -204,7 +204,6 @@ class TestBoard(TMTestCase):
         '''
         self.check_state(0)
         self.tm.set_motor_config(flags=1, R=220, L=80, I_cal=5000)
-        self.assertEqual(self.tm.motor_config.flags, 2)
         self.try_calibrate()
         self.tm.position_control()
         self.check_state(2)
