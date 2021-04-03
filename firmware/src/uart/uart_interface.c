@@ -57,11 +57,11 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
         break;
 
         case 'H': // phase resistance
-            Motor_SetPhaseResistance((float)data * ONE_OVER_UART_R_SCALING_FACTOR);
+            motor_set_phase_resistance((float)data * ONE_OVER_UART_R_SCALING_FACTOR);
         break;
 
         case 'L': // phase inductance
-            Motor_SetPhaseInductance((float)data * ONE_OVER_UART_L_SCALING_FACTOR);
+            motor_set_phase_inductance((float)data * ONE_OVER_UART_L_SCALING_FACTOR);
         break;
 
         case 'M': // Set is motor gimbal?
@@ -129,11 +129,11 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
         case 'h': // phase resistance
-            ret_val = Motor_GetPhaseResistance() * UART_R_SCALING_FACTOR;
+            ret_val = motor_get_phase_resistance() * UART_R_SCALING_FACTOR;
         break;
 
         case 'l': // phase inductance
-            ret_val = Motor_GetPhaseInductance() * UART_L_SCALING_FACTOR;
+            ret_val = motor_get_phase_inductance() * UART_L_SCALING_FACTOR;
         break;
 
         case 'U': // CAN Baud Rate

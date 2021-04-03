@@ -57,8 +57,6 @@
 #define CAL_PHASE_TURNS             8
 
 #define CAL_V_GAIN (0.0005f)
-#define CAL_I_SETPOINT (5.0f)
-#define CAL_I_SETPOINT_GIMBAL (0.7f)
 #define CAL_V_INDUCTANCE (2.0f)
 
 // Eccentricity correction lookup table size

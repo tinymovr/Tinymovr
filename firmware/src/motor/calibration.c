@@ -26,13 +26,13 @@
 #include <src/motor/calibration.h>
 
 static inline void set_epos_and_wait(float angle, float I_setpoint);
-static inline float get_I_setpoint(void);
 static inline void wait_a_while(void);
 static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 
 bool CalibrateResistance(void)
 {
     bool success = true;
+    float I_cal = motor_get_I_cal();
     if (!motor_is_gimbal())
     {
         float V_setpoint = 0.0f;
@@ -41,14 +41,14 @@ bool CalibrateResistance(void)
         for (uint32_t i=0; i<CAL_R_LEN; i++)
         {
             ADC_GetPhaseCurrents(&I_phase_meas);
-            V_setpoint += CAL_V_GAIN * (CAL_I_SETPOINT - I_phase_meas.A);
+            V_setpoint += CAL_V_GAIN * (I_cal - I_phase_meas.A);
             const float pwm_setpoint = V_setpoint / ADC_GetVBus();
             SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
             GateDriver_SetDutyCycle(&modulation_values);
             WaitForControlLoopInterrupt();
         }
 #ifndef DRY_RUN
-        const float R = fabsf(V_setpoint / CAL_I_SETPOINT);
+        const float R = fabsf(V_setpoint / I_cal);
         if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
         {
             add_error_flag(ERROR_PHASE_RESISTANCE_OUT_OF_RANGE);
@@ -56,10 +56,10 @@ bool CalibrateResistance(void)
         }
         else
         {
-            Motor_SetPhaseResistance(R);
+            motor_set_phase_resistance(R);
         }
 #else
-        Motor_SetPhaseResistance(0.5);
+        motor_set_phase_resistance(0.5);
 #endif
         GateDriver_SetDutyCycle(&zeroDC);
     }
@@ -106,11 +106,11 @@ bool CalibrateInductance(void)
         }
         else
         {
-            Motor_SetPhaseInductance(L);
+            motor_set_phase_inductance(L);
             Controller_UpdateCurrentGains();
         }
 #else
-        Motor_SetPhaseInductance(0.005);
+        motor_set_phase_inductance(0.005);
 #endif
         GateDriver_SetDutyCycle(&zeroDC);
     }
@@ -124,7 +124,7 @@ bool CalibrateDirectionAndPolePairs(void)
     // observer, but we generate and use the error table
     // before the observer, at the encoder read.
     const float epos_target = CAL_PHASE_TURNS * twopi;
-    const float I_setpoint = get_I_setpoint();
+    const float I_setpoint = motor_get_I_cal();
     bool success = true;
     // Stay a bit at starting epos
 	for (uint32_t i=0; i<CAL_STAY_LEN; i++)
@@ -144,7 +144,7 @@ bool CalibrateDirectionAndPolePairs(void)
 		set_epos_and_wait(epos_target, I_setpoint);
 	}
     // Try to calibrate
-    if (!Motor_FindPolePairs(ENCODER_TICKS, epos_start, Observer_GetPosEstimate(), epos_target))
+    if (!motor_find_pole_pairs(ENCODER_TICKS, epos_start, Observer_GetPosEstimate(), epos_target))
     {
         add_error_flag(ERROR_INVALID_POLE_PAIRS);
         success = false;
@@ -170,13 +170,13 @@ bool CalibrateOffsetAndEccentricity(void)
 {
     // Size below is an arbitrary large number ie > ECN_SIZE * npp
     int16_t error_ticks[ECN_SIZE * 24];
-    const int16_t npp = Motor_GetPolePairs();
+    const int16_t npp = motor_get_pole_pairs();
     const int16_t n = ECN_SIZE * npp;
     const int16_t nconv = 50;
     const float delta = 2 * PI * npp / (n * nconv);
     const float e_pos_to_ticks = ((float)ENCODER_TICKS)/(2 * PI * npp);
     float e_pos_ref = 0.f;
-    const float I_setpoint = get_I_setpoint();
+    const float I_setpoint = motor_get_I_cal();
     Observer_ClearEccentricityTable();
     int16_t *lut = Observer_GetEccentricityTablePointer();
     wait_a_while();
@@ -240,22 +240,12 @@ bool CalibrateOffsetAndEccentricity(void)
 static inline void set_epos_and_wait(float angle, float I_setpoint)
 {
 	struct FloatTriplet modulation_values = {0.0f};
-	float pwm_setpoint = (I_setpoint * Motor_GetPhaseResistance()) / ADC_GetVBus();
+	float pwm_setpoint = (I_setpoint * motor_get_phase_resistance()) / ADC_GetVBus();
 	our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
 	SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),
 		&modulation_values.A, &modulation_values.B, &modulation_values.C);
 	GateDriver_SetDutyCycle(&modulation_values);
 	WaitForControlLoopInterrupt();
-}
-
-static inline float get_I_setpoint(void)
-{
-	float I_setpoint = CAL_I_SETPOINT;
-	if (motor_is_gimbal() == true)
-	{
-		I_setpoint = CAL_I_SETPOINT_GIMBAL;
-	}
-	return I_setpoint;
 }
 
 static inline void wait_a_while(void)
