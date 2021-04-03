@@ -31,7 +31,13 @@ void MA_Init(void)
 {
     ssp_init(SSPD, SSP_MS_MASTER, 0, 0); // Mode 0
     system_delay_us(16000); // ensure 16ms sensor startup time as per the datasheet
+    MA_QueueAngleCommand();
     MA_UpdateAngle(false);
+}
+
+PAC5XXX_RAMFUNC void MA_QueueAngleCommand(void)
+{
+	ssp_write_one(SSPD, MA_CMD_ANGLE);
 }
 
 PAC5XXX_RAMFUNC int16_t MA_GetAngle(void)
@@ -41,7 +47,7 @@ PAC5XXX_RAMFUNC int16_t MA_GetAngle(void)
 
 PAC5XXX_RAMFUNC void MA_UpdateAngle(bool check_error)
 {
-	ssp_write_one(SSPD, MA_CMD_ANGLE);
+	//ssp_write_one(SSPD, MA_CMD_ANGLE);
     while (!PAC55XX_SSPD->STAT.RNE) {}
     const int16_t angle = (PAC55XX_SSPD->DAT.DATA) >> 3;
 
