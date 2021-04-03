@@ -60,10 +60,10 @@ static struct ControllerConfig config ={
     .vel_limit = 300000.0f,
     .I_limit = 10.0f,
 
-    .pos_gain = 15.0f,
-    .vel_gain = 5.0e-5f,
-    .vel_integrator_gain = 0.00025f,
-    .I_bw = 800.0,
+    .pos_gain = 18.0f,
+    .vel_gain = 8.0e-5f,
+    .vel_integrator_gain = 0.00020f,
+    .I_bw = 1000.0,
     .I_gain = 0.0f,
     .Iq_integrator_gain = 0.0f,
     .Id_integrator_gain = 0.0f,
@@ -143,8 +143,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         state.vel_integrator_Iq *= 0.995f;
     }
 
-    const float e_phase = Observer_GetPosEstimateWrappedRadians() * Motor_GetPolePairs();
-    const float e_phase_vel = Observer_GetVelEstimateRadians() * Motor_GetPolePairs();
+    const float e_phase = Observer_GetPosEstimateWrappedRadians() * motor_get_pole_pairs();
     const float c_I = fast_cos(e_phase);
     const float s_I = fast_sin(e_phase);
     const float VBus = ADC_GetVBus();
@@ -152,8 +151,9 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     float Vd; float Vq;
     if (motor_is_gimbal() == true)
     {
-        Vd = - e_phase_vel * Motor_GetPhaseInductance() * Iq_setpoint;
-        Vq = Motor_GetPhaseResistance() * Iq_setpoint;
+    	const float e_phase_vel = Observer_GetVelEstimateRadians() * motor_get_pole_pairs();
+        Vd = - e_phase_vel * motor_get_phase_inductance() * Iq_setpoint;
+        Vq = motor_get_phase_resistance() * Iq_setpoint;
     }
     else
     {
@@ -426,8 +426,8 @@ static inline bool Controller_LimitVelocity(float min_limit, float max_limit, fl
 
 PAC5XXX_RAMFUNC void Controller_UpdateCurrentGains(void)
 {
-    config.I_gain = config.I_bw * Motor_GetPhaseInductance();
-    float plant_pole = Motor_GetPhaseResistance() / Motor_GetPhaseInductance();
+    config.I_gain = config.I_bw * motor_get_phase_inductance();
+    float plant_pole = motor_get_phase_resistance() / motor_get_phase_inductance();
     config.Iq_integrator_gain = plant_pole * config.I_gain;
     config.Id_integrator_gain = config.Iq_integrator_gain;
 }

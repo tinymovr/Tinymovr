@@ -39,7 +39,8 @@ void CANEP_InitEndpointMap(void)
 {
     (void)memset(EPList, '\0', sizeof(EPList));
 
-    CANEP_AddEndpoint(&CAN_EStop, 0x002);
+    // 0x001 AVAIL
+    // 0x002 AVAIL
     CANEP_AddEndpoint(&CAN_GetState, 0x003);
     CANEP_AddEndpoint(&CAN_GetMinStudioVersion, 0x004);
     CANEP_AddEndpoint(&CAN_GetCANConfig, 0x005);
@@ -92,12 +93,6 @@ CANEP_Callback CANEP_GetEndpoint(uint8_t id)
 }
 
 // Endpoint handlers
-
-uint8_t CAN_EStop(uint8_t buffer[])
-{
-    Controller_SetState(STATE_IDLE);
-    return CANRP_Write;
-}
 
 uint8_t CAN_GetState(uint8_t buffer[])
 {
@@ -367,15 +362,15 @@ uint8_t CAN_EraseConfig(uint8_t buffer[])
 uint8_t CAN_GetMotorConfig(uint8_t buffer[])
 {
     uint8_t flags = (motor_is_calibrated() == true) | ((motor_is_gimbal() == true) << 1);
-    uint16_t R = (uint16_t)(Motor_GetPhaseResistance() * 1e+3f);
-    uint8_t pole_pairs = Motor_GetPolePairs();
-    uint16_t L = (uint16_t)(Motor_GetPhaseInductance() * 1e+6f);
-    uint16_t ticks = (uint16_t)ENCODER_TICKS;
+    uint16_t R = (uint16_t)(motor_get_phase_resistance() * 1e+3f);
+    uint8_t pole_pairs = motor_get_pole_pairs();
+    uint16_t L = (uint16_t)(motor_get_phase_inductance() * 1e+6f);
+    uint16_t I_cal = (uint16_t)(motor_get_I_cal() * 1000.f);
     memcpy(&buffer[0], &flags, sizeof(uint8_t));
     memcpy(&buffer[1], &R, sizeof(uint16_t));
     memcpy(&buffer[3], &pole_pairs, sizeof(uint8_t));
     memcpy(&buffer[4], &L, sizeof(uint16_t));
-    memcpy(&buffer[6], &ticks, sizeof(uint16_t));
+    memcpy(&buffer[6], &I_cal, sizeof(uint16_t));
     return CANRP_Read;
 }
 
@@ -384,19 +379,20 @@ uint8_t CAN_SetMotorConfig(uint8_t buffer[])
     uint8_t flags;
     uint16_t R;
     uint16_t L;
+    uint16_t I_cal;
     memcpy(&flags, &buffer[0], sizeof(uint8_t));
     memcpy(&R, &buffer[1], sizeof(uint16_t));
     memcpy(&L, &buffer[3], sizeof(uint16_t));
+    memcpy(&I_cal, &buffer[5], sizeof(uint16_t));
 
     CAN_ResponseType response = CANRP_NoAction;
 
-    if ((R > 0) && (L > 0))
+    if ((R > 0) && (L > 0) && (I_cal > 0))
     {
         bool is_gimbal = (bool)(flags & 0x1);
         motor_set_is_gimbal(is_gimbal);
-        Motor_SetPhaseResistance(((float)R) * 1e-3f);
-        Motor_SetPhaseInductance(((float)L) * 1e-6f);
-
+        motor_set_phase_R_and_L(((float)R) * 1e-3f, ((float)L) * 1e-6f);
+        motor_set_I_cal(((float)I_cal) * 1e-3f);
         response = CANRP_Write;
     }
     return response;

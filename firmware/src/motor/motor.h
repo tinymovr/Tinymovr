@@ -39,6 +39,8 @@ struct MotorConfig
 	float phase_resistance;
 	float phase_inductance;
 
+	float I_cal;
+
 	bool resistance_calibrated;
 	bool inductance_calibrated;
 	bool poles_calibrated;
@@ -49,15 +51,20 @@ struct MotorConfig
 
 void Motor_Init(void);
 
-PAC5XXX_RAMFUNC uint8_t Motor_GetPolePairs(void);
-PAC5XXX_RAMFUNC uint8_t Motor_FindPolePairs(uint16_t ticks, float start_ticks, float end_ticks, float e_angle);
-PAC5XXX_RAMFUNC void Motor_SetPolePairs(uint8_t pairs);
+PAC5XXX_RAMFUNC uint8_t motor_get_pole_pairs(void);
+PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float start_ticks, float end_ticks, float e_angle);
+PAC5XXX_RAMFUNC void motor_set_pole_pairs(uint8_t pairs);
 
-PAC5XXX_RAMFUNC float Motor_GetPhaseResistance(void);
-PAC5XXX_RAMFUNC void Motor_SetPhaseResistance(float R);
+PAC5XXX_RAMFUNC float motor_get_phase_resistance(void);
+PAC5XXX_RAMFUNC void motor_set_phase_resistance(float R);
 
-PAC5XXX_RAMFUNC float Motor_GetPhaseInductance(void);
-PAC5XXX_RAMFUNC void Motor_SetPhaseInductance(float L);
+PAC5XXX_RAMFUNC float motor_get_phase_inductance(void);
+PAC5XXX_RAMFUNC void motor_set_phase_inductance(float L);
+
+PAC5XXX_RAMFUNC void motor_set_phase_R_and_L(float R, float L);
+
+PAC5XXX_RAMFUNC float motor_get_I_cal(void);
+PAC5XXX_RAMFUNC void motor_set_I_cal(float I);
 
 PAC5XXX_RAMFUNC bool motor_phases_swapped(void);
 PAC5XXX_RAMFUNC void motor_set_phases_swapped(bool swapped);
