@@ -38,19 +38,19 @@ class TMTestCase(unittest.TestCase):
         cls.tm.reset()
         cls.can_bus.shutdown()
 
-    def try_calibrate(self):
+    def try_calibrate(self, *args, **kwargs):
         motor_config = self.tm.motor_config
-        if motor_config.flags == 0:
+        if motor_config.flags == 0 or motor_config.flags == 2:
             self.tm.calibrate()
-            self.wait_for_calibration()
+            self.wait_for_calibration(*args, **kwargs)
             motor_config = self.tm.motor_config
-            self.assertEqual(motor_config.flags, 1)
+            self.assertTrue(motor_config.flags == 1 or motor_config.flags == 3)
 
-    def wait_for_calibration(self):
-        for _ in range(100):
+    def wait_for_calibration(self, check_interval=0.05):
+        for _ in range(1000):
             if self.tm.state.state == 0:
                 break
-            time.sleep(0.2)
+            time.sleep(check_interval)
         self.assertEqual(self.tm.state.state, 0)
 
     def check_state(self, target_state, target_error=None):
