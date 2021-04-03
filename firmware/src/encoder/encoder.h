@@ -42,6 +42,7 @@ struct MA702State
 };
 
 void MA_Init(void);
+PAC5XXX_RAMFUNC void MA_QueueAngleCommand(void);
 PAC5XXX_RAMFUNC int16_t MA_GetAngle(void);
 PAC5XXX_RAMFUNC void MA_UpdateAngle(bool check_error);
 
