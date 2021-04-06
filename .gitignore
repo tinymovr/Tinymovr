@@ -3,3 +3,4 @@
 
 # --- Sphinx documentation
 docs/_build/
+.vscode
