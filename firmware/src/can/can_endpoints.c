@@ -15,18 +15,19 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/common.h"
+#include <src/common.h>
 #include <src/encoder/encoder.h>
-#include "string.h"
+#include <string.h>
 
-#include "src/system/system.h"
-#include "src/adc/adc.h"
-#include "src/observer/observer.h"
-#include "src/controller/controller.h"
-#include "src/scheduler/scheduler.h"
+#include <src/system/system.h>
+#include <src/adc/adc.h>
+#include <src/motor/motor.h>
+#include <src/observer/observer.h>
+#include <src/controller/controller.h>
+#include <src/scheduler/scheduler.h>
 #include "src/nvm/nvm.h"
 
-#include "src/can/can_endpoints.h"
+#include <src/can/can_endpoints.h>
 
 #define EP_LIST_SIZE 64
 #define EP_MAP_SIZE 256
