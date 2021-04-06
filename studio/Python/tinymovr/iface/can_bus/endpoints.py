@@ -18,7 +18,7 @@ from tinymovr.codec import DataType
 from tinymovr.units import get_registry
 
 can_endpoints: Dict[str, Dict] = {
-    "get_offset_dir":
+    "offset_dir":
     {
         "description": "Get User-defined Offset and Direction",
         "type": "r",
