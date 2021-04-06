@@ -18,23 +18,13 @@ from tinymovr.codec import DataType
 from tinymovr.units import get_registry
 
 can_endpoints: Dict[str, Dict] = {
-    "nmt":
+    "get_offset_dir":
     {
-        "description": "CANOpen NMT Message",
-        "type": "w",
-        "ep_id": 0x000
-    },
-    "heartbeat":
-    {
-        "description": "CANOpen Heartbeat Message",
-        "type": "w",
-        "ep_id": 0x700
-    },
-    "estop":
-    {
-        "description": "Tinymovr Estop Message",
-        "type": "w",
-        "ep_id": 0x002
+        "description": "Get User-defined Offset and Direction",
+        "type": "r",
+        "ep_id": 0x002,
+        "types": (DataType.FLOAT, DataType.INT8),
+        "labels": ("offset", "direction")
     },
     "state":
     {
@@ -79,6 +69,14 @@ can_endpoints: Dict[str, Dict] = {
         "types": (DataType.UINT8, DataType.UINT8),
         "defaults": {"mode": 0},
         "labels": ("state", "mode")
+    },
+    "set_offset_dir":
+    {
+        "description": "Set User-defined Offset and Direction",
+        "type": "w",
+        "ep_id": 0x008,
+        "types": (DataType.FLOAT, DataType.INT8),
+        "labels": ("offset", "direction")
     },
     "encoder_estimates":
     {

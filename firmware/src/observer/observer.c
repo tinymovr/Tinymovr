@@ -17,9 +17,10 @@
 
 #include <string.h>
 #include <src/encoder/encoder.h>
-#include "src/common.h"
-#include "src/utils/utils.h"
-#include "observer.h"
+#include <src/motor/motor.h>
+#include <src/common.h>
+#include <src/utils/utils.h>
+#include <src/observer/observer.h>
 
 static struct ObserverState state = {0};
 
@@ -66,12 +67,12 @@ PAC5XXX_RAMFUNC void Observer_UpdateEstimates(void)
 	state.vel_estimate += PWM_PERIOD_S * config.ki * delta_pos_error;
 }
 
-PAC5XXX_RAMFUNC float Observer_GetBandwidth(void)
+PAC5XXX_RAMFUNC float Observer_GetFilterBandwidth(void)
 {
     return config.track_bw;
 }
 
-void Observer_SetBandwidth(float bw)
+void Observer_SetFilterBandwidth(float bw)
 {
     if (bw > 0.0f)
     {
@@ -109,8 +110,17 @@ PAC5XXX_RAMFUNC float Observer_GetVelEstimate(void)
 
 PAC5XXX_RAMFUNC float Observer_GetVelEstimateRadians(void)
 {
-	return (Observer_GetVelEstimate() / ENCODER_TICKS ) * twopi;
+	return Observer_GetVelEstimate() * twopi_by_enc_ticks;
+}
 
+PAC5XXX_RAMFUNC float observer_get_pos_estimate_user_frame(void)
+{
+	return (Observer_GetPosEstimate() - motor_get_user_offset()) * motor_get_user_direction();
+}
+
+PAC5XXX_RAMFUNC float observer_get_vel_estimate_user_frame(void)
+{
+	return Observer_GetVelEstimate() * motor_get_user_direction();
 }
 
 void Observer_ClearEccentricityTable(void)

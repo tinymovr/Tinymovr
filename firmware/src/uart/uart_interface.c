@@ -34,22 +34,22 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
     switch (addr)
     {
         case 'P': // pos setpoint
-            Controller_SetIqSetpoint(0);
-            Controller_SetVelSetpoint(0);
-            Controller_SetPosSetpoint(data);
+            controller_set_Iq_setpoint_user_frame(0);
+            controller_set_vel_setpoint_user_frame(0);
+            controller_set_pos_setpoint_user_frame(data);
             Controller_SetMode(CTRL_POSITION);
         break;
 
         case 'V': // vel setpoint
-            Controller_SetIqSetpoint(0);
-            Controller_SetVelSetpoint(data);
+            controller_set_Iq_setpoint_user_frame(0);
+            controller_set_vel_setpoint_user_frame(data);
             Controller_SetMode(CTRL_VELOCITY);
-            Controller_SetVelSetpoint((float)data);
+            controller_set_vel_setpoint_user_frame((float)data);
         break;
 
         case 'I': // current setpoint
             Controller_SetMode(CTRL_CURRENT);
-            Controller_SetIqSetpoint((float)data * ONE_OVER_UART_I_SCALING_FACTOR);
+            controller_set_Iq_setpoint_user_frame((float)data * ONE_OVER_UART_I_SCALING_FACTOR);
         break;
 
         case 'G': // velocity integrator gain
@@ -101,27 +101,27 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
         case 'p': // pos estimate
-            ret_val = Observer_GetPosEstimate();
+            ret_val = observer_get_pos_estimate_user_frame();
         break;
 
         case 'P': // pos setpoint
-            ret_val = Controller_GetPosSetpoint();
+            ret_val = controller_get_pos_setpoint_user_frame();
         break;
 
         case 'v': // vel estimate
-            ret_val = (int32_t)Observer_GetVelEstimate();
+            ret_val = (int32_t)observer_get_vel_estimate_user_frame();
         break;
 
         case 'V': // vel setpoint
-            ret_val = (int32_t)Controller_GetVelSetpoint();
+            ret_val = (int32_t)controller_get_vel_setpoint_user_frame();
         break;
 
         case 'i': // current estimate
-            ret_val = (int32_t)(Controller_GetIqEstimate() * UART_I_SCALING_FACTOR);
+            ret_val = (int32_t)(controller_get_Iq_estimate_user_frame() * UART_I_SCALING_FACTOR);
         break;
 
         case 'I': // current setpoint
-            ret_val = (int32_t)(Controller_GetIqSetpoint() * UART_I_SCALING_FACTOR);
+            ret_val = (int32_t)(controller_get_Iq_setpoint_user_frame() * UART_I_SCALING_FACTOR);
         break;
 
         case 'G': // velocity integrator setpoint

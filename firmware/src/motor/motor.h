@@ -39,6 +39,9 @@ struct MotorConfig
 	float phase_resistance;
 	float phase_inductance;
 
+	float user_offset;
+	float user_direction;
+
 	float I_cal;
 
 	bool resistance_calibrated;
@@ -73,6 +76,12 @@ PAC5XXX_RAMFUNC bool motor_is_calibrated(void);
 
 PAC5XXX_RAMFUNC bool motor_is_gimbal(void);
 PAC5XXX_RAMFUNC void motor_set_is_gimbal(bool gimbal);
+
+PAC5XXX_RAMFUNC float motor_get_user_offset(void);
+PAC5XXX_RAMFUNC void motor_set_user_offset(float offset);
+
+PAC5XXX_RAMFUNC int8_t motor_get_user_direction(void);
+PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir);
 
 struct MotorConfig* Motor_GetConfig(void);
 void Motor_RestoreConfig(struct MotorConfig* config_);
