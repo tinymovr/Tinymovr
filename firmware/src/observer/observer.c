@@ -99,7 +99,7 @@ PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrapped(void)
 
 PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrappedRadians(void)
 {
-	return (Observer_GetPosEstimateWrapped() / ENCODER_TICKS ) * twopi;
+	return Observer_GetPosEstimateWrapped() * twopi_by_enc_ticks;
 }
 
 PAC5XXX_RAMFUNC float Observer_GetVelEstimate(void)
