@@ -198,7 +198,7 @@ class TestBoard(TMTestCase):
         self.assertEqual(self.tm.state.state, 2)
         self.tm.idle()
 
-    def test_h_gimbal_mode(self):
+    def test_j_gimbal_mode(self):
         '''
         Test gimbal mode
         '''
@@ -213,6 +213,30 @@ class TestBoard(TMTestCase):
             time.sleep(0.2)
             self.assertAlmostEqual(i*1000*ticks, self.tm.encoder_estimates.position, delta=1000*ticks)
             time.sleep(0.4)
+
+    def test_k_rotor_offset_and_direction(self):
+        '''
+        Test rotor offset and direction
+        '''
+        self.check_state(0)
+        self.try_calibrate()
+        self.tm.position_control()
+        self.check_state(2)
+
+        self.assertEqual(self.tm.offset_dir.offset, 0)
+        self.assertEqual(self.tm.offset_dir.direction, 1)
+
+        offset = self.tm.encoder_estimates.position
+        self.tm.set_offset_dir(offset, 1)
+        self.assertAlmostEqual(self.tm.encoder_estimates.position, 0, delta=100)
+
+        self.tm.set_offset_dir(offset, -1)
+        self.assertAlmostEqual(self.tm.encoder_estimates.position, 0, delta=100)
+
+        self.tm.set_pos_setpoint(offset)
+        time.sleep(0.5)
+        self.tm.set_offset_dir(0, 1)
+        self.assertAlmostEqual(self.tm.encoder_estimates.position, 0, delta=100)
 
 
 if __name__ == '__main__':
