@@ -75,7 +75,7 @@ void Controller_ControlLoop(void)
 	while (true)
 	{
 		health_check();
-		const float Iq = Controller_GetIqEstimate();
+		const float Iq = controller_get_Iq_estimate();
 		if ( (Iq > (config.I_limit * I_TRIP_MARGIN)) ||
 					  (Iq < -(config.I_limit * I_TRIP_MARGIN)) )
 		{
@@ -275,39 +275,56 @@ void Controller_SetMode(ControlMode new_mode)
     }
 }
 
-float Controller_GetPosSetpoint(void)
+float controller_get_pos_setpoint_user_frame(void)
 {
-    return state.pos_setpoint;
+    return (state.pos_setpoint - motor_get_user_offset()) * motor_get_user_direction();
 }
 
-void Controller_SetPosSetpoint(float value)
+void controller_set_pos_setpoint_user_frame(float value)
 {
-    state.pos_setpoint = value;
+	// direction is either 1 or -1 so we can multiply instead of divide
+    state.pos_setpoint = value * motor_get_user_direction() + motor_get_user_offset();
 }
 
-float Controller_GetVelSetpoint(void)
+float controller_get_vel_setpoint_user_frame(void)
 {
-    return state.vel_setpoint;
+    return state.vel_setpoint * motor_get_user_direction();
 }
 
-void Controller_SetVelSetpoint(float value)
+void controller_set_vel_setpoint_user_frame(float value)
 {
-    state.vel_setpoint = value;
+	// direction is either 1 or -1 so we can multiply instead of divide
+    state.vel_setpoint = value * motor_get_user_direction();
 }
 
-PAC5XXX_RAMFUNC float Controller_GetIqEstimate(void)
+PAC5XXX_RAMFUNC float controller_get_Iq_estimate(void)
 {
     return state.Iq_meas;
 }
 
-float Controller_GetIqSetpoint(void)
+float controller_get_Iq_setpoint(void)
 {
     return state.Iq_setpoint;
 }
 
-void Controller_SetIqSetpoint(float value)
+void controller_set_Iq_setpoint(float value)
 {
     state.Iq_setpoint = value;
+}
+
+PAC5XXX_RAMFUNC float controller_get_Iq_estimate_user_frame(void)
+{
+	return state.Iq_meas * motor_get_user_direction();
+}
+
+float controller_get_Iq_setpoint_user_frame(void)
+{
+	return state.Iq_setpoint * motor_get_user_direction();
+}
+
+void controller_set_Iq_setpoint_user_frame(float value)
+{
+	state.Iq_setpoint = value * motor_get_user_direction();
 }
 
 void Controller_GetModulationValues(struct FloatTriplet *dc)

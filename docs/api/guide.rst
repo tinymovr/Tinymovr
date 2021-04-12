@@ -426,6 +426,63 @@ Example
     >>>tmx.set_gains(position=25.0, velocity=0.00001)
 
 
+offset_dir
+**********
+
+| **endpoint**: ``0x02``
+| **type**: Read-only
+
+Retrieves the user defined rotor position offset and rotor direction values.
+
+Return Values
+-------------
+
+=============  =================   =========  =========== ==================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ------------------
+``offset``     Offset              float32    0           tick
+``direction``  Direction           int8       4           
+=============  =================   =========  =========== ==================
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.offset_dir
+    {"offset": 0.0, "direction": 1}
+
+
+set_offset_dir()
+****************
+
+| **endpoint**: ``0x08``
+| **type**: Write-only
+
+Sets the user defined rotor position offset and rotor direction values.
+
+.. note::
+    The ``direction`` field only accepts -1 or 1 as values. All other values are ignored.
+
+
+Arguments
+---------
+
+=============  =================   =========  =========== ==================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ------------------
+``offset``     Offset              float32    0           tick
+``direction``  Direction           int8       4           
+=============  =================   =========  =========== ==================
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.set_gains(offset=2500, direction=-1)
+
+
 integrator_gains
 ****************
 

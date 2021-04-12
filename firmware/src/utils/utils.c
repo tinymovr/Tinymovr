@@ -77,13 +77,13 @@ PAC5XXX_RAMFUNC float cos_32s(float x)
 PAC5XXX_RAMFUNC float fast_cos(float angle)
 {
     //clamp to the range 0..2pi
-    angle=angle-floorf(angle*invtwopi)*twopi;
+    angle=angle-floorf(angle * INVTWOPI) * TWOPI;
     angle=angle>0.f?angle:-angle;
 
     if(angle<halfpi) return cos_32s(angle);
     if(angle<pi) return -cos_32s(pi-angle);
     if(angle<threehalfpi) return -cos_32s(angle-pi);
-    return cos_32s(twopi-angle);
+    return cos_32s(TWOPI - angle);
 }
 
 PAC5XXX_RAMFUNC float fast_sin(float angle)

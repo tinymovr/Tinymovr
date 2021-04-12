@@ -15,18 +15,19 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/common.h"
+#include <src/common.h>
 #include <src/encoder/encoder.h>
-#include "string.h"
+#include <string.h>
 
-#include "src/system/system.h"
-#include "src/adc/adc.h"
-#include "src/observer/observer.h"
-#include "src/controller/controller.h"
-#include "src/scheduler/scheduler.h"
+#include <src/system/system.h>
+#include <src/adc/adc.h>
+#include <src/motor/motor.h>
+#include <src/observer/observer.h>
+#include <src/controller/controller.h>
+#include <src/scheduler/scheduler.h>
 #include "src/nvm/nvm.h"
 
-#include "src/can/can_endpoints.h"
+#include <src/can/can_endpoints.h>
 
 #define EP_LIST_SIZE 64
 #define EP_MAP_SIZE 256
@@ -40,13 +41,13 @@ void CANEP_InitEndpointMap(void)
     (void)memset(EPList, '\0', sizeof(EPList));
 
     // 0x001 AVAIL
-    // 0x002 AVAIL
+    CANEP_AddEndpoint(&CAN_GetOffsetAndDirection, 0x002);
     CANEP_AddEndpoint(&CAN_GetState, 0x003);
     CANEP_AddEndpoint(&CAN_GetMinStudioVersion, 0x004);
     CANEP_AddEndpoint(&CAN_GetCANConfig, 0x005);
     CANEP_AddEndpoint(&CAN_SetCANConfig, 0x006);
     CANEP_AddEndpoint(&CAN_SetState, 0x007);
-    // 0x008 AVAIL
+    CANEP_AddEndpoint(&CAN_SetOffsetAndDirection, 0x008);
     CANEP_AddEndpoint(&CAN_GetEncoderEstimates, 0x009);
     CANEP_AddEndpoint(&CAN_GetSetpoints, 0x00A);
     // 0x00B Reserved: Move To Pos
@@ -93,6 +94,15 @@ CANEP_Callback CANEP_GetEndpoint(uint8_t id)
 }
 
 // Endpoint handlers
+
+uint8_t CAN_GetOffsetAndDirection(uint8_t buffer[])
+{
+	float offset = motor_get_user_offset();
+	int8_t direction = motor_get_user_direction();
+	memcpy(&buffer[0], &offset, sizeof(float));
+	memcpy(&buffer[4], &direction, sizeof(int8_t));
+	return CANRP_Read;
+}
 
 uint8_t CAN_GetState(uint8_t buffer[])
 {
@@ -166,10 +176,21 @@ uint8_t CAN_SetState(uint8_t buffer[])
     return response;
 }
 
+uint8_t CAN_SetOffsetAndDirection(uint8_t buffer[])
+{
+	float offset;
+	int8_t direction;
+	memcpy(&offset, &buffer[0], sizeof(float));
+	memcpy(&direction, &buffer[4], sizeof(int8_t));
+	motor_set_user_offset(offset);
+	motor_set_user_direction(direction);
+	return CANRP_Write;
+}
+
 uint8_t CAN_GetEncoderEstimates(uint8_t buffer[])
 {
-    float pos = Observer_GetPosEstimate();
-    float vel = Observer_GetVelEstimate();
+    float pos = observer_get_pos_estimate_user_frame();
+    float vel = observer_get_vel_estimate_user_frame();
     memcpy(&buffer[0], &pos, sizeof(float));
     memcpy(&buffer[4], &vel, sizeof(float));
     return CANRP_Read;
@@ -177,8 +198,8 @@ uint8_t CAN_GetEncoderEstimates(uint8_t buffer[])
 
 uint8_t CAN_GetSetpoints(uint8_t buffer[])
 {
-    float pos = Controller_GetPosSetpoint();
-    float vel = Controller_GetVelSetpoint();
+    float pos = controller_get_pos_setpoint_user_frame();
+    float vel = controller_get_vel_setpoint_user_frame();
     memcpy(&buffer[0], &pos, sizeof(float));
     memcpy(&buffer[4], &vel, sizeof(float));
     return CANRP_Read;
@@ -194,9 +215,9 @@ uint8_t CAN_SetPosSetpoint(uint8_t buffer[])
     memcpy(&Iq_ff, &buffer[6], sizeof(int16_t));
     float velFF_float = vel_ff * 10.0f;
     float iqFF_float = Iq_ff * 0.01f;
-    Controller_SetPosSetpoint(pos);
-    Controller_SetVelSetpoint(velFF_float);
-    Controller_SetIqSetpoint(iqFF_float);
+    controller_set_pos_setpoint_user_frame(pos);
+    controller_set_vel_setpoint_user_frame(velFF_float);
+    controller_set_Iq_setpoint_user_frame(iqFF_float);
     return CANRP_Write;
 }
 
@@ -206,8 +227,8 @@ uint8_t CAN_SetVelSetpoint(uint8_t buffer[])
     float Iq_ff;
     memcpy(&vel, &buffer[0], sizeof(float));
     memcpy(&Iq_ff, &buffer[4], sizeof(float));
-    Controller_SetVelSetpoint(vel);
-    Controller_SetIqSetpoint(Iq_ff);
+    controller_set_vel_setpoint_user_frame(vel);
+    controller_set_Iq_setpoint_user_frame(Iq_ff);
     return CANRP_Write;
 }
 
@@ -215,7 +236,7 @@ uint8_t CAN_SetIqSetpoint(uint8_t buffer[])
 {
     float Iq;
     memcpy(&Iq, &buffer[0], sizeof(float));
-    Controller_SetIqSetpoint(Iq);
+    controller_set_Iq_setpoint_user_frame(Iq);
     return CANRP_Write;
 }
 
@@ -254,8 +275,8 @@ uint8_t CAN_GetPhaseCurrents(uint8_t buffer[])
 
 uint8_t CAN_GetIq(uint8_t buffer[])
 {
-    float Iq_set = Controller_GetIqSetpoint();
-    float Iq_est = Controller_GetIqEstimate();
+    float Iq_set = controller_get_Iq_setpoint_user_frame();
+    float Iq_est = controller_get_Iq_estimate_user_frame();
     memcpy(&buffer[0], &Iq_set, sizeof(float));
     memcpy(&buffer[4], &Iq_est, sizeof(float));
     return CANRP_Read;

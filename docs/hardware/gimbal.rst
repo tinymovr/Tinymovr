@@ -63,4 +63,4 @@ You can now calibrate the motor. Calibration will bypass resistance and inductan
 Controlling the Motor
 ---------------------
 
-Gimbal mode has identical functionality as the regular mode. Position, velocity and current control modes are supported. Note that you may have to tune the control gains to achieve optimal performance.
+Gimbal mode has identical functionality as the regular mode. Position, velocity and current control modes are supported. Note that you may have to tune the control gains to achieve optimal performance. In addition, due to the fact that current control is open loop, high angular velocities may not be available.

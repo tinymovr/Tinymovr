@@ -123,7 +123,7 @@ bool CalibrateDirectionAndPolePairs(void)
     // we read the unwrapped positions given by the
     // observer, but we generate and use the error table
     // before the observer, at the encoder read.
-    const float epos_target = CAL_PHASE_TURNS * twopi;
+    const float epos_target = CAL_PHASE_TURNS * TWOPI;
     const float I_setpoint = motor_get_I_cal();
     bool success = true;
     // Stay a bit at starting epos

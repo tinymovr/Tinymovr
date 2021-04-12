@@ -21,8 +21,6 @@
 #include <stdbool.h>
 #include "src/common.h"
 
-#define ENCODER_TICKS                (8192)
-#define ENCODER_HALF_TICKS           (ENCODER_TICKS / 2)
 #define MAX_ALLOWED_DELTA			 (1024)
 
 typedef enum {

@@ -24,6 +24,9 @@ static struct MotorConfig config = {
 	.phase_resistance = 0.1f,
 	.phase_inductance = 1e-5f,
 
+	.user_offset = 0.0f,
+	.user_direction = 1,
+
 	.I_cal = 5.0f,
 
 	.resistance_calibrated = false,
@@ -39,7 +42,7 @@ void Motor_Init(void) {}
 PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float start_ticks, float end_ticks, float e_angle)
 {
     const float pos = fabsf(end_ticks- start_ticks);
-    float p_angle = twopi * pos/ticks;
+    float p_angle = TWOPI * pos/ticks;
     const float pairs_f = e_angle / p_angle;
     const uint8_t pairs_i = (uint8_t)floorf(pairs_f + 0.5f);
     const float residual = fabsf(pairs_f - (float)pairs_i);
@@ -156,6 +159,29 @@ PAC5XXX_RAMFUNC bool motor_is_gimbal(void)
 PAC5XXX_RAMFUNC void motor_set_is_gimbal(bool gimbal)
 {
     config.is_gimbal = gimbal;
+}
+
+PAC5XXX_RAMFUNC float motor_get_user_offset(void)
+{
+	return config.user_offset;
+}
+
+PAC5XXX_RAMFUNC void motor_set_user_offset(float offset)
+{
+	config.user_offset = offset;
+}
+
+PAC5XXX_RAMFUNC int8_t motor_get_user_direction(void)
+{
+	return config.user_direction;
+}
+
+PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir)
+{
+	if ((dir == -1) || (dir == 1))
+	{
+		config.user_direction = dir;
+	}
 }
 
 struct MotorConfig* Motor_GetConfig(void)

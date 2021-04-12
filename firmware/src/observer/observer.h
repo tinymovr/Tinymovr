@@ -51,8 +51,11 @@ PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrappedRadians(void);
 PAC5XXX_RAMFUNC float Observer_GetVelEstimate(void);
 PAC5XXX_RAMFUNC float Observer_GetVelEstimateRadians(void);
 
-PAC5XXX_RAMFUNC float Observer_GetBandwidth(void);
-void Observer_SetBandwidth(float bw);
+PAC5XXX_RAMFUNC float observer_get_pos_estimate_user_frame(void);
+PAC5XXX_RAMFUNC float observer_get_vel_estimate_user_frame(void);
+
+PAC5XXX_RAMFUNC float Observer_GetFilterBandwidth(void);
+void Observer_SetFilterBandwidth(float bw);
 void Observer_ClearEccentricityTable(void);
 void Observer_SetEccentricityCalibrated(void);
 int16_t *Observer_GetEccentricityTablePointer(void);
