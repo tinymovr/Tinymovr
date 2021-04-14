@@ -20,6 +20,7 @@ Welcome to Tinymovr documentation!
    hardware/gimbal
    hardware/canine
    troubleshooting
+   control/theory
    develop/guide
 
 Indices and tables
