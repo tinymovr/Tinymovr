@@ -113,4 +113,5 @@ Further Reading
 ###############
 
 `Vector Control (Wikipedia) <https://en.wikipedia.org/wiki/Vector_control_(motor)>`_
+
 `Sensorless Field Oriented Control of Brushless PMSMs <https://krex.k-state.edu/dspace/bitstream/handle/2097/1507/JamesMevey2009.pdf;jsessionid=820C6C90C0851225CAE19AF829939F2A?sequence=1>`_
