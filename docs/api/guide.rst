@@ -760,7 +760,7 @@ save_config()
 Saves board configuration to Non-Volatile Memory.
 
 .. note::
-    Saving config to NVM only works when Tinymovr is in idle mode, otherwise the command is ignored.
+    Saving config only works when Tinymovr is in idle mode, otherwise the command is ignored.
 
 Arguments
 ---------
@@ -781,7 +781,10 @@ erase_config()
 | **endpoint**: ``0x1D``
 | **type**: Write-only
 
-Erases board configuration and resets the MCU.
+Erases the configuration stored in NVM and resets the MCU.
+
+.. note::
+    Erasing config only works when Tinymovr is in idle mode, otherwise the command is ignored.
 
 Arguments
 ---------
@@ -794,3 +797,59 @@ Example
 .. code-block:: python
 
     >>>tmx.erase_config()
+
+
+Error Codes
+###########
+
+Tinymovr uses error codes to indicate faults in operation. These are listed below. Note that using Tinymovr studio, the error codes are already presented with an explanation.
+
+0: ``NO_ERROR``
+***************
+
+No error present.
+
+1: ``INVALID_STATE``
+********************
+
+An invalid state has been requested. This can be triggered when attempting to transition to a state whose controller state constraints are not satisfied. E.g. switching to closed loop control without calibrating.
+
+2: ``ILLEGAL_VALUE``
+********************
+
+This is a legacy error code that is not in use.
+
+3: ``VBUS_UNDERVOLTAGE``
+************************
+
+The bus voltage has dropped below the undervoltage threshold. In a current-limited power supply, this may also indicate excessive current demand from the power supply.
+
+4: ``OVERCURRENT``
+******************
+
+The phase current has exceeded the overcurrent threshold. The overcurrent threshold is 1,5 times the user-defined current limit, and in any case no more than 50A.
+
+5: ``PWM_LIMIT_EXCEEDED``
+*************************
+
+This is a legacy error code that is not in use.
+
+6: ``PHASE_RESISTANCE_OUT_OF_RANGE``
+************************************
+
+The phase resistance measured during calibration is out of range. The defined range is 5mΩ to 1Ω.
+
+7: ``PHASE_INDUCTANCE_OUT_OF_RANGE``
+************************************
+
+The phase inductance measured during calibration is out of range. The defined range is 2μH to 5mH.
+
+8: ``INVALID_POLE_PAIRS``
+*************************
+
+The pole pair detection algorithm did not converge near an integer number during calibration.
+
+9: ``ENCODER_READING_UNSTABLE``
+*******************************
+
+Encoder reading variation is over maximum allowed threshold. This is usually the casse if the magnet is misaligned, too far away from the encoder IC, or missing.

@@ -89,7 +89,7 @@ Example
 
 .. code-block:: shell
 
-    .A
+    .Q
     0
 
 .A
@@ -113,7 +113,7 @@ Example
 
 .. code-block:: shell
 
-    .r
+    .e
     0
 
 .p
@@ -240,7 +240,7 @@ Example
 
 .. code-block:: shell
 
-    .i
+    .l
     2000
 
 .R
