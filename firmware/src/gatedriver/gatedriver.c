@@ -15,8 +15,9 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/common.h"
-#include "gatedriver.h"
+#include <src/common.h>
+#include <src/motor/motor.h>
+#include <src/gatedriver/gatedriver.h>
 
 struct GateDriver_ gateDriver = 
 {
@@ -40,9 +41,9 @@ PAC5XXX_RAMFUNC void GateDriver_Enable(void)
         PAC55XX_GPIOB->OUTMASK.w = 0x00;
 
         // Set slew rate
-        // 01000100: push: 650mA pull: 650mA
-        pac5xxx_tile_register_write(ADDR_DRVILIMLS, 0x44);
-        pac5xxx_tile_register_write(ADDR_DRVILIMHS, 0x44);
+        // 01000101: push: 750mA pull: 750mA
+        pac5xxx_tile_register_write(ADDR_DRVILIMLS, 0x45);
+        pac5xxx_tile_register_write(ADDR_DRVILIMHS, 0x45);
 
         // Enable driver manager and verify active - need to enable even in PAC5210 to get ENHS pin to work
         pac5xxx_tile_register_write(ADDR_ENDRV, 1);
@@ -78,11 +79,19 @@ PAC5XXX_RAMFUNC void GateDriver_Disable(void)
     }
 }
 
-PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dc)
+PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dutycycles)
 {
 #ifndef DRY_RUN
-    m1_u_set_duty(dc->A);
-    m1_v_set_duty(dc->B);
-    m1_w_set_duty(dc->C);
+	m1_u_set_duty(dutycycles->A);
+	if (motor_phases_swapped())
+	{
+		m1_v_set_duty(dutycycles->C);
+		m1_w_set_duty(dutycycles->B);
+	}
+	else
+	{
+		m1_v_set_duty(dutycycles->B);
+		m1_w_set_duty(dutycycles->C);
+	}
 #endif
 }

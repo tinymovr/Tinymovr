@@ -23,43 +23,44 @@ Enabling Gimbal Mode
 
    * DO NOT perform calibration on a gimbal motor without setting gimbal mode first! There is a risk of damaging the motor and board.
    
-   * Using arbitrary resistance and inductance settings can damage your motor, as can using gimbal mode with a high-current motor.
+   * Using arbitrary resistance and inductance settings can damage your motor and board.
 
 To enable gimbal mode, set the motor config as follows:
 
 .. code-block:: python
 
-    >>>tm1.set_motor_config(1, motor_resistance, motor_inductance)
+    >>>tm1.set_motor_config(1, motor_resistance, motor_inductance, I_cal)
 
-Please note that by default the motor_resistance field is in Milliohms and the motor_inductance field is in Microhenries.
+Please note that by default the motor_resistance field is in Milliohms, the motor_inductance field is in Microhenries, and the calibration current ``I_cal`` in Milliamps.
 
 Example
 
 .. code-block:: python
     
-    >>>tmx.set_motor_config(1, 5000, 2000)
+    >>>tmx.set_motor_config(1, 5000, 2000, 500)
 
-or, using the units interface:
+This specifies a motor with 5Ohms resistance, 2Millihenries inductance and 0.5Amps calibration current.
+Alternatuvely, using the units interface:
 
 .. code-block:: python
     
-    >>>tmx.set_motor_config(1, 0.005 * Ohm, 0.002 * Henry)
+    >>>tmx.set_motor_config(1, 0.005 * Ohm, 0.002 * Henry, 0.5 * Amps)
 
 Control that the settings are correct:
 
 .. code-block:: python
     
     >>>tmx.motor_config
-    {"flags": 2, "R": 200, "pole_pairs": 11, "L": 100}
+    {"flags": 2, "R": 5000, "pole_pairs": 11, "L": 2000, "I_cal": 500}
 
-You can now calibrate the motor. Calibration will bypass resistance and inductance measurement, and will only calculate pole pairs, offset and direction. After calibration you should see a '3' in the 'flags' field of motor_config:
+You can now calibrate the motor. Calibration will bypass resistance and inductance measurement, and will only calculate pole pairs, offset and direction. After calibration you should see a value of '3' in the 'flags' field of motor_config:
 
 .. code-block:: python
     
     >>>tmx.motor_config
-    {"flags": 3, "R": 200, "pole_pairs": 11, "L": 100}
+    {"flags": 3, "R": 5000, "pole_pairs": 11, "L": 2000, "I_cal": 500}
 
 Controlling the Motor
 ---------------------
 
-Gimbal mode has identical functionality as the regular mode. Position, velocity and current control modes are supported. Note that you may have to tune the control gains to achieve optimal performance.
+Gimbal mode has identical functionality as the regular mode. Position, velocity and current control modes are supported. Note that you may have to tune the control gains to achieve optimal performance. In addition, due to the fact that current control is open loop, high angular velocities may not be available.

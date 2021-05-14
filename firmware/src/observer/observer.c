@@ -17,18 +17,17 @@
 
 #include <string.h>
 #include <src/encoder/encoder.h>
-#include "src/common.h"
-#include "src/utils/utils.h"
-#include "observer.h"
+#include <src/motor/motor.h>
+#include <src/common.h>
+#include <src/utils/utils.h>
+#include <src/observer/observer.h>
 
 static struct ObserverState state = {0};
 
 static struct ObserverConfig config = {
-		.track_bw = 1000.0f,
+		.track_bw = 1500.0f,
 		.kp = 0.0f,
 		.ki = 0.0f,
-		.direction_calibrated = 0,
-		.direction = 1,
 		.eccentricity_table = {0},
 		.eccentricity_calibrated = 0
 };
@@ -65,19 +64,15 @@ PAC5XXX_RAMFUNC void Observer_UpdateEstimates(void)
 		state.pos_estimate += 2 * config.sector_half_interval;
 		state.pos_sector -= 1;
 	}
-	else
-	{
-		// No action
-	}
 	state.vel_estimate += PWM_PERIOD_S * config.ki * delta_pos_error;
 }
 
-PAC5XXX_RAMFUNC float Observer_GetBandwidth(void)
+PAC5XXX_RAMFUNC float Observer_GetFilterBandwidth(void)
 {
     return config.track_bw;
 }
 
-void Observer_SetBandwidth(float bw)
+void Observer_SetFilterBandwidth(float bw)
 {
     if (bw > 0.0f)
     {
@@ -88,64 +83,44 @@ void Observer_SetBandwidth(float bw)
 PAC5XXX_RAMFUNC float Observer_GetPosEstimate(void)
 {
 	const float primary = 2 * config.sector_half_interval * state.pos_sector;
-	return (float)config.direction * (primary + state.pos_estimate);
+	return primary + state.pos_estimate;
 }
 
 PAC5XXX_RAMFUNC float Observer_GetPosDiff(float target)
 {
 	const float primary = 2 * config.sector_half_interval * state.pos_sector;
-	const float diff_sector = target - ((float)config.direction * primary);
-	return diff_sector - ((float)config.direction * state.pos_estimate);
+	const float diff_sector = target - primary;
+	return diff_sector - state.pos_estimate;
 }
 
 PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrapped(void)
 {
-	return config.direction * state.pos_estimate_wrapped;
+	return state.pos_estimate_wrapped;
 }
 
 PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrappedRadians(void)
 {
-	return (Observer_GetPosEstimateWrapped() / ENCODER_TICKS ) * twopi;
+	return Observer_GetPosEstimateWrapped() * twopi_by_enc_ticks;
 }
 
 PAC5XXX_RAMFUNC float Observer_GetVelEstimate(void)
 {
-	return config.direction * state.vel_estimate;
+	return state.vel_estimate;
 }
 
 PAC5XXX_RAMFUNC float Observer_GetVelEstimateRadians(void)
 {
-	return (Observer_GetVelEstimate() / ENCODER_TICKS ) * twopi;
-
+	return Observer_GetVelEstimate() * twopi_by_enc_ticks;
 }
 
-PAC5XXX_RAMFUNC int Observer_GetDirection(void)
+PAC5XXX_RAMFUNC float observer_get_pos_estimate_user_frame(void)
 {
-	return config.direction;
+	return (Observer_GetPosEstimate() - motor_get_user_offset()) * motor_get_user_direction();
 }
 
-void Observer_CalibrateDirection(float ref_pos)
+PAC5XXX_RAMFUNC float observer_get_vel_estimate_user_frame(void)
 {
-    Observer_SetDirection(1);
-	if (Observer_GetPosEstimate() < ref_pos)
-	{
-		Observer_SetDirection(-1);
-	}
-}
-
-void Observer_SetDirection(int direction)
-{
-	if ((direction == -1) || (direction == 1))
-	{
-		config.direction_calibrated = true;
-		config.direction = direction;
-	}
-}
-
-void Observer_ClearDirection(void)
-{
-	config.direction_calibrated = false;
-	config.direction = 1;
+	return Observer_GetVelEstimate() * motor_get_user_direction();
 }
 
 void Observer_ClearEccentricityTable(void)
@@ -166,7 +141,7 @@ int16_t *Observer_GetEccentricityTablePointer(void)
 
 PAC5XXX_RAMFUNC bool Observer_Calibrated(void)
 {
-	return config.direction_calibrated & config.eccentricity_calibrated;
+	return config.eccentricity_calibrated;
 }
 
 struct ObserverConfig* Observer_GetConfig(void)

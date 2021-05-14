@@ -25,7 +25,6 @@
 #include "src/nvm/nvm.h"
 #include "src/can/can.h"
 #include "src/utils/utils.h"
-#include "src/watchdog/watchdog.h"
 #include "src/uart/uart_lowlevel.h"
 #include "src/uart/uart_interface.h"
 
@@ -35,22 +34,22 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
     switch (addr)
     {
         case 'P': // pos setpoint
-            Controller_SetIqSetpoint(0);
-            Controller_SetVelSetpoint(0);
-            Controller_SetPosSetpoint(data);
+            controller_set_Iq_setpoint_user_frame(0);
+            controller_set_vel_setpoint_user_frame(0);
+            controller_set_pos_setpoint_user_frame(data);
             Controller_SetMode(CTRL_POSITION);
         break;
 
         case 'V': // vel setpoint
-            Controller_SetIqSetpoint(0);
-            Controller_SetVelSetpoint(data);
+            controller_set_Iq_setpoint_user_frame(0);
+            controller_set_vel_setpoint_user_frame(data);
             Controller_SetMode(CTRL_VELOCITY);
-            Controller_SetVelSetpoint((float)data);
+            controller_set_vel_setpoint_user_frame((float)data);
         break;
 
         case 'I': // current setpoint
             Controller_SetMode(CTRL_CURRENT);
-            Controller_SetIqSetpoint((float)data * ONE_OVER_UART_I_SCALING_FACTOR);
+            controller_set_Iq_setpoint_user_frame((float)data * ONE_OVER_UART_I_SCALING_FACTOR);
         break;
 
         case 'G': // velocity integrator gain
@@ -58,11 +57,11 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
         break;
 
         case 'H': // phase resistance
-            Motor_SetPhaseResistance((float)data * ONE_OVER_UART_R_SCALING_FACTOR);
+            motor_set_phase_resistance((float)data * ONE_OVER_UART_R_SCALING_FACTOR);
         break;
 
         case 'L': // phase inductance
-            Motor_SetPhaseInductance((float)data * ONE_OVER_UART_L_SCALING_FACTOR);
+            motor_set_phase_inductance((float)data * ONE_OVER_UART_L_SCALING_FACTOR);
         break;
 
         case 'M': // Set is motor gimbal?
@@ -70,11 +69,11 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
         break;
         
         case 'U': // CAN Baud Rate
-            CAN_SetkBaudRate((uint16_t)data);
+            CAN_set_kbit_rate((uint16_t)data);
         break;
 
         case 'C': // CAN ID
-            CAN_SetID((uint8_t)data);
+            CAN_set_ID((uint8_t)data);
         break;
 
         default:
@@ -102,51 +101,47 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
         case 'p': // pos estimate
-            ret_val = Observer_GetPosEstimate();
+            ret_val = observer_get_pos_estimate_user_frame();
         break;
 
         case 'P': // pos setpoint
-            ret_val = Controller_GetPosSetpoint();
+            ret_val = controller_get_pos_setpoint_user_frame();
         break;
 
         case 'v': // vel estimate
-            ret_val = (int32_t)Observer_GetVelEstimate();
+            ret_val = (int32_t)observer_get_vel_estimate_user_frame();
         break;
 
         case 'V': // vel setpoint
-            ret_val = (int32_t)Controller_GetVelSetpoint();
+            ret_val = (int32_t)controller_get_vel_setpoint_user_frame();
         break;
 
         case 'i': // current estimate
-            ret_val = (int32_t)(Controller_GetIqEstimate() * UART_I_SCALING_FACTOR);
+            ret_val = (int32_t)(controller_get_Iq_estimate_user_frame() * UART_I_SCALING_FACTOR);
         break;
 
         case 'I': // current setpoint
-            ret_val = (int32_t)(Controller_GetIqSetpoint() * UART_I_SCALING_FACTOR);
+            ret_val = (int32_t)(controller_get_Iq_setpoint_user_frame() * UART_I_SCALING_FACTOR);
         break;
 
         case 'G': // velocity integrator setpoint
             ret_val = (int32_t)(Controller_GetVelIntegratorGain() * UART_VEL_INT_SCALING_FACTOR);
         break;
 
-        case 'd': // observer direction
-            ret_val = Observer_GetDirection();
-        break;
-
         case 'h': // phase resistance
-            ret_val = Motor_GetPhaseResistance() * UART_R_SCALING_FACTOR;
+            ret_val = motor_get_phase_resistance() * UART_R_SCALING_FACTOR;
         break;
 
         case 'l': // phase inductance
-            ret_val = Motor_GetPhaseInductance() * UART_L_SCALING_FACTOR;
+            ret_val = motor_get_phase_inductance() * UART_L_SCALING_FACTOR;
         break;
 
         case 'U': // CAN Baud Rate
-            ret_val = CAN_GetkBaudRate();
+            ret_val = CAN_get_kbit_rate();
         break;
 
         case 'C': // CAN ID
-            ret_val = CAN_GetID();
+            ret_val = CAN_get_ID();
         break;
 
         case 'm': // Is motor gimbal?
@@ -198,14 +193,12 @@ void UART_ProcessMessage(void)
         // Write operation
         int32_t n = atol(&(uart_rx_msg)[2]);
         UART_WriteAddr(addr, n);
-        Watchdog_Feed();
     }
     else if (len == 0)
     {
         // Read operation
         int32_t val = UART_ReadAddr(uart_rx_msg[1]);
         UART_SendInt32(val);
-        Watchdog_Feed();
     }
     else
     {

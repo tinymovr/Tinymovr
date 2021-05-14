@@ -21,8 +21,6 @@
 #include <stdbool.h>
 #include "src/common.h"
 
-#define ENCODER_TICKS                (8192)
-#define ENCODER_HALF_TICKS           (ENCODER_TICKS / 2)
 #define MAX_ALLOWED_DELTA			 (1024)
 
 typedef enum {
@@ -42,6 +40,7 @@ struct MA702State
 };
 
 void MA_Init(void);
+PAC5XXX_RAMFUNC void MA_QueueAngleCommand(void);
 PAC5XXX_RAMFUNC int16_t MA_GetAngle(void);
 PAC5XXX_RAMFUNC void MA_UpdateAngle(bool check_error);
 

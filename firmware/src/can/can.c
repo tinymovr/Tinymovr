@@ -18,7 +18,6 @@
 #include "string.h"
 
 #include "src/system/system.h"
-#include "src/watchdog/watchdog.h"
 
 #include "src/can/can_endpoints.h"
 #include "src/can/can_func.h"
@@ -29,26 +28,37 @@ static struct CANConfig config = {
     .kbaud_rate = CAN_BAUD_1000KHz
 };
 
-void CAN_Init(void)
+void CAN_init(void)
 {
     CANEP_InitEndpointMap();
 
-    // Configure PF4 as GPIO input
-    PAC55XX_GPIOF->MODE.P4 = IO_HIGH_IMPEDENCE_INPUT;
-    PAC55XX_GPIOF->OUTMASK.P4 = 1;
-    PAC55XX_SCC->PFMUXSEL.P4 = 0;
-    PAC55XX_SCC->PFPUEN.P4 = 1;
-
-    // Configure PE1 as a GPIO output
-    PAC55XX_GPIOE->MODE.P1 = IO_PUSH_PULL_OUTPUT;   // PE1 GPIO configured as an output
-    PAC55XX_SCC->PEMUXSEL.w &= 0xFFFFFF0F;          // Clear bits to select GPIO for PE1 via PE mux select
-    PAC55XX_GPIOE->OUT.P1 = 1;                      // Set PE1 high to force transceiver into normal mode
-
-    // Wait for CAN transceiver to enter normal mode
-    while (PAC55XX_GPIOF->IN.P4 == 0)
+    if (system_board_revision() == BOARD_REV_5)
     {
-        // No action
-    }
+		// Configure PF4 as GPIO input with pulldown
+		PAC55XX_GPIOF->MODE.P4 = IO_HIGH_IMPEDENCE_INPUT;
+		PAC55XX_GPIOF->OUTMASK.P4 = 1;
+		PAC55XX_SCC->PFMUXSEL.P4 = 0;
+		PAC55XX_SCC->PFPDEN.P4 = 1;
+	}
+	else
+	{
+		// Configure PF4 as GPIO input
+		PAC55XX_GPIOF->MODE.P4 = IO_HIGH_IMPEDENCE_INPUT;
+		PAC55XX_GPIOF->OUTMASK.P4 = 1;
+		PAC55XX_SCC->PFMUXSEL.P4 = 0;
+		PAC55XX_SCC->PFPUEN.P4 = 1;
+
+		// Configure PE1 as a GPIO output
+		PAC55XX_GPIOE->MODE.P1 = IO_PUSH_PULL_OUTPUT;   // PE1 GPIO configured as an output
+		PAC55XX_SCC->PEMUXSEL.w &= 0xFFFFFF0F;          // Clear bits to select GPIO for PE1 via PE mux select
+		PAC55XX_GPIOE->OUT.P1 = 1;                      // Set PE1 high to force transceiver into normal mode
+
+		// Wait for CAN transceiver to enter normal mode
+		while (PAC55XX_GPIOF->IN.P4 == 0)
+		{
+			// No action
+		}
+	}
 
     // CAN Bus initialization follows
     can_io_config(CAN_PE23);
@@ -76,22 +86,22 @@ void CAN_Init(void)
     system_delay_us(100);
 }
 
-uint16_t CAN_GetkBaudRate(void)
+uint16_t CAN_get_kbit_rate(void)
 {
     return CAN_BaudTypeToInt(config.kbaud_rate);
 }
 
-void CAN_SetkBaudRate(uint16_t rate)
+void CAN_set_kbit_rate(uint16_t rate)
 {
     config.kbaud_rate = CAN_IntToBaudType(rate);
 }
 
-uint8_t CAN_GetID(void)
+uint8_t CAN_get_ID(void)
 {
     return config.id;
 }
 
-void CAN_SetID(uint8_t id)
+void CAN_set_ID(uint8_t id)
 {
     pac5xxx_can_reset_mode_set(1);  // CAN in reset mode, in order to configure CAN module
     config.id = id;
@@ -103,7 +113,7 @@ void CAN_SetID(uint8_t id)
     system_delay_us(100);
 }
 
-void CAN_ProcessInterrupt(void)
+void CAN_process_interrupt(void)
 {
     buffer = PAC55XX_CAN->RXBUF;	//  read RX buffer, RX buffer bit order same as TX buffer
 
@@ -143,16 +153,15 @@ void CAN_ProcessInterrupt(void)
         {
             can_transmit(8, (config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);
         }
-        Watchdog_Feed();
     }
 }
 
-struct CANConfig* CAN_GetConfig(void)
+struct CANConfig* CAN_get_config(void)
 {
     return &config;
 }
 
-void CAN_RestoreConfig(struct CANConfig* config_)
+void CAN_restore_config(struct CANConfig* config_)
 {
     config = *config_;
 }

@@ -20,7 +20,6 @@
 #include "src/adc/adc.h"
 #include "src/motor/motor.h"
 #include "src/gatedriver/gatedriver.h"
-#include "src/watchdog/watchdog.h"
 #include "src/utils/utils.h"
 #include <src/scheduler/scheduler.h>
 #include <src/encoder/encoder.h>
@@ -63,10 +62,10 @@ static struct ControllerConfig config ={
     .vel_limit = 300000.0f,
     .I_limit = 10.0f,
 
-    .pos_gain = 15.0f,
-    .vel_gain = 5.0e-5f,
-    .vel_integrator_gain = 0.00025f,
-    .I_bw = 800.0,
+    .pos_gain = 18.0f,
+    .vel_gain = 8.0e-5f,
+    .vel_integrator_gain = 0.00020f,
+    .I_bw = 1000.0,
     .I_gain = 0.0f,
     .Iq_integrator_gain = 0.0f,
     .Id_integrator_gain = 0.0f,
@@ -78,7 +77,7 @@ void Controller_ControlLoop(void)
 	while (true)
 	{
 		health_check();
-		const float Iq = Controller_GetIqEstimate();
+		const float Iq = controller_get_Iq_estimate();
 		if ( (Iq > (config.I_limit * I_TRIP_MARGIN)) ||
 					  (Iq < -(config.I_limit * I_TRIP_MARGIN)) )
 		{
@@ -157,8 +156,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         state.vel_integrator_Iq *= 0.995f;
     }
 
-    const float e_phase = Observer_GetPosEstimateWrappedRadians() * Motor_GetPolePairs();
-    const float e_phase_vel = Observer_GetVelEstimateRadians() * Motor_GetPolePairs();
+    const float e_phase = Observer_GetPosEstimateWrappedRadians() * motor_get_pole_pairs();
     const float c_I = fast_cos(e_phase);
     const float s_I = fast_sin(e_phase);
     const float VBus = ADC_GetVBus();
@@ -166,8 +164,9 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     float Vd; float Vq;
     if (motor_is_gimbal() == true)
     {
-        Vd = - e_phase_vel * Motor_GetPhaseInductance() * Iq_setpoint;
-        Vq = Motor_GetPhaseResistance() * Iq_setpoint;
+    	const float e_phase_vel = Observer_GetVelEstimateRadians() * motor_get_pole_pairs();
+        Vd = - e_phase_vel * motor_get_phase_inductance() * Iq_setpoint;
+        Vq = motor_get_phase_resistance() * Iq_setpoint;
     }
     else
     {
@@ -219,7 +218,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
 
 PAC5XXX_RAMFUNC void IdleStep(void)
 {
-    Watchdog_Feed();
+    //pass
 }
 
 PAC5XXX_RAMFUNC ControlState Controller_GetState(void)
@@ -281,39 +280,56 @@ void Controller_SetMode(ControlMode new_mode)
     }
 }
 
-float Controller_GetPosSetpoint(void)
+float controller_get_pos_setpoint_user_frame(void)
 {
-    return state.pos_setpoint;
+    return (state.pos_setpoint - motor_get_user_offset()) * motor_get_user_direction();
 }
 
-void Controller_SetPosSetpoint(float value)
+void controller_set_pos_setpoint_user_frame(float value)
 {
-    state.pos_setpoint = value;
+	// direction is either 1 or -1 so we can multiply instead of divide
+    state.pos_setpoint = value * motor_get_user_direction() + motor_get_user_offset();
 }
 
-float Controller_GetVelSetpoint(void)
+float controller_get_vel_setpoint_user_frame(void)
 {
-    return state.vel_setpoint;
+    return state.vel_setpoint * motor_get_user_direction();
 }
 
-void Controller_SetVelSetpoint(float value)
+void controller_set_vel_setpoint_user_frame(float value)
 {
-    state.vel_setpoint = value;
+	// direction is either 1 or -1 so we can multiply instead of divide
+    state.vel_setpoint = value * motor_get_user_direction();
 }
 
-PAC5XXX_RAMFUNC float Controller_GetIqEstimate(void)
+PAC5XXX_RAMFUNC float controller_get_Iq_estimate(void)
 {
     return state.Iq_meas;
 }
 
-float Controller_GetIqSetpoint(void)
+float controller_get_Iq_setpoint(void)
 {
     return state.Iq_setpoint;
 }
 
-void Controller_SetIqSetpoint(float value)
+void controller_set_Iq_setpoint(float value)
 {
     state.Iq_setpoint = value;
+}
+
+PAC5XXX_RAMFUNC float controller_get_Iq_estimate_user_frame(void)
+{
+	return state.Iq_meas * motor_get_user_direction();
+}
+
+float controller_get_Iq_setpoint_user_frame(void)
+{
+	return state.Iq_setpoint * motor_get_user_direction();
+}
+
+void controller_set_Iq_setpoint_user_frame(float value)
+{
+	state.Iq_setpoint = value * motor_get_user_direction();
 }
 
 void Controller_GetModulationValues(struct FloatTriplet *dc)
@@ -438,8 +454,8 @@ static inline bool Controller_LimitVelocity(float min_limit, float max_limit, fl
 
 PAC5XXX_RAMFUNC void Controller_UpdateCurrentGains(void)
 {
-    config.I_gain = config.I_bw * Motor_GetPhaseInductance();
-    float plant_pole = Motor_GetPhaseResistance() / Motor_GetPhaseInductance();
+    config.I_gain = config.I_bw * motor_get_phase_inductance();
+    float plant_pole = motor_get_phase_resistance() / motor_get_phase_inductance();
     config.Iq_integrator_gain = plant_pole * config.I_gain;
     config.Id_integrator_gain = config.Iq_integrator_gain;
 }

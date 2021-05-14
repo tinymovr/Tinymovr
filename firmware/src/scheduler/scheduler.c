@@ -46,7 +46,7 @@ void WaitForControlLoopInterrupt(void)
 		{
 			// Handle CAN
 			state.can_interrupt = false;
-			CAN_ProcessInterrupt();
+			CAN_process_interrupt();
 		}
 		else if (state.uart_message_interrupt)
 		{
@@ -66,6 +66,7 @@ void WaitForControlLoopInterrupt(void)
 	state.busy_loop_start = DWT->CYCCNT;
 	// We have to service the control loop by updating
 	// current measurements and encoder estimates.
+	MA_QueueAngleCommand();
 	ADC_UpdateMeasurements();
 	MA_UpdateAngle(true);
 	Observer_UpdateEstimates();

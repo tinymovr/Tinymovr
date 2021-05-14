@@ -16,9 +16,11 @@ Welcome to Tinymovr documentation!
    studio/usage
    api/guide
    interfaces/interfaces
+   upgrade/upgrade
    hardware/gimbal
    hardware/canine
    troubleshooting
+   control/theory
    develop/guide
 
 Indices and tables

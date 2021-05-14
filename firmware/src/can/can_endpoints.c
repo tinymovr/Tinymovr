@@ -15,19 +15,19 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/common.h"
+#include <src/common.h>
 #include <src/encoder/encoder.h>
-#include "string.h"
+#include <string.h>
 
-#include "src/system/system.h"
-#include "src/adc/adc.h"
-#include "src/observer/observer.h"
-#include "src/controller/controller.h"
-#include "src/scheduler/scheduler.h"
+#include <src/system/system.h>
+#include <src/adc/adc.h>
+#include <src/motor/motor.h>
+#include <src/observer/observer.h>
+#include <src/controller/controller.h>
+#include <src/scheduler/scheduler.h>
 #include "src/nvm/nvm.h"
-#include "src/watchdog/watchdog.h"
 
-#include "src/can/can_endpoints.h"
+#include <src/can/can_endpoints.h>
 
 #define EP_LIST_SIZE 64
 #define EP_MAP_SIZE 256
@@ -40,13 +40,14 @@ void CANEP_InitEndpointMap(void)
 {
     (void)memset(EPList, '\0', sizeof(EPList));
 
-    CANEP_AddEndpoint(&CAN_EStop, 0x002);
+    // 0x001 AVAIL
+    CANEP_AddEndpoint(&CAN_GetOffsetAndDirection, 0x002);
     CANEP_AddEndpoint(&CAN_GetState, 0x003);
-    // 0x004 AVAIL
+    CANEP_AddEndpoint(&CAN_GetMinStudioVersion, 0x004);
     CANEP_AddEndpoint(&CAN_GetCANConfig, 0x005);
     CANEP_AddEndpoint(&CAN_SetCANConfig, 0x006);
     CANEP_AddEndpoint(&CAN_SetState, 0x007);
-    // 0x008 AVAIL
+    CANEP_AddEndpoint(&CAN_SetOffsetAndDirection, 0x008);
     CANEP_AddEndpoint(&CAN_GetEncoderEstimates, 0x009);
     CANEP_AddEndpoint(&CAN_GetSetpoints, 0x00A);
     CANEP_AddEndpoint(&CAN_MoveToPos, 0x00B);
@@ -94,10 +95,13 @@ CANEP_Callback CANEP_GetEndpoint(uint8_t id)
 
 // Endpoint handlers
 
-uint8_t CAN_EStop(uint8_t buffer[])
+uint8_t CAN_GetOffsetAndDirection(uint8_t buffer[])
 {
-    Controller_SetState(STATE_IDLE);
-    return CANRP_Write;
+	float offset = motor_get_user_offset();
+	int8_t direction = motor_get_user_direction();
+	memcpy(&buffer[0], &offset, sizeof(float));
+	memcpy(&buffer[4], &direction, sizeof(int8_t));
+	return CANRP_Read;
 }
 
 uint8_t CAN_GetState(uint8_t buffer[])
@@ -112,10 +116,21 @@ uint8_t CAN_GetState(uint8_t buffer[])
     return CANRP_Read;
 }
 
+uint8_t CAN_GetMinStudioVersion(uint8_t buffer[])
+{
+    static const uint8_t v_major = STUDIO_MIN_VERSION_MAJOR;
+    static const uint8_t v_minor = STUDIO_MIN_VERSION_MINOR;
+    static const uint8_t v_patch = STUDIO_MIN_VERSION_PATCH;
+    memcpy(&buffer[0], &v_major, sizeof(uint8_t));
+    memcpy(&buffer[1], &v_minor, sizeof(uint8_t));
+    memcpy(&buffer[2], &v_patch, sizeof(uint8_t));
+    return CANRP_Read;
+}
+
 uint8_t CAN_GetCANConfig(uint8_t buffer[])
 {
-    uint8_t id = CAN_GetID();
-    uint16_t baudrate = CAN_GetkBaudRate();
+    uint8_t id = CAN_get_ID();
+    uint16_t baudrate = CAN_get_kbit_rate();
     memcpy(&buffer[0], &id, sizeof(uint8_t));
     memcpy(&buffer[1], &baudrate, sizeof(uint16_t));
     return CANRP_Read;
@@ -130,12 +145,12 @@ uint8_t CAN_SetCANConfig(uint8_t buffer[])
     CAN_ResponseType response = CANRP_NoAction;
     if (id >= 1u)
     {
-        CAN_SetID(id);
+        CAN_set_ID(id);
         response = CANRP_Write;
     }
     if ((baudrate >= 50u) && (baudrate <= 1000u))
     {
-        CAN_SetkBaudRate(baudrate);
+        CAN_set_kbit_rate(baudrate);
         response = CANRP_Write;
     }
     return response;
@@ -161,10 +176,21 @@ uint8_t CAN_SetState(uint8_t buffer[])
     return response;
 }
 
+uint8_t CAN_SetOffsetAndDirection(uint8_t buffer[])
+{
+	float offset;
+	int8_t direction;
+	memcpy(&offset, &buffer[0], sizeof(float));
+	memcpy(&direction, &buffer[4], sizeof(int8_t));
+	motor_set_user_offset(offset);
+	motor_set_user_direction(direction);
+	return CANRP_Write;
+}
+
 uint8_t CAN_GetEncoderEstimates(uint8_t buffer[])
 {
-    float pos = Observer_GetPosEstimate();
-    float vel = Observer_GetVelEstimate();
+    float pos = observer_get_pos_estimate_user_frame();
+    float vel = observer_get_vel_estimate_user_frame();
     memcpy(&buffer[0], &pos, sizeof(float));
     memcpy(&buffer[4], &vel, sizeof(float));
     return CANRP_Read;
@@ -172,8 +198,8 @@ uint8_t CAN_GetEncoderEstimates(uint8_t buffer[])
 
 uint8_t CAN_GetSetpoints(uint8_t buffer[])
 {
-    float pos = Controller_GetPosSetpoint();
-    float vel = Controller_GetVelSetpoint();
+    float pos = controller_get_pos_setpoint_user_frame();
+    float vel = controller_get_vel_setpoint_user_frame();
     memcpy(&buffer[0], &pos, sizeof(float));
     memcpy(&buffer[4], &vel, sizeof(float));
     return CANRP_Read;
@@ -210,9 +236,9 @@ uint8_t CAN_SetPosSetpoint(uint8_t buffer[])
     memcpy(&Iq_ff, &buffer[6], sizeof(int16_t));
     float velFF_float = vel_ff * 10.0f;
     float iqFF_float = Iq_ff * 0.01f;
-    Controller_SetPosSetpoint(pos);
-    Controller_SetVelSetpoint(velFF_float);
-    Controller_SetIqSetpoint(iqFF_float);
+    controller_set_pos_setpoint_user_frame(pos);
+    controller_set_vel_setpoint_user_frame(velFF_float);
+    controller_set_Iq_setpoint_user_frame(iqFF_float);
     return CANRP_Write;
 }
 
@@ -222,8 +248,8 @@ uint8_t CAN_SetVelSetpoint(uint8_t buffer[])
     float Iq_ff;
     memcpy(&vel, &buffer[0], sizeof(float));
     memcpy(&Iq_ff, &buffer[4], sizeof(float));
-    Controller_SetVelSetpoint(vel);
-    Controller_SetIqSetpoint(Iq_ff);
+    controller_set_vel_setpoint_user_frame(vel);
+    controller_set_Iq_setpoint_user_frame(Iq_ff);
     return CANRP_Write;
 }
 
@@ -231,7 +257,7 @@ uint8_t CAN_SetIqSetpoint(uint8_t buffer[])
 {
     float Iq;
     memcpy(&Iq, &buffer[0], sizeof(float));
-    Controller_SetIqSetpoint(Iq);
+    controller_set_Iq_setpoint_user_frame(Iq);
     return CANRP_Write;
 }
 
@@ -270,8 +296,8 @@ uint8_t CAN_GetPhaseCurrents(uint8_t buffer[])
 
 uint8_t CAN_GetIq(uint8_t buffer[])
 {
-    float Iq_set = Controller_GetIqSetpoint();
-    float Iq_est = Controller_GetIqEstimate();
+    float Iq_set = controller_get_Iq_setpoint_user_frame();
+    float Iq_est = controller_get_Iq_estimate_user_frame();
     memcpy(&buffer[0], &Iq_set, sizeof(float));
     memcpy(&buffer[4], &Iq_est, sizeof(float));
     return CANRP_Read;
@@ -378,15 +404,15 @@ uint8_t CAN_EraseConfig(uint8_t buffer[])
 uint8_t CAN_GetMotorConfig(uint8_t buffer[])
 {
     uint8_t flags = (motor_is_calibrated() == true) | ((motor_is_gimbal() == true) << 1);
-    uint16_t R = (uint16_t)(Motor_GetPhaseResistance() * 1e+3f);
-    uint8_t pole_pairs = Motor_GetPolePairs();
-    uint16_t L = (uint16_t)(Motor_GetPhaseInductance() * 1e+6f);
-    uint16_t ticks = (uint16_t)ENCODER_TICKS;
+    uint16_t R = (uint16_t)(motor_get_phase_resistance() * 1e+3f);
+    uint8_t pole_pairs = motor_get_pole_pairs();
+    uint16_t L = (uint16_t)(motor_get_phase_inductance() * 1e+6f);
+    uint16_t I_cal = (uint16_t)(motor_get_I_cal() * 1000.f);
     memcpy(&buffer[0], &flags, sizeof(uint8_t));
     memcpy(&buffer[1], &R, sizeof(uint16_t));
     memcpy(&buffer[3], &pole_pairs, sizeof(uint8_t));
     memcpy(&buffer[4], &L, sizeof(uint16_t));
-    memcpy(&buffer[6], &ticks, sizeof(uint16_t));
+    memcpy(&buffer[6], &I_cal, sizeof(uint16_t));
     return CANRP_Read;
 }
 
@@ -395,19 +421,20 @@ uint8_t CAN_SetMotorConfig(uint8_t buffer[])
     uint8_t flags;
     uint16_t R;
     uint16_t L;
+    uint16_t I_cal;
     memcpy(&flags, &buffer[0], sizeof(uint8_t));
     memcpy(&R, &buffer[1], sizeof(uint16_t));
     memcpy(&L, &buffer[3], sizeof(uint16_t));
+    memcpy(&I_cal, &buffer[5], sizeof(uint16_t));
 
     CAN_ResponseType response = CANRP_NoAction;
 
-    if ((R > 0) && (L > 0))
+    if ((R > 0) && (L > 0) && (I_cal > 0))
     {
         bool is_gimbal = (bool)(flags & 0x1);
         motor_set_is_gimbal(is_gimbal);
-        Motor_SetPhaseResistance(((float)R) * 1e-3f);
-        Motor_SetPhaseInductance(((float)L) * 1e-6f);
-
+        motor_set_phase_R_and_L(((float)R) * 1e-3f, ((float)L) * 1e-6f);
+        motor_set_I_cal(((float)I_cal) * 1e-3f);
         response = CANRP_Write;
     }
     return response;

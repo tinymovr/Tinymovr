@@ -15,11 +15,14 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/adc/adc.h"
-#include "system.h"
+#include <src/adc/adc.h>
+#include <src/utils/utils.h>
+#include <src/rtt/SEGGER_RTT.h>
+#include <src/system/system.h>
 
 uint8_t error_flags[ERROR_FLAG_MAX_SIZE] = {0};
 uint8_t error_count = 0;
+BoardRevision board_rev;
 
 void system_init(void)
 {
@@ -71,15 +74,32 @@ void system_init(void)
     // Vp = 10V , 440mA-540mA, Charge Pump Enable
     pac5xxx_tile_register_write(ADDR_SYSCONF, 0x01);
 
+    // Board revision check
+    // Configure PF7 as GPIO input with pulldown
+	PAC55XX_GPIOF->MODE.P7 = IO_HIGH_IMPEDENCE_INPUT;
+	PAC55XX_GPIOF->OUTMASK.P7 = 1;
+	PAC55XX_SCC->PFMUXSEL.P7 = 0;
+	PAC55XX_SCC->PFPDEN.P7 = 1;
+    board_rev = PAC55XX_GPIOF->IN.P7;
+    
+    // Configure reporting of mcu cycles
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
     DWT->CYCCNT = 0;
     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+
+    // Configure error handling
+    SCB->CCR |= 0x10;
 }
 
 void system_reset(void)
 {
     pac5xxx_tile_register_write(ADDR_WATCHDOG,
         pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
+}
+
+BoardRevision system_board_revision(void)
+{
+	return board_rev;
 }
 
 void system_delay_us(uint32_t us)
@@ -129,4 +149,29 @@ PAC5XXX_RAMFUNC bool health_check(void)
         success = false;
     }
     return success;
+}
+
+void printUsageErrorMsg(uint32_t CFSRValue)
+{
+	SEGGER_RTT_WriteString(0, "Usage fault: ");
+	CFSRValue >>= 16;                  // right shift to lsb
+	if((CFSRValue & (1 << 9)) != 0) {
+		SEGGER_RTT_WriteString(0, "Divide by zero\r\n");
+	}
+}
+
+void HardFault_Handler(void)
+{
+	SEGGER_RTT_WriteString(0, "In Hard Fault Handler\r\n");
+	SEGGER_RTT_printf(0, "SCB->HFSR = 0x%08x\r\n", SCB->HFSR);
+	if ((SCB->HFSR & (1 << 30)) != 0) {
+		SEGGER_RTT_WriteString(0, "Forced Hard Fault\r\n");
+		SEGGER_RTT_printf(0, "SCB->CFSR = 0x%08x\r\n", SCB->CFSR );
+		if((SCB->CFSR & 0xFFFF0000) != 0) {
+			printUsageErrorMsg(SCB->CFSR);
+		}
+	}
+	__ASM volatile("BKPT #01");
+	while(1)
+	{};
 }

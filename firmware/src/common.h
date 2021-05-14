@@ -69,17 +69,21 @@
 
 #define ERROR_FLAG_MAX_SIZE 5u
 
-#define PI (3.141592f)
+#define ENCODER_TICKS               (8192)
+#define ENCODER_HALF_TICKS          (ENCODER_TICKS / 2)
+
+#define PI       (3.141592f)
+#define TWOPI    (6.283185f)
+#define INVTWOPI (0.1591549f)
 
 static const float one_by_sqrt3 = 0.57735026919f;
 static const float two_by_sqrt3 = 1.15470053838f;
-static const float invtwopi = 0.1591549f;
-static const float twopi = 6.283185f;
 static const float threehalfpi = 4.7123889f;
 static const float pi = PI;
 static const float halfpi = PI*0.5f;
 static const float quarterpi = PI*0.25f;
 static const int32_t timer_freq_hz = ACLK_FREQ_HZ / (pow(2, TXCTL_PS_DIV));
+static const float twopi_by_enc_ticks = TWOPI / ENCODER_TICKS;
 
 struct FloatTriplet
 {

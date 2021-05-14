@@ -30,13 +30,13 @@ void CANEP_InitEndpointMap(void);
 void CANEP_AddEndpoint(CANEP_Callback callback, uint8_t id);
 CANEP_Callback CANEP_GetEndpoint(uint8_t id);
 
-uint8_t CAN_EStop(uint8_t buffer[]);
+uint8_t CAN_GetOffsetAndDirection(uint8_t buffer[]);
 uint8_t CAN_GetState(uint8_t buffer[]);
-
+uint8_t CAN_GetMinStudioVersion(uint8_t buffer[]);
 uint8_t CAN_GetCANConfig(uint8_t buffer[]);
 uint8_t CAN_SetCANConfig(uint8_t buffer[]);
 uint8_t CAN_SetState(uint8_t buffer[]);
-
+uint8_t CAN_SetOffsetAndDirection(uint8_t buffer[]);
 uint8_t CAN_GetEncoderEstimates(uint8_t buffer[]);
 uint8_t CAN_GetSetpoints(uint8_t buffer[]);
 
