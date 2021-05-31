@@ -117,6 +117,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         {
         	// Drop to position mode on error or completion
             Controller_SetMode(CTRL_POSITION);
+            state.t_plan = 0;
         }
     }
 

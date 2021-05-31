@@ -93,14 +93,19 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 	// Case 1. Distance to v=0 > desired distance. Full stop trajectory.
 	if (v_0*v_0 > fabsf(2*d_max*S))
 	{
+		const float sign_fs = v_0 >= 0 ? 1.0f : -1.0f;
+		const float deltat_dec = v_0/d_max;
+		const float dec = sign_fs * d_max;
+		const float p_target = p_0 + v_0 * deltat_dec - 0.5 * dec * deltat_dec * deltat_dec;
+
 		plan->p_0 = p_0;
-		plan->p_target = p_target;
-		plan->deltat_dec = v_0/d_max;
-		plan->t_end = plan->deltat_dec;
+		plan->deltat_dec = deltat_dec;
+		plan->t_end = deltat_dec;
 		plan->v_0 = v_0;
 		plan->v_cruise = v_0;
 		//plan->v_target = 0;
-		plan->dec = d_max;
+		plan->dec = dec;
+		plan->p_target = p_target;
 		plan->p_acc_cruise = p_0;
 		plan->p_cruise_dec = p_0;
 		response = true;
@@ -125,38 +130,60 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 	// Case 3. Triangular profile
 	else if (fabsf(2*a_max*d_max*S) < (v_max*v_max - v_0*v_0)*d_max + v_max*v_max*a_max)
 	{
+		const float acc = sign * a_max;
+		const float dec = sign * d_max;
+		const float v_reached = sign * fast_sqrt( (2 * a_max * d_max * fabsf(S) - d_max * v_0 * v_0)/(a_max + d_max) );
+		const float deltat_acc = (v_reached - v_0) / acc;
+		const float deltat_dec = v_reached / dec;
+		const float t_end = deltat_acc + deltat_dec;
+		const float p_acc_cruise = p_0 + v_0 * deltat_acc + 0.5f * acc * deltat_acc * deltat_acc;
+
 		plan->p_0 = p_0;
 		plan->p_target = p_target;
-		plan->acc = sign * a_max;
-		plan->dec = sign * d_max;
-		const float v_reached = sign * fast_sqrt( (2 * a_max * d_max * fabsf(S) - d_max * v_0 * v_0)/(a_max + d_max) );
-		plan->deltat_acc = (v_reached - v_0) / plan->acc;
-		plan->deltat_dec = v_reached / plan->dec;
-		plan->t_acc_cruise = plan->deltat_acc;
-		plan->t_cruise_dec = plan->deltat_acc;
-		plan->p_acc_cruise = plan->p_0 + v_0 * plan->deltat_acc + 0.5f * a_max * plan->deltat_acc * plan->deltat_acc;
-		plan->p_cruise_dec = plan->p_acc_cruise;
+		plan->acc = acc;
+		plan->dec = dec;
+		plan->v_cruise = v_reached;
+		plan->deltat_acc = deltat_acc;
+		plan->deltat_dec =deltat_dec;
+		plan->t_acc_cruise = deltat_acc;
+		plan->t_cruise_dec = deltat_acc;
+		plan->t_end = t_end;
+		plan->v_0 = v_0;
+		//plan->v_target = 0;
+		plan->p_acc_cruise = p_acc_cruise;
+		plan->p_cruise_dec = p_acc_cruise;
 		response = true;
 	}
 	// Case 4. Trapezoidal profile
 	else
-	{
+	{	const float acc = sign * a_max;
+		const float dec = sign * d_max;
+		const float v_cruise = sign * v_max;
+		const float deltat_acc = (v_cruise - v_0)/acc;
+		const float deltat_dec = (sign * v_max) / dec;
+		const float S_vmax = (v_max * v_max - v_0 * v_0) / (2 * a_max) + (v_max * v_max) / (2 * d_max);
+		const float deltat_cruise = (S - sign * S_vmax) / v_cruise;
+		const float t_acc_cruise = deltat_acc;
+		const float t_cruise_dec = deltat_acc + deltat_cruise;
+		const float t_end = t_cruise_dec + deltat_dec;
+		const float p_acc_cruise = p_0 + v_0 * deltat_acc + 0.5f * acc * deltat_acc * deltat_acc;
+		const float p_cruise_dec = p_acc_cruise + v_cruise * deltat_cruise;
+
 		plan->p_0 = p_0;
 		plan->p_target = p_target;
-		plan->acc = sign * a_max;
-		plan->dec = sign * d_max;
-		plan->v_cruise = sign * v_max;
-		plan->deltat_acc = (plan->v_cruise - v_0) / (plan->acc);
-		plan->deltat_dec = (sign * v_max) / (plan->dec);
-		const float S_vmax = (v_max - v_0) * plan->deltat_acc + v_max * plan->deltat_dec;
-		plan->deltat_cruise =  (S - sign * S_vmax) / (plan->v_cruise);
-		plan->t_acc_cruise = plan->deltat_acc;
-		plan->t_cruise_dec = plan->deltat_acc + plan->deltat_cruise;
-		plan->t_end = plan->t_cruise_dec + plan->deltat_dec;
+		plan->acc = acc;
+		plan->dec = dec;
+		plan->v_cruise = v_cruise;
+		plan->deltat_acc = deltat_acc;
+		plan->deltat_dec = deltat_dec;
+		plan->deltat_cruise =  deltat_cruise;
+		plan->t_acc_cruise = t_acc_cruise;
+		plan->t_cruise_dec = t_cruise_dec;
+		plan->t_end = t_end;
 		plan->v_0 = v_0;
 		//plan->v_target = 0;
-		plan->p_acc_cruise = plan->p_0 + v_0 * plan->deltat_acc + 0.5f * plan->acc * plan->deltat_acc * plan->deltat_acc;
-		plan->p_cruise_dec = plan->p_acc_cruise + plan->v_cruise * plan->deltat_cruise;
+		plan->p_acc_cruise = p_acc_cruise;
+		plan->p_cruise_dec = p_cruise_dec;
 		response = true;
 	}
 	return response;
