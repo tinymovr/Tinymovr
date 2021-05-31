@@ -94,9 +94,9 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 	if (v_0*v_0 > fabsf(2*d_max*S))
 	{
 		const float sign_fs = v_0 >= 0 ? 1.0f : -1.0f;
-		const float deltat_dec = v_0/d_max;
+		const float deltat_dec = sign_fs * v_0/d_max;
 		const float dec = sign_fs * d_max;
-		const float p_target = p_0 + v_0 * deltat_dec - 0.5 * dec * deltat_dec * deltat_dec;
+		const float p_target_fullstop = p_0 + v_0 * deltat_dec - 0.5 * dec * deltat_dec * deltat_dec;
 
 		plan->p_0 = p_0;
 		plan->deltat_dec = deltat_dec;
@@ -105,7 +105,7 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 		plan->v_cruise = v_0;
 		//plan->v_target = 0;
 		plan->dec = dec;
-		plan->p_target = p_target;
+		plan->p_target = p_target_fullstop;
 		plan->p_acc_cruise = p_0;
 		plan->p_cruise_dec = p_0;
 		response = true;
@@ -128,11 +128,11 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 //		response = true;
 //	}
 	// Case 3. Triangular profile
-	else if (fabsf(2*a_max*d_max*S) < (v_max*v_max - v_0*v_0)*d_max + v_max*v_max*a_max)
+	else if (fabsf(S) < (v_max*v_max-v_0*v_0)/(2*a_max) + (v_max*v_max)/(2*d_max))
 	{
 		const float acc = sign * a_max;
 		const float dec = sign * d_max;
-		const float v_reached = sign * fast_sqrt( (2 * a_max * d_max * fabsf(S) - d_max * v_0 * v_0)/(a_max + d_max) );
+		const float v_reached = sign * fast_sqrt( (2 * a_max * d_max * fabsf(S) + d_max * v_0 * v_0)/(a_max + d_max) );
 		const float deltat_acc = (v_reached - v_0) / acc;
 		const float deltat_dec = v_reached / dec;
 		const float t_end = deltat_acc + deltat_dec;
