@@ -20,6 +20,11 @@
 
 #include "src/common.h"
 
+struct PlannerConfig {
+	float max_accel;
+	float max_decel;
+};
+
 typedef struct
 {
     // NOTE: The members of this struct are redundant,
@@ -43,8 +48,13 @@ typedef struct
     float p_cruise_dec;
 } MotionPlan;
 
-bool planner_move_to(float p_target, float deltat_tot, float deltat_acc, float deltat_dec);
-bool planner_prepare_plan(float p_target, float deltat_tot, float deltat_acc, float deltat_dec, MotionPlan *plan);
+bool planner_move_to_tlimit(float p_target, float deltat_tot, float deltat_acc, float deltat_dec);
+bool planner_move_to_vlimit(float p_target, float max_vel);
+bool planner_prepare_plan_tlimit(float p_target, float deltat_tot, float deltat_acc, float deltat_dec, MotionPlan *plan);
+bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float d_max, MotionPlan *plan);
+bool planner_set_max_accel_decel(float max_accel, float max_decel);
+float planner_get_max_accel(void);
+float planner_get_max_decel(void);
 PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan, float *pos, float *vel);
 
 #endif /* CONTROLLER_TRAJECTORY_PLANNER_H_ */
