@@ -81,7 +81,7 @@ PAC5XXX_RAMFUNC ControlState Controller_GetState(void);
 PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state);
 
 ControlMode Controller_GetMode(void);
-void Controller_SetMode(ControlMode mode);
+PAC5XXX_RAMFUNC void Controller_SetMode(ControlMode mode);
 
 float controller_get_pos_setpoint_user_frame(void);
 void controller_set_pos_setpoint_user_frame(float value);
@@ -113,7 +113,7 @@ void Controller_SetVelLimit(float limit);
 float Controller_GetIqLimit(void);
 void Controller_SetIqLimit(float limit);
 
-void controller_set_motion_plan(MotionPlan *mp);
+void controller_set_motion_plan(MotionPlan mp);
 
 PAC5XXX_RAMFUNC bool Controller_Calibrated(void);
 

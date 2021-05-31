@@ -32,7 +32,7 @@ PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, flo
     float vel_gain, float *I);
 
 static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
-static MotionPlan *motion_plan;
+static MotionPlan motion_plan;
 static struct ControllerState state = {
 
     .state = STATE_IDLE,
@@ -113,7 +113,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     {
         state.t_plan += PWM_PERIOD_S;
         // WARN: Updating the setpoints directly is a bit risky!
-        if (!planner_evaluate(state.t_plan, motion_plan, &state.pos_setpoint, &state.vel_setpoint))
+        if (!planner_evaluate(state.t_plan, &motion_plan, &state.pos_setpoint, &state.vel_setpoint))
         {
         	// Drop to position mode on error or completion
             Controller_SetMode(CTRL_POSITION);
@@ -257,7 +257,7 @@ ControlMode Controller_GetMode(void)
 	return state.mode;
 }
 
-void Controller_SetMode(ControlMode new_mode)
+PAC5XXX_RAMFUNC void Controller_SetMode(ControlMode new_mode)
 {
     if (new_mode != state.mode)
     {
@@ -423,7 +423,7 @@ void Controller_SetIqLimit(float limit)
     }
 }
 
-void controller_set_motion_plan(MotionPlan *mp)
+void controller_set_motion_plan(MotionPlan mp)
 {
     motion_plan = mp;
     state.t_plan = 0.0f;
