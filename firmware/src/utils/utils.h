@@ -29,6 +29,7 @@
 
 PAC5XXX_RAMFUNC float unwrapf(float reference_val, float wrapped_val, float half_interval);
 PAC5XXX_RAMFUNC float wrapf(float unbound_val, float half_interval);
+PAC5XXX_RAMFUNC float fast_sqrt(float n);
 PAC5XXX_RAMFUNC float fast_inv_sqrt(float n);
 PAC5XXX_RAMFUNC float fast_cos(float angle);
 PAC5XXX_RAMFUNC float fast_sin(float angle);
