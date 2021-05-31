@@ -71,6 +71,7 @@
 
 #define ENCODER_TICKS               (8192)
 #define ENCODER_HALF_TICKS          (ENCODER_TICKS / 2)
+#define ENCODER_TICKS_FLOAT         (8192.f)
 
 #define PI       (3.141592f)
 #define TWOPI    (6.283185f)
