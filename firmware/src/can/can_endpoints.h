@@ -40,8 +40,6 @@ uint8_t CAN_SetOffsetAndDirection(uint8_t buffer[]);
 uint8_t CAN_GetEncoderEstimates(uint8_t buffer[]);
 uint8_t CAN_GetSetpoints(uint8_t buffer[]);
 
-uint8_t CAN_MoveToPos(uint8_t buffer[]);
-
 uint8_t CAN_SetPosSetpoint(uint8_t buffer[]);
 uint8_t CAN_SetVelSetpoint(uint8_t buffer[]);
 uint8_t CAN_SetIqSetpoint(uint8_t buffer[]);
@@ -62,3 +60,8 @@ uint8_t CAN_SaveConfig(uint8_t buffer[]);
 uint8_t CAN_EraseConfig(uint8_t buffer[]);
 uint8_t CAN_GetMotorConfig(uint8_t buffer[]);
 uint8_t CAN_SetMotorConfig(uint8_t buffer[]);
+
+uint8_t CAN_MoveToPosWithTimeLimit(uint8_t buffer[]);
+uint8_t CAN_MoveToPosWithVelLimit(uint8_t buffer[]);
+uint8_t CAN_SetMaxPlanAccelDecel(uint8_t buffer[]);
+uint8_t CAN_GetMaxPlanAccelDecel(uint8_t buffer[]);
