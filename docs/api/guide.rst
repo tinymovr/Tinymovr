@@ -589,6 +589,89 @@ Example
     {"A": 1.0, "B": -0.6, "C": -0.4}
 
 
+plan_t_limit
+************
+
+| **endpoint**: ``0x20``
+| **type**: Write-only
+
+Generate and execute a time-limited trajectory.
+
+Arguments
+-------------
+
+===================  ==========================  =========  ===========  ====================
+Member               Description                 Data Type  Data Offset  Default Unit
+-------------------  --------------------------  ---------  -----------  --------------------
+``target_position``  Target Position             float      0            tick
+``total_time``       Total Trajectory Time       uint16     4            millisecond
+``acc_percent``      Acceleration Phase Percent  uint8      6            (none, values 0-255)
+``dec_percent``      Deceleration Phase Percent  uint8      7            (none, values 0-255)
+===================  ==========================  =========  ===========  ====================
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.plan_t_limit(100000, 3000, 50, 50)
+
+
+plan_v_limit
+************
+
+| **endpoint**: ``0x21``
+| **type**: Write-only
+
+Generate and execute an acceleration- and velocity-limited trajectory.
+
+Arguments
+-------------
+
+===================  ==========================  =========  ===========  ================
+Member               Description                 Data Type  Data Offset  Default Unit
+-------------------  --------------------------  ---------  -----------  ----------------
+``target_position``  Target Position             float      0            tick
+``max_velocity``     Max Velocity                float      4            tick/second
+===================  ==========================  =========  ===========  ================
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.plan_v_limit(100000, 50000)
+
+
+set_max_plan_acc_dec
+********************
+
+| **endpoint**: ``0x22``
+| **type**: Write-only
+
+Set maximum acceleration and deceleration values for trajectory generation.
+
+.. note::
+    This command only sets values, it does not execute a trajectory. For trajecotry execution with set values, make a call to ``plan_v_limit``.
+
+Arguments
+-------------
+
+===================  ==========================  =========  ===========  ================
+Member               Description                 Data Type  Data Offset  Default Unit
+-------------------  --------------------------  ---------  -----------  ----------------
+``max_acc``          Max Acceleration            float      0            tick/(second^2)
+``max_dec``          Max Deceleration            float      4            tick/(second^2)
+===================  ==========================  =========  ===========  ================
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.set_max_plan_acc_dec(50000, 50000)
+
+
 device_info
 ***********
 
@@ -794,3 +877,4 @@ Example
 .. code-block:: python
 
     >>>tmx.erase_config()
+
