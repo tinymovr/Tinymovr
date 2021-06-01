@@ -21,6 +21,7 @@
 #include "src/motor/motor.h"
 #include "src/observer/observer.h"
 #include "src/controller/controller.h"
+#include "src/controller/trajectory_planner.h"
 #include "src/adc/adc.h"
 #include "src/nvm/nvm.h"
 #include "src/can/can.h"
@@ -75,6 +76,22 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
         case 'C': // CAN ID
             CAN_set_ID((uint8_t)data);
         break;
+
+        case '<': // Max Decel
+        	planner_set_max_decel((float)data);
+		break;
+
+        case '>': // Max Accel
+        	planner_set_max_accel((float)data);
+		break;
+
+        case '^': // Max Vel
+			planner_set_max_vel((float)data);
+		break;
+
+        case 'T': // Plan trajectory
+        	planner_move_to_vlimit((float)data);
+		break;
 
         default:
             // No action
