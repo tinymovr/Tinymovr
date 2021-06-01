@@ -23,6 +23,7 @@
 struct PlannerConfig {
 	float max_accel;
 	float max_decel;
+	float max_vel;
 };
 
 typedef struct
@@ -49,12 +50,15 @@ typedef struct
 } MotionPlan;
 
 bool planner_move_to_tlimit(float p_target, float deltat_tot, float deltat_acc, float deltat_dec);
-bool planner_move_to_vlimit(float p_target, float max_vel);
+bool planner_move_to_vlimit(float p_targetl);
 bool planner_prepare_plan_tlimit(float p_target, float deltat_tot, float deltat_acc, float deltat_dec, MotionPlan *plan);
 bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float d_max, MotionPlan *plan);
-bool planner_set_max_accel_decel(float max_accel, float max_decel);
+bool planner_set_max_accel(float max_accel);
+bool planner_set_max_decel(float max_decel);
 float planner_get_max_accel(void);
 float planner_get_max_decel(void);
+bool planner_set_max_vel(float max_vel);
+float planner_get_max_vel(void);
 PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan, float *pos, float *vel);
 
 #endif /* CONTROLLER_TRAJECTORY_PLANNER_H_ */

@@ -455,7 +455,7 @@ uint8_t CAN_MoveToPosWithVelLimit(uint8_t buffer[])
     uint8_t response = CANRP_NoAction;
     memcpy(&target_pos, &buffer[0], sizeof(float));
     memcpy(&max_vel, &buffer[4], sizeof(float));
-    if (planner_move_to_vlimit(target_pos, max_vel))
+    if (planner_set_max_vel(max_vel) && planner_move_to_vlimit(target_pos))
     {
         response = CANRP_Write;
     }
@@ -469,7 +469,7 @@ uint8_t CAN_SetMaxPlanAccelDecel(uint8_t buffer[])
 	uint8_t response = CANRP_NoAction;
 	memcpy(&max_accel, &buffer[0], sizeof(float));
 	memcpy(&max_decel, &buffer[4], sizeof(float));
-	if (planner_set_max_accel_decel(max_accel, max_decel))
+	if (planner_set_max_accel(max_accel) && planner_set_max_decel(max_decel))
 	{
 		response = CANRP_Write;
 	}

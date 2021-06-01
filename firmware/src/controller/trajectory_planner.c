@@ -6,7 +6,8 @@
 
 static struct PlannerConfig config = {
 		.max_accel = ENCODER_TICKS_FLOAT,
-		.max_decel = ENCODER_TICKS_FLOAT
+		.max_decel = ENCODER_TICKS_FLOAT,
+		.max_vel = 50000.0f
 };
 
 bool planner_move_to_tlimit(float p_target, float deltat_tot, float deltat_acc, float deltat_dec)
@@ -22,11 +23,11 @@ bool planner_move_to_tlimit(float p_target, float deltat_tot, float deltat_acc, 
     return response;
 }
 
-bool planner_move_to_vlimit(float p_target, float max_vel)
+bool planner_move_to_vlimit(float p_target)
 {
 	bool response = false;
 	MotionPlan motion_plan = {0};
-	if (!error_flags_exist() && planner_prepare_plan_vlimit(p_target, max_vel, config.max_accel, config.max_decel, &motion_plan))
+	if (!error_flags_exist() && planner_prepare_plan_vlimit(p_target, config.max_vel, config.max_accel, config.max_decel, &motion_plan))
 	{
 		controller_set_motion_plan(motion_plan);
 		Controller_SetMode(CTRL_TRAJECTORY);
@@ -189,12 +190,22 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 	return response;
 }
 
-bool planner_set_max_accel_decel(float max_accel, float max_decel)
+bool planner_set_max_accel(float max_accel)
 {
 	bool response = false;
-	if ((max_accel > 0) && (max_decel > 0))
+	if (max_accel > 0)
 	{
 		config.max_accel = max_accel;
+		response = true;
+	}
+	return response;
+}
+
+bool planner_set_max_decel(float max_decel)
+{
+	bool response = false;
+	if (max_decel > 0)
+	{
 		config.max_decel = max_decel;
 		response = true;
 	}
@@ -209,6 +220,21 @@ float planner_get_max_accel(void)
 float planner_get_max_decel(void)
 {
 	return config.max_decel;
+}
+
+bool planner_set_max_vel(float max_vel)
+{
+	bool response = false;
+	if (max_vel > 0) {
+		config.max_vel = max_vel;
+		response = true;
+	}
+	return response;
+}
+
+float planner_get_max_vel(void)
+{
+	return config.max_vel;
 }
 
 
