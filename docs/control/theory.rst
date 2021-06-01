@@ -1,8 +1,8 @@
 .. _Control theory:
 
-***************************
-Tinymovr Control Principles
-***************************
+******************
+Control Principles
+******************
 
 This document provides a high-level introduction to the control principles found in Tinymovr. 
 

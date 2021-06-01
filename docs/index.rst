@@ -14,6 +14,7 @@ Welcome to Tinymovr documentation!
    hardware/guide
    studio/installation
    studio/usage
+   planner/planner
    api/guide
    interfaces/interfaces
    upgrade/upgrade

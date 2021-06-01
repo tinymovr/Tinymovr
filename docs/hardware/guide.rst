@@ -113,7 +113,7 @@ Connector Diagram
 
 .. image:: connectors.png
   :width: 800
-  :alt: Tinymovr alpha connectors and pinouts
+  :alt: Tinymovr connectors and pinouts
 
 Tinymovr Alpha CAN Bus Connector Erratum
 ****************************************

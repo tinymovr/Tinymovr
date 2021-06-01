@@ -1,5 +1,5 @@
-Tinymovr API
-++++++++++++
+API
++++
 
 Overview
 ########
