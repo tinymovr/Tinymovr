@@ -298,4 +298,13 @@ can_endpoints: Dict[str, Dict] = {
         "units": ("tick/second/second", "tick/second/second"),
         "labels": ("max_accel", "max_decel")
     },
+    "get_max_plan_acc_dec":
+    {
+        "description": "Get maximum acceleration and deceleration for velocity-limited plan moves",
+        "type": "r",
+        "ep_id": 0x023,
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": ("tick/second/second", "tick/second/second"),
+        "labels": ("max_accel", "max_decel")
+    },
 }
