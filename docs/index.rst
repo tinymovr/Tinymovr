@@ -24,9 +24,3 @@ Welcome to Tinymovr documentation!
    control/theory
    develop/guide
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
