@@ -45,7 +45,7 @@
 #define I_TRIP_MARGIN               (1.35f)
 #define VBUS_LOW_THRESHOLD          (11.0f)  // V
 #define VEL_HARD_LIMIT              (600000) // ticks/s
-#define I_HARD_LIMIT                (45.0)   // A
+#define I_HARD_LIMIT                (60.0)   // A
 
 // Calibration
 #define CAL_R_LEN             (2 * PWM_FREQ_HZ)
