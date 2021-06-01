@@ -24,7 +24,7 @@
 #include <src/scheduler/scheduler.h>
 #include <src/encoder/encoder.h>
 #include <src/motor/calibration.h>
-#include "controller.h"
+#include <src/controller/controller.h>
 
 PAC5XXX_RAMFUNC void CLControlStep(void);
 PAC5XXX_RAMFUNC void IdleStep(void);
@@ -32,7 +32,7 @@ PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, flo
     float vel_gain, float *I);
 
 static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
-
+static MotionPlan motion_plan;
 static struct ControllerState state = {
 
     .state = STATE_IDLE,
@@ -53,6 +53,8 @@ static struct ControllerState state = {
 
     .Iq_integrator_Vq = 0.0f,
     .Id_integrator_Vd = 0.0f,
+
+    .t_plan = 0.0f
 };
 
 static struct ControllerConfig config ={
@@ -107,6 +109,18 @@ void Controller_ControlLoop(void)
 
 PAC5XXX_RAMFUNC void CLControlStep(void)
 {
+    if (state.mode >= CTRL_TRAJECTORY)
+    {
+        state.t_plan += PWM_PERIOD_S;
+        // WARN: Updating the setpoints directly is a bit risky!
+        if (!planner_evaluate(state.t_plan, &motion_plan, &state.pos_setpoint, &state.vel_setpoint))
+        {
+        	// Drop to position mode on error or completion
+            Controller_SetMode(CTRL_POSITION);
+            state.t_plan = 0;
+        }
+    }
+
     float vel_setpoint = state.vel_setpoint;
     if (state.mode >= CTRL_POSITION)
     {
@@ -230,14 +244,7 @@ PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
 			GateDriver_Enable();
 			state.state = STATE_CALIBRATE;
 		}
-		else if (new_state != STATE_IDLE)
-		{
-			GateDriver_SetDutyCycle(&zeroDC);
-			GateDriver_Disable();
-			state.state = STATE_IDLE;
-			add_error_flag(ERROR_INVALID_STATE);
-		}
-		else // state != STATE_IDLE && new_state == STATE_IDLE
+		else // state != STATE_IDLE --> Got to idle state anyway
 		{
 			GateDriver_SetDutyCycle(&zeroDC);
 			GateDriver_Disable();
@@ -251,27 +258,26 @@ ControlMode Controller_GetMode(void)
 	return state.mode;
 }
 
-void Controller_SetMode(ControlMode new_mode)
+PAC5XXX_RAMFUNC void Controller_SetMode(ControlMode new_mode)
 {
-    if (new_mode == state.mode)
+    if (new_mode != state.mode)
     {
-        // No action
-    }
-	else if (new_mode == CTRL_POSITION)
-	{
-		state.mode = CTRL_POSITION;
-	}
-	else if (new_mode == CTRL_VELOCITY)
-	{
-		state.mode = CTRL_VELOCITY;
-	}
-	else if (new_mode == CTRL_CURRENT)
-	{
-		state.mode = CTRL_CURRENT;
-	}
-    else
-    {
-        // No action
+		if (new_mode == CTRL_TRAJECTORY)
+		{
+			state.mode = CTRL_TRAJECTORY;
+		}
+		else if (new_mode == CTRL_POSITION)
+		{
+			state.mode = CTRL_POSITION;
+		}
+		else if (new_mode == CTRL_VELOCITY)
+		{
+			state.mode = CTRL_VELOCITY;
+		}
+		else if (new_mode == CTRL_CURRENT)
+		{
+			state.mode = CTRL_CURRENT;
+		}
     }
 }
 
@@ -416,6 +422,12 @@ void Controller_SetIqLimit(float limit)
     {
         config.I_limit = limit;
     }
+}
+
+void controller_set_motion_plan(MotionPlan mp)
+{
+    motion_plan = mp;
+    state.t_plan = 0.0f;
 }
 
 PAC5XXX_RAMFUNC bool Controller_Calibrated(void)

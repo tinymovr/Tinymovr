@@ -4,7 +4,7 @@
 #include "src/uart/uart_func.h"
 #include <src/uart/uart_lowlevel.h>
 
-char uart_rx_buf[48] = {0};
+char uart_rx_buf[96] = {0};
 uint8_t uart_rx_byte_idx = 0;
 
 typedef enum {

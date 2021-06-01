@@ -6,10 +6,10 @@
 #define UART_ASCII_PROT_START_BYTE 0x2E
 #define UART_BYTE_LIMIT 32
 
-char uart_rx_msg[48];
+char uart_rx_msg[96];
 uint8_t uart_rx_msg_len;
 
-char uart_tx_msg[48];
+char uart_tx_msg[96];
 uint8_t uart_tx_byte_idx;
 
 void UART_Init(void);

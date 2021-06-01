@@ -10,6 +10,7 @@ class ControlModes(IntEnum):
     CurrentControl = 0
     VelocityControl = 1
     PositionControl = 2
+    TrajectoryControl = 3
 
 class ErrorIDs(IntEnum):
     InvalidState = 1
@@ -21,6 +22,8 @@ class ErrorIDs(IntEnum):
     PhaseInductanceOutOfRange = 7
     InvalidPolePairs = 8
     EncoderReadingOutOfRange = 9
+    InvalidPlannerInput = 10
+    PlannerVCruiseOverLimit = 11
 
 
 error_descriptions = {
@@ -32,5 +35,7 @@ error_descriptions = {
     ErrorIDs.PhaseResistanceOutOfRange: "Measured phase resistance is out of range",
     ErrorIDs.PhaseInductanceOutOfRange: "Measured phase inductance is out of range",
     ErrorIDs.InvalidPolePairs: "Pole pairs calculation did not converge to a valid value",
-    ErrorIDs.EncoderReadingOutOfRange: "The encoder angle reading is out of range"
+    ErrorIDs.EncoderReadingOutOfRange: "The encoder angle reading is out of range",
+    ErrorIDs.InvalidPlannerInput: "The trajectory planner received invalid input",
+    ErrorIDs.PlannerVCruiseOverLimit: "The computed trajectory planner cruise velocity is over the current velocity limit"
 }    

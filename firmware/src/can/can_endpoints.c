@@ -24,6 +24,7 @@
 #include <src/motor/motor.h>
 #include <src/observer/observer.h>
 #include <src/controller/controller.h>
+#include <src/controller/trajectory_planner.h>
 #include <src/scheduler/scheduler.h>
 #include "src/nvm/nvm.h"
 
@@ -50,13 +51,13 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_SetOffsetAndDirection, 0x008);
     CANEP_AddEndpoint(&CAN_GetEncoderEstimates, 0x009);
     CANEP_AddEndpoint(&CAN_GetSetpoints, 0x00A);
-    // 0x00B Reserved: Move To Pos
+    // 0x00B AVAIL
     CANEP_AddEndpoint(&CAN_SetPosSetpoint, 0x00C);
     CANEP_AddEndpoint(&CAN_SetVelSetpoint, 0x00D);
     CANEP_AddEndpoint(&CAN_SetIqSetpoint, 0x00E);
     CANEP_AddEndpoint(&CAN_SetLimits, 0x00F);
     CANEP_AddEndpoint(&CAN_GetPhaseCurrents, 0x010);
-    // 0x011 Reserved: Move To Pos
+    // 0x011 AVAIL
     CANEP_AddEndpoint(&CAN_GetIntegratorGains, 0x012);
     CANEP_AddEndpoint(&CAN_SetIntegratorGains, 0x013);
     CANEP_AddEndpoint(&CAN_GetIq, 0x014);
@@ -71,6 +72,11 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_EraseConfig, 0x01D);
     CANEP_AddEndpoint(&CAN_GetMotorConfig, 0x01E);
     CANEP_AddEndpoint(&CAN_SetMotorConfig, 0x01F);
+    // ---
+    CANEP_AddEndpoint(&CAN_MoveToPosWithTimeLimit, 0x020);
+    CANEP_AddEndpoint(&CAN_MoveToPosWithVelLimit, 0x021);
+    CANEP_AddEndpoint(&CAN_SetMaxPlanAccelDecel, 0x022);
+    CANEP_AddEndpoint(&CAN_GetMaxPlanAccelDecel, 0x023);
 }
 
 void CANEP_AddEndpoint(CANEP_Callback callback, uint8_t id)
@@ -417,4 +423,64 @@ uint8_t CAN_SetMotorConfig(uint8_t buffer[])
         response = CANRP_Write;
     }
     return response;
+}
+
+// -----
+
+uint8_t CAN_MoveToPosWithTimeLimit(uint8_t buffer[])
+{
+    float target_pos;
+    uint16_t t_tot_int;
+    uint8_t p_acc;
+    uint8_t p_dec;
+    uint8_t response = CANRP_NoAction;
+    memcpy(&target_pos, &buffer[0], sizeof(float));
+    memcpy(&t_tot_int, &buffer[4], sizeof(uint16_t));
+    memcpy(&p_acc, &buffer[6], sizeof(uint8_t));
+    memcpy(&p_dec, &buffer[7], sizeof(uint8_t));
+    float t_tot = ((float)t_tot_int) * 1e-3f;
+    float t_acc = t_tot * ((float)p_acc/256.f);
+    float t_dec = t_tot * ((float)p_dec/256.f);
+    if (planner_move_to_tlimit(target_pos, t_tot, t_acc, t_dec))
+    {
+        response = CANRP_Write;
+    }
+    return response;
+}
+
+uint8_t CAN_MoveToPosWithVelLimit(uint8_t buffer[])
+{
+    float target_pos;
+    float max_vel;
+    uint8_t response = CANRP_NoAction;
+    memcpy(&target_pos, &buffer[0], sizeof(float));
+    memcpy(&max_vel, &buffer[4], sizeof(float));
+    if (planner_set_max_vel(max_vel) && planner_move_to_vlimit(target_pos))
+    {
+        response = CANRP_Write;
+    }
+    return response;
+}
+
+uint8_t CAN_SetMaxPlanAccelDecel(uint8_t buffer[])
+{
+	float max_accel;
+	float max_decel;
+	uint8_t response = CANRP_NoAction;
+	memcpy(&max_accel, &buffer[0], sizeof(float));
+	memcpy(&max_decel, &buffer[4], sizeof(float));
+	if (planner_set_max_accel(max_accel) && planner_set_max_decel(max_decel))
+	{
+		response = CANRP_Write;
+	}
+	return response;
+}
+
+uint8_t CAN_GetMaxPlanAccelDecel(uint8_t buffer[])
+{
+	const float max_accel = planner_get_max_accel();
+	const float max_decel = planner_get_max_decel();
+	memcpy(&buffer[0], &max_accel, sizeof(float));
+	memcpy(&buffer[4], &max_decel, sizeof(float));
+	return CANRP_Read;
 }

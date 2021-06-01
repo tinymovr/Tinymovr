@@ -45,6 +45,25 @@ PAC5XXX_RAMFUNC float wrapf(float unbound_val, float half_interval)
     return bound_val;
 }
 
+#if __ARM_FEATURE_FMA && __ARM_FP&4 && !__SOFTFP__ && !BROKEN_VFP_ASM
+
+PAC5XXX_RAMFUNC float fast_sqrt(float x)
+{
+	__asm__ ("vsqrt.f32 %0, %1" : "=t"(x) : "t"(x));
+	return x;
+}
+
+#else
+
+#warning No sqrt implemented without Arm FPU!
+
+PAC5XXX_RAMFUNC float fast_sqrt(float x)
+{
+
+}
+
+#endif
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 PAC5XXX_RAMFUNC float fast_inv_sqrt(float n)

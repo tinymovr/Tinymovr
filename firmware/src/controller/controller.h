@@ -18,13 +18,8 @@
 #ifndef CONTROLLER_CONTROLLER_H_
 #define CONTROLLER_CONTROLLER_H_
 
-#include "src/common.h"
-
-typedef enum {
-    CONTROLLER_ERR_NO_ERROR        = 0x0000,
-	CONTROLLER_ERR_INVALID_STATE   = 0x0001,
-	CONTROLLER_ERR_OVERCURRENT     = 0x0001
-} ControllerError;
+#include <src/common.h>
+#include <src/controller/trajectory_planner.h>
 
 typedef enum {
 	STATE_IDLE = 0,
@@ -35,7 +30,8 @@ typedef enum {
 typedef enum {
 	CTRL_CURRENT = 0,
 	CTRL_VELOCITY = 1,
-    CTRL_POSITION = 2
+    CTRL_POSITION = 2,
+    CTRL_TRAJECTORY = 3
 } ControlMode;
 
 struct ControllerState
@@ -59,6 +55,8 @@ struct ControllerState
 
     float Iq_integrator_Vq;
     float Id_integrator_Vd;
+
+    float t_plan;
 };
 
 struct ControllerConfig
@@ -83,7 +81,7 @@ PAC5XXX_RAMFUNC ControlState Controller_GetState(void);
 PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state);
 
 ControlMode Controller_GetMode(void);
-void Controller_SetMode(ControlMode mode);
+PAC5XXX_RAMFUNC void Controller_SetMode(ControlMode mode);
 
 float controller_get_pos_setpoint_user_frame(void);
 void controller_set_pos_setpoint_user_frame(float value);
@@ -114,6 +112,8 @@ float Controller_GetVelLimit(void);
 void Controller_SetVelLimit(float limit);
 float Controller_GetIqLimit(void);
 void Controller_SetIqLimit(float limit);
+
+void controller_set_motion_plan(MotionPlan mp);
 
 PAC5XXX_RAMFUNC bool Controller_Calibrated(void);
 

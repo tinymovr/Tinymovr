@@ -271,4 +271,40 @@ can_endpoints: Dict[str, Dict] = {
         "units": (None, "milliohm", "microhenry", "milliamp"),
         "ser_map": {"motor": ("R", "L")}
     },
+    "plan_t_limit":
+    {
+        "description": "Execute a planned move to pos with time limit",
+        "type": "w",
+        "ep_id": 0x020,
+        "types": (DataType.FLOAT, DataType.UINT16, DataType.UINT8, DataType.UINT8),
+        "units": ("tick", "millisecond", None, None),
+        "labels": ("target_position", "total_time", "acc_fraction", "dec_fraction")
+    },
+    "plan_v_limit":
+    {
+        "description": "Execute a planned move to pos with velocity limit",
+        "type": "w",
+        "ep_id": 0x021,
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": ("tick", "tick/second"),
+        "labels": ("target_position", "max_vel")
+    },
+    "set_max_plan_acc_dec":
+    {
+        "description": "Set maximum acceleration and deceleration for velocity-limited plan moves",
+        "type": "w",
+        "ep_id": 0x022,
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": ("tick/second/second", "tick/second/second"),
+        "labels": ("max_accel", "max_decel")
+    },
+    "get_max_plan_acc_dec":
+    {
+        "description": "Get maximum acceleration and deceleration for velocity-limited plan moves",
+        "type": "r",
+        "ep_id": 0x023,
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": ("tick/second/second", "tick/second/second"),
+        "labels": ("max_accel", "max_decel")
+    },
 }
