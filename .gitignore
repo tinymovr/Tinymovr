@@ -4,3 +4,4 @@
 # --- Sphinx documentation
 docs/_build/
 .vscode
+Tinymovr.code-workspace
