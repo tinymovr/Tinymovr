@@ -80,21 +80,21 @@ void Controller_ControlLoop(void);
 PAC5XXX_RAMFUNC ControlState Controller_GetState(void);
 PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state);
 
-ControlMode Controller_GetMode(void);
+PAC5XXX_RAMFUNC ControlMode Controller_GetMode(void);
 PAC5XXX_RAMFUNC void Controller_SetMode(ControlMode mode);
 
-float controller_get_pos_setpoint_user_frame(void);
-void controller_set_pos_setpoint_user_frame(float value);
-float controller_get_vel_setpoint_user_frame(void);
-void controller_set_vel_setpoint_user_frame(float value);
+PAC5XXX_RAMFUNC float controller_get_pos_setpoint_user_frame(void);
+PAC5XXX_RAMFUNC void controller_set_pos_setpoint_user_frame(float value);
+PAC5XXX_RAMFUNC float controller_get_vel_setpoint_user_frame(void);
+PAC5XXX_RAMFUNC void controller_set_vel_setpoint_user_frame(float value);
 
 PAC5XXX_RAMFUNC float controller_get_Iq_estimate(void);
-float controller_get_Iq_setpoint(void);
-void controller_set_Iq_setpoint(float value);
+PAC5XXX_RAMFUNC float controller_get_Iq_setpoint(void);
+PAC5XXX_RAMFUNC void controller_set_Iq_setpoint(float value);
 
 PAC5XXX_RAMFUNC float controller_get_Iq_estimate_user_frame(void);
-float controller_get_Iq_setpoint_user_frame(void);
-void controller_set_Iq_setpoint_user_frame(float value);
+PAC5XXX_RAMFUNC float controller_get_Iq_setpoint_user_frame(void);
+PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value);
 
 void Controller_GetModulationValues(struct FloatTriplet *dc);
 

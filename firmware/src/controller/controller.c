@@ -253,7 +253,7 @@ PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
 	}
 }
 
-ControlMode Controller_GetMode(void)
+PAC5XXX_RAMFUNC ControlMode Controller_GetMode(void)
 {
 	return state.mode;
 }
@@ -281,23 +281,23 @@ PAC5XXX_RAMFUNC void Controller_SetMode(ControlMode new_mode)
     }
 }
 
-float controller_get_pos_setpoint_user_frame(void)
+PAC5XXX_RAMFUNC float controller_get_pos_setpoint_user_frame(void)
 {
     return (state.pos_setpoint - motor_get_user_offset()) * motor_get_user_direction();
 }
 
-void controller_set_pos_setpoint_user_frame(float value)
+PAC5XXX_RAMFUNC void controller_set_pos_setpoint_user_frame(float value)
 {
 	// direction is either 1 or -1 so we can multiply instead of divide
     state.pos_setpoint = value * motor_get_user_direction() + motor_get_user_offset();
 }
 
-float controller_get_vel_setpoint_user_frame(void)
+PAC5XXX_RAMFUNC float controller_get_vel_setpoint_user_frame(void)
 {
     return state.vel_setpoint * motor_get_user_direction();
 }
 
-void controller_set_vel_setpoint_user_frame(float value)
+PAC5XXX_RAMFUNC void controller_set_vel_setpoint_user_frame(float value)
 {
 	// direction is either 1 or -1 so we can multiply instead of divide
     state.vel_setpoint = value * motor_get_user_direction();
@@ -308,12 +308,12 @@ PAC5XXX_RAMFUNC float controller_get_Iq_estimate(void)
     return state.Iq_meas;
 }
 
-float controller_get_Iq_setpoint(void)
+PAC5XXX_RAMFUNC float controller_get_Iq_setpoint(void)
 {
     return state.Iq_setpoint;
 }
 
-void controller_set_Iq_setpoint(float value)
+PAC5XXX_RAMFUNC void controller_set_Iq_setpoint(float value)
 {
     state.Iq_setpoint = value;
 }
@@ -323,12 +323,12 @@ PAC5XXX_RAMFUNC float controller_get_Iq_estimate_user_frame(void)
 	return state.Iq_meas * motor_get_user_direction();
 }
 
-float controller_get_Iq_setpoint_user_frame(void)
+PAC5XXX_RAMFUNC float controller_get_Iq_setpoint_user_frame(void)
 {
 	return state.Iq_setpoint * motor_get_user_direction();
 }
 
-void controller_set_Iq_setpoint_user_frame(float value)
+PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value)
 {
 	state.Iq_setpoint = value * motor_get_user_direction();
 }
