@@ -237,7 +237,7 @@ float planner_get_max_vel(void)
 	return config.max_vel;
 }
 
-PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan, float *pos, float *vel)
+PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan)
 {
     // We assume that t is zero at the start of trajectory
     bool response = true;
