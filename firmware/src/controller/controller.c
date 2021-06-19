@@ -112,8 +112,8 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     if (state.mode >= CTRL_TRAJECTORY)
     {
         state.t_plan += PWM_PERIOD_S;
-        // WARN: Updating the setpoints directly is a bit risky!
-        if (!planner_evaluate(state.t_plan, &motion_plan, &state.pos_setpoint, &state.vel_setpoint))
+        // This will set state.pos_setpoint state.vel_setpoint (in user frame)
+        if (!planner_evaluate(state.t_plan, &motion_plan))
         {
         	// Drop to position mode on error or completion
             Controller_SetMode(CTRL_POSITION);

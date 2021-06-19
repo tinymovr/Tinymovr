@@ -59,6 +59,6 @@ float planner_get_max_accel(void);
 float planner_get_max_decel(void);
 bool planner_set_max_vel(float max_vel);
 float planner_get_max_vel(void);
-PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan, float *pos, float *vel);
+PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan);
 
 #endif /* CONTROLLER_TRAJECTORY_PLANNER_H_ */
