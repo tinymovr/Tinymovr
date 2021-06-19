@@ -237,27 +237,26 @@ float planner_get_max_vel(void)
 	return config.max_vel;
 }
 
-
-PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan, float *pos, float *vel)
+PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan)
 {
     // We assume that t is zero at the start of trajectory
     bool response = true;
     if (t < plan->t_acc_cruise)
     {
-        *pos = plan->p_0 + (plan->v_0 * t) + (0.5f * plan->acc * t * t);
-        *vel = plan->v_0 + (plan->acc * t);
+        controller_set_pos_setpoint_user_frame(plan->p_0 + (plan->v_0 * t) + (0.5f * plan->acc * t * t));
+        controller_set_vel_setpoint_user_frame(plan->v_0 + (plan->acc * t));
     }
     else if (t < plan->t_cruise_dec)
     {
         const float tr = (t - plan->t_acc_cruise);
-        *pos = plan->p_acc_cruise + (plan->v_cruise * tr);
-        *vel = plan->v_cruise;
+        controller_set_pos_setpoint_user_frame(plan->p_acc_cruise + (plan->v_cruise * tr));
+        controller_set_vel_setpoint_user_frame(plan->v_cruise);
     }
     else if (t <= plan->t_end)
     {
         const float tr = (t - plan->t_cruise_dec);
-        *pos = plan->p_cruise_dec + (plan->v_cruise * tr) - (0.5f * plan->dec * tr * tr);
-        *vel = plan->v_cruise - (tr * plan->dec);
+        controller_set_pos_setpoint_user_frame(plan->p_cruise_dec + (plan->v_cruise * tr) - (0.5f * plan->dec * tr * tr));
+        controller_set_vel_setpoint_user_frame(plan->v_cruise - (tr * plan->dec));
     }
     else
     {
