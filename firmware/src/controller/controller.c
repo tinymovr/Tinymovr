@@ -62,7 +62,7 @@ static struct ControllerConfig config ={
     .vel_limit = 300000.0f,
     .I_limit = 10.0f,
 
-    .pos_gain = 18.0f,
+    .pos_gain = 20.0f,
     .vel_gain = 8.0e-5f,
     .vel_integrator_gain = 0.00020f,
     .I_bw = 1000.0,
