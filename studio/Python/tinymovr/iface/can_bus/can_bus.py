@@ -44,7 +44,10 @@ class CANBus(IFace):
             if frame.arbitration_id == frame_id:
                 return frame.data
             else:
-                raise IOError("Received id mismatch: " + str(frame.arbitration_id))
+                error_data = extract_node_message_id(frame_id)
+                error_data += extract_node_message_id(frame.arbitration_id)
+                raise IOError("Received id mismatch. Expected: Node: {}, Endpoint:{}; Got: Node: {}, Endpoint:{}".format(
+                    *error_data))
         else:
             raise TimeoutError()
 

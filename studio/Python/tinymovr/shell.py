@@ -73,11 +73,9 @@ def spawn_shell():
             tms[tm_name] = tm
         except TimeoutError:
             logger.info("Node " + str(node_id) + " timed out")
-        except IOError:
+        except IOError as e:
             logger.error(
-                "Node "
-                + str(node_id)
-                + " received abnormal message (possibly wrong ID?)"
+                str(e)
             )
 
     if len(tms) == 0:
