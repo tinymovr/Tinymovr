@@ -4,7 +4,8 @@ import signal
 from time import sleep
 import can
 from tinymovr import Tinymovr
-from tinymovr.iface.can import CAN, guess_channel
+from tinymovr.iface import IFace
+from tinymovr.iface.can_bus import CANBus, guess_channel
 
 
 tm1: Tinymovr = None
@@ -18,7 +19,7 @@ def main():
     can_bus: can.Bus = can.Bus(bustype='slcan',
                                channel=channel,
                                bitrate=1000000)
-    iface: IFace = CAN(can_bus)
+    iface: IFace = CANBus(can_bus)
     tm1 = Tinymovr(node_id=1, iface=iface)
     tm2 = Tinymovr(node_id=2, iface=iface)
 
