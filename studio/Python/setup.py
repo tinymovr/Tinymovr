@@ -27,7 +27,7 @@ setup(
     install_requires=[
         "ipython",
         #"python-can>=4.0.0.dev0",
-        "python-can @ git+ssh://git@github.com/yconst/python-can.git@develop#egg=python-can-dev"
+        "python-can @ git+ssh://git@github.com/yconst/python-can.git@develop#egg=python-can-dev",
         "pyserial",
         "matplotlib",
         "docopt",
