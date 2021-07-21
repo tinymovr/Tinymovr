@@ -67,7 +67,9 @@ all: release
 
 # Debug target
 debug: CFLAGS += -DDEBUG -g3
+debug: OBJECTS += $(BUILDDIR)/bootloader.o
 debug: binary
+	$(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.bl_section,alloc,load,readonly,data,contents ./bootloader.bin $(BUILDDIR)/bootloader.o
 
 # Release target
 release: CFLAGS += -g0
