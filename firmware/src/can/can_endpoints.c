@@ -101,7 +101,7 @@ CANEP_Callback CANEP_GetEndpoint(uint8_t id)
 
 // Endpoint handlers
 
-uint8_t CAN_GetOffsetAndDirection(uint8_t buffer[])
+uint8_t CAN_GetOffsetAndDirection(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
 	float offset = motor_get_user_offset();
 	int8_t direction = motor_get_user_direction();
@@ -110,7 +110,7 @@ uint8_t CAN_GetOffsetAndDirection(uint8_t buffer[])
 	return CANRP_Read;
 }
 
-uint8_t CAN_GetState(uint8_t buffer[])
+uint8_t CAN_GetState(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     uint8_t state = Controller_GetState();
     uint8_t mode = Controller_GetMode();
@@ -122,7 +122,7 @@ uint8_t CAN_GetState(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_GetMinStudioVersion(uint8_t buffer[])
+uint8_t CAN_GetMinStudioVersion(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     static const uint8_t v_major = STUDIO_MIN_VERSION_MAJOR;
     static const uint8_t v_minor = STUDIO_MIN_VERSION_MINOR;
@@ -133,7 +133,7 @@ uint8_t CAN_GetMinStudioVersion(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_GetCANConfig(uint8_t buffer[])
+uint8_t CAN_GetCANConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     uint8_t id = CAN_get_ID();
     uint16_t baudrate = CAN_get_kbit_rate();
@@ -142,7 +142,7 @@ uint8_t CAN_GetCANConfig(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_SetCANConfig(uint8_t buffer[])
+uint8_t CAN_SetCANConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     uint8_t id;
     uint16_t baudrate;
@@ -162,7 +162,7 @@ uint8_t CAN_SetCANConfig(uint8_t buffer[])
     return response;
 }
 
-uint8_t CAN_SetState(uint8_t buffer[])
+uint8_t CAN_SetState(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     uint8_t requested_state;
     uint8_t requested_mode;
@@ -182,7 +182,7 @@ uint8_t CAN_SetState(uint8_t buffer[])
     return response;
 }
 
-uint8_t CAN_SetOffsetAndDirection(uint8_t buffer[])
+uint8_t CAN_SetOffsetAndDirection(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
 	float offset;
 	int8_t direction;
@@ -193,16 +193,28 @@ uint8_t CAN_SetOffsetAndDirection(uint8_t buffer[])
 	return CANRP_Write;
 }
 
-uint8_t CAN_GetEncoderEstimates(uint8_t buffer[])
+uint8_t CAN_GetEncoderEstimates(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
+    CAN_ResponseType response = CANRP_Read;
+    if ((!rtr) && (*buffer_len > 0))
+    {
+        float pos;
+        float vel;
+        memcpy(&pos, &buffer[0], sizeof(float));
+        memcpy(&vel, &buffer[4], sizeof(float));
+        controller_set_pos_setpoint_user_frame(pos);
+        controller_set_vel_setpoint_user_frame(vel);
+        *buffer_len = 8;
+        response = CANRP_ReadWrite;
+    }
     float pos = observer_get_pos_estimate_user_frame();
     float vel = observer_get_vel_estimate_user_frame();
     memcpy(&buffer[0], &pos, sizeof(float));
     memcpy(&buffer[4], &vel, sizeof(float));
-    return CANRP_Read;
+    return response;
 }
 
-uint8_t CAN_GetSetpoints(uint8_t buffer[])
+uint8_t CAN_GetSetpoints(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float pos = controller_get_pos_setpoint_user_frame();
     float vel = controller_get_vel_setpoint_user_frame();
@@ -211,7 +223,7 @@ uint8_t CAN_GetSetpoints(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_SetPosSetpoint(uint8_t buffer[])
+uint8_t CAN_SetPosSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float pos;
     int16_t vel_ff;
@@ -227,7 +239,7 @@ uint8_t CAN_SetPosSetpoint(uint8_t buffer[])
     return CANRP_Write;
 }
 
-uint8_t CAN_SetVelSetpoint(uint8_t buffer[])
+uint8_t CAN_SetVelSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float vel;
     float Iq_ff;
@@ -238,7 +250,7 @@ uint8_t CAN_SetVelSetpoint(uint8_t buffer[])
     return CANRP_Write;
 }
 
-uint8_t CAN_SetIqSetpoint(uint8_t buffer[])
+uint8_t CAN_SetIqSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float Iq;
     memcpy(&Iq, &buffer[0], sizeof(float));
@@ -246,7 +258,7 @@ uint8_t CAN_SetIqSetpoint(uint8_t buffer[])
     return CANRP_Write;
 }
 
-uint8_t CAN_GetLimits(uint8_t buffer[])
+uint8_t CAN_GetLimits(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float vel_limit = Controller_GetVelLimit();
     float iq_limit = Controller_GetIqLimit();
@@ -255,7 +267,7 @@ uint8_t CAN_GetLimits(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_SetLimits(uint8_t buffer[])
+uint8_t CAN_SetLimits(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float vel_limit;
     float iq_limit;
@@ -266,7 +278,7 @@ uint8_t CAN_SetLimits(uint8_t buffer[])
     return CANRP_Write;
 }
 
-uint8_t CAN_GetPhaseCurrents(uint8_t buffer[])
+uint8_t CAN_GetPhaseCurrents(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     struct FloatTriplet I_phase;
     ADC_GetPhaseCurrents(&I_phase);
@@ -279,7 +291,7 @@ uint8_t CAN_GetPhaseCurrents(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_GetIq(uint8_t buffer[])
+uint8_t CAN_GetIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float Iq_set = controller_get_Iq_setpoint_user_frame();
     float Iq_est = controller_get_Iq_estimate_user_frame();
@@ -288,20 +300,20 @@ uint8_t CAN_GetIq(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_Reset(uint8_t buffer[])
+uint8_t CAN_Reset(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     system_reset();
     return CANRP_Read;
 }
 
-uint8_t CAN_GetVBus(uint8_t buffer[])
+uint8_t CAN_GetVBus(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     const float VBus = ADC_GetVBus();
     memcpy(&buffer[0], &VBus, sizeof(float));
     return CANRP_Read;
 }
 
-uint8_t CAN_GetGains(uint8_t buffer[])
+uint8_t CAN_GetGains(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     const float pos_gain = Controller_GetPosGain();
     const float vel_P_gain = Controller_GetVelGain();
@@ -310,7 +322,7 @@ uint8_t CAN_GetGains(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_SetGains(uint8_t buffer[])
+uint8_t CAN_SetGains(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float pos_gain;
     float vel_P_gain;
@@ -330,14 +342,14 @@ uint8_t CAN_SetGains(uint8_t buffer[])
     return response;
 }
 
-uint8_t CAN_GetIntegratorGains(uint8_t buffer[])
+uint8_t CAN_GetIntegratorGains(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     const float vel_I_gain = Controller_GetVelIntegratorGain();
     memcpy(&buffer[0], &vel_I_gain, sizeof(float));
     return CANRP_Read;
 }
 
-uint8_t CAN_SetIntegratorGains(uint8_t buffer[])
+uint8_t CAN_SetIntegratorGains(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float vel_I_gain;
     memcpy(&vel_I_gain, &buffer[0], sizeof(float));
@@ -350,7 +362,7 @@ uint8_t CAN_SetIntegratorGains(uint8_t buffer[])
     return response;
 }
 
-uint8_t CAN_DeviceInfo(uint8_t buffer[])
+uint8_t CAN_DeviceInfo(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     const uint32_t idr = PAC55XX_INFO2->PACIDR;
     static const uint8_t v_major = VERSION_MAJOR;
@@ -365,7 +377,7 @@ uint8_t CAN_DeviceInfo(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_Timings(uint8_t buffer[])
+uint8_t CAN_Timings(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     const uint32_t total = Scheduler_GetTotalCycles();
     const uint32_t busy = Scheduler_GetBusyCycles();
@@ -374,19 +386,19 @@ uint8_t CAN_Timings(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_SaveConfig(uint8_t buffer[])
+uint8_t CAN_SaveConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     NVM_SaveConfig();
     return CANRP_Write;
 }
 
-uint8_t CAN_EraseConfig(uint8_t buffer[])
+uint8_t CAN_EraseConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     NVM_Erase();
     return CANRP_Write;
 }
 
-uint8_t CAN_GetMotorConfig(uint8_t buffer[])
+uint8_t CAN_GetMotorConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     uint8_t flags = (motor_is_calibrated() == true) | ((motor_is_gimbal() == true) << 1);
     uint16_t R = (uint16_t)(motor_get_phase_resistance() * 1e+3f);
@@ -401,7 +413,7 @@ uint8_t CAN_GetMotorConfig(uint8_t buffer[])
     return CANRP_Read;
 }
 
-uint8_t CAN_SetMotorConfig(uint8_t buffer[])
+uint8_t CAN_SetMotorConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     uint8_t flags;
     uint16_t R;
@@ -427,7 +439,7 @@ uint8_t CAN_SetMotorConfig(uint8_t buffer[])
 
 // -----
 
-uint8_t CAN_MoveToPosWithTimeLimit(uint8_t buffer[])
+uint8_t CAN_MoveToPosWithTimeLimit(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float target_pos;
     uint16_t t_tot_int;
@@ -448,7 +460,7 @@ uint8_t CAN_MoveToPosWithTimeLimit(uint8_t buffer[])
     return response;
 }
 
-uint8_t CAN_MoveToPosWithVelLimit(uint8_t buffer[])
+uint8_t CAN_MoveToPosWithVelLimit(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float target_pos;
     float max_vel;
@@ -462,7 +474,7 @@ uint8_t CAN_MoveToPosWithVelLimit(uint8_t buffer[])
     return response;
 }
 
-uint8_t CAN_SetMaxPlanAccelDecel(uint8_t buffer[])
+uint8_t CAN_SetMaxPlanAccelDecel(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
 	float max_accel;
 	float max_decel;
@@ -476,7 +488,7 @@ uint8_t CAN_SetMaxPlanAccelDecel(uint8_t buffer[])
 	return response;
 }
 
-uint8_t CAN_GetMaxPlanAccelDecel(uint8_t buffer[])
+uint8_t CAN_GetMaxPlanAccelDecel(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
 	const float max_accel = planner_get_max_accel();
 	const float max_decel = planner_get_max_decel();

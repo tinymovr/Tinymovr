@@ -17,7 +17,7 @@
 
 #include "src/common.h"
 
-typedef uint8_t (*CANEP_Callback)(uint8_t *);
+typedef uint8_t (*CANEP_Callback)(uint8_t *, uint8_t, bool);
 
 typedef enum {
     CANRP_NoAction = 0,
@@ -30,38 +30,38 @@ void CANEP_InitEndpointMap(void);
 void CANEP_AddEndpoint(CANEP_Callback callback, uint8_t id);
 CANEP_Callback CANEP_GetEndpoint(uint8_t id);
 
-uint8_t CAN_GetOffsetAndDirection(uint8_t buffer[]);
-uint8_t CAN_GetState(uint8_t buffer[]);
-uint8_t CAN_GetMinStudioVersion(uint8_t buffer[]);
-uint8_t CAN_GetCANConfig(uint8_t buffer[]);
-uint8_t CAN_SetCANConfig(uint8_t buffer[]);
-uint8_t CAN_SetState(uint8_t buffer[]);
-uint8_t CAN_SetOffsetAndDirection(uint8_t buffer[]);
-uint8_t CAN_GetEncoderEstimates(uint8_t buffer[]);
-uint8_t CAN_GetSetpoints(uint8_t buffer[]);
+uint8_t CAN_GetOffsetAndDirection(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_GetState(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_GetMinStudioVersion(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_GetCANConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_SetCANConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_SetState(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_SetOffsetAndDirection(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_GetEncoderEstimates(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_GetSetpoints(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 
-uint8_t CAN_SetPosSetpoint(uint8_t buffer[]);
-uint8_t CAN_SetVelSetpoint(uint8_t buffer[]);
-uint8_t CAN_SetIqSetpoint(uint8_t buffer[]);
-uint8_t CAN_SetLimits(uint8_t buffer[]);
-uint8_t CAN_GetPhaseCurrents(uint8_t buffer[]);
+uint8_t CAN_SetPosSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_SetVelSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_SetIqSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_SetLimits(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_GetPhaseCurrents(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 
-uint8_t CAN_GetIq(uint8_t buffer[]);
-uint8_t CAN_GetLimits(uint8_t buffer[]);
-uint8_t CAN_Reset(uint8_t buffer[]);
-uint8_t CAN_GetVBus(uint8_t buffer[]);
-uint8_t CAN_GetGains(uint8_t buffer[]);
-uint8_t CAN_SetGains(uint8_t buffer[]);
-uint8_t CAN_GetIntegratorGains(uint8_t buffer[]);
-uint8_t CAN_SetIntegratorGains(uint8_t buffer[]);
-uint8_t CAN_DeviceInfo(uint8_t buffer[]);
-uint8_t CAN_Timings(uint8_t buffer[]);
-uint8_t CAN_SaveConfig(uint8_t buffer[]);
-uint8_t CAN_EraseConfig(uint8_t buffer[]);
-uint8_t CAN_GetMotorConfig(uint8_t buffer[]);
-uint8_t CAN_SetMotorConfig(uint8_t buffer[]);
+uint8_t CAN_GetIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_GetLimits(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_Reset(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_GetVBus(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_GetGains(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_SetGains(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_GetIntegratorGains(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_SetIntegratorGains(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_DeviceInfo(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_Timings(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_SaveConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_EraseConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_GetMotorConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_SetMotorConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 
-uint8_t CAN_MoveToPosWithTimeLimit(uint8_t buffer[]);
-uint8_t CAN_MoveToPosWithVelLimit(uint8_t buffer[]);
-uint8_t CAN_SetMaxPlanAccelDecel(uint8_t buffer[]);
-uint8_t CAN_GetMaxPlanAccelDecel(uint8_t buffer[]);
+uint8_t CAN_MoveToPosWithTimeLimit(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_MoveToPosWithVelLimit(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_SetMaxPlanAccelDecel(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_GetMaxPlanAccelDecel(uint8_t buffer[], uint8_t *buffer_len, bool rtr);

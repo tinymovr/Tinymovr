@@ -117,20 +117,20 @@ void CAN_process_interrupt(void)
 {
     buffer = PAC55XX_CAN->RXBUF;	//  read RX buffer, RX buffer bit order same as TX buffer
 
-    rx_dataLen = buffer & 0x0F;
+    data_length = buffer & 0x0F;
     rx_id = ((buffer & 0xE00000) >> 21) | ((buffer & 0xFF00) >> 5);
 
     uint8_t command_id = rx_id & 0x3F;
     bool rtr = ((buffer >> 6) & 0x1) == 0x1;
     rx_data[0] = buffer>>24;    // data0
-    if(rx_dataLen > 1u)
+    if(data_length > 1u)
     {
         buffer = PAC55XX_CAN->RXBUF;    // buffer contains data1..data4
         rx_data[1] = buffer;
         rx_data[2] = buffer >> 8;
         rx_data[3] = buffer >> 16;
         rx_data[4] = buffer >> 24;
-        if(rx_dataLen > 5u)
+        if(data_length > 5u)
         {
             buffer = PAC55XX_CAN->RXBUF;    //  buffer contains data7..data5
             rx_data[5] = buffer;
@@ -140,18 +140,18 @@ void CAN_process_interrupt(void)
     }
     
     // Process message
-    uint8_t (*callback)(uint8_t buffer[]) = CANEP_GetEndpoint(command_id);
+    uint8_t (*callback)(uint8_t buffer[], bool rtr) = CANEP_GetEndpoint(command_id);
     if (callback != NULL)
     {
         uint8_t can_msg_buffer[8] = {0};
-        if ((rtr == false) && (rx_dataLen > 0u))
+        if ((rtr == false) && (data_length > 0u))
         {
-            memcpy(can_msg_buffer, &rx_data, rx_dataLen);
+            memcpy(can_msg_buffer, &rx_data, data_length);
         }
-        uint8_t response_type = callback(can_msg_buffer);
-        if (rtr && (response_type >= CANRP_Read))
+        uint8_t response_type = callback(can_msg_buffer, &data_length, rtr);
+        if (response_type >= CANRP_Read)
         {
-            can_transmit(8, (config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);
+            can_transmit(data_length, (config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);
         }
     }
 }
