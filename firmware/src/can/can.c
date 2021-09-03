@@ -140,7 +140,7 @@ void CAN_process_interrupt(void)
     }
     
     // Process message
-    uint8_t (*callback)(uint8_t buffer[], bool rtr) = CANEP_GetEndpoint(command_id);
+    uint8_t (*callback)(uint8_t buffer[], uint8_t *buffer_length, bool rtr) = CANEP_GetEndpoint(command_id);
     if (callback != NULL)
     {
         uint8_t can_msg_buffer[8] = {0};
