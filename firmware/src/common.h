@@ -75,7 +75,8 @@
 
 #define PI       (3.141592f)
 #define TWOPI    (6.283185f)
-#define INVTWOPI (0.1591549f)
+#define INVTWOPI (0.159155f)
+#define EPSILON  (2.718281f)
 
 static const float one_by_sqrt3 = 0.57735026919f;
 static const float two_by_sqrt3 = 1.15470053838f;
