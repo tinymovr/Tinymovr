@@ -17,7 +17,7 @@
 
 #include "src/common.h"
 
-typedef uint8_t (*CANEP_Callback)(uint8_t *, uint8_t, bool);
+typedef uint8_t (*CANEP_Callback)(uint8_t[], uint8_t *, bool);
 
 typedef enum {
     CANRP_NoAction = 0,
