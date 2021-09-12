@@ -15,6 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include <math.h>
 #include <string.h>
 #include <src/motor/motor.h>
 #include <src/adc/adc.h>
@@ -75,7 +76,7 @@ void ADC_Init(void)
     adc.vbus_val= 12.0f;
 
     // Derive VBus D value for given tau value
-    adc.vbus_D = 1.0f - math.pow(EPSILON, -1.0f/(config.VBus_tau * PWM_FREQ_HZ))
+    adc.vbus_D = 1.0f - powf(EPSILON, -1.0f/(config.VBus_tau * PWM_FREQ_HZ));
 
     // --- Begin CAFE2 Initialization
 
@@ -233,7 +234,7 @@ void ADC_DTSE_Init(void)
 
 PAC5XXX_RAMFUNC float ADC_GetVBus(void)
 {
-    return adc.vbus;
+    return adc.vbus_val;
 }
 
 PAC5XXX_RAMFUNC int16_t ADC_GetMCUTemp(void)
@@ -282,6 +283,6 @@ PAC5XXX_RAMFUNC void ADC_UpdateMeasurements(void)
     const int32_t temp_val = (int32_t)(PAC55XX_ADC->DTSERES2.VAL);
     adc.temp = ( (((FTTEMP + 273) * ((temp_val * 100) + 12288)) / (((int16_t)TTEMPS * 100) + 12288)) - 273);
     
-    adc.vbus_val+= adc.vbus_D * ( ((float)PAC55XX_ADC->DTSERES4.VAL) * VBUS_SCALING_FACTOR - adc.vbus);
+    adc.vbus_val += adc.vbus_D * ( ((float)PAC55XX_ADC->DTSERES4.VAL) * VBUS_SCALING_FACTOR - adc.vbus_val);
 }
 
