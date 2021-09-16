@@ -116,6 +116,16 @@ class TestSimulation(unittest.TestCase):
         time.sleep(0.5)
         self.assertLess(abs(self.tm.encoder_estimates.position.magnitude), 500)
 
+    def test_get_set_pos_vel(self):
+        self.tm.calibrate()
+        self.tm.current_control()
+        vals = self.tm.get_set_pos_vel_Iq(0, 500 * ticks / s, 0.001 * A)
+        self.assertAlmostEqual(vals.position, 0, delta= 1 * ticks)
+        self.assertAlmostEqual(vals.velocity_ff, 0, delta= 10 * ticks)
+        time.sleep(0.5)
+        vals = self.tm.get_set_pos_vel_Iq(0, 0, 0)
+        self.assertLess(abs(vals.position.magnitude), 500)
+
 
 if __name__ == "__main__":
     unittest.main()

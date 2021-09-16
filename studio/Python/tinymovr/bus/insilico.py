@@ -49,6 +49,8 @@ class InSilico(can.BusABC):
             0x18: self._get_gains,
             0x19: self._set_gains,
             0x1A: self._get_device_info,
+            0x25: self._get_set_pos_vel,
+            0x26: self._get_set_pos_vel_Iq,
         }
         self.legacy_errors = False
         self._state = None
@@ -263,3 +265,37 @@ class InSilico(can.BusABC):
             "calibrated": False,
         }
         self._state.update(vals)
+
+    def _get_set_pos_vel(self, payload):
+        set_vals: List = self.codec.deserialize(
+            payload, *can_endpoints["get_set_pos_vel"]["types"]
+        )
+        self._state["position_setpoint"] = set_vals[0]
+        self._state["velocity_setpoint"] = set_vals[1]
+
+        ret_vals: Tuple = (
+            self._state["position_estimate"],
+            self._state["velocity_estimate"]
+        )
+        gen_payload = self.codec.serialize(
+            ret_vals, *can_endpoints["get_set_pos_vel"]["types"]
+        )
+        self.buffer = create_frame(self.node_id, 0x025, False, gen_payload)
+
+    def _get_set_pos_vel_Iq(self, payload):
+        set_vals: List = self.codec.deserialize(
+            payload, *can_endpoints["get_set_pos_vel_Iq"]["types"]
+        )
+        self._state["position_setpoint"] = set_vals[0]
+        self._state["velocity_setpoint"] = set_vals[1]
+        self._state["current_setpoint"] = set_vals[2]
+
+        ret_vals: Tuple = (
+            self._state["position_estimate"],
+            self._state["velocity_estimate"],
+            self._state["current_estimate"]
+        )
+        gen_payload = self.codec.serialize(
+            ret_vals, *can_endpoints["get_set_pos_vel_Iq"]["types"]
+        )
+        self.buffer = create_frame(self.node_id, 0x026, False, gen_payload)
