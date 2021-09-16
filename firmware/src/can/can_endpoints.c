@@ -195,29 +195,17 @@ uint8_t CAN_SetOffsetAndDirection(uint8_t buffer[], uint8_t *buffer_len, bool rt
 
 uint8_t CAN_GetEncoderEstimates(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
-    CAN_ResponseType response = CANRP_Read;
-    if ((!rtr) && (*buffer_len > 0))
-    {
-        float pos;
-        float vel;
-        memcpy(&pos, &buffer[0], sizeof(float));
-        memcpy(&vel, &buffer[4], sizeof(float));
-        controller_set_pos_setpoint_user_frame(pos);
-        controller_set_vel_setpoint_user_frame(vel);
-        *buffer_len = 8;
-        response = CANRP_ReadWrite;
-    }
-    float pos = observer_get_pos_estimate_user_frame();
-    float vel = observer_get_vel_estimate_user_frame();
+    const float pos = observer_get_pos_estimate_user_frame();
+    const float vel = observer_get_vel_estimate_user_frame();
     memcpy(&buffer[0], &pos, sizeof(float));
     memcpy(&buffer[4], &vel, sizeof(float));
-    return response;
+    return CANRP_Read;
 }
 
 uint8_t CAN_GetSetpoints(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
-    float pos = controller_get_pos_setpoint_user_frame();
-    float vel = controller_get_vel_setpoint_user_frame();
+    const float pos = controller_get_pos_setpoint_user_frame();
+    const float vel = controller_get_vel_setpoint_user_frame();
     memcpy(&buffer[0], &pos, sizeof(float));
     memcpy(&buffer[4], &vel, sizeof(float));
     return CANRP_Read;
@@ -260,8 +248,8 @@ uint8_t CAN_SetIqSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 
 uint8_t CAN_GetLimits(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
-    float vel_limit = Controller_GetVelLimit();
-    float iq_limit = Controller_GetIqLimit();
+    const float vel_limit = Controller_GetVelLimit();
+    const float iq_limit = Controller_GetIqLimit();
     memcpy(&buffer[0], &vel_limit, sizeof(float));
     memcpy(&buffer[4], &iq_limit, sizeof(float));
     return CANRP_Read;
@@ -282,9 +270,9 @@ uint8_t CAN_GetPhaseCurrents(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     struct FloatTriplet I_phase;
     ADC_GetPhaseCurrents(&I_phase);
-    int16_t IA = (int16_t)(I_phase.A * 1000.0f);
-    int16_t IB = (int16_t)(I_phase.B * 1000.0f);
-    int16_t IC = (int16_t)(I_phase.C * 1000.0f);
+    const int16_t IA = (int16_t)(I_phase.A * 1000.0f);
+    const int16_t IB = (int16_t)(I_phase.B * 1000.0f);
+    const int16_t IC = (int16_t)(I_phase.C * 1000.0f);
     memcpy(&buffer[0], &IA, sizeof(int16_t));
     memcpy(&buffer[2], &IB, sizeof(int16_t));
     memcpy(&buffer[4], &IC, sizeof(int16_t));
@@ -293,8 +281,8 @@ uint8_t CAN_GetPhaseCurrents(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 
 uint8_t CAN_GetIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
-    float Iq_set = controller_get_Iq_setpoint_user_frame();
-    float Iq_est = controller_get_Iq_estimate_user_frame();
+    const float Iq_set = controller_get_Iq_setpoint_user_frame();
+    const float Iq_est = controller_get_Iq_estimate_user_frame();
     memcpy(&buffer[0], &Iq_set, sizeof(float));
     memcpy(&buffer[4], &Iq_est, sizeof(float));
     return CANRP_Read;
@@ -365,9 +353,9 @@ uint8_t CAN_SetIntegratorGains(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 uint8_t CAN_DeviceInfo(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     const uint32_t idr = PAC55XX_INFO2->PACIDR;
-    static const uint8_t v_major = VERSION_MAJOR;
-    static const uint8_t v_minor = VERSION_MINOR;
-    static const uint8_t v_patch = VERSION_PATCH;
+    const uint8_t v_major = VERSION_MAJOR;
+    const uint8_t v_minor = VERSION_MINOR;
+    const uint8_t v_patch = VERSION_PATCH;
     const int8_t temp = (int8_t)ADC_GetMCUTemp();
     memcpy(&buffer[0], &idr, sizeof(uint32_t));
     memcpy(&buffer[4], &v_major, sizeof(uint8_t));
@@ -400,11 +388,11 @@ uint8_t CAN_EraseConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 
 uint8_t CAN_GetMotorConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
-    uint8_t flags = (motor_is_calibrated() == true) | ((motor_is_gimbal() == true) << 1);
-    uint16_t R = (uint16_t)(motor_get_phase_resistance() * 1e+3f);
-    uint8_t pole_pairs = motor_get_pole_pairs();
-    uint16_t L = (uint16_t)(motor_get_phase_inductance() * 1e+6f);
-    uint16_t I_cal = (uint16_t)(motor_get_I_cal() * 1000.f);
+    const uint8_t flags = (motor_is_calibrated() == true) | ((motor_is_gimbal() == true) << 1);
+    const uint16_t R = (uint16_t)(motor_get_phase_resistance() * 1e+3f);
+    const uint8_t pole_pairs = motor_get_pole_pairs();
+    const uint16_t L = (uint16_t)(motor_get_phase_inductance() * 1e+6f);
+    const uint16_t I_cal = (uint16_t)(motor_get_I_cal() * 1000.f);
     memcpy(&buffer[0], &flags, sizeof(uint8_t));
     memcpy(&buffer[1], &R, sizeof(uint16_t));
     memcpy(&buffer[3], &pole_pairs, sizeof(uint8_t));
@@ -495,4 +483,45 @@ uint8_t CAN_GetMaxPlanAccelDecel(uint8_t buffer[], uint8_t *buffer_len, bool rtr
 	memcpy(&buffer[0], &max_accel, sizeof(float));
 	memcpy(&buffer[4], &max_decel, sizeof(float));
 	return CANRP_Read;
+}
+
+// -----
+
+uint8_t CAN_GetSetPosVel(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+{
+    float pos;
+    float vel;
+    memcpy(&pos, &buffer[0], sizeof(float));
+    memcpy(&vel, &buffer[4], sizeof(float));
+    controller_set_pos_setpoint_user_frame(pos);
+    controller_set_vel_setpoint_user_frame(vel);
+    *buffer_len = 8;
+    pos = observer_get_pos_estimate_user_frame();
+    vel = observer_get_vel_estimate_user_frame();
+    memcpy(&buffer[0], &pos, sizeof(float));
+    memcpy(&buffer[4], &vel, sizeof(float));
+    return CANRP_ReadWrite;
+}
+
+uint8_t CAN_GetSetPosVelIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+{
+    float pos;
+    int16_t vel_ff;
+    int16_t Iq_ff;
+    memcpy(&pos, &buffer[0], sizeof(float));
+    memcpy(&vel_ff, &buffer[4], sizeof(int16_t));
+    memcpy(&Iq_ff, &buffer[6], sizeof(int16_t));
+    float velFF_float = vel_ff * 10.0f;
+    float iqFF_float = Iq_ff * 0.01f;
+    controller_set_pos_setpoint_user_frame(pos);
+    controller_set_vel_setpoint_user_frame(velFF_float);
+    controller_set_Iq_setpoint_user_frame(iqFF_float);
+    *buffer_len = 8;
+    pos = observer_get_pos_estimate_user_frame();
+    vel_ff = (int16_t)(observer_get_vel_estimate_user_frame() * 0.1f);
+    Iq_ff = (int16_t)(controller_get_Iq_estimate() * 100.0f);
+    memcpy(&buffer[0], &pos, sizeof(float));
+    memcpy(&buffer[4], &vel, sizeof(int16_t));
+    memcpy(&buffer[6], &vel, sizeof(int16_t));
+    return CANRP_ReadWrite;
 }
