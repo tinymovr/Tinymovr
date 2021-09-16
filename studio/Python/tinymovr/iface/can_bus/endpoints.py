@@ -251,7 +251,7 @@ can_endpoints: Dict[str, Dict] = {
     "motor_config":
     {
         "description": "Get Motor Configuration (Flags (calibrated, is_gimbal), \
-                        Resistance, Pole Pairs, Inductance, Calibration Current)",
+Resistance, Pole Pairs, Inductance, Calibration Current)",
         "type": "r",
         "ep_id": 0x01E,
         "types": (DataType.UINT8, DataType.UINT16,
@@ -291,7 +291,8 @@ can_endpoints: Dict[str, Dict] = {
     },
     "set_max_plan_acc_dec":
     {
-        "description": "Set maximum acceleration and deceleration for velocity-limited plan moves",
+        "description": "Set maximum acceleration and deceleration \
+for velocity-limited plan moves",
         "type": "w",
         "ep_id": 0x022,
         "types": (DataType.FLOAT, DataType.FLOAT),
@@ -300,11 +301,32 @@ can_endpoints: Dict[str, Dict] = {
     },
     "get_max_plan_acc_dec":
     {
-        "description": "Get maximum acceleration and deceleration for velocity-limited plan moves",
+        "description": "Get maximum acceleration and deceleration \
+for velocity-limited plan moves",
         "type": "r",
         "ep_id": 0x023,
         "types": (DataType.FLOAT, DataType.FLOAT),
         "units": ("tick/second/second", "tick/second/second"),
         "labels": ("max_accel", "max_decel")
+    },
+    "get_set_pos_vel":
+    {
+        "description": "Get and set Position and Velocity feedforward in one go",
+        "type": "rw",
+        "ep_id": 0x025,
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": ("tick", "tick/second"),
+        "defaults": {"velocity_ff": 0},
+        "labels": ("position", "velocity_ff")
+    },
+    "get_set_pos_vel_Iq":
+    {
+        "description": "Get and set Position, Velocity feedforward and Iq feedforward in one go",
+        "type": "rw",
+        "ep_id": 0x026,
+        "types": (DataType.FLOAT, DataType.INT16, DataType.INT16),
+        "units": ("tick", "decatick/second", "centiampere"),
+        "defaults": {"velocity_ff": 0, "current_ff": 0},
+        "labels": ("position", "velocity_ff", "current_ff")
     },
 }
