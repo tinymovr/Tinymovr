@@ -493,11 +493,11 @@ uint8_t CAN_GetMaxPlanAccelDecel(uint8_t buffer[], uint8_t *buffer_len, bool rtr
 uint8_t CAN_GetSetPosVel(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float pos;
-    float vel;
+    float vel_ff;
     memcpy(&pos, &buffer[0], sizeof(float));
-    memcpy(&vel, &buffer[4], sizeof(float));
+    memcpy(&vel_ff, &buffer[4], sizeof(float));
     controller_set_pos_setpoint_user_frame(pos);
-    controller_set_vel_setpoint_user_frame(vel);
+    controller_set_vel_setpoint_user_frame(vel_ff);
     *buffer_len = 8;
     pos = observer_get_pos_estimate_user_frame();
     vel_ff = observer_get_vel_estimate_user_frame();
