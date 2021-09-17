@@ -497,9 +497,9 @@ uint8_t CAN_GetSetPosVel(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     controller_set_vel_setpoint_user_frame(vel);
     *buffer_len = 8;
     pos = observer_get_pos_estimate_user_frame();
-    vel = observer_get_vel_estimate_user_frame();
+    vel_ff = observer_get_vel_estimate_user_frame();
     memcpy(&buffer[0], &pos, sizeof(float));
-    memcpy(&buffer[4], &vel, sizeof(float));
+    memcpy(&buffer[4], &vel_ff, sizeof(float));
     return CANRP_ReadWrite;
 }
 
@@ -521,7 +521,7 @@ uint8_t CAN_GetSetPosVelIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     vel_ff = (int16_t)(observer_get_vel_estimate_user_frame() * 0.1f);
     Iq_ff = (int16_t)(controller_get_Iq_estimate() * 100.0f);
     memcpy(&buffer[0], &pos, sizeof(float));
-    memcpy(&buffer[4], &vel, sizeof(int16_t));
-    memcpy(&buffer[6], &vel, sizeof(int16_t));
+    memcpy(&buffer[4], &vel_ff, sizeof(int16_t));
+    memcpy(&buffer[6], &Iq_ff, sizeof(int16_t));
     return CANRP_ReadWrite;
 }
