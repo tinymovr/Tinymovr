@@ -77,6 +77,9 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_MoveToPosWithVelLimit, 0x021);
     CANEP_AddEndpoint(&CAN_SetMaxPlanAccelDecel, 0x022);
     CANEP_AddEndpoint(&CAN_GetMaxPlanAccelDecel, 0x023);
+    // ---
+    CANEP_AddEndpoint(&CAN_GetSetPosVel, 0x025);
+    CANEP_AddEndpoint(&CAN_GetSetPosVelIq, 0x026);
 }
 
 void CANEP_AddEndpoint(CANEP_Callback callback, uint8_t id)

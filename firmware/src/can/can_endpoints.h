@@ -65,3 +65,6 @@ uint8_t CAN_MoveToPosWithTimeLimit(uint8_t buffer[], uint8_t *buffer_len, bool r
 uint8_t CAN_MoveToPosWithVelLimit(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_SetMaxPlanAccelDecel(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_GetMaxPlanAccelDecel(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+
+uint8_t CAN_GetSetPosVel(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_GetSetPosVelIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
