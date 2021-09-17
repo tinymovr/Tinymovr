@@ -27,6 +27,14 @@ from pint import Quantity as _Q
 min_fw_version = "0.8.0"
 
 
+class VersionError(Exception):
+    
+    def __init__(self, msg, found, required, *args, **kwargs):
+        super().__init__(msg, *args, **kwargs)
+        self.found = found
+        self.required = required
+
+
 class Tinymovr:
     def __init__(self, node_id: int, iface: IFace, version_check=True):
         self.node_id: int = node_id
@@ -39,17 +47,18 @@ class Tinymovr:
             [str(di.fw_major), str(di.fw_minor), str(di.fw_patch)]
         )
         if version_check:
-            assert version.parse(self.fw_version) >= version.parse(
-                min_fw_version
-            ), "Min FW version requirement ({}) not satisfied!".format(min_fw_version)
-
+            # Check FW version
+            if version.parse(self.fw_version) < version.parse(min_fw_version):
+                raise VersionError("Min FW version requirement not satisfied!",
+                                    found=self.fw_version,
+                                    required=min_fw_version)
+            # Check studio version
             msv = self.min_studio_version
-            msv_str = ".".join(
-                [str(msv.fw_major), str(msv.fw_minor), str(msv.fw_patch)]
-            )
-            sv = pkg_resources.require("tinymovr")[0].version
-            assert version.parse(sv) >= version.parse(msv_str), "Min Studio version \
-requirement ({}) not satisfied!".format(msv_str)        
+            msv_str = ".".join([str(msv.fw_major), str(msv.fw_minor), str(msv.fw_patch)])
+            if version.parse(pkg_resources.require("tinymovr")[0].version) < version.parse(msv_str):
+                raise VersionError("Min Studio version requirement not satisfied!",
+                                    found=self.fw_version,
+                                    required=msv_str)     
 
     def __getattr__(self, attr: str):
         
