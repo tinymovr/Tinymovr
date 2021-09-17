@@ -49,10 +49,13 @@ class TestSimulation(unittest.TestCase):
 
     def test_version_mismatch(self):
         can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
+        original_version = can_bus.min_studio_version
         can_bus.min_studio_version = ["0", "255", "255"] # some impossibly large version
         iface: IFace = CANBus(can_bus)
         with self.assertRaises(AssertionError):
             Tinymovr(node_id=1, iface=iface)
+        # need to restore because the bus is singleton
+        can_bus.min_studio_version = original_version 
 
     def test_get_error_idle(self):
         """
