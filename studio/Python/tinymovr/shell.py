@@ -76,8 +76,7 @@ def spawn_shell():
         except IOError as e:
             logger.error(str(e))
         except VersionError as e:
-            logger.warning("Node {} FW version incompatible (found: {}, required: {}), skipping"
-                .format(node_id, e.found, e.required))
+            logger.warning(str(e))
 
     if len(tms) == 0:
         logger.error("No Tinymovr instances detected. Exiting shell...")

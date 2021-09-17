@@ -29,8 +29,10 @@ min_fw_version = "0.8.0"
 
 class VersionError(Exception):
     
-    def __init__(self, msg, found, required, *args, **kwargs):
+    def __init__(self, kw, found, required, *args, **kwargs):
+        msg = "Node {} version incompatible (found: {}, required: {})".format(kw, found, required)
         super().__init__(msg, *args, **kwargs)
+        self.kw = kw
         self.found = found
         self.required = required
 
@@ -49,16 +51,12 @@ class Tinymovr:
         if version_check:
             # Check FW version
             if version.parse(self.fw_version) < version.parse(min_fw_version):
-                raise VersionError("Min FW version requirement not satisfied!",
-                                    found=self.fw_version,
-                                    required=min_fw_version)
+                raise VersionError(kw="fw", found=self.fw_version, required=min_fw_version)
             # Check studio version
             msv = self.min_studio_version
             msv_str = ".".join([str(msv.fw_major), str(msv.fw_minor), str(msv.fw_patch)])
             if version.parse(pkg_resources.require("tinymovr")[0].version) < version.parse(msv_str):
-                raise VersionError("Min Studio version requirement not satisfied!",
-                                    found=self.fw_version,
-                                    required=msv_str)     
+                raise VersionError(kw="studio", found=self.fw_version, required=msv_str)
 
     def __getattr__(self, attr: str):
         
