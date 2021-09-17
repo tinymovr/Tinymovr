@@ -8,7 +8,7 @@ import time
 import can
 
 import tinymovr
-from tinymovr import Tinymovr
+from tinymovr import Tinymovr, VersionError
 from tinymovr.constants import ErrorIDs
 from tinymovr.iface import IFace
 from tinymovr.iface.can_bus import CANBus
@@ -52,7 +52,7 @@ class TestSimulation(unittest.TestCase):
         original_version = can_bus.min_studio_version
         can_bus.min_studio_version = ["0", "255", "255"] # some impossibly large version
         iface: IFace = CANBus(can_bus)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(VersionError):
             Tinymovr(node_id=1, iface=iface)
         # need to restore because the bus is singleton
         can_bus.min_studio_version = original_version 
