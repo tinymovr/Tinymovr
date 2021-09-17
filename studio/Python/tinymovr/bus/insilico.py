@@ -1,5 +1,6 @@
 import math
 import can
+import pkg_resources
 from time import sleep
 from datetime import datetime
 from typing import Tuple, List, Dict, Union
@@ -32,6 +33,7 @@ class InSilico(can.BusABC):
         self.I: float = M * R * R  # thin hoop formula
         self.TICKS: int = ENC_TICKS
         self.last_call_time = datetime.now()
+        self.min_studio_version = pkg_resources.require("tinymovr")[0].version.split(".")
         self.ep_func_map: Dict[int, callable] = {
             0x03: self._get_state,
             0x04: self._get_min_studio_version,
@@ -149,8 +151,7 @@ class InSilico(can.BusABC):
         self.buffer = create_frame(self.node_id, 0x03, False, gen_payload)
 
     def _get_min_studio_version(self, payload):
-        vals: Tuple = (0, 3, 7)
-        gen_payload = self.codec.serialize(vals, *can_endpoints["min_studio_version"]["types"])
+        gen_payload = self.codec.serialize(self.min_studio_version, *can_endpoints["min_studio_version"]["types"])
         self.buffer = create_frame(self.node_id, 0x04, False, gen_payload)
 
     def _set_state(self, payload):

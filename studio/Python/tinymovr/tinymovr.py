@@ -48,7 +48,8 @@ class Tinymovr:
                 [str(msv.fw_major), str(msv.fw_minor), str(msv.fw_patch)]
             )
             sv = pkg_resources.require("tinymovr")[0].version
-            assert version.parse(sv) >= version.parse(msv_str), "Min Studio version requirement ({}) not satisfied!".format(msv_str)        
+            assert version.parse(sv) >= version.parse(msv_str), "Min Studio version \
+requirement ({}) not satisfied!".format(msv_str)        
 
     def __getattr__(self, attr: str):
         

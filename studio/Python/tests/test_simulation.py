@@ -47,6 +47,13 @@ class TestSimulation(unittest.TestCase):
         self.assertGreaterEqual(info.fw_major, 0)
         self.assertGreaterEqual(info.fw_minor, 7)
 
+    def test_version_mismatch(self):
+        can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
+        can_bus.min_studio_version = ["0", "255", "255"] # some impossibly large version
+        iface: IFace = CANBus(can_bus)
+        with self.assertRaises(AssertionError):
+            Tinymovr(node_id=1, iface=iface)
+
     def test_get_error_idle(self):
         """
         Test successful getting of correct error codes
