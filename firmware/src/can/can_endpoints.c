@@ -214,6 +214,7 @@ uint8_t CAN_GetSetpoints(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     const float pos = controller_get_pos_setpoint_user_frame();
     const float vel = controller_get_vel_setpoint_user_frame();
+    *buffer_len = 2 * sizeof(float);
     memcpy(&buffer[0], &pos, sizeof(float));
     memcpy(&buffer[4], &vel, sizeof(float));
     return CANRP_Read;
