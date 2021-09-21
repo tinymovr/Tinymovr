@@ -294,7 +294,7 @@ uint8_t CAN_GetIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 uint8_t CAN_Reset(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     system_reset();
-    return CANRP_Read;
+    return CANRP_Write;
 }
 
 uint8_t CAN_GetVBus(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
