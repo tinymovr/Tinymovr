@@ -34,10 +34,12 @@ class CANBus(IFace):
         return can_endpoints
 
     def send(self, node_id: int, endpoint_id: int, payload: bytearray = None):
+        #print("send {}:{}".format(node_id, endpoint_id))
         rtr: bool = False if payload and len(payload) else True
         self.bus.send(create_frame(node_id, endpoint_id, rtr, payload))
 
     def receive(self, node_id: int, endpoint_id: int, timeout: float = 0.1):
+        #print("recv {}:{}".format(node_id, endpoint_id))
         frame_id: int = create_node_id(node_id, endpoint_id)
         frame: can.Message = self.bus.recv(timeout=timeout)
         if frame:
@@ -47,7 +49,7 @@ class CANBus(IFace):
                 error_data = extract_node_message_id(frame_id)
                 error_data += extract_node_message_id(frame.arbitration_id)
                 raise IOError("Received id mismatch. Expected: Node: {}, Endpoint:{}; Got: Node: {}, Endpoint:{}".format(
-                    *error_data))
+                    *[hex(v) for v in error_data]))
         else:
             raise TimeoutError()
 
