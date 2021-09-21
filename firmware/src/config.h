@@ -18,12 +18,12 @@
 // Firmware Version
 #define VERSION_MAJOR (0u)
 #define VERSION_MINOR (8u)
-#define VERSION_PATCH (9u)
+#define VERSION_PATCH (10u)
 
 // Required Studio version
 #define STUDIO_MIN_VERSION_MAJOR (0u)
 #define STUDIO_MIN_VERSION_MINOR (3u)
-#define STUDIO_MIN_VERSION_PATCH (8u)
+#define STUDIO_MIN_VERSION_PATCH (10u)
 
 /// TINYMOVR CONFIGURATION OPTIONS ///
 
