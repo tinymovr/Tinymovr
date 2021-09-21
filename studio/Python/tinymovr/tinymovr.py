@@ -62,9 +62,9 @@ class Tinymovr:
         
         if attr in self.eps:
             d = self.eps[attr]
-            type = d["type"]
+            ep_type = d["type"]
 
-            if "w" in type:
+            if "w" in ep_type:
                 # This is a write or read-write endpoint
                 def wrapper(*args, **kwargs):
                     assert len(args) == 0 or len(kwargs) == 0, "Either positional or keyword arguments are supported, not both"
@@ -90,12 +90,12 @@ class Tinymovr:
                     if len(inputs) > 0:
                         payload = self.codec.serialize(inputs, *d["types"])
                     self.iface.send(self.node_id, d["ep_id"], payload=payload)
-                    if "r" in type:
+                    if "r" in ep_type:
                         return self.present_response(attr, d, self.iface.receive(self.node_id, d["ep_id"]))
 
                 return wrapper
 
-            elif type == "r":
+            elif ep_type == "r":
                 # This is a read-type endpoint
                 self.iface.send(self.node_id, d["ep_id"])
                 return self.present_response(attr, d, self.iface.receive(self.node_id, d["ep_id"]))
