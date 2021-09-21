@@ -238,6 +238,23 @@ class TestBoard(TMTestCase):
         self.tm.set_offset_dir(0, 1)
         self.assertAlmostEqual(self.tm.encoder_estimates.position, 0, delta=100)
 
+    def test_l_read_write_endpoints(self):
+        '''
+        Test read-write endpoints
+        '''
+        self.check_state(0)
+        self.try_calibrate()
+        self.tm.position_control()
+        self.check_state(2)
+
+        self.tm.velocity_control()
+
+        for k in range(10):
+            values = self.tm.get_set_pos_vel(0, 20000)
+            time.sleep(1)
+            self.assertAlmostEqual(20000*k*ticks, values.position, delta=2000*(k+1)*ticks)
+
+
 
 if __name__ == '__main__':
     unittest.main(failfast=True)
