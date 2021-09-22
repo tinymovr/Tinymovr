@@ -247,6 +247,11 @@ class TestBoard(TMTestCase):
         self.tm.position_control()
         self.check_state(2)
 
+        self.tm.position_control()
+        self.tm.set_pos_setpoint(0)
+
+        time.sleep(2)
+
         self.tm.velocity_control()
 
         for k in range(10):
