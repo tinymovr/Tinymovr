@@ -55,7 +55,7 @@ class TMTestCase(unittest.TestCase):
 
     def check_state(self, target_state, target_error=None):
         state = self.tm.state
-        if target_error:
+        if target_error and state.errors:
             self.assertIn(target_error, state.errors)
         else:
             self.assertFalse(state.errors)

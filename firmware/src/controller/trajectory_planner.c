@@ -97,7 +97,7 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 		const float sign_fs = v_0 >= 0 ? 1.0f : -1.0f;
 		const float deltat_dec = sign_fs * v_0/d_max;
 		const float dec = sign_fs * d_max;
-		const float p_target_fullstop = p_0 + v_0 * deltat_dec - 0.5 * dec * deltat_dec * deltat_dec;
+		const float p_target_fullstop = p_0 + v_0 * deltat_dec - 0.5f * dec * deltat_dec * deltat_dec;
 
 		plan->p_0 = p_0;
 		plan->deltat_dec = deltat_dec;

@@ -24,42 +24,50 @@ from tinymovr.constants import ControlStates, ControlModes
 from pint import Quantity as _Q
 
 
-min_fw_version = "0.8.0"
+min_fw_version = "0.8.10"
+
+
+class VersionError(Exception):
+    
+    def __init__(self, kw, found, required, *args, **kwargs):
+        msg = "Node {} version incompatible (found: {}, required: {})".format(kw, found, required)
+        super().__init__(msg, *args, **kwargs)
+        self.kw = kw
+        self.found = found
+        self.required = required
 
 
 class Tinymovr:
     def __init__(self, node_id: int, iface: IFace, version_check=True):
         self.node_id: int = node_id
         self.iface: IFace = iface
+        self.eps = self.iface.get_ep_map()
+        self.codec = self.iface.get_codec()
 
         di = self.device_info
         self.fw_version = ".".join(
             [str(di.fw_major), str(di.fw_minor), str(di.fw_patch)]
         )
         if version_check:
-            assert version.parse(self.fw_version) >= version.parse(
-                min_fw_version
-            ), "Min FW version requirement ({}) not satisfied!".format(min_fw_version)
-
+            # Check FW version
+            if version.parse(self.fw_version) < version.parse(min_fw_version):
+                raise VersionError(kw="fw", found=self.fw_version, required=min_fw_version)
+            # Check studio version
             msv = self.min_studio_version
-            msv_str = ".".join(
-                [str(msv.fw_major), str(msv.fw_minor), str(msv.fw_patch)]
-            )
-            sv = pkg_resources.require("tinymovr")[0].version
-            assert version.parse(sv) >= version.parse(msv_str), "Min Studio version requirement ({}) not satisfied!".format(msv_str)
+            msv_str = ".".join([str(msv.fw_major), str(msv.fw_minor), str(msv.fw_patch)])
+            if version.parse(pkg_resources.require("tinymovr")[0].version) < version.parse(msv_str):
+                raise VersionError(kw="studio", found=self.fw_version, required=msv_str)
 
+    def __getattr__(self, attr: str):
+        
+        if attr in self.eps:
+            d = self.eps[attr]
+            ep_type = d["type"]
 
-    def __getattr__(self, _attr: str):
-        attr = strip_end(_attr, "_asdict")
-        eps = self.iface.get_ep_map()
-        codec = self.iface.get_codec()
-        if attr in eps:
-            d = eps[attr]
-
-            if d["type"] == "w":
-                # This is a write-type endpoint
+            if 'w' in ep_type:
+                # This is a write or read-write endpoint
                 def wrapper(*args, **kwargs):
-                    assert len(args) == 0 or len(kwargs) == 0
+                    assert len(args) == 0 or len(kwargs) == 0, "Either positional or keyword arguments are supported, not both"
                     if len(kwargs) > 0:
                         assert "labels" in d
                         inputs = [
@@ -80,19 +88,23 @@ class Tinymovr:
                         ]
                     payload = None
                     if len(inputs) > 0:
-                        payload = codec.serialize(inputs, *d["types"])
+                        payload = self.codec.serialize(inputs, *d["types"])
                     self.iface.send(self.node_id, d["ep_id"], payload=payload)
+                    if 'r' in ep_type:
+                        return self.present_response(attr, d, self.iface.receive(self.node_id, d["ep_id"]))
 
                 return wrapper
 
-            elif d["type"] == "r":
+            elif ep_type == "r":
                 # This is a read-type endpoint
                 self.iface.send(self.node_id, d["ep_id"])
-                response = self.iface.receive(self.node_id, d["ep_id"])
-                data = codec.deserialize(response, *d["types"])
-                if attr in presenter_map:
-                    return presenter_map[attr](_attr, data, d)
-                return presenter_map["default"](_attr, data, d)
+                return self.present_response(attr, d, self.iface.receive(self.node_id, d["ep_id"]))
+                
+    def present_response(self, attr, ep, response):
+        data = self.codec.deserialize(response, *ep["types"])
+        if attr in presenter_map:
+            return presenter_map[attr](attr, data, ep)
+        return presenter_map["default"](attr, data, ep)
 
     def calibrate(self):
         self.set_state(ControlStates.Calibration)

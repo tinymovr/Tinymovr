@@ -8,9 +8,7 @@ ureg = get_registry()
 def present_default(attr, data, endpoint):
     if "units" in endpoint:
         data  = [v * ureg(u) for v, u in zip (data, endpoint["units"])]
-    if attr.endswith("_asdict") and len(data) == 1:
-        return DictObj([strip_end(attr, "_asdict"), data[0]])
-    elif len(data) == 1:    
+    if len(data) == 1:    
         return data[0]
     else:
         return DictObj(zip(endpoint["labels"], data))

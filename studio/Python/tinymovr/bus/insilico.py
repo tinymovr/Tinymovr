@@ -1,5 +1,6 @@
 import math
 import can
+import pkg_resources
 from time import sleep
 from datetime import datetime
 from typing import Tuple, List, Dict, Union
@@ -32,6 +33,7 @@ class InSilico(can.BusABC):
         self.I: float = M * R * R  # thin hoop formula
         self.TICKS: int = ENC_TICKS
         self.last_call_time = datetime.now()
+        self.min_studio_version = pkg_resources.require("tinymovr")[0].version.split(".")
         self.ep_func_map: Dict[int, callable] = {
             0x03: self._get_state,
             0x04: self._get_min_studio_version,
@@ -49,6 +51,8 @@ class InSilico(can.BusABC):
             0x18: self._get_gains,
             0x19: self._set_gains,
             0x1A: self._get_device_info,
+            0x25: self._get_set_pos_vel,
+            0x26: self._get_set_pos_vel_Iq,
         }
         self.legacy_errors = False
         self._state = None
@@ -147,8 +151,7 @@ class InSilico(can.BusABC):
         self.buffer = create_frame(self.node_id, 0x03, False, gen_payload)
 
     def _get_min_studio_version(self, payload):
-        vals: Tuple = (0, 3, 7)
-        gen_payload = self.codec.serialize(vals, *can_endpoints["min_studio_version"]["types"])
+        gen_payload = self.codec.serialize(self.min_studio_version, *can_endpoints["min_studio_version"]["types"])
         self.buffer = create_frame(self.node_id, 0x04, False, gen_payload)
 
     def _set_state(self, payload):
@@ -176,7 +179,7 @@ class InSilico(can.BusABC):
         self.buffer = create_frame(self.node_id, 0x17, False, gen_payload)
 
     def _get_device_info(self, payload):
-        vals: Tuple = (0, 0, 8, 5, 25)
+        vals: Tuple = (0, 0, 8, 10, 25)
         gen_payload = self.codec.serialize(vals, *can_endpoints["device_info"]["types"])
         self.buffer = create_frame(self.node_id, 0x1A, False, gen_payload)
 
@@ -263,3 +266,37 @@ class InSilico(can.BusABC):
             "calibrated": False,
         }
         self._state.update(vals)
+
+    def _get_set_pos_vel(self, payload):
+        set_vals: List = self.codec.deserialize(
+            payload, *can_endpoints["get_set_pos_vel"]["types"]
+        )
+        self._state["position_setpoint"] = set_vals[0]
+        self._state["velocity_setpoint"] = set_vals[1]
+
+        ret_vals: Tuple = (
+            self._state["position_estimate"],
+            self._state["velocity_estimate"]
+        )
+        gen_payload = self.codec.serialize(
+            ret_vals, *can_endpoints["get_set_pos_vel"]["types"]
+        )
+        self.buffer = create_frame(self.node_id, 0x025, False, gen_payload)
+
+    def _get_set_pos_vel_Iq(self, payload):
+        set_vals: List = self.codec.deserialize(
+            payload, *can_endpoints["get_set_pos_vel_Iq"]["types"]
+        )
+        self._state["position_setpoint"] = set_vals[0]
+        self._state["velocity_setpoint"] = set_vals[1]
+        self._state["current_setpoint"] = set_vals[2]
+
+        ret_vals: Tuple = (
+            self._state["position_estimate"],
+            self._state["velocity_estimate"],
+            self._state["current_estimate"]
+        )
+        gen_payload = self.codec.serialize(
+            ret_vals, *can_endpoints["get_set_pos_vel_Iq"]["types"]
+        )
+        self.buffer = create_frame(self.node_id, 0x026, False, gen_payload)

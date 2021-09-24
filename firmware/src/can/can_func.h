@@ -80,7 +80,7 @@ typedef enum
 extern uint8_t tx_data[8];
 extern uint8_t rx_data[8];
 
-extern uint8_t rx_dataLen;
+extern uint8_t data_length;
 extern uint16_t rx_id;
 extern uint32_t buffer;
 extern uint8_t rx_flag;

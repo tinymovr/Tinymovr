@@ -21,7 +21,7 @@ import IPython
 from traitlets.config import Config
 from docopt import docopt
 import pynumparser
-from tinymovr import UserWrapper
+from tinymovr import UserWrapper, VersionError
 from tinymovr.iface import IFace
 from tinymovr.iface.can_bus import CANBus, guess_channel
 from tinymovr.plotter import plot
@@ -69,14 +69,14 @@ def spawn_shell():
         try:
             tm: UserWrapper = UserWrapper(node_id=node_id, iface=iface, version_check=do_version_check)
             tm_name: str = base_name + str(node_id)
-            logger.info("Connected to " + tm_name)
+            logger.info("Connected to {}".format(tm_name))
             tms[tm_name] = tm
         except TimeoutError:
-            logger.info("Node " + str(node_id) + " timed out")
+            logger.info("Node {} timed out".format(node_id))
         except IOError as e:
-            logger.error(
-                str(e)
-            )
+            logger.error(str(e))
+        except VersionError as e:
+            logger.warning(str(e))
 
     if len(tms) == 0:
         logger.error("No Tinymovr instances detected. Exiting shell...")

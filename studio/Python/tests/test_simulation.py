@@ -8,7 +8,7 @@ import time
 import can
 
 import tinymovr
-from tinymovr import Tinymovr
+from tinymovr import Tinymovr, VersionError
 from tinymovr.constants import ErrorIDs
 from tinymovr.iface import IFace
 from tinymovr.iface.can_bus import CANBus
@@ -46,6 +46,16 @@ class TestSimulation(unittest.TestCase):
         info = self.tm.device_info
         self.assertGreaterEqual(info.fw_major, 0)
         self.assertGreaterEqual(info.fw_minor, 7)
+
+    def test_version_mismatch(self):
+        can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
+        original_version = can_bus.min_studio_version
+        can_bus.min_studio_version = ["0", "255", "255"] # some impossibly large version
+        iface: IFace = CANBus(can_bus)
+        with self.assertRaises(VersionError):
+            Tinymovr(node_id=1, iface=iface)
+        # need to restore because the bus is singleton
+        can_bus.min_studio_version = original_version 
 
     def test_get_error_idle(self):
         """
@@ -115,6 +125,16 @@ class TestSimulation(unittest.TestCase):
         self.tm.set_vel_setpoint(-1000)
         time.sleep(0.5)
         self.assertLess(abs(self.tm.encoder_estimates.position.magnitude), 500)
+
+    def test_get_set_pos_vel(self):
+        self.tm.calibrate()
+        self.tm.current_control()
+        vals = self.tm.get_set_pos_vel_Iq(0, 500 * ticks / s, 0.001 * A)
+        self.assertAlmostEqual(vals.position, 0, delta= 1 * ticks)
+        self.assertAlmostEqual(vals.velocity_ff, 0, delta= 10 * ticks)
+        time.sleep(0.5)
+        vals = self.tm.get_set_pos_vel_Iq(0, 0, 0)
+        self.assertLess(abs(vals.position.magnitude), 500)
 
 
 if __name__ == "__main__":

@@ -67,7 +67,8 @@ typedef enum {
 
 struct ADCState
 {
-    float vbus;
+    float vbus_val;
+    float vbus_D;
     int16_t temp;
     struct FloatTriplet I_phase_meas;
     struct FloatTriplet I_phase_offset;
@@ -78,6 +79,7 @@ struct ADCConfig
     float Iphase_limit;
     float I_filter_k;
     float I_phase_offset_tau;
+    float VBus_tau;
 };
 
 void ADC_Init(void);

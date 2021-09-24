@@ -15,6 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include <math.h>
 #include <string.h>
 #include <src/motor/motor.h>
 #include <src/adc/adc.h>
@@ -64,19 +65,19 @@ static struct ADCState adc;
 
 static struct ADCConfig config = {
         .Iphase_limit = 40.0f,
-        .I_filter_k = 0.6,
-        .I_phase_offset_tau = 0.2
+        .I_filter_k = 0.6f,
+        .I_phase_offset_tau = 0.2f,
+        .VBus_tau = 0.001f,
 };
-
-// TODO: Add temp sensor ADC
-// Set the ADC Pre Mux to send AB11 Power Monitor signal to ADC0
-//    pac5xxx_tile_register_write(ADDR_ADCIN1, SIGMGR_AB10);                      // AB10 temperature
 
 void ADC_Init(void)
 {
     // Arbitrary value to avoid division by zero
-    adc.vbus = 12.0f;
-    
+    adc.vbus_val= 12.0f;
+
+    // Derive VBus D value for given tau value
+    adc.vbus_D = 1.0f - powf(EPSILON, -1.0f/(config.VBus_tau * PWM_FREQ_HZ));
+
     // --- Begin CAFE2 Initialization
 
     // Write all CAFE registers
@@ -233,7 +234,7 @@ void ADC_DTSE_Init(void)
 
 PAC5XXX_RAMFUNC float ADC_GetVBus(void)
 {
-    return adc.vbus;
+    return adc.vbus_val;
 }
 
 PAC5XXX_RAMFUNC int16_t ADC_GetMCUTemp(void)
@@ -282,6 +283,6 @@ PAC5XXX_RAMFUNC void ADC_UpdateMeasurements(void)
     const int32_t temp_val = (int32_t)(PAC55XX_ADC->DTSERES2.VAL);
     adc.temp = ( (((FTTEMP + 273) * ((temp_val * 100) + 12288)) / (((int16_t)TTEMPS * 100) + 12288)) - 273);
     
-    adc.vbus = ((float)PAC55XX_ADC->DTSERES4.VAL) * VBUS_SCALING_FACTOR;
+    adc.vbus_val += adc.vbus_D * ( ((float)PAC55XX_ADC->DTSERES4.VAL) * VBUS_SCALING_FACTOR - adc.vbus_val);
 }
 

@@ -240,7 +240,7 @@ set_pos_setpoint()
 | **endpoint**: ``0x0C``
 | **type**: Write-only
 
-Sets the position setpoint, and optionally velocity and current feed-forward values. Due to the fact that data types of feed-forward values are range-limited, multiples of the root units are used.
+Sets the position setpoint, and optionally velocity and current feed-forward values. Due to the fact that data types of feed-forward values are limited by type, multiples of the root units are used.
 
 Arguments
 ---------
@@ -880,6 +880,82 @@ Example
 .. code-block:: python
 
     >>>tmx.erase_config()
+
+
+get_set_pos_vel()
+******************
+    
+| **endpoint**: ``0x25``
+| **type**: Read-Write
+
+Gets and sets Position and Velocity feedforward in one go.
+
+Arguments
+---------
+
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``position``   Position Setpoint   float32    0           ticks
+``velocity``   Velocity Setpoint   float32    4           ticks/second
+=============  =================   =========  =========== ================
+
+Return Values
+-------------
+
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``position``   Position Estimate   float32    0           ticks
+``velocity``   Velocity Estimate   float32    4           ticks/second
+=============  =================   =========  =========== ================
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.get_set_pos_vel(1000.0, 0)
+    {"position":0.0, "velocity": 0.0}
+
+
+get_set_pos_vel_Iq()
+********************
+    
+| **endpoint**: ``0x26``
+| **type**: Read-Write
+
+Get and set Position, Velocity feedforward and Iq feedforward in one go. Due to the fact that data types of feed-forward values are limited by type, multiples of the root units are used.
+
+Arguments
+---------
+
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``position``   Position Setpoint   float32    0           tick
+``velocity``   Velocity Setpoint   int16      4           decatick/second
+``current``    Current Setpoint    int16      6           centiampere
+=============  =================   =========  =========== ================
+
+Return Values
+-------------
+
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``position``   Position Estimate   float32    0           tick
+``velocity``   Velocity Estimate   int16      4           decatick/second
+``current``    Current Estimate    int16      6           centiampere
+=============  =================   =========  =========== ================
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.get_set_pos_vel_Iq(1000.0, 0, 0)
+    {"position":0.0, "velocity": 0.0, "current": 0.0}
 
 
 Error Codes
