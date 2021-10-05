@@ -3,5 +3,7 @@
 
 # --- Sphinx documentation
 docs/_build/
-.vscode
+
+*.log
+*.state.json
 Tinymovr.code-workspace

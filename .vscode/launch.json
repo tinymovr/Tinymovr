@@ -1,0 +1,22 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
+            "name": "Debug Tinymovr",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "jlink",
+            "device": "PAC55XX",
+            "interface": "swd",
+            "serialNumber": "", // add J-Link serial number if having multiple attached the same time.
+            "runToMain": true,
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
+            "preLaunchTask": "Build Project (Debug)",
+        }
+    ]
+}

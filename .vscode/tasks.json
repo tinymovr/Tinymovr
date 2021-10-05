@@ -1,0 +1,62 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Build Project (Debug)",
+            "command": "make debug",
+            "options": {
+                "cwd": "${workspaceFolder}/firmware"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": {
+                "base": "$gcc", 
+                "fileLocation": ["relative", "${workspaceFolder}/firmware"]
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Build Project (Release)",
+            "command": "make release",
+            "options": {
+                "cwd": "${workspaceFolder}/firmware"
+            },
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc", 
+                "fileLocation": ["relative", "${workspaceFolder}/firmware"]
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Clean and Build Project (Debug)",
+            "command": "make clean; make debug",
+            "options": {
+                "cwd": "${workspaceFolder}/firmware"
+            },
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc", 
+                "fileLocation": ["relative", "${workspaceFolder}/firmware"]
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Clean and Build Project (Release)",
+            "command": "make clean; make release",
+            "options": {
+                "cwd": "${workspaceFolder}/firmware"
+            },
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc", 
+                "fileLocation": ["relative", "${workspaceFolder}/firmware"]
+            }
+        },
+    ]
+}
