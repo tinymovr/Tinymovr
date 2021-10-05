@@ -3,7 +3,7 @@ name: Tinymovr Studio Lint/Test
 on: [push]
 
 jobs:
-  build:
+  test-studio:
 
     runs-on: ubuntu-latest
     strategy:

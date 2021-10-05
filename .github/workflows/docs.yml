@@ -3,7 +3,7 @@ name: Tinymovr Docs Build
 on: [push]
 
 jobs:
-  build:
+  build-docs:
 
     runs-on: ubuntu-latest
     strategy:

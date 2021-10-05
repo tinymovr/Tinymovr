@@ -3,7 +3,7 @@ name: Tinymovr Firmware Check/Build
 on: [push]
 
 jobs:
-  check-and-build-tinymovr:
+  check-and-build-fw:
     runs-on: 'ubuntu-20.04'
     steps:
     - uses: actions/checkout@v2
