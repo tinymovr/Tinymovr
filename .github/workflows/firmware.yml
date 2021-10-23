@@ -24,7 +24,9 @@ jobs:
       working-directory: firmware
 
     - name: Install gcc-arm-none-eabi
-      run: sudo apt install gcc-arm-none-eabi
+      run: |
+        sudo apt install gcc-arm-none-eabi
+        arm-none-eabi-gcc --version
 
     - name: Clone Qorvo deps
       uses: actions/checkout@v2
