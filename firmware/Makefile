@@ -9,50 +9,50 @@ ALLDIRS = $(shell find $(SOURCEDIR) -maxdepth 3 -type d \
 			-not -path "./.vscode/*" \
 			-not -path "./.settings/*")
 
+# Toolchain
 CC := arm-none-eabi-gcc
 CPP := arm-none-eabi-g++
 LD := arm-none-eabi-g++
 OBJCOPY := arm-none-eabi-objcopy
 
+# Base flags for all actions
 BASEFLAGS += -mcpu=cortex-m4
 BASEFLAGS += -mthumb
 BASEFLAGS += -mfloat-abi=hard
 BASEFLAGS += -mfpu=fpv4-sp-d16
-BASEFLAGS += -fmessage-length=0
-BASEFLAGS += -fsigned-char
-BASEFLAGS += -ffunction-sections
-BASEFLAGS += -fdata-sections
+BASEFLAGS += -ffunction-sections # generate a separate ELF section for each function in the source file
+BASEFLAGS += -fdata-sections # generate a separate ELF section for each data item in the source file
 BASEFLAGS += -Wall
 BASEFLAGS += -Wlogical-op
 BASEFLAGS += -Waggregate-return
 BASEFLAGS += -Wdouble-promotion
-BASEFLAGS += $(foreach d, $(ALLDIRS), -I$d)
 
+# Compiler flags (c and c++)
+COMPILEFLAGS += $(BASEFLAGS)
+COMPILEFLAGS += $(foreach d, $(ALLDIRS), -I$d)
+COMPILEFLAGS += -fcommon # legacy behavior for GCC 10
+
+# gcc flags
 CFLAGS += -Wstrict-prototypes
 CFLAGS += -std=gnu11
-CFLAGS += $(BASEFLAGS)
+CFLAGS += $(COMPILEFLAGS)
 
+# g++ flags
 CPPFLAGS += -std=c++17
-CPPFLAGS += $(BASEFLAGS)
+CPPFLAGS += $(COMPILEFLAGS)
 
-LDFLAGS += -mcpu=cortex-m4
-LDFLAGS += -mthumb
-LDFLAGS += -mfloat-abi=hard
-LDFLAGS += -mfpu=fpv4-sp-d16
-LDFLAGS += -fmessage-length=0
-LDFLAGS += -fsigned-char
-LDFLAGS += -ffunction-sections
-LDFLAGS += -fdata-sections
-LDFLAGS += -Wall
-LDFLAGS += -Wlogical-op
-LDFLAGS += -Waggregate-return
+ # Link time flags
+LDFLAGS += $(BASEFLAGS)
 LDFLAGS += -Tpac55xx.ld
 LDFLAGS += -nostartfiles
 LDFLAGS += -specs=nosys.specs
 LDFLAGS += -Xlinker --gc-sections
+LDFLAGS += -Xlinker -fno-lto
 LDFLAGS += -Xlinker -Map="$(BUILDDIR)/tinymovr.map"
 
+# objcopy flags
 BFLAGS += -O ihex
+
 # ---
 
 # Include all sources
@@ -66,15 +66,15 @@ OBJECTS := $(addprefix $(BUILDDIR)/,$(CSOURCES:%.c=%.o)) $(addprefix $(BUILDDIR)
 all: release
 
 # Debug target
-debug: CFLAGS += -DDEBUG -g -O1
-debug: CPPFLAGS += -DDEBUG -g -O1
+debug: CFLAGS += -DDEBUG -O1
+debug: CPPFLAGS += -DDEBUG -O1
 debug: LDFLAGS += -O1
 debug: OBJECTS += $(BUILDDIR)/bootloader.o
 debug: binary
 
 # Release target
-release: CFLAGS += -g0 -O3 -funroll-loops
-release: CPPFLAGS += -g0 -O3 -funroll-loops
+release: CFLAGS += -g0 -O3
+release: CPPFLAGS += -g0 -O3
 release: LDFLAGS += -O3
 release: binary
 
