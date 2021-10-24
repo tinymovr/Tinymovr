@@ -1,3 +1,8 @@
+
+# ---------------------
+# Compiling and linking
+# ---------------------
+
 SOURCEDIR := .
 BUILDDIR := $(SOURCEDIR)/build
 ELF := $(BUILDDIR)/tinymovr_fw.elf
@@ -28,22 +33,22 @@ BASEFLAGS += -Waggregate-return
 BASEFLAGS += -Wshadow
 BASEFLAGS += -Wdouble-promotion
 
-# Compiler flags (c and c++)
+# Compiler flags (c and c++), inherit BASEFLAGS
 COMPILEFLAGS += $(BASEFLAGS)
 COMPILEFLAGS += $(foreach d, $(ALLDIRS), -I$d)
 COMPILEFLAGS += -fcommon # legacy behavior for GCC 10
 COMpileFLAGS += -fstack-usage # emit stack usage info
 
-# gcc flags
+# gcc flags, inherit COMPILEFLAGS
 CFLAGS += -Wstrict-prototypes
 CFLAGS += -std=gnu11
 CFLAGS += $(COMPILEFLAGS)
 
-# g++ flags
+# g++ flags, inherit COMPILEFLAGS
 CPPFLAGS += -std=c++20
 CPPFLAGS += $(COMPILEFLAGS)
 
- # Link time flags
+ # Link time flags, inherit BASEFLAGS
 LDFLAGS += $(BASEFLAGS)
 LDFLAGS += -Tpac55xx.ld
 LDFLAGS += -nostartfiles
@@ -55,7 +60,9 @@ LDFLAGS += -Xlinker -Map="$(BUILDDIR)/tinymovr.map"
 # objcopy flags
 BFLAGS += -O ihex
 
-# ---
+# ---------------------
+# Actions
+# ---------------------
 
 # Include all sources
 CSOURCES := $(shell find $(SOURCEDIR) -name '*.c')
