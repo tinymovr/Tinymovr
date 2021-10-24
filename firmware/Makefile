@@ -22,15 +22,17 @@ BASEFLAGS += -mfloat-abi=hard
 BASEFLAGS += -mfpu=fpv4-sp-d16
 BASEFLAGS += -ffunction-sections # generate a separate ELF section for each function in the source file
 BASEFLAGS += -fdata-sections # generate a separate ELF section for each data item in the source file
-BASEFLAGS += -Wall
+BASEFLAGS += -Wall -Werror
 BASEFLAGS += -Wlogical-op
 BASEFLAGS += -Waggregate-return
+BASEFLAGS += -Wshadow
 BASEFLAGS += -Wdouble-promotion
 
 # Compiler flags (c and c++)
 COMPILEFLAGS += $(BASEFLAGS)
 COMPILEFLAGS += $(foreach d, $(ALLDIRS), -I$d)
 COMPILEFLAGS += -fcommon # legacy behavior for GCC 10
+COMpileFLAGS += -fstack-usage # emit stack usage info
 
 # gcc flags
 CFLAGS += -Wstrict-prototypes
@@ -38,7 +40,7 @@ CFLAGS += -std=gnu11
 CFLAGS += $(COMPILEFLAGS)
 
 # g++ flags
-CPPFLAGS += -std=c++17
+CPPFLAGS += -std=c++20
 CPPFLAGS += $(COMPILEFLAGS)
 
  # Link time flags
@@ -46,8 +48,8 @@ LDFLAGS += $(BASEFLAGS)
 LDFLAGS += -Tpac55xx.ld
 LDFLAGS += -nostartfiles
 LDFLAGS += -specs=nosys.specs
-LDFLAGS += -Xlinker --gc-sections
-LDFLAGS += -Xlinker -fno-lto
+LDFLAGS += -Xlinker --gc-sections # optimize function and data sections produced during compile...
+LDFLAGS += -Xlinker --print-gc-sections # ... and print relevant info
 LDFLAGS += -Xlinker -Map="$(BUILDDIR)/tinymovr.map"
 
 # objcopy flags
