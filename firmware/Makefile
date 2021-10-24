@@ -22,7 +22,7 @@ BASEFLAGS += -mfloat-abi=hard
 BASEFLAGS += -mfpu=fpv4-sp-d16
 BASEFLAGS += -ffunction-sections # generate a separate ELF section for each function in the source file
 BASEFLAGS += -fdata-sections # generate a separate ELF section for each data item in the source file
-BASEFLAGS += -Wall -Werror
+BASEFLAGS += -Wall
 BASEFLAGS += -Wlogical-op
 BASEFLAGS += -Waggregate-return
 BASEFLAGS += -Wshadow
