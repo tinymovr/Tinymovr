@@ -1,18 +1,15 @@
 
-# ---------------------
-# Compiling and linking
-# ---------------------
+rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
 
-SOURCEDIR := .
-BUILDDIR := $(SOURCEDIR)/build
+# ---------
+# Variables
+# ---------
+
+PROJECTDIR := .
+BUILDDIR := $(PROJECTDIR)/build
 ELF := $(BUILDDIR)/tinymovr_fw.elf
 HEX := $(BUILDDIR)/tinymovr_fw.hex
 OBJDIR = $(BUILDDIR)/obj
-ALLDIRS = $(shell find $(SOURCEDIR) -maxdepth 3 -type d \
-			-not -path "./.git/*" \
-			-not -path "./build/*" \
-			-not -path "./.vscode/*" \
-			-not -path "./.settings/*")
 
 # Toolchain
 CC := arm-none-eabi-gcc
@@ -32,12 +29,12 @@ BASEFLAGS += -Wlogical-op
 BASEFLAGS += -Waggregate-return
 BASEFLAGS += -Wshadow
 BASEFLAGS += -Wdouble-promotion
+BASEFLAGS += $(INCLUDEFLAGS)
 
 # Compiler flags (c and c++), inherit BASEFLAGS
 COMPILEFLAGS += $(BASEFLAGS)
-COMPILEFLAGS += $(foreach d, $(ALLDIRS), -I$d)
 COMPILEFLAGS += -fcommon # legacy behavior for GCC 10
-COMpileFLAGS += -fstack-usage # emit stack usage info
+COMPILEFLAGS += -fstack-usage # emit stack usage info
 
 # gcc flags, inherit COMPILEFLAGS
 CFLAGS += -Wstrict-prototypes
@@ -54,22 +51,28 @@ LDFLAGS += -Tpac55xx.ld
 LDFLAGS += -nostartfiles
 LDFLAGS += -specs=nosys.specs
 LDFLAGS += -Xlinker --gc-sections # optimize function and data sections produced during compile...
-LDFLAGS += -Xlinker --print-gc-sections # ... and print relevant info
+# LDFLAGS += -Xlinker --print-gc-sections # ... and print relevant info
 LDFLAGS += -Xlinker -Map="$(BUILDDIR)/tinymovr.map"
 
 # objcopy flags
 BFLAGS += -O ihex
 
-# ---------------------
-# Actions
-# ---------------------
+# Headers
+INCLUDEDIRS := . ./cmsis_core/ ./pac55xx_sdk/ ./pac55xx_sdk/device/ ./pac55xx_sdk/driver/ ./pac55xx_sdk/peripheral/
+INCLUDEFLAGS := $(foreach d, $(INCLUDEDIRS), -I$d)
 
-# Include all sources
-CSOURCES := $(shell find $(SOURCEDIR) -name '*.c')
-CPPSOURCES := $(shell find $(SOURCEDIR) -name '*.cpp')
+# Source Files
+CSOURCES := $(call rwildcard,./src,*.c)
+CSOURCES += $(call rwildcard,./pac55xx_sdk,*.c)
+CPPSOURCES := $(call rwildcard,./src,*.cpp)
+CPPSOURCES += $(call rwildcard,./pac55xx_sdk,*.cpp)
 
-# Get list of object files, with paths
+# List of object files, with paths
 OBJECTS := $(addprefix $(BUILDDIR)/,$(CSOURCES:%.c=%.o)) $(addprefix $(BUILDDIR)/,$(CPPSOURCES:%.cpp=%.o))
+
+# -------
+# Targets
+# -------
 
 # All targets
 all: release
@@ -98,18 +101,18 @@ $(HEX): $(ELF)
 
 # Link
 $(ELF): $(OBJECTS)
-	- $(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.bl_section,alloc,load,readonly,data,contents $(SOURCEDIR)/bootloader.bin $(BUILDDIR)/bootloader.o
+	- $(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.bl_section,alloc,load,readonly,data,contents $(PROJECTDIR)/bootloader.bin $(BUILDDIR)/bootloader.o
 	$(LD) $(LDFLAGS) $(OBJECTS) -o $(ELF)
 
 # Compile C
 $(BUILDDIR)/%.o: %.c
 	mkdir -p $(@D)
-	$(CC) $(CFLAGS) -I$(HEADERDIR) -I$(dir $<) -c $< -o $@
+	$(CC) $(CFLAGS) -I$(dir $<) -c $< -o $@
 
 # Compile C++
 $(BUILDDIR)/%.o: %.cpp
 	mkdir -p $(@D)
-	$(CPP) $(CPPFLAGS) -I$(HEADERDIR) -I$(dir $<) -c $< -o $@
+	$(CPP) $(CPPFLAGS) -I$(dir $<) -c $< -o $@
 
 # Clean
 .PHONY : clean
