@@ -1,5 +1,14 @@
 
+# -------
+# Helpers
+# -------
+
 rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+ifeq ($(OS),Windows_NT)
+	OS := Windows
+else
+	OS := $(shell uname)
+endif
 
 # ---------
 # Variables
@@ -16,6 +25,13 @@ CC := arm-none-eabi-gcc
 CPP := arm-none-eabi-g++
 LD := arm-none-eabi-g++
 OBJCOPY := arm-none-eabi-objcopy
+ifeq ($(OS),Windows)
+	MKDIR := mkdir
+	RMDIR := rmdir /S /Q
+else
+	MKDIR := mkdir -p
+	RMDIR := rm -rf
+endif
 
 # Base flags for all actions
 BASEFLAGS += -mcpu=cortex-m4
@@ -106,15 +122,15 @@ $(ELF): $(OBJECTS)
 
 # Compile C
 $(BUILDDIR)/%.o: %.c
-	mkdir -p $(@D)
+	@if not exist $(@D) $(MKDIR) "$(@D)"
 	$(CC) $(CFLAGS) -I$(dir $<) -c $< -o $@
 
 # Compile C++
 $(BUILDDIR)/%.o: %.cpp
-	mkdir -p $(@D)
+	@if not exist $(@D) $(MKDIR) "$(@D)"
 	$(CPP) $(CPPFLAGS) -I$(dir $<) -c $< -o $@
 
 # Clean
 .PHONY : clean
 clean :
-	-rm $(OBJECTS)
+	- $(RMDIR) "$(BUILDDIR)"
