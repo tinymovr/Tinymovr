@@ -4,6 +4,7 @@
 # -------
 
 rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+
 ifeq ($(OS),Windows_NT)
 	OS := Windows
 else
@@ -26,11 +27,11 @@ CPP := arm-none-eabi-g++
 LD := arm-none-eabi-g++
 OBJCOPY := arm-none-eabi-objcopy
 ifeq ($(OS),Windows)
-	MKDIR := mkdir
-	RMDIR := rmdir /S /Q
+	dir_guard=@if not exist $(@D) @mkdir "$(@D)"
+	rmdir_cmd=@rmdir /S /Q
 else
-	MKDIR := mkdir -p
-	RMDIR := rm -rf
+	dir_guard=@mkdir -p $(@D)
+	rmdir_cmd=@rm -rf
 endif
 
 # Base flags for all actions
@@ -122,15 +123,15 @@ $(ELF): $(OBJECTS)
 
 # Compile C
 $(BUILDDIR)/%.o: %.c
-	@if not exist $(@D) $(MKDIR) "$(@D)"
+	$(dir_guard)
 	$(CC) $(CFLAGS) -I$(dir $<) -c $< -o $@
 
 # Compile C++
 $(BUILDDIR)/%.o: %.cpp
-	@if not exist $(@D) $(MKDIR) "$(@D)"
+	$(dir_guard)
 	$(CPP) $(CPPFLAGS) -I$(dir $<) -c $< -o $@
 
 # Clean
 .PHONY : clean
 clean :
-	- $(RMDIR) "$(BUILDDIR)"
+	- $(rmdir_cmd) "$(BUILDDIR)"
