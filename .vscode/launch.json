@@ -13,10 +13,13 @@
             "servertype": "jlink",
             "device": "PAC55XX",
             "interface": "swd",
-            "serialNumber": "", // add J-Link serial number if having multiple attached the same time.
-            "runToMain": true,
+            "runToEntryPoint": "main",
             "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
             "preLaunchTask": "Build Project (Debug)",
+            "windows": {
+                // Update the path below as necessary
+                "serverpath": "C:\\Program Files (x86)\\SEGGER\\JLink_V631b\\JLinkGDBServerCL.exe" 
+            }
         }
     ]
 }

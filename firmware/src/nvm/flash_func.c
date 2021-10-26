@@ -22,7 +22,7 @@
 /// @retval None
 ///
 //==============================================================================
-PAC5XXX_RAMFUNC void flash_erase_page(uint32_t page_num)
+void flash_erase_page(uint32_t page_num)
 {
     // Enable Write Access to FLash Controller
     PAC55XX_MEMCTL->FLASHLOCK = FLASH_LOCK_ALLOW_WRITE_ERASE_FLASH;
@@ -49,7 +49,7 @@ PAC5XXX_RAMFUNC void flash_erase_page(uint32_t page_num)
 /// @retval None
 ///
 //==============================================================================
-PAC5XXX_RAMFUNC void flash_erase_key(uint32_t key)
+void flash_erase_key(uint32_t key)
 {
     // Enable Write Access to FLash Controller
     PAC55XX_MEMCTL->FLASHLOCK = FLASH_LOCK_ALLOW_WRITE_ERASE_FLASH;
@@ -80,7 +80,7 @@ PAC5XXX_RAMFUNC void flash_erase_key(uint32_t key)
 #elif defined(__GNUC__)
     __attribute__((optimize("Os"))) // For GCC C Compiler, "optimize("O3") causes insertion of function calls to FLASH, which must not occur
 #endif
-PAC5XXX_RAMFUNC void flash_write(uint8_t *p_dest, uint8_t *p_src, uint32_t size_bytes)
+void flash_write(uint8_t *p_dest, uint8_t *p_src, uint32_t size_bytes)
 {
     // The memory controller requires all flash writes to start on a 16-byte boundary and consist of 16 bytes in size
     // If the desired amount to be written is less than 16 bytes, this code writes the other bytes as 0xFF to preserve the contents.
@@ -172,7 +172,7 @@ PAC5XXX_RAMFUNC void flash_write(uint8_t *p_dest, uint8_t *p_src, uint32_t size_
 /// @retval PAC5XXX_OK: All is OK, PAC5XXX_ERROR: An error occurred
 ///
 //=================================================================================================
-PAC5XXX_RAMFUNC uint32_t flash_write_16byte_aligned(uint32_t *p_dest, uint32_t *p_src, uint32_t size_32bit_words)
+uint32_t flash_write_16byte_aligned(uint32_t *p_dest, uint32_t *p_src, uint32_t size_32bit_words)
 {
 
     // If destination is not 16-byte aligned OR source isn't 32-bit aligned OR size is not a multiple of 16 bytes, then return an error
@@ -211,7 +211,7 @@ PAC5XXX_RAMFUNC uint32_t flash_write_16byte_aligned(uint32_t *p_dest, uint32_t *
 /// @retval None
 ///
 //==============================================================================
-PAC5XXX_RAMFUNC void flash_write_word(uint32_t * p_dest, uint32_t value)
+void flash_write_word(uint32_t * p_dest, uint32_t value)
 {
     flash_write((uint8_t *)p_dest, (uint8_t *)&value, 4);     // Destination, Source, size_bytes
 }
