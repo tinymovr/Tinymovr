@@ -29,11 +29,11 @@ Qorvo provides an application to interface with the bootloader environment using
 
 You should now be able to use Tinymovr as usual with the new firmware.
 
+We are actively working to provide a cross-platform utility to allow easy firmware file flashing using the command line.
+
 
 Upgrading using J-Link
 ======================
 
-Please see :ref:`setting-up-eclipse` and :ref:`setting-up-jlink`.
+Please see :ref:`setting-up-vscode`.
 
-
-We are actively working to provide a cross-platform utility to allow easy firmware file flashing using the command line.
