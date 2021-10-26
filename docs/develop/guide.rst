@@ -1,24 +1,34 @@
-******************
-Firmware Dev Guide
-******************
+********************
+Firmware Development
+********************
 
 
 Overview
 ########
 
-This document provides a guide for setting up a development environment for developing Tinymovr firmware. Development is currently possible in the Qorvo-supplied Eclipse distribution in Windows. Any help for porting support for development to Macos and Linux would be greatly appreciated!
-
-It is possible to build the Tinymovr firmware using make and gcc, however this configuration is outdated and should be avoided. In particular, this generated a non-bootloader enabled binary and may brick your board.
+This document provides a guide for setting up a development environment for developing Tinymovr firmware. There are two alternatives, a cross-platform approach using the Arm toolchain, make and VSCode, and a Windows-only approach using Eclipse. The former is suggested.
 
 
 Hardware Connections
 ####################
 
-For proper debuggin capabilities you will need a Segger J-Link adapter. Unfortunately original J-Link adapters are quite expensive. A more affordable option is the J-Link EDU adapter at around $60 or the J-Link EDU mini adapter at around $20. In addition, there are J-Link clones that can be purchased for very low prices on ebay or Aliexpress. However, reliability of these clones is not guaranteed.
+For proper debugging capabilities you will need a Segger J-Link adapter. Unfortunately original J-Link adapters are quite expensive. A more affordable option is the J-Link EDU adapter at around $60 or the J-Link EDU mini adapter at around $20. In addition, there are J-Link clones that can be purchased for very low prices on ebay or Aliexpress. However, reliability of these clones is not guaranteed.
 
 With the board and J-Link adapter powered off, connect the J-Link to Tinymovr as shown below:
 
-(image)
+Connection directly to J-Link adapter:
+
+.. image:: jtag.png
+  :width: 800
+  :alt: Tinymovr alpha pin header connection
+
+Connection with SWD adapter (e.g. isolator):
+
+.. image:: swd.png
+  :width: 800
+  :alt: Tinymovr alpha pin header connection
+
+(diagrams made with `Wireviz <https://github.com/formatc1702/WireViz>`_)
 
 Setting up the repo
 ###################
@@ -52,24 +62,44 @@ Then:
 
 Done.
 
-.. _setting-up-eclipse:
+.. _setting-up-vscode:
 
-Setting up Eclipse
-##################
+Using VSCode
+############
 
-You will need the Qorvo-supplied Eclipse distribution. Download from the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_.
+VSCode-based Tinymovr development is a cross-platform solution (Linux, Macos and Windows supported) for building, flashing and debugging firmware. As of November 2021, it is the official approach to Tinymovr development.
 
-Run the downloaded installer that will install Eclipse and the J-Link utility (ver. 6.31) for you.
-
-Once installation is complete, run Eclipse and import the Tinymovr project. Try building to verify everything is ok.
-
-.. _setting-up-jlink:
-
-Setting up J-Link
-#################
+The Tinymovr repo includes all VSCode settings configured. You will need to install the `GNU Arm Embedded Toolchain <https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads>`_, and J-Link drivers. 
 
 The required J-Link drivers and software, together with instructions, can be found in the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_, under the download 'Segger J-Link Support'. This download includes a nacessary patch to enable J-Link to work with Qorvo devices. Instructions on how to apply the patch are included.
 
-Once you have the J-Link adapter wired up and the software installed, you are ready to flash and debug the firmware in Eclipse. Please note that the default configuration in Eclipse is configured to flash the bootloader and firmware together.
+In addition, if you are in Windows you will need to install GNU make. This is rather easy in Windows 10 or later:
 
-TODO: Writeup debugging bootloader.
+.. code-block:: console
+
+    choco install make
+
+Once you have the J-Link adapter wired up and the software installed, you are ready to flash and debug the firmware. To try out a test build from within VSCode select Terminal -> Run Task... from the menu bar. Then select Clean and Build Project (Debug). You should end up with a ``build/`` directory inside ``firmware/`` and there you should see the files ``tinymovr_fw.elf`` and ``tinymovr_fw.hex``.
+
+To flash the firmware, provided your J-Link adapter is connected and drivers properly installed, hit F5. After a while you should see a screen like below:
+
+(image)
+
+Congrats! You are now fully set to develop!
+
+
+.. _setting-up-eclipse:
+
+Using Eclipse
+##################
+
+Eclipse is the legacy method of developing Tinymovr firmware and is no longer actively supported. Consider switching to VSCode-based development instead.
+
+You will need the Qorvo-supplied Eclipse distribution, which is Windows-compatible. Download from the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_.
+
+Run the downloaded installer that will install Eclipse and the J-Link utility (ver. 6.31) for you.
+
+Once installation is complete, run Eclipse and import the Tinymovr project. Try building to verify everything is ok. You are now ready to flash and debug using Eclipse.
+
+
+
