@@ -23,7 +23,7 @@ Qorvo provides an application to interface with the bootloader environment using
 2. Power on Tinymovr
 3. Under 'COMMUNICATION' click on 'Connect'
 4. Power off and on Tinymov. The application status should now indicate that it is connected to the device. 
-5. Under 'PROGRAMMING' click on 'Browse...' and find the firmware .bin file
+5. Under 'PROGRAMMING' click on 'Browse...' and find the latest 'tinymovr<firmware_version>-R<board_revision>.bin' file for the board being used, which can be downloaded from `releases <https://github.com/tinymovr/Tinymovr/releases>`_. Also take note of any version specific instructions in the release notes.
 6. Under 'PROGRAMMING' click on 'Auto Program'. The application will erase, flash and verify the device with the new firmware. Wait for the process to complete
 7. Once complete, power off Tinymovr and quit the application
 
