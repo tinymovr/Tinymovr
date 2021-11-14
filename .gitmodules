@@ -1,0 +1,3 @@
+[submodule "firmware/avlos-server"]
+	path = firmware/avlos-server
+	url = git@github.com:tinymovr/avlos-server.git
