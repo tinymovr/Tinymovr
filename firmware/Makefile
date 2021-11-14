@@ -59,7 +59,7 @@ CFLAGS += -std=gnu11
 CFLAGS += $(COMPILEFLAGS)
 
 # g++ flags, inherit COMPILEFLAGS
-CPPFLAGS += -std=c++20
+CPPFLAGS += -std=c++11
 CPPFLAGS += $(COMPILEFLAGS)
 
  # Link time flags, inherit BASEFLAGS
@@ -75,14 +75,16 @@ LDFLAGS += -Xlinker -Map="$(BUILDDIR)/tinymovr.map"
 BFLAGS += -O ihex
 
 # Headers
-INCLUDEDIRS := . ./cmsis_core/ ./pac55xx_sdk/ ./pac55xx_sdk/device/ ./pac55xx_sdk/driver/ ./pac55xx_sdk/peripheral/
+INCLUDEDIRS := . ./cmsis_core/ ./pac55xx_sdk/ ./pac55xx_sdk/device/ ./pac55xx_sdk/driver/ ./pac55xx_sdk/peripheral/ ./avlos-server/include/
 INCLUDEFLAGS := $(foreach d, $(INCLUDEDIRS), -I$d)
 
 # Source Files
-CSOURCES := $(call rwildcard,./src,*.c)
-CSOURCES += $(call rwildcard,./pac55xx_sdk,*.c)
-CPPSOURCES := $(call rwildcard,./src,*.cpp)
-CPPSOURCES += $(call rwildcard,./pac55xx_sdk,*.cpp)
+CSOURCES := $(call rwildcard,./pac55xx_sdk,*.c)
+CSOURCES += $(call rwildcard,./isotp,*.c)
+CSOURCES += $(call rwildcard,./src,*.c)
+CPPSOURCES := $(call rwildcard,./pac55xx_sdk,*.cpp)
+CPPSOURCES += $(call rwildcard,./src,*.cpp)
+
 
 # List of object files, with paths
 OBJECTS := $(addprefix $(BUILDDIR)/,$(CSOURCES:%.c=%.o)) $(addprefix $(BUILDDIR)/,$(CPPSOURCES:%.cpp=%.o))
@@ -95,15 +97,15 @@ OBJECTS := $(addprefix $(BUILDDIR)/,$(CSOURCES:%.c=%.o)) $(addprefix $(BUILDDIR)
 all: release
 
 # Debug target
-debug: CFLAGS += -DDEBUG -g1 -O1
-debug: CPPFLAGS += -DDEBUG -g1 -O1
-debug: LDFLAGS += -O1
+debug: CFLAGS += -DDEBUG -g -Og
+debug: CPPFLAGS += -DDEBUG -g -Og
+debug: LDFLAGS += -Og
 debug: OBJECTS += $(BUILDDIR)/bootloader.o
 debug: binary
 
 # Release target
-release: CFLAGS += -g0 -O3
-release: CPPFLAGS += -g0 -O3
+release: CFLAGS += -O3
+release: CPPFLAGS += -O3
 release: LDFLAGS += -O3
 release: binary
 
