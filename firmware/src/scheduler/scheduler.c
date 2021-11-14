@@ -23,6 +23,8 @@
 #include <src/encoder/encoder.h>
 #include <src/observer/observer.h>
 
+volatile uint32_t msTicks = 0;
+
 struct SchedulerState
 {
 	bool adc_interrupt;
@@ -91,6 +93,11 @@ void CAN_IRQHandler(void)
 void UART_ReceiveMessageHandler(void)
 {
 	state.uart_message_interrupt = true;
+}
+
+void SysTick_Handler(void)  {                               /* SysTick interrupt Handler. */
+    msTicks = msTicks + 1;                                  /* See startup file startup_LPC17xx.s for SysTick vector */ 
+    CAN_poll();
 }
 
 uint32_t Scheduler_GetTotalCycles(void)
