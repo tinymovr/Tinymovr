@@ -18,7 +18,11 @@
 #ifndef CAN_CAN_H_
 #define CAN_CAN_H_
 
+#include <isotp/isotp.h>
+
 #define CAN_EP_SIZE 6
+#define ISOTP_EP_OFFSET 28
+#define ISOTP_BUFSIZE 512
 
 struct CANConfig
 {
@@ -35,5 +39,6 @@ void CAN_process_interrupt(void);
 
 struct CANConfig* CAN_get_config(void);
 void CAN_restore_config(struct CANConfig* config_);
+void CAN_poll(void);
 
 #endif /* CAN_CAN_H_ */

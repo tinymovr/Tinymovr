@@ -171,7 +171,7 @@ void can_baud(CAN_BAUD_TYPE baud)
     }
 }
 
-void can_transmit(uint8_t dataLen, uint16_t id, uint8_t * data)
+void can_transmit(uint8_t dataLen, uint16_t id, const uint8_t * data)
 {
     while (PAC55XX_CAN->SR.TBS == 0) {};           // wait for TX buffer free
     PAC55XX_CAN->TXBUF = (dataLen << 0)    |       // DLC - Data Length Code

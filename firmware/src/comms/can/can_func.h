@@ -87,7 +87,7 @@ extern uint8_t rx_flag;
 
 void can_baud(CAN_BAUD_TYPE baud);
 void can_io_config(CAN_IO_TYPE can);
-void can_transmit(uint8_t dataLen, uint16_t id, uint8_t * data);
+void can_transmit(uint8_t dataLen, uint16_t id, const uint8_t * data);
 
 uint16_t CAN_BaudTypeToInt(CAN_BAUD_TYPE type);
 CAN_BAUD_TYPE CAN_IntToBaudType(uint16_t baud);

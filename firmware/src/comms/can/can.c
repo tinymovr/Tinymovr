@@ -17,11 +17,19 @@
 
 #include "string.h"
 
-#include "src/system/system.h"
+#include <src/system/system.h>
+#include <src/comms/defs.h>
+#include <src/comms/can/can_func.h>
+#include <src/comms/can/can.h>
 
-#include "src/can/can_endpoints.h"
-#include "src/can/can_func.h"
-#include "src/can/can.h"
+/* Alloc IsoTpLink statically in RAM */
+static IsoTpLink g_link;
+
+/* Alloc send and receive buffer statically in RAM */
+static uint8_t g_isotpRecvBuf[ISOTP_BUFSIZE];
+static uint8_t g_isotpSendBuf[ISOTP_BUFSIZE];
+
+Server s = {0};
 
 static struct CANConfig config = {
     .id = 1,
@@ -30,7 +38,6 @@ static struct CANConfig config = {
 
 void CAN_init(void)
 {
-    CANEP_InitEndpointMap();
 
     if (system_board_revision() == BOARD_REV_5)
     {
@@ -84,6 +91,8 @@ void CAN_init(void)
 
     pac5xxx_can_reset_mode_set(0);	// CAN reset mode inactive
     system_delay_us(100);
+
+    init_server(&s);
 }
 
 uint16_t CAN_get_kbit_rate(void)
@@ -120,8 +129,8 @@ void CAN_process_interrupt(void)
     data_length = buffer & 0x0F;
     rx_id = ((buffer & 0xE00000) >> 21) | ((buffer & 0xFF00) >> 5);
 
-    uint8_t command_id = rx_id & 0x3F;
-    bool rtr = ((buffer >> 6) & 0x1) == 0x1;
+    //uint8_t command_id = rx_id & 0x3F;
+    //bool rtr = ((buffer >> 6) & 0x1) == 0x1;
     rx_data[0] = buffer>>24;    // data0
     if(data_length > 1u)
     {
@@ -139,19 +148,29 @@ void CAN_process_interrupt(void)
         }
     }
     
-    // Process message
-    uint8_t (*callback)(uint8_t buffer[], uint8_t *buffer_length, bool rtr) = CANEP_GetEndpoint(command_id);
-    if (callback != NULL)
-    {
-        uint8_t can_msg_buffer[8] = {0};
-        if ((rtr == false) && (data_length > 0u))
-        {
-            memcpy(can_msg_buffer, &rx_data, data_length);
-        }
-        uint8_t response_type = callback(can_msg_buffer, &data_length, rtr);
-        if (response_type >= CANRP_Read)
-        {
-            can_transmit(data_length, (config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);
+    isotp_on_can_message(&g_link, rx_data, data_length);
+
+    /* Poll link to handle multiple frame transmition */
+    isotp_poll(&g_link);
+    
+    /* You can receive message with isotp_receive.
+        payload is upper layer message buffer, usually UDS;
+        payload_size is payload buffer size;
+        out_size is the actuall read size;
+        */
+    uint16_t n_received;
+    int ret = isotp_receive(&g_link, g_isotpRecvBuf, ISOTP_BUFSIZE, &n_received);
+    if (ISOTP_RET_OK == ret) {
+        /* Handle received message */
+        const size_t response_size = handle(&s, g_isotpRecvBuf, g_isotpSendBuf);
+        if (response_size > 0) {
+            /* In case you want to send data w/ functional addressing, use isotp_send_with_id */
+            ret = isotp_send_with_id(&g_link, 0x7df, g_isotpSendBuf, response_size);
+            if (ISOTP_RET_OK == ret) {
+                /* Send ok */
+            } else {
+                /* Error occur */
+            }
         }
     }
 }
@@ -166,3 +185,27 @@ void CAN_restore_config(struct CANConfig* config_)
     config = *config_;
 }
 
+// ISO-TP-C shims
+int isotp_user_send_can(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
+{
+    //can_transmit(size, (this->config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);
+    can_transmit(size, arbitration_id, data);
+    return ISOTP_RET_OK;
+}
+
+// TODO: Ya.. could be better
+extern volatile uint32_t msTicks;
+
+uint32_t isotp_user_get_ms(void)
+{
+    return msTicks;
+}
+
+/* optional, provide to receive debugging log messages */
+void isotp_user_debug(const char* message, ...) {
+    // ...
+}
+
+void CAN_poll(void) {
+    isotp_poll(&g_link);
+}
