@@ -18,7 +18,6 @@
 #include <string.h>
 #include <src/encoder/encoder.h>
 #include <src/motor/motor.h>
-#include <src/common.h>
 #include <src/utils/utils.h>
 #include <src/observer/observer.h>
 

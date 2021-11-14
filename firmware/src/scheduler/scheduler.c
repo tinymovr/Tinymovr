@@ -17,9 +17,9 @@
 
 #include <src/common.h>
 #include <src/adc/adc.h>
-#include <src/can/can.h>
-#include <src/uart/uart_interface.h>
-#include <src/uart/uart_lowlevel.h>
+#include <src/comms/can/can.h>
+#include <src/comms/uart/uart_interface.h>
+#include <src/comms/uart/uart_lowlevel.h>
 #include <src/encoder/encoder.h>
 #include <src/observer/observer.h>
 

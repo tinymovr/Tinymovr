@@ -21,7 +21,7 @@
 #include "src/motor/motor.h"
 #include "src/observer/observer.h"
 #include "src/controller/controller.h"
-#include "src/can/can.h"
+#include "src/comms/can/can.h"
 
 #define SETTINGS_PAGE (120)
 #define SETTINGS_PAGE_HEX (0x0001E000)

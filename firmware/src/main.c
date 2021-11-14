@@ -19,14 +19,14 @@
 #include "src/common.h"
 #include "src/system/system.h"
 
-#include "src/uart/uart_lowlevel.h"
+#include "src/comms/uart/uart_lowlevel.h"
 #include "src/observer/observer.h"
 #include "src/adc/adc.h"
 #include "src/motor/motor.h"
 #include "src/controller/controller.h"
 #include "src/gatedriver/gatedriver.h"
 #include "src/timer/timer.h"
-#include "src/can/can.h"
+#include "src/comms/can/can.h"
 #include "src/nvm/nvm.h"
 
 int test_div(int lho, int rho)
