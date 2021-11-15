@@ -123,6 +123,12 @@ int isotp_send_with_id(IsoTpLink *link, uint32_t id, const uint8_t payload[], ui
  */
 int isotp_receive(IsoTpLink *link, uint8_t *payload, const uint16_t payload_size, uint16_t *out_size);
 
+int isotp_receive_alt(IsoTpLink *link, uint8_t *payload);
+
+int isotp_full(IsoTpLink *link);
+
+uint16_t isotp_payload_size(IsoTpLink *link);
+
 #ifdef __cplusplus
 }
 #endif

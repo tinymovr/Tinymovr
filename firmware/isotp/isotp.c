@@ -452,6 +452,30 @@ int isotp_receive(IsoTpLink *link, uint8_t *payload, const uint16_t payload_size
     return ISOTP_RET_OK;
 }
 
+int isotp_receive_alt(IsoTpLink *link, uint8_t *payload) {
+    if (ISOTP_RECEIVE_STATUS_FULL != link->receive_status) {
+        return ISOTP_RET_NO_DATA;
+    }
+
+    memcpy(payload, link->receive_buffer, link->receive_size);
+
+    link->receive_status = ISOTP_RECEIVE_STATUS_IDLE;
+
+    return ISOTP_RET_OK;
+}
+
+int isotp_full(IsoTpLink *link) {
+    if (ISOTP_RECEIVE_STATUS_FULL != link->receive_status) {
+        return ISOTP_RET_NO_DATA;
+    }
+    return ISOTP_RET_OK;
+}
+
+uint16_t isotp_payload_size(IsoTpLink *link) {
+    return link->receive_size;
+}
+
+
 void isotp_init_link(IsoTpLink *link, uint32_t sendid, uint8_t *sendbuf, uint16_t sendbufsize, uint8_t *recvbuf, uint16_t recvbufsize) {
     memset(link, 0, sizeof(*link));
     link->receive_status = ISOTP_RECEIVE_STATUS_IDLE;
