@@ -15,9 +15,9 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "string.h"
-
-#include <src/system/system.h>
+#include <string.h>
+#include <src/common.h>
+#include <src/utils/utils.h>
 #include <src/comms/defs.h>
 #include <src/comms/can/can_func.h>
 #include <src/comms/can/can.h>
@@ -34,12 +34,13 @@ static struct CANConfig config = {
     .kbaud_rate = CAN_BAUD_1000KHz
 };
 
-extern Server s;
-
 void CAN_init(void)
 {
+    isotp_init_link(&g_link, config.id << CAN_EP_SIZE | ISOTP_EP_OFFSET,
+						g_isotpSendBuf, ISOTP_BUFSIZE, 
+						g_isotpRecvBuf, ISOTP_BUFSIZE);
 
-    if (system_board_revision() == BOARD_REV_5)
+    if (board_revision() == BOARD_REV_5)
     {
 		// Configure PF4 as GPIO input with pulldown
 		PAC55XX_GPIOF->MODE.P4 = IO_HIGH_IMPEDENCE_INPUT;
@@ -90,7 +91,7 @@ void CAN_init(void)
     NVIC_EnableIRQ(CAN_IRQn);
 
     pac5xxx_can_reset_mode_set(0);	// CAN reset mode inactive
-    system_delay_us(100);
+    delay_us(100);
 }
 
 uint16_t CAN_get_kbit_rate(void)
@@ -117,7 +118,7 @@ void CAN_set_ID(uint8_t id)
     PAC55XX_CAN->AMR = 0xFFFFFF87;
     PAC55XX_CAN->ACR = config.id << (CAN_EP_SIZE - 3);
     pac5xxx_can_reset_mode_set(0);  // CAN reset mode inactive
-    system_delay_us(100);
+    delay_us(100);
 }
 
 void CAN_process_interrupt(void)
@@ -151,26 +152,25 @@ void CAN_process_interrupt(void)
     /* Poll link to handle multiple frame transmition */
     isotp_poll(&g_link);
     
-    /* You can receive message with isotp_receive.
-        payload is upper layer message buffer, usually UDS;
-        payload_size is payload buffer size;
-        out_size is the actuall read size;
-        */
-    uint16_t n_received;
-    int ret = isotp_receive(&g_link, g_isotpRecvBuf, ISOTP_BUFSIZE, &n_received);
-    if (ISOTP_RET_OK == ret) {
-        /* Handle received message */
-        const size_t response_size = handle(&s, g_isotpRecvBuf, g_isotpSendBuf);
-        if (response_size > 0) {
-            /* In case you want to send data w/ functional addressing, use isotp_send_with_id */
-            ret = isotp_send_with_id(&g_link, 0x7df, g_isotpSendBuf, response_size);
-            if (ISOTP_RET_OK == ret) {
-                /* Send ok */
-            } else {
-                /* Error occur */
+    if (ISOTP_RET_OK == isotp_full(&g_link))
+    {
+        uint8_t payload[isotp_payload_size(&g_link)];
+        int ret = isotp_receive_alt(&g_link, payload);
+        if (ISOTP_RET_OK == ret) {
+            /* Handle received message */
+            const size_t response_size = handle_message(g_isotpRecvBuf, g_isotpSendBuf);
+            if (response_size > 0) {
+                /* In case you want to send data w/ functional addressing, use isotp_send_with_id */
+                ret = isotp_send_with_id(&g_link, 0x7df, g_isotpSendBuf, response_size);
+                if (ISOTP_RET_OK == ret) {
+                    /* Send ok */
+                } else {
+                    /* Error occur */
+                }
             }
         }
     }
+    
 }
 
 struct CANConfig* CAN_get_config(void)
