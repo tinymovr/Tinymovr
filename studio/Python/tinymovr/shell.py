@@ -16,16 +16,17 @@ Options:
 from typing import Dict
 import logging
 import pkg_resources
-import can
 import IPython
 from traitlets.config import Config
 from docopt import docopt
 import pynumparser
-from tinymovr import UserWrapper, VersionError
-from tinymovr.iface import IFace
-from tinymovr.iface.can_bus import CANBus, guess_channel
-from tinymovr.plotter import plot
-from tinymovr.units import get_registry
+
+import can
+from tinymovr.isotp_channel import VersionError, ISOTPChannel, guess_channel
+from avlos import get_object_tree
+
+#from tinymovr import UserWrapper, VersionError
+#from tinymovr.units import get_registry
 
 """
 This program is free software: you can redistribute it and/or modify it under
@@ -47,30 +48,34 @@ def spawn_shell():
     """
     Spawns the Tinymovr Studio IPython shell.
     """
-    version: str = pkg_resources.require("tinymovr")[0].version
-    arguments: Dict[str, str] = docopt(__doc__, version=shell_name + " " + str(version))
+    version = pkg_resources.require("tinymovr")[0].version
+    arguments = docopt(__doc__, version=shell_name + " " + str(version))
 
-    logger = configure_logging()
+    logging.getLogger("can.io.logger").setLevel(logging.WARNING)
+    logging.getLogger("parso").setLevel(logging.WARNING)
+    logging.getLogger("asyncio").setLevel(logging.WARNING)
+    logger = make_logger()
 
     num_parser = pynumparser.NumberSequence(limits=(0, 16))
     node_ids = num_parser(arguments["--ids"])
     
-    bustype: str = arguments["--bustype"]
-    channel: str = arguments["--chan"]
-    bitrate: int = int(arguments["--bitrate"])
-    do_version_check: bool = not arguments["--no-version-check"]
+    bustype = arguments["--bustype"]
+    channel = arguments["--chan"]
+    bitrate = int(arguments["--bitrate"])
+    do_version_check = not arguments["--no-version-check"]
     if channel == "auto":
-        channel = guess_channel(bustype_hint=bustype)
-    can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
-    iface: IFace = CANBus(can_bus)
+        channel = guess_channel(bustype, logger)
+    can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
 
     tms: Dict = {}
     for node_id in node_ids:
         try:
-            tm: UserWrapper = UserWrapper(node_id=node_id, iface=iface, version_check=do_version_check)
-            tm_name: str = base_name + str(node_id)
+            isotp_channel = ISOTPChannel(can_bus, node_id, logger)
+            root = get_object_tree(isotp_channel)
+            #tm = UserWrapper(node_id=node_id, iface=iface, version_check=do_version_check)
+            tm_name = base_name + str(node_id)
             logger.info("Connected to {}".format(tm_name))
-            tms[tm_name] = tm
+            tms[tm_name] = root
         except TimeoutError:
             logger.info("Node {} timed out".format(node_id))
         except IOError as e:
@@ -81,8 +86,8 @@ def spawn_shell():
     if len(tms) == 0:
         logger.error("No Tinymovr instances detected. Exiting shell...")
     else:
-        tms_discovered: str = ", ".join(list(tms.keys()))
-        user_ns: Dict = {}
+        tms_discovered = ", ".join(list(tms.keys()))
+        user_ns = {}
         user_ns.update(tms)
         user_ns["tms"] = list(tms.values())
         user_ns["plot"] = plot
@@ -103,14 +108,11 @@ is the index starting from 1"
         logger.debug("Exiting shell...")
 
 
-def configure_logging() -> logging.Logger:
+def make_logger():
     """
     Configures logging options and
     generates a default logger instance.
     """
-    logging.getLogger("parso").setLevel(logging.WARNING)
-    logging.getLogger("asyncio").setLevel(logging.WARNING)
-    can.util.set_logging_level("warning")
     logger = logging.getLogger("tinymovr")
     logger.setLevel(logging.DEBUG)
     return logger
