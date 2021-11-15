@@ -62,36 +62,6 @@ class ISOTPChannel(Channel):
             isinstance(error, ConsecutiveFrameTimeoutError)):
             pass
             # TODO: Display message
-        
-
-def discover_channels(path, callback, cancellation_token, logger):
-    """
-    Scans for CAN-ISOTP devices that match the path spec.
-    This function blocks until cancellation_token is set.
-    Channels spawned by this function run until channel_termination_token is set.
-    """
-    try:
-        bustype, bitrate_string = path.split(":")
-        bitrate = parse_size(bitrate_string)
-        channel = guess_channel(bustype, logger)
-    except (ValueError):
-        raise Exception('"{}" is not a valid ISOTP channel. The format should be something like "isotp:slcan:1M".'
-                    .format(path))
-
-    bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
-    device_ids = [0x01]
-    while not cancellation_token.is_set():
-        for device_id in device_ids:
-            try:
-                bus.send(create_frame(device_id, CAN_DEVICE_INFO_ADDR, True))
-                frame = bus.recv(timeout=0.2)
-                data_len = len(frame.data)
-            except TimeoutError:
-                logger.debug("ISOTP device failed to respond")
-            except AttributeError:
-                logger.debug("ISOTP device returned empty response")
-            else:
-                callback(ISOTPChannel(bus, device_id, logger))
 
 
 def create_frame(

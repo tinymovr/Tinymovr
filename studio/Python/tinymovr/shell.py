@@ -90,8 +90,8 @@ def spawn_shell():
         user_ns = {}
         user_ns.update(tms)
         user_ns["tms"] = list(tms.values())
-        user_ns["plot"] = plot
-        user_ns["ureg"] = get_registry()
+        #user_ns["plot"] = plot
+        #user_ns["ureg"] = get_registry()
         print(shell_name + " " + str(version))
         print("Discovered instances: " + tms_discovered)
         print(
