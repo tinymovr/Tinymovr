@@ -8,6 +8,8 @@
 
 RemoteObject *store[50];
 
+Server s;
+
 size_t noop(uint8_t *buffer_in, uint8_t *buffer_out) {return 0;}
 
 size_t pos_est_user_frame_getter(uint8_t *buffer_in, uint8_t *buffer_out) {
@@ -39,6 +41,6 @@ RemoteObject *make_system(void) {
     return &system;
 }
 
-void init_server(Server *s) {
-    make_server(s, make_system(), store);
+void init_server(void) {
+    make_server(&s, make_system(), store);
 }

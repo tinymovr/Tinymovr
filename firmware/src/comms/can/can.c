@@ -29,12 +29,12 @@ static IsoTpLink g_link;
 static uint8_t g_isotpRecvBuf[ISOTP_BUFSIZE];
 static uint8_t g_isotpSendBuf[ISOTP_BUFSIZE];
 
-Server s = {0};
-
 static struct CANConfig config = {
     .id = 1,
     .kbaud_rate = CAN_BAUD_1000KHz
 };
+
+extern Server s;
 
 void CAN_init(void)
 {
@@ -91,8 +91,6 @@ void CAN_init(void)
 
     pac5xxx_can_reset_mode_set(0);	// CAN reset mode inactive
     system_delay_us(100);
-
-    init_server(&s);
 }
 
 uint16_t CAN_get_kbit_rate(void)
