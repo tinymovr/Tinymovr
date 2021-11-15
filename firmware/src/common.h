@@ -87,6 +87,11 @@ static const float quarterpi = PI*0.25f;
 static const int32_t timer_freq_hz = ACLK_FREQ_HZ / (TXCTL_PS_DIV * TXCTL_PS_DIV);
 static const float twopi_by_enc_ticks = TWOPI / ENCODER_TICKS;
 
+typedef enum {
+	BOARD_REV_3                         = 0,
+	BOARD_REV_5                         = 1
+} BoardRevision;
+
 struct FloatTriplet
 {
 	float A;

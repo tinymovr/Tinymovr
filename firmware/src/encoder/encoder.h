@@ -19,7 +19,7 @@
 #define ENCODERS_MA702_H_
 
 #include <stdbool.h>
-#include "src/common.h"
+#include <src/common.h>
 
 #define MAX_ALLOWED_DELTA			 (1024)
 
