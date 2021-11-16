@@ -10,9 +10,9 @@ from avlos import Channel, get_object_tree
 
 CAN_EP_BITS = 6
 CAN_EP_COUNT = 2 << CAN_EP_BITS
-CAN_DEVICE_INFO_ADDR = 0x03
-CAN_TX_ADDR = 0x18
-CAN_RX_ADDR = 0x19
+ISOTP_TX_ADDR = 0x3E
+ISOTP_RX_ADDR = 0x3F
+
 
 
 min_fw_version = "0.8.10"
@@ -39,10 +39,11 @@ class ISOTPChannel(Channel):
     def __init__(self, can_bus, can_id, logger):
         super().__init__()
         self.logger = logger
+        self.stop_requested = False
         # First check device info using regular stack
 
-        address = Address(0, rxid=(CAN_RX_ADDR + (can_id << CAN_EP_BITS)),
-                          txid=(CAN_TX_ADDR + (can_id << CAN_EP_BITS)) )
+        address = Address(0, rxid=(ISOTP_RX_ADDR + (can_id << CAN_EP_BITS)),
+                          txid=(ISOTP_TX_ADDR + (can_id << CAN_EP_BITS)) )
         self.stack = CanStack(can_bus, address=address, error_handler=self.stack_error_handler)
         self.update_thread = threading.Thread(target=self.stack_update, daemon=True)
         self.update_thread.start()
@@ -50,17 +51,26 @@ class ISOTPChannel(Channel):
     def send(self, buffer):
         self.stack.send(buffer)
 
-    def recv(self, deadline=0):
-        return self.stack.recv()
+    def recv(self, deadline=1.0, sleep_interval=0.1):
+        if deadline > 0:
+            total_interval = 0
+            while not self.stack.available():
+                time.sleep(sleep_interval)
+                total_interval += sleep_interval
+                if total_interval > deadline:
+                    break
+        if self.stack.available():
+            return self.stack.recv()
 
     def stack_update(self):
-        self.stack.process()
-        time.sleep(self.stack.sleep_time())
+        while not self.stop_requested:
+            self.stack.process()
+            time.sleep(self.stack.sleep_time())
 
     def stack_error_handler(self, error: IsoTpError):
         if (isinstance(error, FlowControlTimeoutError) or
             isinstance(error, ConsecutiveFrameTimeoutError)):
-            pass
+            self.logger.error(error)
             # TODO: Display message
 
 
