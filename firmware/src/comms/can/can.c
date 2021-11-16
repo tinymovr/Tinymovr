@@ -36,7 +36,7 @@ static struct CANConfig config = {
 
 void CAN_init(void)
 {
-    isotp_init_link(&g_link, config.id << CAN_EP_SIZE | ISOTP_EP_OFFSET,
+    isotp_init_link(&g_link, (config.id << CAN_EP_SIZE) | ISOTP_TX_ADDR,
 						g_isotpSendBuf, ISOTP_BUFSIZE, 
 						g_isotpRecvBuf, ISOTP_BUFSIZE);
 
@@ -128,7 +128,7 @@ void CAN_process_interrupt(void)
     data_length = buffer & 0x0F;
     rx_id = ((buffer & 0xE00000) >> 21) | ((buffer & 0xFF00) >> 5);
 
-    //uint8_t command_id = rx_id & 0x3F;
+    uint8_t command_id = rx_id & 0x3F;
     //bool rtr = ((buffer >> 6) & 0x1) == 0x1;
     rx_data[0] = buffer>>24;    // data0
     if(data_length > 1u)
@@ -147,30 +147,32 @@ void CAN_process_interrupt(void)
         }
     }
     
-    isotp_on_can_message(&g_link, rx_data, data_length);
+    if (ISOTP_RX_ADDR == command_id) {
+        isotp_on_can_message(&g_link, rx_data, data_length);
 
-    /* Poll link to handle multiple frame transmition */
-    isotp_poll(&g_link);
-    
-    if (ISOTP_RET_OK == isotp_full(&g_link))
-    {
-        uint8_t payload[isotp_payload_size(&g_link)];
-        int ret = isotp_receive_alt(&g_link, payload);
-        if (ISOTP_RET_OK == ret) {
-            /* Handle received message */
-            const size_t response_size = handle_message(g_isotpRecvBuf, g_isotpSendBuf);
-            if (response_size > 0) {
-                /* In case you want to send data w/ functional addressing, use isotp_send_with_id */
-                ret = isotp_send_with_id(&g_link, 0x7df, g_isotpSendBuf, response_size);
-                if (ISOTP_RET_OK == ret) {
-                    /* Send ok */
-                } else {
-                    /* Error occur */
+        /* Poll link to handle multiple frame transmition */
+        isotp_poll(&g_link);
+        
+        if (ISOTP_RET_OK == isotp_full(&g_link))
+        {
+            uint8_t payload[512];
+            uint16_t payload_size = 0;
+            int ret = isotp_receive(&g_link, payload, 512, &payload_size);
+            if (ISOTP_RET_OK == ret) {
+                /* Handle received message */
+                const size_t response_size = handle_message(payload, payload);
+                if (response_size > 0) {
+                    /* In case you want to send data w/ functional addressing, use isotp_send_with_id */
+                    ret = isotp_send(&g_link, payload, response_size);
+                    if (ISOTP_RET_OK == ret) {
+                        /* Send ok */
+                    } else {
+                        /* Error occur */
+                    }
                 }
             }
         }
     }
-    
 }
 
 struct CANConfig* CAN_get_config(void)

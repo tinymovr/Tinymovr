@@ -21,7 +21,8 @@
 #include <isotp/isotp.h>
 
 #define CAN_EP_SIZE 6
-#define ISOTP_EP_OFFSET 28
+#define ISOTP_RX_ADDR 0x3E
+#define ISOTP_TX_ADDR 0x3F
 #define ISOTP_BUFSIZE 512
 
 struct CANConfig
