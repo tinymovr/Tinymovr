@@ -16,6 +16,7 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <src/adc/adc.h>
+#include <src/comms/defs.h>
 #include <src/utils/utils.h>
 #include <src/rtt/SEGGER_RTT.h>
 #include <src/system/system.h>
@@ -85,7 +86,7 @@ void system_init(void)
     SysTick_Config(150000); // TODO: Use var
 
     /* Initialize */
-    //init_server();
+    init_server();
 }
 
 void system_reset(void)
