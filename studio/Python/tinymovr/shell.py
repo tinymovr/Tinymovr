@@ -6,7 +6,7 @@ Usage:
     tinymovr --version
 
 Options:
-    --ids=<ids>          CAN node IDs to search [default: 1-10]
+    --ids=<ids>          CAN node IDs to search [default: 1-2]
     --bustype=<bustype>  CAN bus type to use [default: slcan].
     --chan=<chan>        CAN channel (i.e. device) to use [default: auto].
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
@@ -22,7 +22,7 @@ from docopt import docopt
 import pynumparser
 
 import can
-from tinymovr.isotp_channel import VersionError, ISOTPChannel, guess_channel
+from tinymovr.isotp_channel import VersionError, ResponseError, ISOTPChannel, guess_channel
 from avlos import get_object_tree
 
 #from tinymovr import UserWrapper, VersionError
@@ -82,6 +82,8 @@ def spawn_shell():
             logger.error(str(e))
         except VersionError as e:
             logger.warning(str(e))
+        except ResponseError as e:
+            logger.info(str(e))
 
     if len(tms) == 0:
         logger.error("No Tinymovr instances detected. Exiting shell...")
