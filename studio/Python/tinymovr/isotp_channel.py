@@ -34,12 +34,21 @@ class VersionError(Exception):
         self.required = required
 
 
+class ResponseError(Exception):
+
+    def __init__(self, kw, *args, **kwargs):
+        msg = "Node {} did not respond".format(kw)
+        super().__init__(msg, *args, **kwargs)
+        self.kw = kw
+
+
 class ISOTPChannel(Channel):
 
     def __init__(self, can_bus, can_id, logger):
         super().__init__()
         self.logger = logger
         self.stop_requested = False
+        self.can_id = can_id
         # First check device info using regular stack
 
         address = Address(0, rxid=(ISOTP_RX_ADDR + (can_id << CAN_EP_BITS)),
@@ -51,7 +60,7 @@ class ISOTPChannel(Channel):
     def send(self, buffer):
         self.stack.send(buffer)
 
-    def recv(self, deadline=1.0, sleep_interval=0.1):
+    def recv(self, deadline=0.5, sleep_interval=0.02):
         if deadline > 0:
             total_interval = 0
             while not self.stack.available():
@@ -61,6 +70,7 @@ class ISOTPChannel(Channel):
                     break
         if self.stack.available():
             return self.stack.recv()
+        raise ResponseError(self.can_id)
 
     def stack_update(self):
         while not self.stop_requested:
