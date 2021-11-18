@@ -1,18 +1,19 @@
 
 import threading
 import time
+from functools import cached_property
 import serial.tools.list_ports as list_ports
 import can
 from humanfriendly import parse_size
 from isotp import CanStack, Address, IsoTpError, FlowControlTimeoutError, ConsecutiveFrameTimeoutError
 from avlos import Channel, get_object_tree
+from avlos.codecs import MultibyteCodec
 
 
 CAN_EP_BITS = 6
 CAN_EP_COUNT = 2 << CAN_EP_BITS
 ISOTP_TX_ADDR = 0x3E
 ISOTP_RX_ADDR = 0x3F
-
 
 
 min_fw_version = "0.8.10"
@@ -81,7 +82,10 @@ class ISOTPChannel(Channel):
         if (isinstance(error, FlowControlTimeoutError) or
             isinstance(error, ConsecutiveFrameTimeoutError)):
             self.logger.error(error)
-            # TODO: Display message
+    
+    @cached_property
+    def serializer(self):
+        return MultibyteCodec()
 
 
 def create_frame(
