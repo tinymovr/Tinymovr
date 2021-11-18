@@ -68,10 +68,8 @@ class ISOTPChannel(Channel):
                 time.sleep(sleep_interval)
                 total_interval += sleep_interval
                 if total_interval > deadline:
-                    break
-        if self.stack.available():
-            return self.stack.recv()
-        raise ResponseError(self.can_id)
+                    raise ResponseError(self.can_id)
+        return self.stack.recv()
 
     def stack_update(self):
         while not self.stop_requested:
