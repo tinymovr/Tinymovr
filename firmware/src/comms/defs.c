@@ -2,6 +2,7 @@
 #include <avlos/avlos.h>
 #include <src/observer/observer.h>
 #include <src/nvm/nvm.h>
+#include <src/scheduler/scheduler.h>
 #include <src/system/system.h>
 #include <src/comms/defs.h>
 
@@ -13,16 +14,23 @@ size_t noop(uint8_t *buffer_in, uint8_t *buffer_out) {return 0;}
 
 size_t pos_est_user_frame_getter(uint8_t *buffer_in, uint8_t *buffer_out)
 {
-    size_t pos = 0;
-    write_le(observer_get_pos_estimate_user_frame(), buffer_out, &pos);
-    return pos;
+    size_t v = 0;
+    write_le(observer_get_pos_estimate_user_frame(), buffer_out, &v);
+    return v;
 }
 
 size_t vel_est_user_frame_getter(uint8_t *buffer_in, uint8_t *buffer_out)
 {
-    size_t pos = 0;
-    write_le(observer_get_vel_estimate_user_frame(), buffer_out, &pos);
-    return pos;
+    size_t v = 0;
+    write_le(observer_get_vel_estimate_user_frame(), buffer_out, &v);
+    return v;
+}
+
+size_t busy_cycles_getter(uint8_t *buffer_in, uint8_t *buffer_out)
+{
+    size_t v = 0;
+    write_le(Scheduler_GetBusyCycles(), buffer_out, &v);
+    return v;
 }
 
 size_t save_config_caller(uint8_t *buffer_in, uint8_t *buffer_out) {NVM_SaveConfig();return 0;}
@@ -52,7 +60,8 @@ RemoteObject *make_system(void)
     //MAKE_ATTR(version, version_getter, version_setter)
     MAKE_FUNC(save, 0, save_config_caller)
     MAKE_FUNC(reset, 0, reset_caller)
-    MAKE_OBJECT(system, &encoder, &save, &reset)
+    MAKE_ATTR(busy_cycles, 6, busy_cycles_getter, noop)
+    MAKE_OBJECT(system, &encoder, &busy_cycles, &save, &reset)
     return &system;
 }
 
