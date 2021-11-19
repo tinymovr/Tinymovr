@@ -5,6 +5,7 @@ from functools import cached_property
 import serial.tools.list_ports as list_ports
 import can
 from humanfriendly import parse_size
+import isotp
 from isotp import CanStack, Address, IsoTpError, FlowControlTimeoutError, ConsecutiveFrameTimeoutError
 from avlos import Channel, get_object_tree
 from avlos.codecs import MultibyteCodec
@@ -52,7 +53,8 @@ class ISOTPChannel(Channel):
         self.can_id = can_id
         # First check device info using regular stack
 
-        address = Address(0, rxid=(ISOTP_RX_ADDR + (can_id << CAN_EP_BITS)),
+        address = Address(isotp.AddressingMode.Normal_11bits,
+                          rxid=(ISOTP_RX_ADDR + (can_id << CAN_EP_BITS)),
                           txid=(ISOTP_TX_ADDR + (can_id << CAN_EP_BITS)) )
         self.stack = CanStack(can_bus, address=address, error_handler=self.stack_error_handler)
         self.update_thread = threading.Thread(target=self.stack_update, daemon=True)
@@ -62,14 +64,14 @@ class ISOTPChannel(Channel):
         self.stack.send(buffer)
 
     def recv(self, deadline=0.5, sleep_interval=0.02):
-        if deadline > 0:
-            total_interval = 0
-            while not self.stack.available():
-                time.sleep(sleep_interval)
-                total_interval += sleep_interval
-                if total_interval > deadline:
-                    raise ResponseError(self.can_id)
-        return self.stack.recv()
+        total_interval = 0
+        while total_interval < deadline:
+            if self.stack.available():
+                return self.stack.recv()
+            time.sleep(sleep_interval)
+            total_interval += sleep_interval
+        raise ResponseError(self.can_id)
+        
 
     def stack_update(self):
         while not self.stop_requested:
