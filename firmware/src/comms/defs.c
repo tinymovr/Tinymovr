@@ -37,7 +37,10 @@ size_t pos_set_user_frame_getter(uint8_t *buffer_in, uint8_t *buffer_out) {
     return v;
 }
 size_t pos_set_user_frame_setter(uint8_t *buffer_in, uint8_t *buffer_out) {
-    
+    float v = 0;
+    read_le(&v, buffer_in);
+    controller_set_pos_setpoint_user_frame(v);
+    return 0;
 }
 
 size_t vel_set_user_frame_getter(uint8_t *buffer_in, uint8_t *buffer_out) {
@@ -46,7 +49,10 @@ size_t vel_set_user_frame_getter(uint8_t *buffer_in, uint8_t *buffer_out) {
     return v;
 }
 size_t vel_set_user_frame_setter(uint8_t *buffer_in, uint8_t *buffer_out) {
-    
+    float v = 0;
+    read_le(&v, buffer_in);
+    controller_set_vel_setpoint_user_frame(v);
+    return 0;
 }
 
 size_t Iq_set_user_frame_getter(uint8_t *buffer_in, uint8_t *buffer_out) {
@@ -55,7 +61,10 @@ size_t Iq_set_user_frame_getter(uint8_t *buffer_in, uint8_t *buffer_out) {
     return v;
 }
 size_t Iq_set_user_frame_setter(uint8_t *buffer_in, uint8_t *buffer_out) {
-    
+    float v = 0;
+    read_le(&v, buffer_in);
+    controller_set_Iq_setpoint_user_frame(v);
+    return 0;
 }
 
 size_t busy_cycles_getter(uint8_t *buffer_in, uint8_t *buffer_out) {
@@ -98,7 +107,7 @@ RemoteObject *make_system(void)
     MAKE_FUNC(save, 0, save_config_caller)
     MAKE_FUNC(reset, 0, reset_caller)
     MAKE_ATTR(busy_cycles, 6, busy_cycles_getter, noop)
-    MAKE_OBJECT(system, &encoder, &busy_cycles, &save, &reset)
+    MAKE_OBJECT(system, &encoder, &controller, &busy_cycles, &save, &reset)
     return &system;
 }
 
