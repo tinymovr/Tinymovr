@@ -12,7 +12,6 @@ from avlos.codecs import MultibyteCodec
 
 
 CAN_EP_BITS = 6
-CAN_EP_COUNT = 2 << CAN_EP_BITS
 ISOTP_TX_ADDR = 0x3E
 ISOTP_RX_ADDR = 0x3F
 
@@ -63,6 +62,10 @@ class ISOTPChannel(Channel):
     def send(self, buffer):
         self.stack.send(buffer)
 
+    def shutdown(self):
+        self.request_stop()
+        self.update_thread.join()
+
     def recv(self, deadline=0.5, sleep_interval=0.02):
         total_interval = 0
         while total_interval < deadline:
@@ -71,10 +74,12 @@ class ISOTPChannel(Channel):
             time.sleep(sleep_interval)
             total_interval += sleep_interval
         raise ResponseError(self.can_id)
-        
+
+    def request_stop(self):
+        self.stop_requested = True
 
     def stack_update(self):
-        while not self.stop_requested:
+        while False == self.stop_requested:
             self.stack.process()
             time.sleep(self.stack.sleep_time())
 

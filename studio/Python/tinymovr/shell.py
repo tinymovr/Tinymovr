@@ -13,6 +13,7 @@ Options:
     --no-version-check   Disable firmware-studio version compatibility check.
 """
 
+import time
 from typing import Dict
 import logging
 import pkg_resources
@@ -69,13 +70,12 @@ def spawn_shell():
 
     tms: Dict = {}
     for node_id in node_ids:
+        isotp_channel = ISOTPChannel(can_bus, node_id, logger)
         try:
-            isotp_channel = ISOTPChannel(can_bus, node_id, logger)
             root = get_object_tree(isotp_channel)
-            #tm = UserWrapper(node_id=node_id, iface=iface, version_check=do_version_check)
             tm_name = base_name + str(node_id)
             logger.info("Connected to {}".format(tm_name))
-            tms[tm_name] = root
+            tms[node_id] = root
         except TimeoutError:
             logger.info("Node {} timed out".format(node_id))
         except IOError as e:
@@ -84,13 +84,19 @@ def spawn_shell():
             logger.warning(str(e))
         except ResponseError as e:
             logger.info(str(e))
-
+        isotp_channel.shutdown()
+    time.sleep(0.2)
+    can_bus.shutdown()
+    
+    can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
     if len(tms) == 0:
         logger.error("No Tinymovr instances detected. Exiting shell...")
     else:
-        tms_discovered = ", ".join(list(tms.keys()))
+        for tm_id, tm in tms.items():
+            tm.channel = ISOTPChannel(can_bus, tm_id, logger)
+        tms_discovered = ", ".join([base_name + str(k) for k in tms.keys()])
         user_ns = {}
-        user_ns.update(tms)
+        user_ns.update({base_name + str(k) : v for k, v in tms.items()})
         user_ns["tms"] = list(tms.values())
         #user_ns["plot"] = plot
         #user_ns["ureg"] = get_registry()
