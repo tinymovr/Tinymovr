@@ -119,6 +119,9 @@ void CAN_set_ID(uint8_t id)
     PAC55XX_CAN->ACR = config.id << (CAN_EP_SIZE - 3);
     pac5xxx_can_reset_mode_set(0);  // CAN reset mode inactive
     delay_us(100);
+    isotp_init_link(&g_link, (config.id << CAN_EP_SIZE) | ISOTP_TX_ADDR,
+						g_isotpSendBuf, ISOTP_BUFSIZE, 
+						g_isotpRecvBuf, ISOTP_BUFSIZE);
 }
 
 void CAN_process_interrupt(void)
