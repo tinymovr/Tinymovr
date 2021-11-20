@@ -13,6 +13,8 @@ Server s;
 
 size_t noop(uint8_t *buffer_in, uint8_t *buffer_out) {return 0;}
 
+// --- Encoder
+
 size_t pos_est_user_frame_getter(uint8_t *buffer_in, uint8_t *buffer_out) {
     size_t v = 0;
     write_le(observer_get_pos_estimate_user_frame(), buffer_out, &v);
@@ -24,6 +26,8 @@ size_t vel_est_user_frame_getter(uint8_t *buffer_in, uint8_t *buffer_out) {
     write_le(observer_get_vel_estimate_user_frame(), buffer_out, &v);
     return v;
 }
+
+// --- Controller
 
 size_t Iq_est_user_frame_getter(uint8_t *buffer_in, uint8_t *buffer_out) {
     size_t v = 0;
@@ -67,6 +71,23 @@ size_t Iq_set_user_frame_setter(uint8_t *buffer_in, uint8_t *buffer_out) {
     return 0;
 }
 
+// --- CAN
+
+size_t can_id_getter(uint8_t *buffer_in, uint8_t *buffer_out) {
+    size_t v = 0;
+    write_le(CAN_get_ID(), buffer_out, &v);
+    return v;
+}
+
+size_t can_id_setter(uint8_t *buffer_in, uint8_t *buffer_out) {
+    uint8_t v = 0;
+    read_le(&v, buffer_in);
+    CAN_set_ID(v);
+    return 0;
+}
+
+// --- System
+
 size_t busy_cycles_getter(uint8_t *buffer_in, uint8_t *buffer_out) {
     size_t v = 0;
     write_le(Scheduler_GetBusyCycles(), buffer_out, &v);
@@ -102,12 +123,15 @@ RemoteObject *make_system(void)
     MAKE_ATTR(Iq_set, 10, Iq_set_user_frame_getter, Iq_set_user_frame_setter)
     MAKE_OBJECT(controller, &pos_set, &vel_set, &Iq_est, &Iq_set)
 
+    MAKE_ATTR(can_id, 2, can_id_getter, can_id_setter)
+    MAKE_OBJECT(can, &can_id)
+
     //MAKE_ATTR(counter, counter_getter, counter_setter)
     //MAKE_ATTR(version, version_getter, version_setter)
     MAKE_FUNC(save, 0, save_config_caller)
     MAKE_FUNC(reset, 0, reset_caller)
     MAKE_ATTR(busy_cycles, 6, busy_cycles_getter, noop)
-    MAKE_OBJECT(system, &encoder, &controller, &busy_cycles, &save, &reset)
+    MAKE_OBJECT(system, &encoder, &controller, &can, &busy_cycles, &save, &reset)
     return &system;
 }
 
