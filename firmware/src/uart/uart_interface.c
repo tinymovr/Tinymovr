@@ -114,7 +114,7 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
         case 'o': // encoder pos
-            ret_val =  MA_GetAngle();
+            ret_val =  encoder_get_pos();
         break;
 
         case 'p': // pos estimate

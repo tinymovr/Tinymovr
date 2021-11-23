@@ -180,7 +180,7 @@ bool CalibrateOffsetAndEccentricity(void)
     Observer_ClearEccentricityTable();
     int16_t *lut = Observer_GetEccentricityTablePointer();
     wait_a_while();
-    int16_t offset_raw = MA_GetAngle();
+    int16_t offset_raw = encoder_get_pos();
     // Perform measuerments, store only mean of F + B error
     for (uint32_t i=0; i<n; i++)
     {
@@ -193,7 +193,7 @@ bool CalibrateOffsetAndEccentricity(void)
         const float pos_meas = Observer_GetPosEstimate();
         error_ticks[i] = (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
     }
-    offset_raw = (offset_raw + MA_GetAngle()) / 2;
+    offset_raw = (offset_raw + encoder_get_pos()) / 2;
     for (uint32_t i=0; i<n; i++)
     {
         for (uint8_t j=0; j<nconv; j++)
