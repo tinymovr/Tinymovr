@@ -634,9 +634,9 @@ void ssp_io_config(SSP_TYPE ssp, SSP_MS_TYPE ms_mode)
         case SSPC:
             // Select ssp C peripheral choose one!
 //            SSPC_IO_Select_PC0123(ms_mode);
-            SSPC_IO_Select_PC4567(ms_mode);
+//            SSPC_IO_Select_PC4567(ms_mode);
 //            SSPC_IO_Select_PD0123(ms_mode);
-//            SSPC_IO_Select_PE0123(ms_mode);
+            SSPC_IO_Select_PE0123(ms_mode);
             break;
 
         case SSPD:
