@@ -49,11 +49,11 @@ PAC5XXX_RAMFUNC void Observer_UpdateEstimates(void)
 	const int16_t angle_meas = raw + off_interp;
 
 	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;
-	const float delta_pos_meas = wrapf((float)angle_meas - state.pos_estimate, ENCODER_HALF_TICKS);
+	const float delta_pos_meas = wrapf_min_max((float)angle_meas - state.pos_estimate, -ENCODER_HALF_TICKS, ENCODER_HALF_TICKS);
 	const float delta_pos_error = delta_pos_meas - delta_pos_est;
 	const float incr_pos = delta_pos_est + (PWM_PERIOD_S * config.kp * delta_pos_error);
 	state.pos_estimate += incr_pos;
-	state.pos_estimate_wrapped = wrapf(state.pos_estimate_wrapped + incr_pos, ENCODER_HALF_TICKS);
+	state.pos_estimate_wrapped = wrapf_min_max(state.pos_estimate_wrapped + incr_pos, -ENCODER_HALF_TICKS, ENCODER_HALF_TICKS);
 	if (state.pos_estimate > config.sector_half_interval)
 	{
 		state.pos_estimate -= 2 * config.sector_half_interval;
