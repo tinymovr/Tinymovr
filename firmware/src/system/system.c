@@ -88,11 +88,6 @@ void system_reset(void)
         pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
 }
 
-void system_delay_us(uint32_t us)
-{
-    pac_delay_asm(us * 16u);
-}
-
 PAC5XXX_RAMFUNC bool error_flags_exist(void)
 {
     return error_count > 0u;

@@ -18,7 +18,6 @@
 #ifndef ENCODERS_MA702_H_
 #define ENCODERS_MA702_H_
 
-#include <stdbool.h>
 #include "src/common.h"
 
 #define MAX_ALLOWED_DELTA			 (1024)
@@ -34,10 +33,10 @@ typedef enum {
     MA_CMD_ANGLE            = 0x0000
 } MA702Command;
 
-struct MA702State
+typedef struct
 {
 	int16_t angle;
-};
+} EncoderState;
 
 void encoder_init(void);
 PAC5XXX_RAMFUNC void encoder_send_angle_cmd(void);

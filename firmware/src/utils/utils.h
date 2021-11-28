@@ -40,6 +40,11 @@ PAC5XXX_RAMFUNC char checksum(char* msg, uint8_t len);
 PAC5XXX_RAMFUNC float wrapf_max(float x, float max);
 PAC5XXX_RAMFUNC float wrapf_min_max(float x, float min, float max);
 
+static inline void delay_us(uint32_t us)
+{
+    pac_delay_asm(us * 16u);
+}
+
 // https://github.com/madcowswe/ODrive/blob/3113aedf081cf40e942d25d3b0b36c8806f11f23/Firmware/MotorControl/utils.c
 // Released under teh following license:
 // The MIT License (MIT)

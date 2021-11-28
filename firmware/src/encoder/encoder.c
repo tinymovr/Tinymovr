@@ -15,12 +15,12 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/common.h"
-#include "src/system/system.h"
-#include "src/ssp/ssp_func.h"
+#include <src/system/system.h>
+#include <src/ssp/ssp_func.h>
+#include <src/utils/utils.h>
 #include <src/encoder/encoder.h>
 
-static struct MA702State state = { 0 };
+static EncoderState state = { 0 };
 
 #define MAX_ALLOWED_DELTA_ADD (MAX_ALLOWED_DELTA + ENCODER_TICKS)
 #define MAX_ALLOWED_DELTA_SUB (MAX_ALLOWED_DELTA - ENCODER_TICKS)
@@ -38,7 +38,7 @@ static struct MA702State state = { 0 };
 void encoder_init(void)
 {
     ssp_init(PRIMARY_ENCODER_SSP_PORT, SSP_MS_MASTER, 0, 0); // Mode 0
-    system_delay_us(16000); // ensure 16ms sensor startup time as per the datasheet
+    delay_us(16000); // ensure 16ms sensor startup time as per the datasheet
     encoder_send_angle_cmd();
     encoder_update_angle(false);
 }

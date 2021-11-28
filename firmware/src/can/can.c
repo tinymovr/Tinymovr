@@ -17,7 +17,7 @@
 
 #include <string.h>
 
-#include <src/system/system.h>
+#include <src/utils/utils.h>
 
 #include <src/can/can_endpoints.h>
 #include <src/can/can_func.h>
@@ -85,7 +85,7 @@ void CAN_init(void)
     NVIC_EnableIRQ(CAN_IRQn);
 
     pac5xxx_can_reset_mode_set(0);	// CAN reset mode inactive
-    system_delay_us(100);
+    delay_us(100);
 }
 
 uint16_t CAN_get_kbit_rate(void)
@@ -112,7 +112,7 @@ void CAN_set_ID(uint8_t id)
     PAC55XX_CAN->AMR = 0xFFFFFF87;
     PAC55XX_CAN->ACR = config.id << (CAN_EP_SIZE - 3);
     pac5xxx_can_reset_mode_set(0);  // CAN reset mode inactive
-    system_delay_us(100);
+    delay_us(100);
 }
 
 void CAN_process_interrupt(void)
