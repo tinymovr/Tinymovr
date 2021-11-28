@@ -27,7 +27,7 @@ static struct MotorConfig config = {
 	.user_offset = 0.0f,
 	.user_direction = 1,
 
-	.I_cal = 5.0f,
+	.I_cal = 6.0f,
 
 	.resistance_calibrated = false,
 	.inductance_calibrated = false,
@@ -37,13 +37,11 @@ static struct MotorConfig config = {
     .is_gimbal = false
 };
 
-void Motor_Init(void) {}
-
-PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float start_ticks, float end_ticks, float e_angle)
+PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad)
 {
-    const float pos = fabsf(end_ticks- start_ticks);
-    float p_angle = TWOPI * pos/ticks;
-    const float pairs_f = e_angle / p_angle;
+    const float mpos_diff = fabsf(mpos_end - mpos_start);
+    float mpos_diff_rad = TWOPI * mpos_diff/ticks;
+    const float pairs_f = epos_rad / mpos_diff_rad;
     const uint8_t pairs_i = (uint8_t)floorf(pairs_f + 0.5f);
     const float residual = fabsf(pairs_f - (float)pairs_i);
 

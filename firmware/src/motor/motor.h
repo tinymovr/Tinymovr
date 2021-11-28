@@ -52,10 +52,8 @@ struct MotorConfig
 	bool is_gimbal;
 };
 
-void Motor_Init(void);
-
 PAC5XXX_RAMFUNC uint8_t motor_get_pole_pairs(void);
-PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float start_ticks, float end_ticks, float e_angle);
+PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad);
 PAC5XXX_RAMFUNC void motor_set_pole_pairs(uint8_t pairs);
 
 PAC5XXX_RAMFUNC float motor_get_phase_resistance(void);

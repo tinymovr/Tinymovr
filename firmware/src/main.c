@@ -45,7 +45,6 @@ int main(void)
 	Observer_Init();
 	ADC_Init();
 	GateDriver_Init();
-	Motor_Init();
     CAN_init();
     Timer_Init();
     __enable_irq();
