@@ -38,7 +38,7 @@ int main(void)
 {
   	__disable_irq();
     system_init();
-    MA_Init();
+    encoder_init();
     NVM_Init();
     NVM_LoadConfig(); // This will TRY to deserialize and import config
     UART_Init();

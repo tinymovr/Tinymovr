@@ -39,9 +39,9 @@ struct MA702State
 	int16_t angle;
 };
 
-void MA_Init(void);
-PAC5XXX_RAMFUNC void MA_QueueAngleCommand(void);
-PAC5XXX_RAMFUNC int16_t MA_GetAngle(void);
-PAC5XXX_RAMFUNC void MA_UpdateAngle(bool check_error);
+void encoder_init(void);
+PAC5XXX_RAMFUNC void encoder_send_angle_cmd(void);
+PAC5XXX_RAMFUNC int16_t encoder_get_angle(void);
+PAC5XXX_RAMFUNC void encoder_update_angle(bool check_error);
 
 #endif /* ENCODERS_MA702_H_ */
