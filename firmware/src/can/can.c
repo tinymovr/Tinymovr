@@ -44,7 +44,7 @@ void CAN_init(void)
     PAC55XX_GPIOD->OUTMASK.P7 = 1;
     PAC55XX_SCC->PDMUXSEL.P7 = 0;
     PAC55XX_SCC->PDPDEN.P7 = 1;
-#elif defined(BOARD_REV_R5)
+#elif defined(BOARD_REV_R3)
     // Configure PF4 as GPIO input
     PAC55XX_GPIOF->MODE.P4 = IO_HIGH_IMPEDENCE_INPUT;
     PAC55XX_GPIOF->OUTMASK.P4 = 1;
