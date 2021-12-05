@@ -29,12 +29,14 @@ setup(
         "python-can>=4.0.0.dev0",
         #"python-can @ git+https://github.com/yconst/python-can.git@develop#egg=python-can-dev",
         "pyserial",
-        "matplotlib",
         "docopt",
         "pynumparser",
         "flatten-dict",
         "pint"
     ],
+    extras_require={
+        'plot': ["matplotlib"]
+    }
     entry_points={
         "console_scripts": [
             "tinymovr=tinymovr.shell:spawn_shell"
