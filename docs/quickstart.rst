@@ -9,12 +9,16 @@ If you are using a Tinymovr Dev Kit, please ensure you have completed :ref:`conn
 
 If you are using a Tinymovr board in your own setup, please go through the :ref:`hardware-setup-guide`.
 
+If using Tinymovr on Windows with a CANtact-compatible CAN Bus adapter, such as CANine, you will need to install an .inf file to enable proper device naming. You can `download the inf file here <https://canable.io/utilities/windows-driver.zip>`_. Extract the archive, right click and select Install.
+
+If using CAN bus, ensure at least one termination resistor is enabled, either on the CANine adapter, or on one Tinymovr. To enable the termination resistor on CANine, you can take a look at the `CANine connectors diagram <https://canine.readthedocs.io/en/latest/canine.html#hardware-configuration>`_.
+
 Before proceeding to the next steps, ensure your Tinymovr is powered up.
 
 Installing and Launching Studio
 ###############################
 
-Tinymovr can be installed simply using pip. Python 3.6 or greater is required.
+Tinymovr can be installed using pip. Python 3.6 or greater is required.
 
 .. code-block:: console
 
