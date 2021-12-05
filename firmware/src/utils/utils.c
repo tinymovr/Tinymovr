@@ -17,34 +17,6 @@
 
 #include "src/utils/utils.h"
 
-PAC5XXX_RAMFUNC float unwrapf(float reference_val, float wrapped_val, float half_interval)
-{
-    float full_interval = half_interval * 2.0f;
-	float delta = fmodf((wrapped_val - reference_val) + half_interval, 
-		full_interval) - half_interval;
-    if (delta < 0.0f)
-    {
-        delta += full_interval;
-    }
-    delta -= half_interval;
-    return reference_val + delta;
-}
-
-PAC5XXX_RAMFUNC float wrapf(float unbound_val, float half_interval)
-{
-    float full_interval = half_interval * 2.0f;
-    float bound_val = unbound_val;
-    while (bound_val > half_interval)
-    {
-        bound_val -= full_interval;
-    }
-    while (bound_val < -half_interval)
-    {
-        bound_val += full_interval;
-    }
-    return bound_val;
-}
-
 #if __ARM_FEATURE_FMA && __ARM_FP&4 && !__SOFTFP__ && !BROKEN_VFP_ASM
 
 PAC5XXX_RAMFUNC float fast_sqrt(float x)
@@ -112,13 +84,6 @@ PAC5XXX_RAMFUNC float fast_sin(float angle)
 
 PAC5XXX_RAMFUNC float fminf(float x, float y)
 {
-    if (isnan(x))
-        return y;
-    if (isnan(y))
-        return x;
-    /* handle signed zeros, see C99 Annex F.9.9.2 */
-    if (signbit(x) != signbit(y))
-        return signbit(x) ? x : y;
     return x < y ? x : y;
 }
 
@@ -155,56 +120,22 @@ PAC5XXX_RAMFUNC float fmodf(float a, float b)
     return (a - b * floorf(a / b));
 }
 
-PAC5XXX_RAMFUNC bool our_clamp(float *d, float min, float max)
+/* wrap x -> [0,max) */
+PAC5XXX_RAMFUNC float wrapf_max(float x, float max)
 {
-    bool clamped = false;
-    if (*d < min)
-    {
-        *d = min;
-        clamped = true;
-    }
-    else if (*d > max)
-    {
-        *d = max;
-        clamped = true;
-    }
-    return clamped;
+    return fmodf(max + fmodf(x, max), max);
+}
+/* wrap x -> [min,max) */
+PAC5XXX_RAMFUNC float wrapf_min_max(float x, float min, float max)
+{
+    return min + wrapf_max(x - min, max - min);
 }
 
-PAC5XXX_RAMFUNC int ltoa(int32_t value, uint8_t *sp, int radix)
+PAC5XXX_RAMFUNC bool our_clamp(float *d, float min, float max)
 {
-    char tmp[64];// be careful with the length of the buffer
-    char *tp = tmp;
-    uint32_t v;
-
-    const int sign = (radix == 10 && value < 0);
-    if (sign)
-        v = -value;
-    else
-        v = (uint32_t)value;
-
-    while (v || tp == tmp)
-    {
-        const int i = v % radix;
-        v /= radix; // v/=radix uses less CPU clocks than v=v/radix does
-        if (i < 10)
-          *tp++ = i+'0';
-        else
-          *tp++ = i + 'a' - 10;
-    }
-
-    int len = tp - tmp;
-
-    if (sign)
-    {
-        *sp++ = '-';
-        len++;
-    }
-
-    while (tp > tmp)
-        *sp++ = *--tp;
-
-    return len;
+    const float t = *d < min ? min : *d;
+    *d = t > max ? max : t;
+    return (*d == min) || (*d == max);
 }
 
 PAC5XXX_RAMFUNC char checksum(char* msg, uint8_t len)

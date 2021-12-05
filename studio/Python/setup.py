@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="tinymovr",
-    version="0.3.10",
+    version="0.3.11",
     author="Yannis Chatzikonstantinou",
     author_email="info@tinymovr.com",
     description="Tinymovr Studio",
@@ -26,15 +26,17 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         "ipython",
-        #"python-can>=4.0.0.dev0",
-        "python-can @ git+https://github.com/yconst/python-can.git@develop#egg=python-can-dev",
+        "python-can>=4.0.0.dev0",
+        #"python-can @ git+https://github.com/yconst/python-can.git@develop#egg=python-can-dev",
         "pyserial",
-        "matplotlib",
         "docopt",
         "pynumparser",
         "flatten-dict",
         "pint"
     ],
+    extras_require={
+        'plot': ["matplotlib"]
+    },
     entry_points={
         "console_scripts": [
             "tinymovr=tinymovr.shell:spawn_shell"

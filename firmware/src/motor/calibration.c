@@ -47,7 +47,6 @@ bool CalibrateResistance(void)
             GateDriver_SetDutyCycle(&modulation_values);
             WaitForControlLoopInterrupt();
         }
-#ifndef DRY_RUN
         const float R = fabsf(V_setpoint / I_cal);
         if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
         {
@@ -58,9 +57,6 @@ bool CalibrateResistance(void)
         {
             motor_set_phase_resistance(R);
         }
-#else
-        motor_set_phase_resistance(0.5);
-#endif
         GateDriver_SetDutyCycle(&zeroDC);
     }
     return success;
@@ -95,7 +91,6 @@ bool CalibrateInductance(void)
             GateDriver_SetDutyCycle(&modulation_values);
             WaitForControlLoopInterrupt();
         }
-#ifndef DRY_RUN
         const float num_cycles = CAL_L_LEN / 2;
         const float dI_by_dt = (I_high - I_low) / (PWM_PERIOD_S * num_cycles);
         const float L = CAL_V_INDUCTANCE / dI_by_dt;
@@ -109,9 +104,6 @@ bool CalibrateInductance(void)
             motor_set_phase_inductance(L);
             Controller_UpdateCurrentGains();
         }
-#else
-        motor_set_phase_inductance(0.005);
-#endif
         GateDriver_SetDutyCycle(&zeroDC);
     }
     return success;
@@ -180,7 +172,7 @@ bool CalibrateOffsetAndEccentricity(void)
     Observer_ClearEccentricityTable();
     int16_t *lut = Observer_GetEccentricityTablePointer();
     wait_a_while();
-    int16_t offset_raw = MA_GetAngle();
+    int16_t offset_raw = encoder_get_angle();
     // Perform measuerments, store only mean of F + B error
     for (uint32_t i=0; i<n; i++)
     {
@@ -193,7 +185,7 @@ bool CalibrateOffsetAndEccentricity(void)
         const float pos_meas = Observer_GetPosEstimate();
         error_ticks[i] = (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
     }
-    offset_raw = (offset_raw + MA_GetAngle()) / 2;
+    offset_raw = (offset_raw + encoder_get_angle()) / 2;
     for (uint32_t i=0; i<n; i++)
     {
         for (uint8_t j=0; j<nconv; j++)

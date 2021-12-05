@@ -29,11 +29,11 @@ UART
 
 As an alternative to CAN Bus, Tinymovr offers UART-based (serial) communication. The protocol is much simpler than can and mainly designed for troubleshooting or testing in the absence of CAN hardware.
 
-Protocol Description
-####################
-
 .. warning::
    The UART port on Tinymovr is NOT 5V tolerant. Applying 5V voltage will immediately damage the onboard PAC5527 controller. Please use only 3.3V for UART communication.
+
+Protocol Description
+####################
 
 The UART port is TTL at 115200 baud. A regular FTDI-style USB to UART adapter should be sufficient.
 

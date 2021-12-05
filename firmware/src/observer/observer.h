@@ -43,7 +43,7 @@ struct ObserverConfig
 };
 
 void Observer_Init(void);
-PAC5XXX_RAMFUNC void Observer_UpdateEstimates(void);
+PAC5XXX_RAMFUNC void observer_update_estimates(const int16_t raw_pos);
 PAC5XXX_RAMFUNC float Observer_GetPosEstimate(void);
 PAC5XXX_RAMFUNC float Observer_GetPosDiff(float target);
 PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrapped(void);
