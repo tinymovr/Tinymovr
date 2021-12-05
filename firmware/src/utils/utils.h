@@ -27,8 +27,6 @@
 #define MACRO_MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MACRO_MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-PAC5XXX_RAMFUNC float unwrapf(float reference_val, float wrapped_val, float half_interval);
-PAC5XXX_RAMFUNC float wrapf(float unbound_val, float half_interval);
 PAC5XXX_RAMFUNC float fast_sqrt(float n);
 PAC5XXX_RAMFUNC float fast_inv_sqrt(float n);
 PAC5XXX_RAMFUNC float fast_cos(float angle);
@@ -38,8 +36,14 @@ PAC5XXX_RAMFUNC float fabsf(float x);
 PAC5XXX_RAMFUNC float floorf(float x);
 PAC5XXX_RAMFUNC float fmodf(float a, float b);
 PAC5XXX_RAMFUNC bool our_clamp(float *d, float min, float max);
-PAC5XXX_RAMFUNC int ltoa(int32_t value, uint8_t *sp, int radix);
 PAC5XXX_RAMFUNC char checksum(char* msg, uint8_t len);
+PAC5XXX_RAMFUNC float wrapf_max(float x, float max);
+PAC5XXX_RAMFUNC float wrapf_min_max(float x, float min, float max);
+
+static inline void delay_us(uint32_t us)
+{
+    pac_delay_asm(us * 16u);
+}
 
 inline void delay_us(uint32_t us)
 {

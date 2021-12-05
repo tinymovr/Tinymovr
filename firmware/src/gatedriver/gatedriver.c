@@ -30,7 +30,6 @@ PAC5XXX_RAMFUNC void GateDriver_Enable(void)
 {
     if (gateDriver.state == GATEDRIVER_DISABLED)
     {
-#ifndef DRY_RUN
         // Select PWMA peripheral for Port B
         PAC55XX_SCC->PBMUXSEL.w =  0x01110111;
 
@@ -50,7 +49,6 @@ PAC5XXX_RAMFUNC void GateDriver_Enable(void)
 
         pac5xxx_tile_register_write(ADDR_CFGDRV4,
                 pac5xxx_tile_register_read(ADDR_CFGDRV4) | 0x1); // BBM is bit 0
-#endif
         gateDriver.state = GATEDRIVER_ENABLED;
     }
 }
@@ -59,7 +57,6 @@ PAC5XXX_RAMFUNC void GateDriver_Disable(void)
 {
     if (gateDriver.state == GATEDRIVER_ENABLED)
     {
-#ifndef DRY_RUN
         // Disable driver manager and verify active - need to enable even in PAC5210 to get ENHS pin to work
         pac5xxx_tile_register_write(ADDR_ENDRV, 0);
 
@@ -74,14 +71,12 @@ PAC5XXX_RAMFUNC void GateDriver_Disable(void)
 
         // Turn on output enables
         PAC55XX_GPIOB->OUTMASK.w = 0x00;
-#endif
         gateDriver.state = GATEDRIVER_DISABLED;
     }
 }
 
 PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dutycycles)
 {
-#ifndef DRY_RUN
 	m1_u_set_duty(dutycycles->A);
 	if (motor_phases_swapped())
 	{
@@ -93,5 +88,4 @@ PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dutycycles)
 		m1_v_set_duty(dutycycles->B);
 		m1_w_set_duty(dutycycles->C);
 	}
-#endif
 }

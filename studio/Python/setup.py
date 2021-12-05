@@ -26,8 +26,8 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         "ipython",
-        #"python-can>=4.0.0.dev0",
-        "python-can @ git+https://github.com/yconst/python-can.git@develop#egg=python-can-dev",
+        "python-can>=4.0.0.dev0",
+        #"python-can @ git+https://github.com/yconst/python-can.git@develop#egg=python-can-dev",
         "can-isotp",
         "avlos @ git+ssh://git@github.com/tinymovr/avlos-client.git@main#egg=avlos"
         "pyserial",
@@ -37,6 +37,9 @@ setup(
         "flatten-dict",
         "pint"
     ],
+    extras_require={
+        'plot': ["matplotlib"]
+    },
     entry_points={
         "console_scripts": [
             "tinymovr=tinymovr.shell:spawn_shell"

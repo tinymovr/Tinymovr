@@ -68,10 +68,10 @@ void WaitForControlLoopInterrupt(void)
 	state.busy_loop_start = DWT->CYCCNT;
 	// We have to service the control loop by updating
 	// current measurements and encoder estimates.
-	MA_QueueAngleCommand();
+	encoder_send_angle_cmd();
 	ADC_UpdateMeasurements();
-	MA_UpdateAngle(true);
-	Observer_UpdateEstimates();
+	encoder_update_angle(true);
+	observer_update_estimates(encoder_get_angle());
 	// At this point control is returned to main loop.
 }
 

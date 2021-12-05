@@ -18,9 +18,16 @@
 #include <string.h>
 #include <src/common.h>
 #include <src/utils/utils.h>
+
 #include <src/comms/defs.h>
 #include <src/comms/can/can_func.h>
 #include <src/comms/can/can.h>
+
+#if defined(BOARD_REV_R3)
+#define CAN_BUS_PINS CAN_PE23
+#elif defined(BOARD_REV_T5)
+#define CAN_BUS_PINS CAN_PF67
+#endif
 
 /* Alloc IsoTpLink statically in RAM */
 static IsoTpLink g_link;
@@ -40,36 +47,31 @@ void CAN_init(void)
 						g_isotpSendBuf, ISOTP_BUFSIZE, 
 						g_isotpRecvBuf, ISOTP_BUFSIZE);
 
-    if (board_revision() == BOARD_REV_5)
+#if defined(BOARD_REV_T5)
+    // Configure PD7 as GPIO output
+    PAC55XX_GPIOD->MODE.P7 = IO_PUSH_PULL_OUTPUT;   // GPIO configured as an output
+    PAC55XX_SCC->PDMUXSEL.w &= 0xFFFFFF0F;          // Clear bits to select GPIO function
+    PAC55XX_GPIOD->OUT.P7 = 0;                      // Set high to force transceiver into normal mode
+#elif defined(BOARD_REV_R3)
+    // Configure PF4 as GPIO input
+    PAC55XX_GPIOF->MODE.P4 = IO_HIGH_IMPEDENCE_INPUT;
+    PAC55XX_GPIOF->OUTMASK.P4 = 1;
+    PAC55XX_SCC->PFMUXSEL.P4 = 0;
+    PAC55XX_SCC->PFPUEN.P4 = 1;
+
+    // Configure PE1 as a GPIO output
+    PAC55XX_GPIOE->MODE.P1 = IO_PUSH_PULL_OUTPUT;   // PE1 GPIO configured as an output
+    PAC55XX_SCC->PEMUXSEL.w &= 0xFFFFFF0F;          // Clear bits to select GPIO for PE1 via PE mux select
+    PAC55XX_GPIOE->OUT.P1 = 1;                      // Set PE1 high to force transceiver into normal mode
+
+    // Wait for CAN transceiver to enter normal mode
+    while (PAC55XX_GPIOF->IN.P4 == 0)
     {
-		// Configure PF4 as GPIO input with pulldown
-		PAC55XX_GPIOF->MODE.P4 = IO_HIGH_IMPEDENCE_INPUT;
-		PAC55XX_GPIOF->OUTMASK.P4 = 1;
-		PAC55XX_SCC->PFMUXSEL.P4 = 0;
-		PAC55XX_SCC->PFPDEN.P4 = 1;
-	}
-	else
-	{
-		// Configure PF4 as GPIO input
-		PAC55XX_GPIOF->MODE.P4 = IO_HIGH_IMPEDENCE_INPUT;
-		PAC55XX_GPIOF->OUTMASK.P4 = 1;
-		PAC55XX_SCC->PFMUXSEL.P4 = 0;
-		PAC55XX_SCC->PFPUEN.P4 = 1;
+        // No action
+    }
+#endif
 
-		// Configure PE1 as a GPIO output
-		PAC55XX_GPIOE->MODE.P1 = IO_PUSH_PULL_OUTPUT;   // PE1 GPIO configured as an output
-		PAC55XX_SCC->PEMUXSEL.w &= 0xFFFFFF0F;          // Clear bits to select GPIO for PE1 via PE mux select
-		PAC55XX_GPIOE->OUT.P1 = 1;                      // Set PE1 high to force transceiver into normal mode
-
-		// Wait for CAN transceiver to enter normal mode
-		while (PAC55XX_GPIOF->IN.P4 == 0)
-		{
-			// No action
-		}
-	}
-
-    // CAN Bus initialization follows
-    can_io_config(CAN_PE23);
+    can_io_config(CAN_BUS_PINS);
 
     pac5xxx_can_reset_mode_set(1);	// CAN in reset mode, in order to configure CAN module
     PAC55XX_CAN->MR.AFM = 1;		// Single filter scheme
