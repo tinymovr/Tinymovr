@@ -24,7 +24,11 @@ import pynumparser
 from tinymovr import UserWrapper, VersionError
 from tinymovr.iface import IFace
 from tinymovr.iface.can_bus import CANBus, guess_channel
-from tinymovr.plotter import plot
+try:
+    from tinymovr.plotter import plot
+except ImportError:
+    import warnings
+    warnings.warn('matplotlib not found, please install to enable plotting')
 from tinymovr.units import get_registry
 
 """
@@ -85,7 +89,10 @@ def spawn_shell():
         user_ns: Dict = {}
         user_ns.update(tms)
         user_ns["tms"] = list(tms.values())
-        user_ns["plot"] = plot
+        try:
+            user_ns["plot"] = plot
+        except NameError:
+            pass
         user_ns["ureg"] = get_registry()
         print(shell_name + " " + str(version))
         print("Discovered instances: " + tms_discovered)
