@@ -45,21 +45,6 @@ static inline void delay_us(uint32_t us)
     pac_delay_asm(us * 16u);
 }
 
-inline void delay_us(uint32_t us)
-{
-    pac_delay_asm(us * 16u);
-}
-
-inline BoardRevision board_revision(void) {
-    // Board revision check
-    // Configure PF7 as GPIO input with pulldown
-	PAC55XX_GPIOF->MODE.P7 = IO_HIGH_IMPEDENCE_INPUT;
-	PAC55XX_GPIOF->OUTMASK.P7 = 1;
-	PAC55XX_SCC->PFMUXSEL.P7 = 0;
-	PAC55XX_SCC->PFPDEN.P7 = 1;
-    return PAC55XX_GPIOF->IN.P7;
-}
-
 // https://github.com/madcowswe/ODrive/blob/3113aedf081cf40e942d25d3b0b36c8806f11f23/Firmware/MotorControl/utils.c
 // Released under teh following license:
 // The MIT License (MIT)
