@@ -65,12 +65,12 @@ PAC5XXX_RAMFUNC void observer_update_estimates(const int16_t raw_pos)
 	state.vel_estimate += PWM_PERIOD_S * config.ki * delta_pos_error;
 }
 
-PAC5XXX_RAMFUNC float Observer_GetFilterBandwidth(void)
+PAC5XXX_RAMFUNC float observer_get_filter_bandwidth(void)
 {
     return config.track_bw;
 }
 
-void Observer_SetFilterBandwidth(float bw)
+void observer_set_filter_bandwidth(float bw)
 {
     if (bw > 0.0f)
     {

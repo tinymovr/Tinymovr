@@ -36,7 +36,7 @@ bool NVM_SaveConfig(void)
 	s.can_config = *CAN_get_config();
 	s.version = (VERSION_MAJOR << 16) + (VERSION_MINOR << 8) + VERSION_PATCH;
 	memcpy(data, &s, sizeof(struct NVMStruct));
-	if (Controller_GetState() == STATE_IDLE)
+	if (controller_get_state() == STATE_IDLE)
 	{
 		uint8_t* dataBuffer = data;
 		__disable_irq();
@@ -66,7 +66,7 @@ bool NVM_LoadConfig(void)
 
 void NVM_Erase(void)
 {
-	if (Controller_GetState() == STATE_IDLE)
+	if (controller_get_state() == STATE_IDLE)
 	{
 		flash_erase_page(SETTINGS_PAGE);
 		system_reset();

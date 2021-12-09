@@ -17,7 +17,7 @@ bool planner_move_to_tlimit(float p_target, float deltat_tot, float deltat_acc, 
     if (!error_flags_exist() && planner_prepare_plan_tlimit(p_target, deltat_tot, deltat_acc, deltat_dec, &motion_plan))
     {
         controller_set_motion_plan(motion_plan);
-        Controller_SetMode(CTRL_TRAJECTORY);
+        controller_set_mode(CTRL_TRAJECTORY);
         response = true;
     }
     return response;
@@ -30,7 +30,7 @@ bool planner_move_to_vlimit(float p_target)
 	if (!error_flags_exist() && planner_prepare_plan_vlimit(p_target, config.max_vel, config.max_accel, config.max_decel, &motion_plan))
 	{
 		controller_set_motion_plan(motion_plan);
-		Controller_SetMode(CTRL_TRAJECTORY);
+		controller_set_mode(CTRL_TRAJECTORY);
 		response = true;
 	}
 	return response;

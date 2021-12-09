@@ -85,7 +85,7 @@ void Controller_ControlLoop(void)
 		}
 		if (error_flags_exist() && (state.state != STATE_IDLE))
 		{
-			Controller_SetState(STATE_IDLE);
+			controller_set_state(STATE_IDLE);
 		}
 
 		if (state.state == STATE_CALIBRATE)
@@ -93,7 +93,7 @@ void Controller_ControlLoop(void)
 			state.is_calibrating = true;
 			(void) ((CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && CalibrateOffsetAndEccentricity());
 			state.is_calibrating = false;
-			Controller_SetState(STATE_IDLE);
+			controller_set_state(STATE_IDLE);
 		}
 		else if (state.state == STATE_CL_CONTROL)
 		{
@@ -116,7 +116,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         if (!planner_evaluate(state.t_plan, &motion_plan))
         {
         	// Drop to position mode on error or completion
-            Controller_SetMode(CTRL_POSITION);
+            controller_set_mode(CTRL_POSITION);
             state.t_plan = 0;
         }
     }
@@ -222,12 +222,12 @@ PAC5XXX_RAMFUNC void IdleStep(void)
     //pass
 }
 
-PAC5XXX_RAMFUNC ControlState Controller_GetState(void)
+PAC5XXX_RAMFUNC ControlState controller_get_state(void)
 {
     return state.state;
 }
 
-PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
+PAC5XXX_RAMFUNC void controller_set_state(ControlState new_state)
 {
 	if ((new_state != state.state) && (state.is_calibrating == false))
 	{
@@ -253,12 +253,12 @@ PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
 	}
 }
 
-PAC5XXX_RAMFUNC ControlMode Controller_GetMode(void)
+PAC5XXX_RAMFUNC ControlMode controller_get_mode(void)
 {
 	return state.mode;
 }
 
-PAC5XXX_RAMFUNC void Controller_SetMode(ControlMode new_mode)
+PAC5XXX_RAMFUNC void controller_set_mode(ControlMode new_mode)
 {
     if (new_mode != state.mode)
     {
@@ -340,12 +340,12 @@ void Controller_GetModulationValues(struct FloatTriplet *dc)
     dc->C = state.modulation_values.C;
 }
 
-float Controller_GetPosGain(void)
+float controller_get_pos_gain(void)
 {
     return config.pos_gain;
 }
 
-void Controller_SetPosGain(float gain)
+void controller_set_pos_gain(float gain)
 {
     if (gain >= 0.0f)
     {
@@ -353,12 +353,12 @@ void Controller_SetPosGain(float gain)
     }
 }
 
-float Controller_GetVelGain(void)
+float controller_get_vel_gain(void)
 {
     return config.vel_gain;
 }
 
-void Controller_SetVelGain(float gain)
+void controller_set_vel_gain(float gain)
 {
     if (gain >= 0.0f)
     {
@@ -366,12 +366,12 @@ void Controller_SetVelGain(float gain)
     }
 }
 
-float Controller_GetVelIntegratorGain(void)
+float controller_get_vel_integrator_gain(void)
 {
     return config.vel_integrator_gain;
 }
 
-void Controller_SetVelIntegratorGain(float gain)
+void controller_set_vel_integrator_gain(float gain)
 {
     if (gain >= 0.0f)
     {
@@ -384,12 +384,12 @@ float Controller_GetIqGain(void)
     return config.I_gain;
 }
 
-float Controller_GetIqBandwidth(void)
+float controller_get_Iq_bandwidth(void)
 {
     return config.I_bw;
 }
 
-void Controller_SetIqBandwidth(float bw)
+void controller_set_Iq_bandwidth(float bw)
 {
     if (bw > 0.0f)
     {

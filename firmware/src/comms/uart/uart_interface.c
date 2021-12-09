@@ -38,23 +38,23 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
             controller_set_Iq_setpoint_user_frame(0);
             controller_set_vel_setpoint_user_frame(0);
             controller_set_pos_setpoint_user_frame(data);
-            Controller_SetMode(CTRL_POSITION);
+            controller_set_mode(CTRL_POSITION);
         break;
 
         case 'V': // vel setpoint
             controller_set_Iq_setpoint_user_frame(0);
             controller_set_vel_setpoint_user_frame(data);
-            Controller_SetMode(CTRL_VELOCITY);
+            controller_set_mode(CTRL_VELOCITY);
             controller_set_vel_setpoint_user_frame((float)data);
         break;
 
         case 'I': // current setpoint
-            Controller_SetMode(CTRL_CURRENT);
+            controller_set_mode(CTRL_CURRENT);
             controller_set_Iq_setpoint_user_frame((float)data * ONE_OVER_UART_I_SCALING_FACTOR);
         break;
 
         case 'G': // velocity integrator gain
-            Controller_SetVelIntegratorGain((float)data * ONE_OVER_UART_VEL_INT_SCALING_FACTOR);
+            controller_set_vel_integrator_gain((float)data * ONE_OVER_UART_VEL_INT_SCALING_FACTOR);
         break;
 
         case 'H': // phase resistance
@@ -142,7 +142,7 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
         case 'G': // velocity integrator setpoint
-            ret_val = (int32_t)(Controller_GetVelIntegratorGain() * UART_VEL_INT_SCALING_FACTOR);
+            ret_val = (int32_t)(controller_get_vel_integrator_gain() * UART_VEL_INT_SCALING_FACTOR);
         break;
 
         case 'h': // phase resistance
@@ -166,15 +166,15 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
         case 'Q': // calibrate
-            Controller_SetState(STATE_CALIBRATE);
+            controller_set_state(STATE_CALIBRATE);
         break;
 
         case 'A': // closed loop
-            Controller_SetState(STATE_CL_CONTROL);
+            controller_set_state(STATE_CL_CONTROL);
         break;
 
         case 'Z': // idle
-            Controller_SetState(STATE_IDLE);
+            controller_set_state(STATE_IDLE);
         break;
 
         case 'R': // reset mcu

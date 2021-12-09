@@ -77,11 +77,11 @@ struct ControllerConfig
 
 void Controller_ControlLoop(void);
 
-PAC5XXX_RAMFUNC ControlState Controller_GetState(void);
-PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state);
+PAC5XXX_RAMFUNC ControlState controller_get_state(void);
+PAC5XXX_RAMFUNC void controller_set_state(ControlState new_state);
 
-PAC5XXX_RAMFUNC ControlMode Controller_GetMode(void);
-PAC5XXX_RAMFUNC void Controller_SetMode(ControlMode mode);
+PAC5XXX_RAMFUNC ControlMode controller_get_mode(void);
+PAC5XXX_RAMFUNC void controller_set_mode(ControlMode mode);
 
 PAC5XXX_RAMFUNC float controller_get_pos_setpoint_user_frame(void);
 PAC5XXX_RAMFUNC void controller_set_pos_setpoint_user_frame(float value);
@@ -98,15 +98,15 @@ PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value);
 
 void Controller_GetModulationValues(struct FloatTriplet *dc);
 
-float Controller_GetPosGain(void);
-void Controller_SetPosGain(float gain);
-float Controller_GetVelGain(void);
-void Controller_SetVelGain(float gain);
-float Controller_GetVelIntegratorGain(void);
-void Controller_SetVelIntegratorGain(float gain);
+float controller_get_pos_gain(void);
+void controller_set_pos_gain(float gain);
+float controller_get_vel_gain(void);
+void controller_set_vel_gain(float gain);
+float controller_get_vel_integrator_gain(void);
+void controller_set_vel_integrator_gain(float gain);
 float Controller_GetIqGain(void);
-float Controller_GetIqBandwidth(void);
-void Controller_SetIqBandwidth(float bw);
+float controller_get_Iq_bandwidth(void);
+void controller_set_Iq_bandwidth(float bw);
 
 float Controller_GetVelLimit(void);
 void Controller_SetVelLimit(float limit);
