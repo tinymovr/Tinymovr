@@ -26,11 +26,9 @@ MAKE_GETTER(motor_get_phase_resistance)
 MAKE_SETTER(motor_set_phase_resistance)
 MAKE_GETTER(motor_get_phase_inductance)
 MAKE_SETTER(motor_set_phase_inductance)
-
-// PAC5XXX_RAMFUNC bool motor_is_calibrated(void);
-
-// PAC5XXX_RAMFUNC bool motor_is_gimbal(void);
-// PAC5XXX_RAMFUNC void motor_set_is_gimbal(bool gimbal);
+MAKE_GETTER(motor_is_calibrated)
+MAKE_GETTER(motor_is_gimbal)
+MAKE_SETTER(motor_set_is_gimbal)
 
 // PAC5XXX_RAMFUNC float motor_get_user_offset(void);
 // PAC5XXX_RAMFUNC void motor_set_user_offset(float offset);
@@ -95,7 +93,9 @@ RemoteObject *make_system(void)
     MAKE_ATTR(pole_pairs, 4, motor_get_pole_pairs_getter, motor_set_pole_pairs_setter)
     MAKE_ATTR(R, 10, motor_get_phase_resistance_getter, motor_set_phase_resistance_setter)
     MAKE_ATTR(L, 10, motor_get_phase_inductance_getter, motor_set_phase_inductance_setter)
-    MAKE_OBJECT(motor, &pole_pairs, &R, &L)
+    MAKE_ATTR(calibrated, 1, motor_is_calibrated_getter, noop)
+    MAKE_ATTR(gimbal, 1, motor_is_gimbal_getter, motor_set_is_gimbal_setter)
+    MAKE_OBJECT(motor, &pole_pairs, &R, &L, &calibrated, &gimbal)
 
     // --- Encoder
     MAKE_ATTR(pos_est, 10, observer_get_pos_estimate_user_frame_getter, noop)
