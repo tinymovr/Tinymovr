@@ -103,24 +103,6 @@ PAC5XXX_RAMFUNC void motor_set_phase_inductance(float L)
     }
 }
 
-PAC5XXX_RAMFUNC void motor_set_phase_R_and_L(float R, float L)
-{
-	if ((R > MIN_PHASE_RESISTANCE) && ((R < MAX_PHASE_RESISTANCE) || motor_is_gimbal()))
-	{
-		config.phase_resistance = R;
-		config.resistance_calibrated = true;
-	}
-	if ((L > MIN_PHASE_INDUCTANCE) && ((L < MAX_PHASE_INDUCTANCE) || motor_is_gimbal()))
-	{
-		config.phase_inductance = L;
-		config.inductance_calibrated = true;
-	}
-	if (config.resistance_calibrated && config.inductance_calibrated)
-	{
-		Controller_UpdateCurrentGains();
-	}
-}
-
 PAC5XXX_RAMFUNC float motor_get_I_cal(void)
 {
 	return config.I_cal;

@@ -62,8 +62,6 @@ PAC5XXX_RAMFUNC void motor_set_phase_resistance(float R);
 PAC5XXX_RAMFUNC float motor_get_phase_inductance(void);
 PAC5XXX_RAMFUNC void motor_set_phase_inductance(float L);
 
-PAC5XXX_RAMFUNC void motor_set_phase_R_and_L(float R, float L);
-
 PAC5XXX_RAMFUNC float motor_get_I_cal(void);
 PAC5XXX_RAMFUNC void motor_set_I_cal(float I);
 
