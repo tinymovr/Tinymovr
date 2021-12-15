@@ -9,6 +9,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
+        ssh-key: ${{ secrets.SUBMODULE_CONTENT_PULL_KEY }}
         submodules: recursive
 
     - name: Set up Python 3.7
