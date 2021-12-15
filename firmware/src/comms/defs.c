@@ -74,60 +74,47 @@ size_t save_config_caller(uint8_t *buffer_in, uint8_t *buffer_out) {NVM_SaveConf
 size_t erase_config_caller(uint8_t *buffer_in, uint8_t *buffer_out) {NVM_Erase();return 0;}
 size_t reset_caller(uint8_t *buffer_in, uint8_t *buffer_out) {system_reset();return 0;}
 
-    // VOID = 0
-    // BOOL = 1
-    // UINT8 = 2
-    // INT8 = 3
-    // UINT16 = 4
-    // INT16 = 5
-    // UINT32 = 6
-    // INT32 = 7
-    // UINT64 = 8
-    // INT64 = 9
-    // FLOAT = 10
-    // DOUBLE = 11
-
 RemoteObject *make_system(void)
 {
     // --- Motor
-    MAKE_ATTR(pole_pairs, 4, motor_get_pole_pairs_getter, motor_set_pole_pairs_setter)
-    MAKE_ATTR(R, 10, motor_get_phase_resistance_getter, motor_set_phase_resistance_setter)
-    MAKE_ATTR(L, 10, motor_get_phase_inductance_getter, motor_set_phase_inductance_setter)
-    MAKE_ATTR(calibrated, 1, motor_is_calibrated_getter, noop)
-    MAKE_ATTR(gimbal, 1, motor_is_gimbal_getter, motor_set_is_gimbal_setter)
+    MAKE_ATTR(pole_pairs, &motor_get_pole_pairs, motor_get_pole_pairs_getter, motor_set_pole_pairs_setter)
+    MAKE_ATTR(R, &motor_get_phase_resistance, motor_get_phase_resistance_getter, motor_set_phase_resistance_setter)
+    MAKE_ATTR(L, &motor_get_phase_inductance, motor_get_phase_inductance_getter, motor_set_phase_inductance_setter)
+    MAKE_ATTR(calibrated, &motor_is_calibrated, motor_is_calibrated_getter, noop)
+    MAKE_ATTR(gimbal, &motor_is_gimbal, motor_is_gimbal_getter, motor_set_is_gimbal_setter)
     MAKE_OBJECT(motor, &pole_pairs, &R, &L, &calibrated, &gimbal)
 
     // --- Encoder
-    MAKE_ATTR(pos_est, 10, observer_get_pos_estimate_user_frame_getter, noop)
-    MAKE_ATTR(vel_est, 10, observer_get_vel_estimate_user_frame_getter, noop)
-    MAKE_ATTR(bw, 10, observer_get_filter_bandwidth_getter, observer_set_filter_bandwidth_setter)
+    MAKE_ATTR(pos_est, &observer_get_pos_estimate_user_frame, observer_get_pos_estimate_user_frame_getter, noop)
+    MAKE_ATTR(vel_est, &observer_get_vel_estimate_user_frame, observer_get_vel_estimate_user_frame_getter, noop)
+    MAKE_ATTR(bw, &observer_get_filter_bandwidth, observer_get_filter_bandwidth_getter, observer_set_filter_bandwidth_setter)
     MAKE_ATTR(ticks, 4, ticks_getter, noop)
     MAKE_OBJECT(encoder, &pos_est, &vel_est, &bw, &ticks)
 
     // --- Controller
-    MAKE_ATTR(state, 2, controller_get_state_getter, controller_set_state_setter)
-    MAKE_ATTR(mode, 2, controller_get_mode_getter, controller_set_mode_setter)
-    MAKE_ATTR(pos_set, 10, controller_get_pos_setpoint_user_frame_getter, controller_set_pos_setpoint_user_frame_setter)
-    MAKE_ATTR(vel_set, 10, controller_get_vel_setpoint_user_frame_getter, controller_set_vel_setpoint_user_frame_setter)
-    MAKE_ATTR(Iq_est, 10, controller_get_Iq_estimate_user_frame_getter, noop)
-    MAKE_ATTR(Iq_set, 10, controller_get_Iq_setpoint_user_frame_getter, controller_set_Iq_setpoint_user_frame_setter)
-    MAKE_ATTR(pos_gain, 10, controller_get_pos_gain_getter, controller_set_pos_gain_setter)
-    MAKE_ATTR(vel_gain, 10, controller_get_vel_gain_getter, controller_set_vel_gain_setter)
-    MAKE_ATTR(vel_I_gain, 10, controller_get_vel_integrator_gain_getter, controller_set_vel_integrator_gain_setter)
-    MAKE_ATTR(I_bw, 10, controller_get_Iq_bandwidth_getter, controller_set_Iq_bandwidth_setter)
-    MAKE_ATTR(vel_lim, 10, Controller_GetVelLimit_getter, Controller_SetVelLimit_setter)
-    MAKE_ATTR(Iq_lim, 10, Controller_GetIqLimit_getter, Controller_SetIqLimit_setter)
+    MAKE_ATTR(state, &controller_get_state, controller_get_state_getter, controller_set_state_setter)
+    MAKE_ATTR(mode, &controller_get_mode, controller_get_mode_getter, controller_set_mode_setter)
+    MAKE_ATTR(pos_set, &controller_get_pos_setpoint_user_frame, controller_get_pos_setpoint_user_frame_getter, controller_set_pos_setpoint_user_frame_setter)
+    MAKE_ATTR(vel_set, &controller_get_vel_setpoint_user_frame, controller_get_vel_setpoint_user_frame_getter, controller_set_vel_setpoint_user_frame_setter)
+    MAKE_ATTR(Iq_est, &controller_get_Iq_estimate_user_frame, controller_get_Iq_estimate_user_frame_getter, noop)
+    MAKE_ATTR(Iq_set, &controller_get_Iq_setpoint_user_frame, controller_get_Iq_setpoint_user_frame_getter, controller_set_Iq_setpoint_user_frame_setter)
+    MAKE_ATTR(pos_gain, &controller_get_pos_gain, controller_get_pos_gain_getter, controller_set_pos_gain_setter)
+    MAKE_ATTR(vel_gain, &controller_get_vel_gain, controller_get_vel_gain_getter, controller_set_vel_gain_setter)
+    MAKE_ATTR(vel_I_gain, &controller_get_vel_integrator_gain, controller_get_vel_integrator_gain_getter, controller_set_vel_integrator_gain_setter)
+    MAKE_ATTR(I_bw, &controller_get_Iq_bandwidth, controller_get_Iq_bandwidth_getter, controller_set_Iq_bandwidth_setter)
+    MAKE_ATTR(vel_lim, &Controller_GetVelLimit, Controller_GetVelLimit_getter, Controller_SetVelLimit_setter)
+    MAKE_ATTR(Iq_lim, &Controller_GetIqLimit, Controller_GetIqLimit_getter, Controller_SetIqLimit_setter)
     MAKE_OBJECT(controller, &state, &mode, &pos_set, &vel_set, &Iq_est, &Iq_set, &pos_gain, &vel_gain, &vel_I_gain, &I_bw, &vel_lim, &Iq_lim)
 
     // --- CAN
-    MAKE_ATTR(can_id, 2, CAN_get_ID_getter, CAN_set_ID_setter)
-    MAKE_ATTR(rate, 2, CAN_get_kbit_rate_getter, CAN_set_kbit_rate_setter)
+    MAKE_ATTR(can_id, &CAN_get_ID, CAN_get_ID_getter, CAN_set_ID_setter)
+    MAKE_ATTR(rate, &CAN_get_kbit_rate, CAN_get_kbit_rate_getter, CAN_set_kbit_rate_setter)
     MAKE_OBJECT(can, &can_id, &rate)
 
     // --- System
-    MAKE_FUNC(save, 0, save_config_caller)
-    MAKE_FUNC(erase, 0, erase_config_caller)
-    MAKE_FUNC(reset, 0, reset_caller)
+    MAKE_FUNC(save, &NVM_SaveConfig, save_config_caller)
+    MAKE_FUNC(erase, &NVM_Erase, erase_config_caller)
+    MAKE_FUNC(reset, &system_reset, reset_caller)
     MAKE_ATTR(busy_cycles, 6, Scheduler_GetBusyCycles_getter, noop)
     MAKE_OBJECT(system, &motor, &encoder, &controller, &can, &busy_cycles, &save, &erase, &reset)
     return &system;
