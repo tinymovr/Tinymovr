@@ -20,7 +20,7 @@ jobs:
         python -m pip install patch
 
     - name: Run cppcheck on Tinymovr
-      run: cppcheck --force --addon=cert --error-exitcode=1 -isrc/rtt -isrc/utils -isrc/nvm -isrc/uart -isrc/can src
+      run: cppcheck --force --addon=cert --error-exitcode=1 -isrc/rtt -isrc/utils -isrc/nvm -isrc/comms src
       working-directory: firmware
 
     - name: Install gcc-arm-none-eabi
