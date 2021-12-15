@@ -6,7 +6,11 @@ jobs:
   check-and-build-fw:
     runs-on: 'ubuntu-20.04'
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Checkout submodules
+      uses: textbook/git-checkout-submodule-action@master
 
     - name: Set up Python 3.7
       uses: actions/setup-python@v2
