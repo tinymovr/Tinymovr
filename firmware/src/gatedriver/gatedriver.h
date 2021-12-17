@@ -18,20 +18,10 @@
 #ifndef GATEDRIVER_GATEDRIVER_H_
 #define GATEDRIVER_GATEDRIVER_H_
 
-typedef enum {
-	GATEDRIVER_DISABLED = 0,
-	GATEDRIVER_ENABLED = 1
-} GateDriverState;
-
-struct GateDriver_
-{
-    GateDriverState state;
-};
-
-void GateDriver_Init(void);
 PAC5XXX_RAMFUNC void GateDriver_Enable(void);
 PAC5XXX_RAMFUNC void GateDriver_Disable(void);
 PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dc);
+PAC5XXX_RAMFUNC static inline bool gate_driver_get_fault(void) { return 0;}
 
 
 //=============================================
