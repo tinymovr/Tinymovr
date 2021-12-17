@@ -24,7 +24,6 @@
 #include "src/adc/adc.h"
 #include "src/motor/motor.h"
 #include "src/controller/controller.h"
-#include "src/gatedriver/gatedriver.h"
 #include "src/timer/timer.h"
 #include "src/comms/can/can.h"
 #include "src/nvm/nvm.h"
@@ -44,7 +43,6 @@ int main(void)
     UART_Init();
 	Observer_Init();
 	ADC_Init();
-	GateDriver_Init();
     CAN_init();
     Timer_Init();
     __enable_irq();

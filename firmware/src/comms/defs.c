@@ -2,6 +2,7 @@
 #include <avlos/avlos.h>
 #include <src/observer/observer.h>
 #include <src/controller/controller.h>
+#include <src/gatedriver/gatedriver.h>
 #include <src/nvm/nvm.h>
 #include <src/scheduler/scheduler.h>
 #include <src/system/system.h>
@@ -29,6 +30,9 @@ MAKE_SETTER(motor_set_phase_inductance)
 MAKE_GETTER(motor_is_calibrated)
 MAKE_GETTER(motor_is_gimbal)
 MAKE_SETTER(motor_set_is_gimbal)
+
+// --- Driver
+MAKE_GETTER(gate_driver_get_fault)
 
 // PAC5XXX_RAMFUNC float motor_get_user_offset(void);
 // PAC5XXX_RAMFUNC void motor_set_user_offset(float offset);
@@ -84,6 +88,10 @@ RemoteObject *make_system(void)
     MAKE_ATTR(gimbal, &motor_is_gimbal, motor_is_gimbal_getter, motor_set_is_gimbal_setter)
     MAKE_OBJECT(motor, &pole_pairs, &R, &L, &calibrated, &gimbal)
 
+    // --- Driver
+    MAKE_ATTR(fault, &gate_driver_get_fault, gate_driver_get_fault_getter, noop)
+    MAKE_OBJECT(driver, &fault)
+
     // --- Encoder
     MAKE_ATTR(pos_est, &observer_get_pos_estimate_user_frame, observer_get_pos_estimate_user_frame_getter, noop)
     MAKE_ATTR(vel_est, &observer_get_vel_estimate_user_frame, observer_get_vel_estimate_user_frame_getter, noop)
@@ -116,7 +124,7 @@ RemoteObject *make_system(void)
     MAKE_FUNC(erase, &NVM_Erase, erase_config_caller)
     MAKE_FUNC(reset, &system_reset, reset_caller)
     MAKE_ATTR(busy_cycles, 6, Scheduler_GetBusyCycles_getter, noop)
-    MAKE_OBJECT(system, &motor, &encoder, &controller, &can, &busy_cycles, &save, &erase, &reset)
+    MAKE_OBJECT(system, &motor, &driver, &encoder, &controller, &can, &busy_cycles, &save, &erase, &reset)
     return &system;
 }
 
