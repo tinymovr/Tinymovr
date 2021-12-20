@@ -101,11 +101,15 @@ debug: LDFLAGS += -O1
 debug: OBJECTS += $(BUILDDIR)/bootloader.o
 debug: binary
 
+# Upgrade target
+upgrade: CFLAGS += -g0 -O3
+upgrade: CPPFLAGS += -g0 -O3
+upgrade: LDFLAGS += -O3
+upgrade: binary
+
 # Release target
-release: CFLAGS += -g0 -O3
-release: CPPFLAGS += -g0 -O3
-release: LDFLAGS += -O3
-release: binary
+release: OBJECTS += $(BUILDDIR)/bootloader.o
+release: upgrade
 
 # Binary target
 binary: $(HEX) $(ELF)
