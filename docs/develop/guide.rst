@@ -83,7 +83,9 @@ Once you have the J-Link adapter wired up and the software installed, you are re
 
 To flash the firmware, provided your J-Link adapter is connected and drivers properly installed, hit F5. After a while you should see a screen like below:
 
-(image)
+.. image:: Capture.PNG
+  :width: 800
+  :alt: Tinymovr firmware debug session using VSCode
 
 Congrats! You are now fully set to develop!
 
