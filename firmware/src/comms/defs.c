@@ -33,6 +33,8 @@ MAKE_SETTER(motor_set_is_gimbal)
 
 // --- Driver
 MAKE_GETTER(gate_driver_get_fault)
+MAKE_GETTER(gate_driver_get_short_fault)
+MAKE_GETTER(gate_driver_get_hvcp_fault)
 
 // PAC5XXX_RAMFUNC float motor_get_user_offset(void);
 // PAC5XXX_RAMFUNC void motor_set_user_offset(float offset);
@@ -90,7 +92,9 @@ RemoteObject *make_system(void)
 
     // --- Driver
     MAKE_ATTR(fault, &gate_driver_get_fault, gate_driver_get_fault_getter, noop)
-    MAKE_OBJECT(driver, &fault)
+    MAKE_ATTR(short_flt, &gate_driver_get_short_fault, gate_driver_get_short_fault_getter, noop)
+    MAKE_ATTR(hvcp_flt, &gate_driver_get_hvcp_fault, gate_driver_get_hvcp_fault_getter, noop)
+    MAKE_OBJECT(driver, &fault, &short_flt, &hvcp_flt)
 
     // --- Encoder
     MAKE_ATTR(pos_est, &observer_get_pos_estimate_user_frame, observer_get_pos_estimate_user_frame_getter, noop)
