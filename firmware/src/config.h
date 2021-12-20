@@ -20,7 +20,7 @@
 // Firmware Version
 #define VERSION_MAJOR (0u)
 #define VERSION_MINOR (8u)
-#define VERSION_PATCH (10u)
+#define VERSION_PATCH (11u)
 
 // Required Studio version
 #define STUDIO_MIN_VERSION_MAJOR (0u)
