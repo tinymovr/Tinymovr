@@ -3,18 +3,19 @@ import math
 from collections import deque
 import can
 import isotp
-import pkg_resources
-from time import sleep
-from datetime import datetime
-from typing import Tuple, List, Dict, Union
+import msgpack
+import avlos
 from tinymovr.constants import ErrorIDs
 from tinymovr.codec import MultibyteCodec
 from tinymovr.iface.can_bus import create_frame, extract_node_message_id
 from tinymovr.iface.can_bus import can_endpoints
 
 
-ENC_TICKS: int = 8192
-rad_to_ticks: float = ENC_TICKS / (2 * math.pi)
+AVLOS_SPEC_ADDR = 0xFFFF
+AVLOS_CMD_GET = 0x01
+AVLOS_CMD_SET = 0x02
+ENC_TICKS = 8192
+rad_to_ticks = ENC_TICKS / (2 * math.pi)
 
 
 class SimBus(can.BusABC):
@@ -40,6 +41,12 @@ class SimBus(can.BusABC):
         self.I: float = self.M * self.R * self.R  # thin hoop formula
         self.TICKS: int = ENC_TICKS
 
+        # Spec
+        self.spec = msgpack.packb([1, 2, 3], use_bin_type=True)
+
+        # Endpoints
+        self.endpoints = [self._get_version, self._get_pos_setpoint, self._set_pos_setpoint]
+
         # Initialize a second iso-tp layer that will 
         # correspond to the simulated mcu side
         self.layer = isotp.TransportLayer(
@@ -47,11 +54,20 @@ class SimBus(can.BusABC):
             error_handler=None, params=None)
 
     def process_frame(self):
-        isotp_frame = self.layer.recv()
-        if isotp_frame:
-            data = bytearray()
-            self.layer.send(data, self.node_id)
+        isotp_data = self.layer.recv()
+        if isotp_data:
+            return_data = self.process_isotp(isotp_data)
+            if return_data:
+                self.layer.send(return_data, self.node_id)
 
+    def process_isotp(self, data):
+        ep_idx = self.codec.deserialize(data[0:2])
+        if AVLOS_SPEC_ADDR == ep_idx:
+            return self.spec
+        elif AVLOS_CMD_GET == data[2]:
+            return self.endpoints[ep_idx]()
+        elif AVLOS_CMD_SET == data[2]:
+            return self.endpoints[ep_idx](data[2:])
         
     def isotp_rx(self):
         # This receives on the Tinymovr side
@@ -67,6 +83,7 @@ class SimBus(can.BusABC):
     def send(self, msg):
         # This transmits on the PC SIDE
         self.rx_q.appendleft(msg)
+        self.process_frame()
 
     def _recv_internal(self, timeout):
         # This receives on the PC SIDE
@@ -82,3 +99,19 @@ class SimBus(can.BusABC):
                 return None
 
 
+    # Bunch of definitions
+
+    def _get_version(self):
+        '''
+        '''
+        return 1
+
+    def _get_pos_setpoint(self):
+        '''
+        '''
+        return 1.5
+
+    def _set_pos_setpoint(self, value):
+        '''
+        '''
+        pass
