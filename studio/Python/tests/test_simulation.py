@@ -26,17 +26,17 @@ class TestSimulation(unittest.TestCase):
         cls.tm = get_object_tree(isotp_chan)
 
     def setUp(self):
-        self.tm.system.reset()
+        self.tm.reset()
 
     def test_set_get_pos(self):
         """
         Test setting and getting position
         """
-        self.assertAlmostEqual(0, self.tm.system.controller.pos_setpoint)
-        self.tm.system.controller.pos_setpoint = 5.0
-        self.assertAlmostEqual(5, self.tm.system.controller.pos_setpoint)
-        self.tm.system.controller.pos_setpoint = -100000.0
-        self.assertAlmostEqual(-100000.0, self.tm.system.controller.pos_setpoint)
+        self.assertAlmostEqual(0, self.tm.controller.pos_setpoint)
+        self.tm.controller.pos_setpoint = 5.0
+        self.assertAlmostEqual(5, self.tm.controller.pos_setpoint)
+        self.tm.controller.pos_setpoint = -100000.0
+        self.assertAlmostEqual(-100000.0, self.tm.controller.pos_setpoint)
 
 
 

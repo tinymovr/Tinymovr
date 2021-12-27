@@ -54,15 +54,12 @@ class SimBus(can.BusABC):
             json.loads(
                 """
             {
-                "system":
-                {
-                    "version": {"id":0, "K":"A", "T":2},
-                    "controller":{
-                        "pos_setpoint": {"id":1, "K":"A", "T":10},
-                        "vel_setpoint": {"id":2, "K":"A", "T":10}
-                    },
-                    "reset": {"id":3, "K":"F", "T":0}
-                }
+                "version": {"id":0, "K":"A", "T":2},
+                "controller":{
+                    "pos_setpoint": {"id":1, "K":"A", "T":10},
+                    "vel_setpoint": {"id":2, "K":"A", "T":10}
+                },
+                "reset": {"id":3, "K":"F", "T":0}
             }
         """
             )
