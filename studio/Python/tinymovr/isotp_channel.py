@@ -7,7 +7,7 @@ import can
 from humanfriendly import parse_size
 import isotp
 from isotp import CanStack, Address, IsoTpError, FlowControlTimeoutError, ConsecutiveFrameTimeoutError
-from avlos import Channel, get_object_tree
+from avlos import Channel
 from avlos.codecs import MultibyteCodec
 
 
@@ -56,6 +56,10 @@ class ISOTPChannel(Channel):
                           rxid=(ISOTP_RX_ADDR + (can_id << CAN_EP_BITS)),
                           txid=(ISOTP_TX_ADDR + (can_id << CAN_EP_BITS)) )
         self.stack = CanStack(can_bus, address=address, error_handler=self.stack_error_handler)
+        
+        msg = bytearray([0,9,8,9])
+        self.stack.send(msg)
+
         self.update_thread = threading.Thread(target=self.stack_update, daemon=True)
         self.update_thread.start()
 
@@ -66,7 +70,7 @@ class ISOTPChannel(Channel):
         self.request_stop()
         self.update_thread.join()
 
-    def recv(self, deadline=0.5, sleep_interval=0.02):
+    def recv(self, deadline=0.5, sleep_interval=0.01):
         total_interval = 0
         while total_interval < deadline:
             if self.stack.available():

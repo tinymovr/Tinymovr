@@ -43,6 +43,9 @@ setup(
     entry_points={
         "console_scripts": [
             "tinymovr=tinymovr.shell:spawn_shell"
+        ],
+        "can.interface": [
+            "sim=tests:SimBus",
         ]
     }
 )
