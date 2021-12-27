@@ -38,6 +38,16 @@ class TestSimulation(unittest.TestCase):
         self.tm.controller.pos_setpoint = -100000.0
         self.assertAlmostEqual(-100000.0, self.tm.controller.pos_setpoint)
 
+    def test_set_get_vel(self):
+        """
+        Test setting and getting velocity
+        """
+        self.assertAlmostEqual(0, self.tm.controller.vel_setpoint)
+        self.tm.controller.vel_setpoint = 5.0
+        self.assertAlmostEqual(5, self.tm.controller.vel_setpoint)
+        self.tm.controller.vel_setpoint = -100000.0
+        self.assertAlmostEqual(-100000.0, self.tm.controller.vel_setpoint)
+
 
 
 if __name__ == "__main__":

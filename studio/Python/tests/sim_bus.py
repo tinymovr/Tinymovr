@@ -22,6 +22,23 @@ rad_to_ticks = ENC_TICKS / (2 * math.pi)
 TEST_TM_RX_ADDR = 0x3E
 TEST_TM_TX_ADDR = 0x3F
 
+
+class TestEndpoint:
+
+    def __init__(self, getter, setter, codec, datatype=None):
+        self.getter = getter
+        self.setter = setter
+        self.codec = codec
+        self.datatype = datatype
+
+    def process(self, trimmed_data):
+        if AVLOS_CMD_GET == trimmed_data[0]:
+            return self.codec.serialize([self.getter()], self.datatype)
+        elif AVLOS_CMD_SET == trimmed_data[0]:
+            v = self.codec.deserialize(trimmed_data[1:], self.datatype)[0]
+            return self.setter(v)
+
+
 class SimBus(can.BusABC):
     """
     A Bus subclass that implements a Tinymovr
@@ -66,8 +83,12 @@ class SimBus(can.BusABC):
         )
 
         # Endpoints
-        self.getters = [self._get_version, self._get_pos_setpoint, self._get_vel_setpoint, self._reset]
-        self.setters = [None, self._set_pos_setpoint, self._set_vel_setpoint, None]
+        self.endpoints = [
+            TestEndpoint(self._get_version, None, self.codec, DataType.UINT16),
+            TestEndpoint(self._get_pos_setpoint, self._set_pos_setpoint, self.codec, DataType.FLOAT),
+            TestEndpoint(self._get_vel_setpoint, self._set_vel_setpoint, self.codec, DataType.FLOAT),
+            TestEndpoint(self._reset, None, self.codec)
+        ]
 
         # Initialize a second iso-tp layer that will 
         # correspond to the simulated mcu side
@@ -97,11 +118,11 @@ class SimBus(can.BusABC):
         ep_idx = self.codec.deserialize(data[:2], DataType.UINT16)[0]
         if AVLOS_SPEC_ADDR == ep_idx:
             return self.spec
-        elif AVLOS_CMD_GET == data[2]:
-            return self.codec.serialize([self.getters[ep_idx]()], DataType.FLOAT)
-        elif AVLOS_CMD_SET == data[2]:
-            v = self.codec.deserialize(data[3:], DataType.FLOAT)[0]
-            return self.setters[ep_idx](v)
+        try:
+            ep = self.endpoints[ep_idx]
+            return ep.process(data[2:])
+        except IndexError:
+            pass
 
     # -- Tinymovr Side
         
