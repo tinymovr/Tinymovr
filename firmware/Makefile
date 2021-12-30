@@ -19,6 +19,7 @@ PROJECTDIR := .
 BUILDDIR := $(PROJECTDIR)/build
 ELF := $(BUILDDIR)/tinymovr_fw.elf
 HEX := $(BUILDDIR)/tinymovr_fw.hex
+BIN := $(BUILDDIR)/tinymovr_fw.bin
 OBJDIR = $(BUILDDIR)/obj
 
 # Toolchain
@@ -26,6 +27,7 @@ CC := arm-none-eabi-gcc
 CPP := arm-none-eabi-g++
 LD := arm-none-eabi-g++
 OBJCOPY := arm-none-eabi-objcopy
+SIZE_EX := arm-none-eabi-size
 ifeq ($(OS),Windows)
 	dir_guard=@if not exist $(@D) @mkdir "$(@D)"
 	rmdir_cmd=@rmdir /S /Q
@@ -72,7 +74,8 @@ LDFLAGS += -Xlinker --gc-sections # optimize function and data sections produced
 LDFLAGS += -Xlinker -Map="$(BUILDDIR)/tinymovr.map"
 
 # objcopy flags
-BFLAGS += -O ihex
+HEXFLAGS += -O ihex
+BINFLAGS += -O binary
 
 # Headers
 INCLUDEDIRS := . ./cmsis_core/ ./pac55xx_sdk/ ./pac55xx_sdk/device/ ./pac55xx_sdk/driver/ ./pac55xx_sdk/peripheral/
@@ -112,18 +115,22 @@ release: OBJECTS += $(BUILDDIR)/bootloader.o
 release: upgrade
 
 # Binary target
-binary: $(HEX) $(ELF)
+binary: $(HEX) $(BIN) $(ELF)
 
-# Objcopy
+# Objcopy to HEX
 $(HEX): $(ELF)
-	$(OBJCOPY) $(BFLAGS) $(ELF) $(HEX)
-	arm-none-eabi-size $(ELF)
-	arm-none-eabi-size $(HEX)
+	$(OBJCOPY) $(HEXFLAGS) $(ELF) $(HEX)
+	$(SIZE_EX) $(HEX)
+
+# Objcopy to BIN
+$(BIN): $(ELF)
+	$(OBJCOPY) $(BINFLAGS) $(ELF) $(BIN)
 
 # Link
 $(ELF): $(OBJECTS)
 	- $(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.bl_section,alloc,load,readonly,data,contents $(PROJECTDIR)/bootloader.bin $(BUILDDIR)/bootloader.o
 	$(LD) $(LDFLAGS) $(OBJECTS) -o $(ELF)
+	$(SIZE_EX) --format=berkeley $(ELF)
 
 # Compile C
 $(BUILDDIR)/%.o: %.c
