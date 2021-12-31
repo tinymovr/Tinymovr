@@ -24,9 +24,6 @@
 #ifndef UTILS_UTILS_H_
 #define UTILS_UTILS_H_
 
-#define MACRO_MAX(x, y) (((x) > (y)) ? (x) : (y))
-#define MACRO_MIN(x, y) (((x) < (y)) ? (x) : (y))
-
 PAC5XXX_RAMFUNC float fast_sqrt(float n);
 PAC5XXX_RAMFUNC float fast_inv_sqrt(float n);
 PAC5XXX_RAMFUNC float fast_cos(float angle);
