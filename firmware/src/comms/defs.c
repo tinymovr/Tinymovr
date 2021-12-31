@@ -1,5 +1,6 @@
 
 #include <avlos/avlos.h>
+#include <src/adc/adc.h>
 #include <src/observer/observer.h>
 #include <src/controller/controller.h>
 #include <src/gatedriver/gatedriver.h>
@@ -74,6 +75,7 @@ MAKE_GETTER(CAN_get_kbit_rate)
 MAKE_SETTER(CAN_set_kbit_rate)
 
 // --- System
+MAKE_GETTER(ADC_GetVBus)
 MAKE_GETTER(Scheduler_GetBusyCycles)
 MAKE_GETTER(get_unique_id)
 
@@ -128,9 +130,10 @@ RemoteObject *make_system(void)
     MAKE_FUNC(save, &NVM_SaveConfig, save_config_caller)
     MAKE_FUNC(erase, &NVM_Erase, erase_config_caller)
     MAKE_FUNC(reset, &system_reset, reset_caller)
-    MAKE_ATTR(busy_cycles, 6, Scheduler_GetBusyCycles_getter, noop)
+    MAKE_ATTR(busy, 6, Scheduler_GetBusyCycles_getter, noop)
+    MAKE_ATTR(vbus, &ADC_GetVBus, ADC_GetVBus_getter, noop)
     MAKE_ATTR(uid, &get_unique_id, get_unique_id_getter, noop)
-    MAKE_OBJECT(system, &motor, &driver, &encoder, &controller, &can, &busy_cycles, &save, &erase, &reset)
+    MAKE_OBJECT(system, &motor, &driver, &encoder, &controller, &can, &vbus, &busy, &uid, &save, &erase, &reset)
     return &system;
 }
 
