@@ -33,4 +33,8 @@ PAC5XXX_RAMFUNC uint8_t* get_error_flags(void);
 PAC5XXX_RAMFUNC void add_error_flag(uint8_t error);
 PAC5XXX_RAMFUNC bool health_check(void);
 
+PAC5XXX_RAMFUNC inline uint32_t get_unique_id(void) {
+    return PAC55XX_INFO1->UNIQUEID[0] ^ PAC55XX_INFO1->UNIQUEID[1] ^ PAC55XX_INFO1->UNIQUEID[2];
+}
+
 #endif /* SYSTEM_SYSTEM_H_ */

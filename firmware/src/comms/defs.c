@@ -75,6 +75,7 @@ MAKE_SETTER(CAN_set_kbit_rate)
 
 // --- System
 MAKE_GETTER(Scheduler_GetBusyCycles)
+MAKE_GETTER(get_unique_id)
 
 size_t save_config_caller(uint8_t *buffer_in, uint8_t *buffer_out) {NVM_SaveConfig();return 0;}
 size_t erase_config_caller(uint8_t *buffer_in, uint8_t *buffer_out) {NVM_Erase();return 0;}
@@ -128,6 +129,7 @@ RemoteObject *make_system(void)
     MAKE_FUNC(erase, &NVM_Erase, erase_config_caller)
     MAKE_FUNC(reset, &system_reset, reset_caller)
     MAKE_ATTR(busy_cycles, 6, Scheduler_GetBusyCycles_getter, noop)
+    MAKE_ATTR(uid, &get_unique_id, get_unique_id_getter, noop)
     MAKE_OBJECT(system, &motor, &driver, &encoder, &controller, &can, &busy_cycles, &save, &erase, &reset)
     return &system;
 }
