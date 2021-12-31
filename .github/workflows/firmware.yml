@@ -50,6 +50,12 @@ jobs:
         make debug
         make clean
       working-directory: firmware
+    
+    - name: Build Upgrade Image
+      run: |
+        make upgrade
+        make clean
+      working-directory: firmware
 
     - name: Build Release
       run: |

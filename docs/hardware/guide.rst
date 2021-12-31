@@ -97,14 +97,25 @@ The connection can be achieved in two ways. Either by soldering the motor leads 
 .. note::
    If using a lug connection, ensure that the screw and nut are not rotating against the PCB surface, as this may remove parts of the soldermask or even conductive copper layer.
 
-(image)
-
 .. _connecting-data:
 
 Connecting Data
 ###############
 
-Connect the CAN bus header to one of the two DF-13 sockets on the board. It is not important which one you choose. If this is a terminal node in the CAN network, flip the DIP switch labelled "CAN 120R" to on to enable the 120Ohm termination resistor. In small setups with a few nodes and short wires, it is enough to enable just a single termination resistor, either on one Tinymovr board or on the CAN adapter.
+Connect the CAN bus header to one of the two DF-13 sockets on the board. It is not important which one you choose. If this is a terminal node in the CAN network, flip ONLY the DIP switch labelled "CAN 120R" to on to enable the 120Ohm termination resistor. This is the switch closer to the edge of the Tinymovr board.
+
+In small setups with few nodes and short wires, it is better to enable just a single termination resistor, either on one Tinymovr board or on the CAN adapter. In setups with many nodes and long cables, you may need to enable termination resistors in both terminal nodes.
+
+
+.. _connecting-power:
+
+Connecting Power
+################
+
+Tinymovr can be powered from a 12-26V (3S-6S) power source. With the power supply off, connect the XT30 plug to the socket on the board and turn on the power supply. On Tinymovr boards equipped with a status LED, the LED should light up.
+
+.. note::
+   Each Tinymovr board has a capacitance of around 500μF. Such capacitance can introduce significant inrush current upon power-on, especially if several boards are connected to the same power supply. To prevent damage to components from overcurrent, the use of an inrush current limiter or a current-limited power supply is advised.
 
 .. _alpha-erratum-1:
 
@@ -137,12 +148,3 @@ In addition, avoid exerting lateral forces to the connector (upwards or downward
 
 The next adapter iterations (aka CANine) use a USB Type C connector and do not have this issue.
 
-.. _connecting-power:
-
-Connecting Power
-################
-
-Tinymovr can be powered from a 12-26V (3S-6S) power source. With the power supply off, connect the XT30 plug to the socket on the board and turn on the power supply. On Tinymovr boards equipped with a status LED, the LED should light up.
-
-.. note::
-   Each Tinymovr board has a capacitance of around 500μF. Such capacitance can introduce significant inrush current upon power-on, especially if several boards are connected to the same power supply. To prevent damage to components from overcurrent, the use of an inrush current limiter or a current-limited power supply is advised.

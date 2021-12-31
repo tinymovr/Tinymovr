@@ -1,3 +1,8 @@
 {
-    "makefile.makeDirectory": "firmware"
+    "makefile.makeDirectory": "firmware",
+    "files.associations": {
+        "random": "c",
+        "limits": "c",
+        "common.h": "c"
+    }
 }

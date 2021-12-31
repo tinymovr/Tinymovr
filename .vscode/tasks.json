@@ -58,5 +58,18 @@
                 "fileLocation": ["relative", "${workspaceFolder}/firmware"]
             }
         },
+        {
+            "type": "shell",
+            "label": "Clean and Build Project (Upgrade)",
+            "command": "make clean; make upgrade",
+            "options": {
+                "cwd": "${workspaceFolder}/firmware"
+            },
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc", 
+                "fileLocation": ["relative", "${workspaceFolder}/firmware"]
+            }
+        },
     ]
 }
