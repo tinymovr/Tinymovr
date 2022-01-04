@@ -278,8 +278,8 @@ uint8_t CAN_SetLimits(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 
 uint8_t CAN_GetPhaseCurrents(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
-    struct FloatTriplet I_phase;
-    ADC_GetPhaseCurrents(&I_phase);
+    FloatTriplet I_phase;
+    ADC_get_I_phase(&I_phase);
     const int16_t IA = (int16_t)(I_phase.A * 1000.0f);
     const int16_t IB = (int16_t)(I_phase.B * 1000.0f);
     const int16_t IC = (int16_t)(I_phase.C * 1000.0f);

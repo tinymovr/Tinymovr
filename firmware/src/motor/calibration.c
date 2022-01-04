@@ -27,7 +27,7 @@
 
 static inline void set_epos_and_wait(float angle, float I_setpoint);
 static inline void wait_a_while(void);
-static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
+static FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 
 bool CalibrateResistance(void)
 {
@@ -36,11 +36,11 @@ bool CalibrateResistance(void)
     if (!motor_is_gimbal())
     {
         float V_setpoint = 0.0f;
-        struct FloatTriplet I_phase_meas = {0.0f};
-        struct FloatTriplet modulation_values = {0.0f};
+        FloatTriplet I_phase_meas = {0.0f};
+        FloatTriplet modulation_values = {0.0f};
         for (uint32_t i=0; i<CAL_R_LEN; i++)
         {
-            ADC_GetPhaseCurrents(&I_phase_meas);
+            ADC_get_I_phase(&I_phase_meas);
             V_setpoint += CAL_V_GAIN * (I_cal - I_phase_meas.A);
             const float pwm_setpoint = V_setpoint / ADC_GetVBus();
             SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
@@ -70,12 +70,12 @@ bool CalibrateInductance(void)
         float V_setpoint = 0.0f;
         float I_low = 0.0f;
         float I_high = 0.0f;
-        struct FloatTriplet I_phase_meas = {0.0f};
-        struct FloatTriplet modulation_values = {0.0f};
+        FloatTriplet I_phase_meas = {0.0f};
+        FloatTriplet modulation_values = {0.0f};
         
         for (uint32_t i=0; i<CAL_L_LEN; i++)
         {
-            ADC_GetPhaseCurrents(&I_phase_meas);
+            ADC_get_I_phase(&I_phase_meas);
             if ((i & 0x2u) == 0x2u)
             {
                 I_high += I_phase_meas.A;
@@ -231,7 +231,7 @@ bool CalibrateOffsetAndEccentricity(void)
 
 static inline void set_epos_and_wait(float angle, float I_setpoint)
 {
-	struct FloatTriplet modulation_values = {0.0f};
+	FloatTriplet modulation_values = {0.0f};
 	float pwm_setpoint = (I_setpoint * motor_get_phase_resistance()) / ADC_GetVBus();
 	our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
 	SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),

@@ -70,8 +70,8 @@ struct ADCState
     float vbus_val;
     float vbus_D;
     int16_t temp;
-    struct FloatTriplet I_phase_meas;
-    struct FloatTriplet I_phase_offset;
+    FloatTriplet I_phase_meas;
+    FloatTriplet I_phase_offset;
 };
 
 struct ADCConfig
@@ -85,7 +85,7 @@ struct ADCConfig
 void ADC_Init(void);
 PAC5XXX_RAMFUNC float ADC_GetVBus(void);
 PAC5XXX_RAMFUNC int16_t ADC_GetMCUTemp(void);
-PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc);
+PAC5XXX_RAMFUNC void ADC_get_I_phase(FloatTriplet *phc);
 PAC5XXX_RAMFUNC void ADC_UpdateMeasurements(void);
 
 #endif /* ADC_ADC_H_ */

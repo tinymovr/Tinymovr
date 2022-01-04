@@ -242,7 +242,7 @@ PAC5XXX_RAMFUNC int16_t ADC_GetMCUTemp(void)
     return adc.temp;
 }
 
-PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc)
+PAC5XXX_RAMFUNC void ADC_get_I_phase(FloatTriplet *phc)
 {
     phc->A = adc.I_phase_meas.A;
     if (motor_phases_swapped())

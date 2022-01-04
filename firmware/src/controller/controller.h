@@ -41,8 +41,8 @@ struct ControllerState
     ControlMode mode;
     bool is_calibrating;
 
-    struct FloatTriplet I_phase_meas;
-    struct FloatTriplet modulation_values;
+    FloatTriplet I_phase_meas;
+    FloatTriplet modulation_values;
 
     float Iq_meas;
     float Id_meas;
@@ -96,7 +96,8 @@ PAC5XXX_RAMFUNC float controller_get_Iq_estimate_user_frame(void);
 PAC5XXX_RAMFUNC float controller_get_Iq_setpoint_user_frame(void);
 PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value);
 
-void Controller_GetModulationValues(struct FloatTriplet *dc);
+PAC5XXX_RAMFUNC void controller_adjust_modulation_values(FloatTriplet *dc);
+PAC5XXX_RAMFUNC void controller_reset_modulation_values(void);
 
 float Controller_GetPosGain(void);
 void Controller_SetPosGain(float gain);

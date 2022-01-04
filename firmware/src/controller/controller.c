@@ -27,11 +27,10 @@
 #include <src/controller/controller.h>
 
 PAC5XXX_RAMFUNC void closed_loop_update(void);
-PAC5XXX_RAMFUNC void idle_update(void);
 PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
     float vel_gain, float *I);
 
-static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
+static FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 static MotionPlan motion_plan;
 static struct ControllerState state = {
 
@@ -101,7 +100,7 @@ void Controller_ControlLoop(void)
 		}
 		else
 		{
-			idle_update();
+			// pass
 		}
 		WaitForControlLoopInterrupt();
 	}
@@ -171,7 +170,7 @@ PAC5XXX_RAMFUNC void closed_loop_update(void)
     }
     else
     {
-        ADC_GetPhaseCurrents(&(state.I_phase_meas));
+        ADC_get_I_phase(&(state.I_phase_meas));
 
         // Clarke transform
         const float Ialpha = state.I_phase_meas.A;
@@ -212,14 +211,12 @@ PAC5XXX_RAMFUNC void closed_loop_update(void)
     float mod_a = (c_I * mod_d) - (s_I * mod_q);
     float mod_b = (c_I * mod_q) + (s_I * mod_d);
 
-    SVM(mod_a, mod_b, &state.modulation_values.A,
-        &state.modulation_values.B, &state.modulation_values.C);
-    GateDriver_SetDutyCycle(&state.modulation_values);
-}
-
-PAC5XXX_RAMFUNC void idle_update(void)
-{
-    //pass
+    static FloatTriplet mod_values = {0.0f};
+    SVM(mod_a, mod_b, &mod_values.A, &mod_values.B, &mod_values.C);
+    
+    controller_adjust_modulation_values(&mod_values);
+    GateDriver_SetDutyCycle(&(state.modulation_values));
+    controller_reset_modulation_values();
 }
 
 PAC5XXX_RAMFUNC ControlState Controller_GetState(void)
@@ -333,11 +330,18 @@ PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value)
 	state.Iq_setpoint = value * motor_get_user_direction();
 }
 
-void Controller_GetModulationValues(struct FloatTriplet *dc)
+PAC5XXX_RAMFUNC void controller_adjust_modulation_values(FloatTriplet *dc)
 {
-    dc->A = state.modulation_values.A;
-    dc->B = state.modulation_values.B;
-    dc->C = state.modulation_values.C;
+    state.modulation_values.A += dc->A;
+    state.modulation_values.B += dc->B;
+    state.modulation_values.C += dc->C;
+}
+
+PAC5XXX_RAMFUNC void controller_reset_modulation_values(void)
+{
+    state.modulation_values.A = 0;
+    state.modulation_values.B = 0;
+    state.modulation_values.C = 0;
 }
 
 float Controller_GetPosGain(void)

@@ -31,7 +31,7 @@ struct GateDriver_
 void GateDriver_Init(void);
 PAC5XXX_RAMFUNC void GateDriver_Enable(void);
 PAC5XXX_RAMFUNC void GateDriver_Disable(void);
-PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dc);
+PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(FloatTriplet *dc);
 
 
 //=============================================

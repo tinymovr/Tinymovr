@@ -75,7 +75,7 @@ PAC5XXX_RAMFUNC void GateDriver_Disable(void)
     }
 }
 
-PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dutycycles)
+PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(FloatTriplet *dutycycles)
 {
 	m1_u_set_duty(dutycycles->A);
 	if (motor_phases_swapped())

@@ -1,7 +1,7 @@
 
 #define HFI_SAMPLE_COUNT 8
 #define HFI_SAMPLE_STEP (32/HFI_SAMPLE_COUNT)
-#define HFI_VOLTAGE 1.0
+#define HFI_VOLTAGE 1.0f
 
 typedef struct {
     float I_diffs[HFI_SAMPLE_COUNT];
