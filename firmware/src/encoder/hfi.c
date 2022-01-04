@@ -4,54 +4,31 @@
 
 void hfi_update(void)
 {
-    float real_bin1, imag_bin1, real_bin2, imag_bin2;
-    motor->m_hfi.fft_bin1_func((float*)motor->m_hfi.buffer, &real_bin1, &imag_bin1);
-    motor->m_hfi.fft_bin2_func((float*)motor->m_hfi.buffer, &real_bin2, &imag_bin2);
+    if ((state.current_step & 0x2u) == 0x2u) // even
+    { 
+        // get current measurement, Ihfi = Imeas - Iprev
+        // store Ihfi for current angle
+        // calculate next hfi_voltage vector in ab frame, convert to uvw
+    }
+    else // odd
+    {
+        // get current measurement, Iprev = Imeas
+        // calculate next hfi_voltage vector in ab frame, convert to uvw
+    }
 
-    float mag_bin_1 = sqrtf(SQ(imag_bin1) + SQ(real_bin1));
-    float angle_bin_1 = -utils_fast_atan2(imag_bin1, real_bin1);
+    state.current_step++;
 
-    angle_bin_1 += M_PI / 1.7; // Why 1.7??
-    utils_norm_angle_rad(&angle_bin_1);
+    if (state.current_step == HFI_SAMPLE_COUNT) {
+        float c_real, c_im;
+        fft_8_bin1(state.I_diff_buffer, c_real, c_im);
 
-    float mag_bin_2 = sqrtf(SQ(imag_bin2) + SQ(real_bin2));
-    float angle_bin_2 = -utils_fast_atan2(imag_bin2, real_bin2) / 2.0;
+        const float f_mag = sqrtf(c_real * c_real + c_im * c_im);
+        const float f_phase = atan2f(c_im, c_real);
 
-    motor->m_hfi.angle = angle_bin_2;
-	utils_norm_angle_rad((float*)&motor->m_hfi.angle);
-}
 
-static void update_hfi_samples(foc_hfi_samples samples, volatile motor_all_state_t *motor) {
-	utils_sys_lock_cnt();
 
-	memset((void*)&motor->m_hfi, 0, sizeof(motor->m_hfi));
-	switch (samples) {
-	case HFI_SAMPLES_8:
-		motor->m_hfi.samples = 8;
-		motor->m_hfi.table_fact = 4;
-		motor->m_hfi.fft_bin0_func = utils_fft8_bin0;
-		motor->m_hfi.fft_bin1_func = utils_fft8_bin1;
-		motor->m_hfi.fft_bin2_func = utils_fft8_bin2;
-		break;
-
-	case HFI_SAMPLES_16:
-		motor->m_hfi.samples = 16;
-		motor->m_hfi.table_fact = 2;
-		motor->m_hfi.fft_bin0_func = utils_fft16_bin0;
-		motor->m_hfi.fft_bin1_func = utils_fft16_bin1;
-		motor->m_hfi.fft_bin2_func = utils_fft16_bin2;
-		break;
-
-	case HFI_SAMPLES_32:
-		motor->m_hfi.samples = 32;
-		motor->m_hfi.table_fact = 1;
-		motor->m_hfi.fft_bin0_func = utils_fft32_bin0;
-		motor->m_hfi.fft_bin1_func = utils_fft32_bin1;
-		motor->m_hfi.fft_bin2_func = utils_fft32_bin2;
-		break;
-	}
-
-	utils_sys_unlock_cnt();
+        state.current_step = 0;
+    }
 }
 
 // Yes, this is only the average...
