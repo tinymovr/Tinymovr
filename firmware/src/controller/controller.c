@@ -26,8 +26,8 @@
 #include <src/motor/calibration.h>
 #include <src/controller/controller.h>
 
-PAC5XXX_RAMFUNC void CLControlStep(void);
-PAC5XXX_RAMFUNC void IdleStep(void);
+PAC5XXX_RAMFUNC void closed_loop_update(void);
+PAC5XXX_RAMFUNC void idle_update(void);
 PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
     float vel_gain, float *I);
 
@@ -97,17 +97,17 @@ void Controller_ControlLoop(void)
 		}
 		else if (state.state == STATE_CL_CONTROL)
 		{
-			CLControlStep();
+			closed_loop_update();
 		}
 		else
 		{
-			IdleStep();
+			idle_update();
 		}
 		WaitForControlLoopInterrupt();
 	}
 }
 
-PAC5XXX_RAMFUNC void CLControlStep(void)
+PAC5XXX_RAMFUNC void closed_loop_update(void)
 {
     if (state.mode >= CTRL_TRAJECTORY)
     {
@@ -217,7 +217,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     GateDriver_SetDutyCycle(&state.modulation_values);
 }
 
-PAC5XXX_RAMFUNC void IdleStep(void)
+PAC5XXX_RAMFUNC void idle_update(void)
 {
     //pass
 }
