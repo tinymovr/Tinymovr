@@ -24,6 +24,7 @@
 #include <src/scheduler/scheduler.h>
 #include <src/encoder/encoder.h>
 #include <src/motor/calibration.h>
+#include <src/encoder/hfi.h>
 #include <src/controller/controller.h>
 
 PAC5XXX_RAMFUNC void closed_loop_update(void);
@@ -96,6 +97,7 @@ void Controller_ControlLoop(void)
 		}
 		else if (state.state == STATE_CL_CONTROL)
 		{
+            hfi_update();
 			closed_loop_update();
 		}
 		else

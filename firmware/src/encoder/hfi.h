@@ -14,3 +14,6 @@ typedef struct {
 } HFIState;
 
 void hfi_update(void);
+
+float hfi_get_mag(void);
+float hfi_get_phase(void);

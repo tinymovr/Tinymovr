@@ -22,6 +22,7 @@
 #include <src/system/system.h>
 #include <src/adc/adc.h>
 #include <src/motor/motor.h>
+#include <src/encoder/hfi.h>
 #include <src/observer/observer.h>
 #include <src/controller/controller.h>
 #include <src/controller/trajectory_planner.h>
@@ -80,6 +81,8 @@ void CANEP_InitEndpointMap(void)
     // ---
     CANEP_AddEndpoint(&CAN_GetSetPosVel, 0x025);
     CANEP_AddEndpoint(&CAN_GetSetPosVelIq, 0x026);
+
+    CANEP_AddEndpoint(&CAN_HFI_get_mag_phase, 0x027);
 }
 
 void CANEP_AddEndpoint(CANEP_Callback callback, uint8_t id)
@@ -542,4 +545,13 @@ uint8_t CAN_GetSetPosVelIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     memcpy(&buffer[4], &vel_ff, sizeof(int16_t));
     memcpy(&buffer[6], &Iq_ff, sizeof(int16_t));
     return CANRP_ReadWrite;
+}
+
+uint8_t CAN_HFI_get_mag_phase(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+{
+    const float mag = hfi_get_mag();
+	const float phase = hfi_get_phase();
+	memcpy(&buffer[0], &mag, sizeof(float));
+	memcpy(&buffer[4], &phase, sizeof(float));
+    return CANRP_Read;
 }

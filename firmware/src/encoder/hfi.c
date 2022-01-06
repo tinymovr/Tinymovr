@@ -48,9 +48,19 @@ void hfi_update(void)
 
         state.magnitude = f_mag;
         state.phase = f_phase;
-        
+
 		// compute & store angle
 
         state.current_step = 0;
     }
+}
+
+float hfi_get_mag(void)
+{
+    return state.magnitude;
+}
+
+float hfi_get_phase(void)
+{
+    return state.phase;
 }
