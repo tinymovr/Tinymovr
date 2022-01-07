@@ -122,6 +122,8 @@ def guess_channel(bustype_hint, logger):
     """
     Tries to guess a channel based on a bustype hint.
     """
+    if "sim" == bustype_hint:
+        return None
     device_strings = [s.lower() for s in can_devices[bustype_hint]]
     ports = []
     for p in list_ports.comports():
