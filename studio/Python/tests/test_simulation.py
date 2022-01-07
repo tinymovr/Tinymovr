@@ -52,7 +52,7 @@ class TestSimulation(unittest.TestCase):
         """
         Test getting resistance and inductance
         """
-        self.assertAlmostEqual(0.02, self.tm.motor.R)
+        self.assertAlmostEqual(0.2, self.tm.motor.R)
         self.assertAlmostEqual(0.0005, self.tm.motor.L)
 
 
