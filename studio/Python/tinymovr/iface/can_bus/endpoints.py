@@ -329,4 +329,13 @@ for velocity-limited plan moves",
         "defaults": {"velocity_ff": 0, "current_ff": 0},
         "labels": ("position", "velocity_ff", "current_ff")
     },
+    "get_hfi_amp_phase":
+    {
+        "description": "Get HFI amp and phase",
+        "type": "r",
+        "ep_id": 0x027,
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": ("ampere", None),
+        "labels": ("magnitude", "phase")
+    }
 }
