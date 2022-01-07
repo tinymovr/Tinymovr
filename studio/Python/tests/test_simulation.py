@@ -19,7 +19,7 @@ NODE_ID = 1
 class TestSimulation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        can_bus = can.Bus(bustype="sim", node_id=1)
+        can_bus = can.Bus(bustype="sim", channel="sim", node_id=1)
         cls.logger = logging.getLogger("tinymovr")
         cls.logger.setLevel(logging.DEBUG)
         isotp_chan = ISOTPChannel(can_bus, NODE_ID, cls.logger)
