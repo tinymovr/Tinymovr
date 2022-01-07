@@ -39,7 +39,7 @@ void hfi_update(void)
 	SVM(mod_a, mod_b, &mod_values.A, &mod_values.B, &mod_values.C);
 	controller_adjust_modulation_values(&mod_values);
 
-    if (state.current_step == HFI_SAMPLE_COUNT) {
+    if (HFI_SAMPLE_COUNT == state.current_step) {
         float c_real, c_im;
         utils_fft8_bin1(state.I_diffs, &c_real, &c_im);
 
