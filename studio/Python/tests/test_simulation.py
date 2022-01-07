@@ -19,7 +19,7 @@ NODE_ID = 1
 class TestSimulation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        can_bus = can.Bus(bustype="sim", channel="test", node_id=1)
+        can_bus = can.Bus(bustype="sim", node_id=1)
         cls.logger = logging.getLogger("tinymovr")
         cls.logger.setLevel(logging.DEBUG)
         isotp_chan = ISOTPChannel(can_bus, NODE_ID, cls.logger)
@@ -47,6 +47,13 @@ class TestSimulation(unittest.TestCase):
         self.assertAlmostEqual(5, self.tm.controller.vel_setpoint)
         self.tm.controller.vel_setpoint = -100000.0
         self.assertAlmostEqual(-100000.0, self.tm.controller.vel_setpoint)
+
+    def test_get_RL(self):
+        """
+        Test getting resistance and inductance
+        """
+        self.assertAlmostEqual(0.02, self.tm.motor.R)
+        self.assertAlmostEqual(0.0005, self.tm.motor.L)
 
 
 

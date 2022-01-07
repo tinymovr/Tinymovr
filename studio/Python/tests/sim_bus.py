@@ -56,10 +56,12 @@ class SimBus(can.BusABC):
         self.sending = False
         
         # Mechanical and electrical properties
-        self.Kv_SI: float = 10.0
-        self.R: float = 0.05
-        self.M: float = 0.5
-        self.I: float = self.M * self.R * self.R  # thin hoop formula
+        self.Kv_SI = 10.0
+        self.r = 0.05
+        self.M = 0.5
+        self.I = self.M * self.r * self.r  # thin hoop formula
+        self.R = 0.2
+        self.L = 0.0005
         self.TICKS: int = ENC_TICKS
 
         # Live values
@@ -76,7 +78,11 @@ class SimBus(can.BusABC):
                     "pos_setpoint": {"id":1, "K":"A", "T":10},
                     "vel_setpoint": {"id":2, "K":"A", "T":10}
                 },
-                "reset": {"id":3, "K":"F", "T":0}
+                "motor":{
+                    "R": {"id":3, "K":"A", "T":10},
+                    "L": {"id":4, "K":"A", "T":10}
+                },
+                "reset": {"id":5, "K":"F", "T":0}
             }
         """
             )
@@ -87,6 +93,8 @@ class SimBus(can.BusABC):
             TestEndpoint(self._get_version, None, self.codec, DataType.UINT16),
             TestEndpoint(self._get_pos_setpoint, self._set_pos_setpoint, self.codec, DataType.FLOAT),
             TestEndpoint(self._get_vel_setpoint, self._set_vel_setpoint, self.codec, DataType.FLOAT),
+            TestEndpoint(self._get_R, self._null_setter, self.codec, DataType.FLOAT),
+            TestEndpoint(self._get_L, self._null_setter, self.codec, DataType.FLOAT),
             TestEndpoint(self._reset, None, self.codec)
         ]
 
@@ -171,32 +179,29 @@ class SimBus(can.BusABC):
     # Bunch of definitions
 
     def _get_version(self):
-        '''
-        '''
         return 1
 
     def _get_pos_setpoint(self):
-        '''
-        '''
         return self.pos_setpoint
 
     def _set_pos_setpoint(self, value):
-        '''
-        '''
         self.pos_setpoint = value
 
     def _get_vel_setpoint(self):
-        '''
-        '''
         return self.vel_setpoint
 
+    def _get_R(self):
+        return self.R
+
+    def _get_L(self):
+        return self.L
+
     def _set_vel_setpoint(self, value):
-        '''
-        '''
         self.vel_setpoint = value
 
     def _reset(self):
-        '''
-        '''
         self.pos_setpoint = 0.0
         self.vel_setpoint = 0.0
+
+    def _null_setter(self, value):
+        pass
