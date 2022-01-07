@@ -21,20 +21,18 @@
 #include "src/common.h"
 
 typedef enum {
-    SYSTEM_ERR_NO_ERROR        			= 0x0000,
-	SYSTEM_ERR_VBUS_UNDERVOLTAGE        = 0x0001
-} SystemError;
+    SYSTEM_FLT_NONE         			= 0x0000,
+	SYSTEM_FLT_VBUS_UNDERVOLTAGE        = 0x0001
+} SystemFault;
 
 void system_init(void);
 void system_reset(void);
 
-PAC5XXX_RAMFUNC bool error_flags_exist(void);
-PAC5XXX_RAMFUNC uint8_t* get_error_flags(void);
-PAC5XXX_RAMFUNC void add_error_flag(uint8_t error);
-PAC5XXX_RAMFUNC bool health_check(void);
-
 PAC5XXX_RAMFUNC inline uint32_t get_unique_id(void) {
     return PAC55XX_INFO1->UNIQUEID[0] ^ PAC55XX_INFO1->UNIQUEID[1] ^ PAC55XX_INFO1->UNIQUEID[2];
 }
+
+PAC5XXX_RAMFUNC uint8_t system_get_faults(void);
+PAC5XXX_RAMFUNC bool system_has_faults(void);
 
 #endif /* SYSTEM_SYSTEM_H_ */

@@ -21,12 +21,13 @@
 PAC5XXX_RAMFUNC void GateDriver_Enable(void);
 PAC5XXX_RAMFUNC void GateDriver_Disable(void);
 PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dc);
-PAC5XXX_RAMFUNC static inline bool gate_driver_get_fault(void) 
-    { return (bool)((pac5xxx_tile_register_read(ADDR_DINSIG1) >> 5) & 0x1);}
-PAC5XXX_RAMFUNC static inline bool gate_driver_get_short_fault(void) 
-    { return (bool)(pac5xxx_tile_register_read(ADDR_DRV_FLT) & 0x1);}
-PAC5XXX_RAMFUNC static inline bool gate_driver_get_hvcp_fault(void) 
-    { return (bool)((pac5xxx_tile_register_read(ADDR_DRV_FLT) >> 2) & 0x1);}
+PAC5XXX_RAMFUNC static inline uint8_t gate_driver_get_faults(void)
+{
+    const uint8_t gen_fault = (pac5xxx_tile_register_read(ADDR_DINSIG1) >> 5) & 0x1;
+    const uint8_t short_fault = pac5xxx_tile_register_read(ADDR_DRV_FLT) & 0x1;
+    const uint8_t hvcp_fault = (pac5xxx_tile_register_read(ADDR_DRV_FLT) >> 2) & 0x1;
+    return (hvcp_fault << 2) | (short_fault << 1) | gen_fault;
+}
 
 
 //=============================================

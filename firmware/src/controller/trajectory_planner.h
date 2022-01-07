@@ -18,13 +18,23 @@
 #ifndef CONTROLLER_TRAJECTORY_PLANNER_H_
 #define CONTROLLER_TRAJECTORY_PLANNER_H_
 
-#include "src/common.h"
+typedef enum
+{
+    PLN_FLT_INVALID_INPUT = 0,
+    PLN_FLT_OVEL_VCRUISE = 1
+} PlannerFault;
 
-struct PlannerConfig {
+struct PlannerConfig
+{
 	float max_accel;
 	float max_decel;
 	float max_vel;
 };
+
+typedef struct
+{
+    uint8_t faults;
+} PlannerState;
 
 typedef struct
 {
@@ -60,5 +70,6 @@ float planner_get_max_decel(void);
 bool planner_set_max_vel(float max_vel);
 float planner_get_max_vel(void);
 PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan);
+PAC5XXX_RAMFUNC uint8_t planner_get_faults(void);
 
 #endif /* CONTROLLER_TRAJECTORY_PLANNER_H_ */

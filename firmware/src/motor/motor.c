@@ -37,6 +37,8 @@ static struct MotorConfig config = {
     .is_gimbal = false
 };
 
+static MotorState state = {0};
+
 PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad)
 {
     const float mpos_diff = fabsf(mpos_end - mpos_start);
@@ -162,6 +164,16 @@ PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir)
 	{
 		config.user_direction = dir;
 	}
+}
+
+PAC5XXX_RAMFUNC uint8_t motor_get_faults(void)
+{
+    return state.faults;
+}
+
+void motor_add_fault(MotorFault f)
+{
+    state.faults |= f;
 }
 
 struct MotorConfig* Motor_GetConfig(void)

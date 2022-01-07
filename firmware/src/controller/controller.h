@@ -34,11 +34,17 @@ typedef enum {
     CTRL_TRAJECTORY = 3
 } ControlMode;
 
+typedef enum {
+    CTRL_FLT_NONE = 0,
+    CTRL_FLT_OC   = 1
+} ControlFault;
+
 struct ControllerState
 {
 	// TODO: State.state is very confusing, name appropriately
 	ControlState state;
     ControlMode mode;
+    uint8_t faults;
     bool is_calibrating;
 
     struct FloatTriplet I_phase_meas;
@@ -112,6 +118,8 @@ float Controller_GetVelLimit(void);
 void Controller_SetVelLimit(float limit);
 float Controller_GetIqLimit(void);
 void Controller_SetIqLimit(float limit);
+
+PAC5XXX_RAMFUNC uint8_t controller_get_faults(void);
 
 void controller_set_motion_plan(MotionPlan mp);
 

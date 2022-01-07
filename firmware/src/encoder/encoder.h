@@ -23,9 +23,9 @@
 #define MAX_ALLOWED_DELTA			 (1024)
 
 typedef enum {
-    ENCODER_ERR_NO_ERROR        = 0x0000,
-    ENCODER_ERR_UNSTABLE        = 0x0001
-} EncoderError;
+    ENCODER_FLT_NONE     = 0,
+    ENCODER_FLT_UNSTABLE = 1
+} EncoderFault;
 
 // MA702 commands
 typedef enum {
@@ -36,11 +36,13 @@ typedef enum {
 typedef struct
 {
 	int16_t angle;
+    uint8_t faults;
 } EncoderState;
 
 void encoder_init(void);
 PAC5XXX_RAMFUNC void encoder_send_angle_cmd(void);
 PAC5XXX_RAMFUNC int16_t encoder_get_angle(void);
 PAC5XXX_RAMFUNC void encoder_update_angle(bool check_error);
+PAC5XXX_RAMFUNC uint8_t encoder_get_faults(void);
 
 #endif /* ENCODERS_MA702_H_ */

@@ -16,13 +16,14 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <src/adc/adc.h>
+#include <src/gatedriver/gatedriver.h>
+#include <src/encoder/encoder.h>
+#include <src/motor/motor.h>
+#include <src/controller/controller.h>
 #include <src/comms/defs.h>
 #include <src/utils/utils.h>
 #include <src/rtt/SEGGER_RTT.h>
 #include <src/system/system.h>
-
-uint8_t error_flags[ERROR_FLAG_MAX_SIZE] = {0};
-uint8_t error_count = 0;
 
 void system_init(void)
 {
@@ -95,48 +96,27 @@ void system_reset(void)
         pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
 }
 
-PAC5XXX_RAMFUNC bool error_flags_exist(void)
+PAC5XXX_RAMFUNC uint8_t system_get_faults(void)
 {
-    return error_count > 0u;
+    if (ADC_GetVBus() < VBUS_LOW_THRESHOLD)
+    {
+        return SYSTEM_FLT_VBUS_UNDERVOLTAGE;
+    }
+    return SYSTEM_FLT_NONE;
 }
 
-PAC5XXX_RAMFUNC uint8_t* get_error_flags(void)
+PAC5XXX_RAMFUNC bool system_has_faults(void)
 {
-    return error_flags;
-}
-
-PAC5XXX_RAMFUNC void add_error_flag(uint8_t flag)
-{
-    bool add = flag > 0u;
-    uint8_t i = 0u;
-    while ((add == true) && (i < ERROR_FLAG_MAX_SIZE))
+    if (encoder_get_faults() |
+        controller_get_faults() |
+        motor_get_faults() |
+        gate_driver_get_faults() |
+        system_get_faults() |
+        planner_get_faults())
     {
-        if (error_flags[i++] == flag)
-        {
-            add = false;
-        }
+        return true;
     }
-    if (add)
-    {
-        error_flags[error_count] |= flag;
-        error_count++;
-        if (error_count >= ERROR_FLAG_MAX_SIZE)
-        {
-            error_count = 0;
-        }
-    }
-}
-
-PAC5XXX_RAMFUNC bool health_check(void)
-{
-    const float VBus = ADC_GetVBus();
-    bool success = true;
-    if (VBus < VBUS_LOW_THRESHOLD)
-    {
-        add_error_flag(ERROR_VBUS_UNDERVOLTAGE);
-        success = false;
-    }
-    return success;
+    return false;
 }
 
 void printUsageErrorMsg(uint32_t CFSRValue)

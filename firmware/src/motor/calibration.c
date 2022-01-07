@@ -50,7 +50,7 @@ bool CalibrateResistance(void)
         const float R = fabsf(V_setpoint / I_cal);
         if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
         {
-            add_error_flag(ERROR_PHASE_RESISTANCE_OUT_OF_RANGE);
+            motor_add_fault(MOTOR_FLT_PHASE_RESISTANCE_OUT_OF_RANGE);
             success = false;
         }
         else
@@ -96,7 +96,7 @@ bool CalibrateInductance(void)
         const float L = CAL_V_INDUCTANCE / dI_by_dt;
         if ((L <= MIN_PHASE_INDUCTANCE) || (L >= MAX_PHASE_INDUCTANCE))
         {
-            add_error_flag(ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE);
+            motor_add_fault(MOTOR_FLT_PHASE_INDUCTANCE_OUT_OF_RANGE);
             success = false;
         }
         else
@@ -138,7 +138,7 @@ bool CalibrateDirectionAndPolePairs(void)
     // Try to calibrate
     if (!motor_find_pole_pairs(ENCODER_TICKS, epos_start, Observer_GetPosEstimate(), epos_target))
     {
-        add_error_flag(ERROR_INVALID_POLE_PAIRS);
+        motor_add_fault(MOTOR_FLT_INVALID_POLE_PAIRS);
         success = false;
     }
     else

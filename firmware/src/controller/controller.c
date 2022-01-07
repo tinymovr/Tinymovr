@@ -37,6 +37,7 @@ static struct ControllerState state = {
 
     .state = STATE_IDLE,
     .mode = CTRL_CURRENT,
+    .faults = CTRL_FLT_NONE,
     .is_calibrating = false,
 
     .I_phase_meas = {0.0f, 0.0f, 0.0f},
@@ -76,26 +77,24 @@ void Controller_ControlLoop(void)
 {
 	while (true)
 	{
-		health_check();
 		const float Iq = controller_get_Iq_estimate();
-		if ( (Iq > (config.I_limit * I_TRIP_MARGIN)) ||
-					  (Iq < -(config.I_limit * I_TRIP_MARGIN)) )
+		if (fabsf(Iq) > config.I_limit * I_TRIP_MARGIN)
 		{
-			add_error_flag(ERROR_OVERCURRENT);
+			state.faults |= CTRL_FLT_OC;
 		}
-		if (error_flags_exist() && (state.state != STATE_IDLE))
+		if (system_has_faults())
 		{
 			controller_set_state(STATE_IDLE);
 		}
 
-		if (state.state == STATE_CALIBRATE)
+		if (STATE_CALIBRATE == state.state)
 		{
 			state.is_calibrating = true;
 			(void) ((CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && CalibrateOffsetAndEccentricity());
 			state.is_calibrating = false;
 			controller_set_state(STATE_IDLE);
 		}
-		else if (state.state == STATE_CL_CONTROL)
+		else if (STATE_CL_CONTROL == state.state)
 		{
 			CLControlStep();
 		}
@@ -232,14 +231,14 @@ PAC5XXX_RAMFUNC void controller_set_state(ControlState new_state)
 	if ((new_state != state.state) && (state.is_calibrating == false))
 	{
 		if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE)
-				&& (!error_flags_exist()) && Controller_Calibrated())
+				&& (!system_has_faults()) && Controller_Calibrated())
 		{
 			state.pos_setpoint = Observer_GetPosEstimate();
 			GateDriver_Enable();
 			state.state = STATE_CL_CONTROL;
 		}
 		else if ((new_state == STATE_CALIBRATE) && (state.state == STATE_IDLE)
-				&& (!error_flags_exist()))
+				&& (!system_has_faults()))
 		{
 			GateDriver_Enable();
 			state.state = STATE_CALIBRATE;
@@ -422,6 +421,11 @@ void Controller_SetIqLimit(float limit)
     {
         config.I_limit = limit;
     }
+}
+
+PAC5XXX_RAMFUNC uint8_t controller_get_faults(void)
+{
+    return state.faults;
 }
 
 void controller_set_motion_plan(MotionPlan mp)

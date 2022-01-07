@@ -67,8 +67,6 @@
 #define READ_UINT16(address)        (*((uint16_t *) address))
 #define READ_UINT32(address)        (*((uint32_t *) address))
 
-#define ERROR_FLAG_MAX_SIZE 5u
-
 #define ENCODER_TICKS               (8192)
 #define ENCODER_HALF_TICKS          (ENCODER_TICKS / 2)
 #define ENCODER_TICKS_FLOAT         (8192.f)

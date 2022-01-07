@@ -10,11 +10,13 @@ static struct PlannerConfig config = {
 		.max_vel = 50000.0f
 };
 
+static PlannerState state = {0};
+
 bool planner_move_to_tlimit(float p_target, float deltat_tot, float deltat_acc, float deltat_dec)
 {
 	bool response = false;
 	MotionPlan motion_plan = {0};
-    if (!error_flags_exist() && planner_prepare_plan_tlimit(p_target, deltat_tot, deltat_acc, deltat_dec, &motion_plan))
+    if (!system_has_faults() && planner_prepare_plan_tlimit(p_target, deltat_tot, deltat_acc, deltat_dec, &motion_plan))
     {
         controller_set_motion_plan(motion_plan);
         controller_set_mode(CTRL_TRAJECTORY);
@@ -27,7 +29,7 @@ bool planner_move_to_vlimit(float p_target)
 {
 	bool response = false;
 	MotionPlan motion_plan = {0};
-	if (!error_flags_exist() && planner_prepare_plan_vlimit(p_target, config.max_vel, config.max_accel, config.max_decel, &motion_plan))
+	if (!system_has_faults() && planner_prepare_plan_vlimit(p_target, config.max_vel, config.max_accel, config.max_decel, &motion_plan))
 	{
 		controller_set_motion_plan(motion_plan);
 		controller_set_mode(CTRL_TRAJECTORY);
@@ -46,11 +48,11 @@ bool planner_prepare_plan_tlimit(float p_target, float deltat_tot, float deltat_
     float v_cruise = (S - 0.5f * deltat_acc * v_0) / (0.5f * deltat_acc + deltat_cruise + 0.5f * deltat_dec);
     if (deltat_tot < 0 || deltat_acc < 0 || deltat_dec < 0 || deltat_cruise < 0.0f)
     {
-    	add_error_flag(ERROR_PLANNER_INVALID_INPUT);
+		state.faults |= PLN_FLT_INVALID_INPUT;
     }
     else if (fabsf(v_cruise) > Controller_GetVelLimit())
     {
-    	add_error_flag(ERROR_PLANNER_VCRUISE_OVER_LIMIT);
+		state.faults |= PLN_FLT_OVEL_VCRUISE;
     }
     else if (S != 0.0f)
 	{
@@ -263,4 +265,9 @@ PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan)
         response = false;
     }
     return response;
+}
+
+PAC5XXX_RAMFUNC uint8_t planner_get_faults(void)
+{
+	return state.faults;
 }

@@ -65,8 +65,13 @@ PAC5XXX_RAMFUNC void encoder_update_angle(bool check_error)
 		     ((delta > MAX_ALLOWED_DELTA_ADD) || (delta < MIN_ALLOWED_DELTA_ADD)) &&
 		     ((delta > MAX_ALLOWED_DELTA_SUB) || (delta < MIN_ALLOWED_DELTA_SUB)) )
 		{
-			add_error_flag(ERROR_ENCODER_READING_UNSTABLE);
+			state.faults |= ENCODER_FLT_UNSTABLE;
 		}
     }
     state.angle = angle;
+}
+
+PAC5XXX_RAMFUNC uint8_t encoder_get_faults(void)
+{
+    return state.faults;
 }

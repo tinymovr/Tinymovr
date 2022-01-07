@@ -27,11 +27,11 @@
 #include "src/common.h"
 
 typedef enum {
-    MOTOR_ERR_NO_ERROR        					   = 0x0000,
-    MOTOR_ERR_PHASE_RESISTANCE_OUT_OF_RANGE        = 0x0001,
-	MOTOR_ERR_PHASE_INDUCTANCE_OUT_OF_RANGE        = 0x0002,
-	MOTOR_ERR_INVALID_POLE_PAIRS	               = 0x0004
-} MotorError;
+    MOTOR_FLT_NONE        					= 0,
+    MOTOR_FLT_PHASE_RESISTANCE_OUT_OF_RANGE = 1,
+	MOTOR_FLT_PHASE_INDUCTANCE_OUT_OF_RANGE = 1<<1,
+	MOTOR_FLT_INVALID_POLE_PAIRS	        = 1<<2
+} MotorFault;
 
 struct MotorConfig
 {
@@ -51,6 +51,11 @@ struct MotorConfig
 	bool phases_swapped;
 	bool is_gimbal;
 };
+
+typedef struct 
+{
+	uint8_t faults;
+} MotorState;
 
 PAC5XXX_RAMFUNC uint8_t motor_get_pole_pairs(void);
 PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad);
@@ -78,6 +83,9 @@ PAC5XXX_RAMFUNC void motor_set_user_offset(float offset);
 
 PAC5XXX_RAMFUNC int8_t motor_get_user_direction(void);
 PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir);
+
+PAC5XXX_RAMFUNC uint8_t motor_get_faults(void);
+void motor_add_fault(MotorFault f);
 
 struct MotorConfig* Motor_GetConfig(void);
 void Motor_RestoreConfig(struct MotorConfig* config_);
