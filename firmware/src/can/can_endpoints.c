@@ -553,5 +553,6 @@ uint8_t CAN_HFI_get_mag_phase(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 	const float phase = hfi_get_phase();
 	memcpy(&buffer[0], &mag, sizeof(float));
 	memcpy(&buffer[4], &phase, sizeof(float));
+    *buffer_len = 2 * sizeof(float);
     return CANRP_Read;
 }

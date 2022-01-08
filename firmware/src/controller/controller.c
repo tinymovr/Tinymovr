@@ -40,7 +40,9 @@ static struct ControllerState state = {
     .is_calibrating = false,
 
     .I_phase_meas = {0.0f, 0.0f, 0.0f},
-    .modulation_values = {0.0f, 0.0f, 0.0f},
+    
+    .mod_a = 0,
+    .mod_b = 0,
 
     .Iq_meas = 0.0f,
     .Id_meas = 0.0f,
@@ -209,16 +211,16 @@ PAC5XXX_RAMFUNC void closed_loop_update(void)
         state.Iq_integrator_Vq *= I_INTEGRATOR_DECAY_FACTOR;
     }
 
-    // Inverse Park transform
-    float mod_a = (c_I * mod_d) - (s_I * mod_q);
-    float mod_b = (c_I * mod_q) + (s_I * mod_d);
+    // Inverse Park transform (incremental)
+    state.mod_a += (c_I * mod_d) - (s_I * mod_q);
+    state.mod_b += (c_I * mod_q) + (s_I * mod_d);
 
     static FloatTriplet mod_values = {0.0f};
-    SVM(mod_a, mod_b, &mod_values.A, &mod_values.B, &mod_values.C);
+    SVM(state.mod_a, state.mod_b, &mod_values.A, &mod_values.B, &mod_values.C);
     
-    controller_adjust_modulation_values(&mod_values);
-    GateDriver_SetDutyCycle(&(state.modulation_values));
-    controller_reset_modulation_values();
+    GateDriver_SetDutyCycle(&mod_values);
+    state.mod_a = 0;
+    state.mod_b = 0;
 }
 
 PAC5XXX_RAMFUNC ControlState Controller_GetState(void)
@@ -332,18 +334,10 @@ PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value)
 	state.Iq_setpoint = value * motor_get_user_direction();
 }
 
-PAC5XXX_RAMFUNC void controller_adjust_modulation_values(FloatTriplet *dc)
+PAC5XXX_RAMFUNC void controller_adjust_ab_values(float mod_a, float mod_b)
 {
-    state.modulation_values.A += dc->A;
-    state.modulation_values.B += dc->B;
-    state.modulation_values.C += dc->C;
-}
-
-PAC5XXX_RAMFUNC void controller_reset_modulation_values(void)
-{
-    state.modulation_values.A = 0;
-    state.modulation_values.B = 0;
-    state.modulation_values.C = 0;
+    state.mod_a += mod_a;
+    state.mod_b += mod_b;
 }
 
 float Controller_GetPosGain(void)

@@ -1,16 +1,18 @@
 
-#define HFI_SAMPLE_COUNT 16
-#define HFI_SAMPLE_STRIDE (32/HFI_SAMPLE_COUNT)
-#define HFI_VOLTAGE 1.0f
+#define HFI_VOLTAGE 0.005f
+#define HFI_UPDATE_GAIN 0.01f
 
 typedef struct {
-    float I_diffs[HFI_SAMPLE_COUNT];
-    uint8_t current_step;
-    uint8_t substep;
     float angle;
     float phase;
     float magnitude;
+    float c_real;
+    float c_imag;
+    uint8_t current_idx;
+    uint8_t substep;
     float I_prev;
+    float c_reals[32];
+    float c_imags[32];
 } HFIState;
 
 void hfi_update(void);
