@@ -13,7 +13,7 @@
 RemoteObject *store[50];
 Server s;
 
-size_t noop(uint8_t *buffer_in, uint8_t *buffer_out) {return 0;}
+static inline size_t noop(uint8_t *buffer_in, uint8_t *buffer_out) {return 0;}
 
 // --- Encoder
 MAKE_GETTER(observer_get_pos_estimate_user_frame)
@@ -34,6 +34,10 @@ MAKE_GETTER(motor_is_calibrated)
 MAKE_GETTER(motor_is_gimbal)
 MAKE_SETTER(motor_set_is_gimbal)
 MAKE_GETTER(motor_get_faults)
+MAKE_GETTER(motor_get_user_offset)
+MAKE_SETTER(motor_set_user_offset)
+MAKE_GETTER(motor_get_user_direction)
+MAKE_SETTER(motor_set_user_direction)
 
 // --- Driver
 MAKE_GETTER(gate_driver_get_faults)
@@ -70,6 +74,16 @@ MAKE_GETTER(Controller_GetIqLimit)
 MAKE_SETTER(Controller_SetIqLimit)
 MAKE_GETTER(controller_get_faults)
 
+// --- Planner
+MAKE_GETTER(planner_get_max_accel)
+MAKE_SETTER(planner_set_max_accel)
+MAKE_GETTER(planner_get_max_decel)
+MAKE_SETTER(planner_set_max_decel)
+MAKE_GETTER(planner_get_max_vel)
+MAKE_SETTER(planner_set_max_vel)
+MAKE_SETTER(planner_move_to_vlimit)
+MAKE_GETTER(planner_get_faults)
+
 // --- CAN
 MAKE_GETTER(CAN_get_ID)
 MAKE_SETTER(CAN_set_ID)
@@ -94,8 +108,10 @@ RemoteObject *make_system(void)
     MAKE_ATTR(L, &motor_get_phase_inductance, motor_get_phase_inductance_getter, motor_set_phase_inductance_setter)
     MAKE_ATTR(calibrated, &motor_is_calibrated, motor_is_calibrated_getter, noop)
     MAKE_ATTR(gimbal, &motor_is_gimbal, motor_is_gimbal_getter, motor_set_is_gimbal_setter)
+    MAKE_ATTR(offset, &motor_get_user_offset, motor_get_user_offset_getter, motor_set_user_offset_setter)
+    MAKE_ATTR(dir, &motor_get_user_direction, motor_get_user_direction_getter, motor_set_user_direction_setter)
     MAKE_ATTR(mtr_flt, &motor_get_faults, motor_get_faults_getter, noop)
-    MAKE_OBJECT(motor, &pole_pairs, &R, &L, &calibrated, &gimbal, &mtr_flt)
+    MAKE_OBJECT(motor, &pole_pairs, &R, &L, &calibrated, &gimbal, &offset, &dir, &mtr_flt)
 
     // --- Driver
     MAKE_ATTR(drv_flt, &gate_driver_get_faults, gate_driver_get_faults_getter, noop)
@@ -125,10 +141,21 @@ RemoteObject *make_system(void)
     MAKE_ATTR(ctrl_flt, &controller_get_faults, controller_get_faults_getter, noop)
     MAKE_OBJECT(controller, &state, &mode, &pos_set, &vel_set, &Iq_est, &Iq_set, &pos_gain, &vel_gain, &vel_I_gain, &I_bw, &vel_lim, &Iq_lim, &ctrl_flt)
 
+    // --- Trajectory Planner
+    MAKE_ATTR(max_accel, &planner_get_max_accel, planner_get_max_accel_getter, planner_set_max_accel_setter)
+    MAKE_ATTR(max_decel, &planner_get_max_decel, planner_get_max_decel_getter, planner_set_max_decel_setter)
+    MAKE_ATTR(max_vel, &planner_get_max_vel, planner_get_max_vel_getter, planner_set_max_vel_setter)
+    MAKE_ATTR(move_to, 10, noop, planner_move_to_vlimit_setter)
+    MAKE_ATTR(pln_flt, &planner_get_faults, planner_get_faults_getter, noop)
+    MAKE_OBJECT(planner, &max_accel, &max_decel, &max_vel, &move_to)
+
     // --- CAN
     MAKE_ATTR(can_id, &CAN_get_ID, CAN_get_ID_getter, CAN_set_ID_setter)
     MAKE_ATTR(rate, &CAN_get_kbit_rate, CAN_get_kbit_rate_getter, CAN_set_kbit_rate_setter)
     MAKE_OBJECT(can, &can_id, &rate)
+
+    // --- Comms
+    MAKE_OBJECT(comms, &can)
 
     // --- System
     MAKE_FUNC(save, &NVM_SaveConfig, save_config_caller)
@@ -138,7 +165,7 @@ RemoteObject *make_system(void)
     MAKE_ATTR(vbus, &ADC_GetVBus, ADC_GetVBus_getter, noop)
     MAKE_ATTR(uid, &get_unique_id, get_unique_id_getter, noop)
     MAKE_ATTR(sys_flt, &system_get_faults, system_get_faults_getter, noop)
-    MAKE_OBJECT(system, &motor, &driver, &encoder, &controller, &can, &vbus, &busy, &uid, &save, &erase, &reset, &sys_flt)
+    MAKE_OBJECT(system, &motor, &driver, &encoder, &controller, &planner, &comms, &vbus, &busy, &uid, &save, &erase, &reset, &sys_flt)
     return &system;
 }
 
