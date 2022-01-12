@@ -21,7 +21,8 @@
 typedef enum
 {
     PLN_FLT_INVALID_INPUT = 0,
-    PLN_FLT_OVEL_VCRUISE = 1
+    PLN_FLT_OVEL_VCRUISE = 1,
+    PLN_FLT_UNKNOWN = 1<<1
 } PlannerFault;
 
 struct PlannerConfig
@@ -59,15 +60,15 @@ typedef struct
     float p_cruise_dec;
 } MotionPlan;
 
-bool planner_move_to_tlimit(float p_target, float deltat_tot, float deltat_acc, float deltat_dec);
-bool planner_move_to_vlimit(float p_targetl);
+void planner_move_to_tlimit(float p_target, float deltat_tot, float deltat_acc, float deltat_dec);
+void planner_move_to_vlimit(float p_targetl);
 bool planner_prepare_plan_tlimit(float p_target, float deltat_tot, float deltat_acc, float deltat_dec, MotionPlan *plan);
 bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float d_max, MotionPlan *plan);
-bool planner_set_max_accel(float max_accel);
-bool planner_set_max_decel(float max_decel);
+void planner_set_max_accel(float max_accel);
+void planner_set_max_decel(float max_decel);
 float planner_get_max_accel(void);
 float planner_get_max_decel(void);
-bool planner_set_max_vel(float max_vel);
+void planner_set_max_vel(float max_vel);
 float planner_get_max_vel(void);
 PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan);
 PAC5XXX_RAMFUNC uint8_t planner_get_faults(void);
