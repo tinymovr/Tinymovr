@@ -23,7 +23,8 @@ from docopt import docopt
 import pynumparser
 
 import can
-from tinymovr.isotp_channel import VersionError, ResponseError, ISOTPChannel, guess_channel
+from tinymovr.isotp_channel import ISOTPChannel, guess_channel
+from tinymovr.discovery import Discovery
 from avlos import get_object_tree
 
 #from tinymovr import UserWrapper, VersionError
@@ -67,53 +68,54 @@ def spawn_shell():
     if channel == "auto":
         channel = guess_channel(bustype, logger)
     can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
+    isotp_channels = {}
+    tms = {}
 
-    tms: Dict = {}
-    for node_id in node_ids:
-        isotp_channel = ISOTPChannel(can_bus, node_id, logger)
-        try:
-            root = get_object_tree(isotp_channel)
-            tm_name = base_name + str(node_id)
-            logger.info("Connected to {}".format(tm_name))
-            tms[node_id] = root
-        except TimeoutError:
-            logger.info("Node {} timed out".format(node_id))
-        except IOError as e:
-            logger.error(str(e))
-        except VersionError as e:
-            logger.warning(str(e))
-        except ResponseError as e:
-            logger.info(str(e))
-        isotp_channel.shutdown()
-    time.sleep(0.2)
-    can_bus.shutdown()
+    def node_appeared(node_id):
+        isotp_channels[node_id] = ISOTPChannel(can_bus, node_id, logger)
+        root = get_object_tree(isotp_channels[node_id])
+        node_name = "{}{}".format(base_name, node_id)
+        print("{} appeared".format(node_name))
+        tms[node_id] = root
+        user_ns[node_name] = root
+        return True
+
+    def node_disappeared(node_id):
+        logger.info("{} disappeared".format(base_name + str(node_id)))
+        del tms[node_id]
+
+    dsc = Discovery(can_bus, node_appeared, node_disappeared, logger)
     
-    can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
-    if len(tms) == 0:
-        logger.error("No Tinymovr instances detected. Exiting shell...")
-    else:
-        for tm_id, tm in tms.items():
-            tm.channel = ISOTPChannel(can_bus, tm_id, logger)
-        tms_discovered = ", ".join([base_name + str(k) for k in tms.keys()])
-        user_ns = {}
-        user_ns.update({base_name + str(k) : v for k, v in tms.items()})
-        user_ns["tms"] = list(tms.values())
-        #user_ns["plot"] = plot
-        #user_ns["ureg"] = get_registry()
-        print(shell_name + " " + str(version))
-        print("Discovered instances: " + tms_discovered)
-        print(
-            "Access Tinymovr instances as tmx, where x \
-is the index starting from 1"
-        )
-        print("e.g. the first Tinymovr instance will be tm1.")
-        print("Instances are also available by index in the tms list.")
+    user_ns = {}
+    user_ns["tms"] = tms
 
-        c = Config()
-        c.InteractiveShellApp.gui = "tk"
-        c.TerminalIPythonApp.display_banner = False
-        IPython.start_ipython(argv=[], config=c, user_ns=user_ns)
-        logger.debug("Exiting shell...")
+    print(shell_name + " " + str(version))
+#     can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
+#     if len(tms) == 0:
+#         logger.error("No Tinymovr instances detected. Exiting shell...")
+#     else:
+#         for tm_id, tm in tms.items():
+#             tm.channel = ISOTPChannel(can_bus, tm_id, logger)
+#         tms_discovered = ", ".join([base_name + str(k) for k in tms.keys()])
+#         user_ns = {}
+#         user_ns.update({base_name + str(k) : v for k, v in tms.items()})
+#         user_ns["tms"] = list(tms.values())
+#         #user_ns["plot"] = plot
+#         #user_ns["ureg"] = get_registry()
+#         print(shell_name + " " + str(version))
+#         print("Discovered instances: " + tms_discovered)
+#         print(
+#             "Access Tinymovr instances as tmx, where x \
+# is the index starting from 1"
+#         )
+#         print("e.g. the first Tinymovr instance will be tm1.")
+#         print("Instances are also available by index in the tms list.")
+
+    c = Config()
+    c.InteractiveShellApp.gui = "tk"
+    c.TerminalIPythonApp.display_banner = False
+    IPython.start_ipython(argv=[], config=c, user_ns=user_ns)
+    logger.debug("Exiting shell...")
 
 
 def make_logger():
