@@ -23,13 +23,19 @@
 #define CAN_EP_SIZE 6
 #define ISOTP_RX_ADDR 0x3E
 #define ISOTP_TX_ADDR 0x3F
-#define ISOTP_BUFSIZE 512
+#define ISOTP_BUFSIZE 1536
 
-struct CANConfig
+typedef struct 
 {
     uint8_t id;
     uint8_t kbaud_rate;
-};
+    uint16_t heartbeat_period;
+} CANConfig;
+
+typedef struct 
+{
+    uint32_t last_msg_ms;
+} CANState;
 
 void CAN_init(void);
 uint16_t CAN_get_kbit_rate(void);
@@ -38,8 +44,8 @@ uint8_t CAN_get_ID(void);
 void CAN_set_ID(uint8_t id);
 void CAN_process_interrupt(void);
 
-struct CANConfig* CAN_get_config(void);
-void CAN_restore_config(struct CANConfig* config_);
-void CAN_poll(void);
+CANConfig* CAN_get_config(void);
+void CAN_restore_config(CANConfig* config_);
+void CAN_task(void);
 
 #endif /* CAN_CAN_H_ */

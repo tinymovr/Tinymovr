@@ -97,7 +97,7 @@ void UART_ReceiveMessageHandler(void)
 
 void SysTick_Handler(void)  {                               /* SysTick interrupt Handler. */
     msTicks = msTicks + 1;                                  /* See startup file startup_LPC17xx.s for SysTick vector */ 
-    CAN_poll();
+    CAN_task();
 }
 
 uint32_t Scheduler_GetTotalCycles(void)

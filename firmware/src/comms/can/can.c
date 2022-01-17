@@ -36,10 +36,15 @@ static IsoTpLink g_link;
 static uint8_t g_isotpRecvBuf[ISOTP_BUFSIZE];
 static uint8_t g_isotpSendBuf[ISOTP_BUFSIZE];
 
-static struct CANConfig config = {
+static const uint8_t heartbeat_byte = 0;
+
+static CANConfig config = {
     .id = 1,
-    .kbaud_rate = CAN_BAUD_1000KHz
+    .kbaud_rate = CAN_BAUD_1000KHz,
+    .heartbeat_period = 1000
 };
+
+static CANState state ={0};
 
 void CAN_init(void)
 {
@@ -180,26 +185,27 @@ void CAN_process_interrupt(void)
     }
 }
 
-struct CANConfig* CAN_get_config(void)
+CANConfig* CAN_get_config(void)
 {
     return &config;
 }
 
-void CAN_restore_config(struct CANConfig* config_)
+void CAN_restore_config(CANConfig* config_)
 {
     config = *config_;
 }
+
+// TODO: Ya.. could be better
+extern volatile uint32_t msTicks;
 
 // ISO-TP-C shims
 int isotp_user_send_can(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
     //can_transmit(size, (this->config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);
     can_transmit(size, arbitration_id, data);
+    state.last_msg_ms = msTicks;
     return ISOTP_RET_OK;
 }
-
-// TODO: Ya.. could be better
-extern volatile uint32_t msTicks;
 
 uint32_t isotp_user_get_ms(void)
 {
@@ -211,6 +217,16 @@ void isotp_user_debug(const char* message, ...) {
     // ...
 }
 
-void CAN_poll(void) {
+void CAN_task(void) {
     isotp_poll(&g_link);
+    // Transmit heartbeat
+    const uint32_t msg_diff = msTicks - state.last_msg_ms;
+    if (msg_diff >= config.heartbeat_period &&
+        ISOTP_SEND_STATUS_INPROGRESS != g_link.send_status &&
+        ISOTP_RECEIVE_STATUS_INPROGRESS != g_link.receive_status &&
+        PAC55XX_CAN->SR.TBS != 0)
+    {
+        state.last_msg_ms = msTicks;
+        can_transmit(1, 0x700 | config.id, &heartbeat_byte);
+    }
 }
