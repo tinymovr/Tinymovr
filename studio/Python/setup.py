@@ -35,7 +35,6 @@ setup(
         "docopt",
         "pynumparser",
         "humanfriendly",
-        "flatten-dict",
         "pint"
     ],
     extras_require={
