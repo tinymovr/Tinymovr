@@ -70,6 +70,8 @@ def spawn_shell():
     can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
     isotp_channels = {}
     tms = {}
+    user_ns = {}
+    user_ns["tms"] = tms
 
     def node_appeared(node_id):
         isotp_channels[node_id] = ISOTPChannel(can_bus, node_id, logger)
@@ -86,9 +88,6 @@ def spawn_shell():
 
     dsc = Discovery(can_bus, node_appeared, node_disappeared, logger)
     
-    user_ns = {}
-    user_ns["tms"] = tms
-
     print(shell_name + " " + str(version))
 #     can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
 #     if len(tms) == 0:

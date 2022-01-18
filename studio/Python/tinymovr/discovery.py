@@ -1,25 +1,27 @@
 
-import can
-from tinymovr.isotp_channel import VersionError, ResponseError
+import time
+import threading
+from tinymovr.tee import Tee
 
-class Discovery(can.Listener):
+class Discovery:
     
-    def __init__(self, can_bus_channel, appeared_cb, disappeared_cb, logger):
+    def __init__(self, can_bus, appeared_cb, disappeared_cb, logger):
         self.logger = logger
         self.appeared_cb = appeared_cb
         self.disappeared_cb = disappeared_cb
-        self.can_bus_channel = can_bus_channel
-        self.notifier = can.Notifier(can_bus_channel, [self], timeout=1.0, loop=None)
         self.nodes = set()
 
-    def on_message_received(self, message):
-        arb_id = message.arbitration_id
-        if 0x700 == arb_id & 0x700:
-            node_id = arb_id & 0x3F
-            if node_id not in self.nodes:
-                if self.appeared_cb(node_id):
-                    self.nodes.add(node_id)
+        self.tee = Tee(can_bus, lambda msg: 0x700 == msg.arbitration_id & 0x700)
 
-    def on_error(self, error):
-        print(error)
-                
+        self.update_thread = threading.Thread(target=self.stack_update, daemon=True)
+        self.update_thread.start()
+
+    def stack_update(self):
+        while True:
+            msg = self.tee.recv()
+            if msg:
+                node_id = msg.arbitration_id & 0x3F
+                if node_id not in self.nodes:
+                    if self.appeared_cb(node_id):
+                        self.nodes.add(node_id)
+            time.sleep(0.5)

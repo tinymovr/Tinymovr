@@ -5,6 +5,7 @@ from functools import cached_property
 import serial.tools.list_ports as list_ports
 import can
 from humanfriendly import parse_size
+from tinymovr.tee import Tee
 import isotp
 from isotp import CanStack, Address, IsoTpError, FlowControlTimeoutError, ConsecutiveFrameTimeoutError
 from avlos import Channel
@@ -44,25 +45,19 @@ class ResponseError(Exception):
 
 
 class OurCanStack(isotp.TransportLayer):
-    """
-    The IsoTP transport using `python-can <https://python-can.readthedocs.io>`_ as CAN layer. python-can must be installed in order to use this class.
-    All parameters except the ``bus`` parameter will be given to the :class:`TransportLayer<isotp.TransportLayer>` constructor
 
-    :param bus: A python-can bus object implementing ``recv`` and ``send``
-    :type bus: BusABC
+    def __init__(self, can_bus, address, *args, **kwargs):
+        self.tee = Tee(can_bus,
+            lambda msg: msg.arbitration_id == address.rxid)
+        isotp.TransportLayer.__init__(
+            self,
+            rxfn=self.rx_canbus,
+            txfn=self.tx_canbus,
+            address=address,
+            *args, **kwargs
+            )
 
-    :param address: The address information of CAN messages. Includes the addressing mode, txid/rxid, source/target address and address extension. See :class:`isotp.Address<isotp.Address>` for more details.
-    :type address: isotp.Address
-
-    :param error_handler: A function to be called when an error has been detected. An :class:`isotp.protocol.IsoTpError<isotp.protocol.IsoTpError>` (inheriting Exception class) will be given as sole parameter
-    :type error_handler: Callable
-
-    :param params: List of parameters for the transport layer
-    :type params: dict
-
-    """
-
-    def _tx_canbus_3plus(self, msg):
+    def tx_canbus(self, msg):
         can_msg = can.Message(
             arbitration_id=msg.arbitration_id,
             data = msg.data,
@@ -70,61 +65,26 @@ class OurCanStack(isotp.TransportLayer):
             is_fd=msg.is_fd,
             bitrate_switch=msg.bitrate_switch
             )
-        print(can_msg)
-        self.bus.send(can_msg)
-
-    def _tx_canbus_3minus(self, msg):
-        can_msg = can.Message(
-            arbitration_id=msg.arbitration_id,
-            data = msg.data, 
-            extended_id=msg.is_extended_id,
-            is_fd=msg.is_fd,
-            bitrate_switch=msg.bitrate_switch
-            )
-        print(can_msg)
-        self.bus.send(can_msg)
+        self.tee.send(can_msg)
 
     def rx_canbus(self):
-        msg = self.bus.recv(0)
+        msg = self.tee.recv()
         if msg is not None:
-            print(msg)
             return isotp.CanMessage(arbitration_id=msg.arbitration_id, data=msg.data, extended_id=msg.is_extended_id, is_fd=msg.is_fd, bitrate_switch=msg.bitrate_switch)
-
-    def __init__(self, bus, *args, **kwargs):
-        global can
-        import can
-
-        # Backward compatibility stuff.
-        message_input_args =  can.Message.__init__.__code__.co_varnames[:can.Message.__init__.__code__.co_argcount]
-        if 'is_extended_id' in message_input_args:
-            self.tx_canbus = self._tx_canbus_3plus
-        else:
-            self.tx_canbus = self._tx_canbus_3minus
-
-        self.set_bus(bus)
-        isotp.TransportLayer.__init__(self, rxfn=self.rx_canbus, txfn=self.tx_canbus, *args, **kwargs)
-
-    def set_bus(self, bus):
-        if not isinstance(bus, can.BusABC):
-            raise ValueError('bus must be a python-can BusABC object')
-        self.bus=bus
 
 
 class ISOTPChannel(Channel):
 
-    def __init__(self, can_bus, can_id, logger):
+    def __init__(self, can_bus, node_id, logger):
         super().__init__()
+        self.node_id = node_id
         self.logger = logger
         self.stop_requested = False
-        self.can_id = can_id
 
         address = Address(isotp.AddressingMode.Normal_11bits,
-                          rxid=(ISOTP_RX_ADDR + (can_id << CAN_EP_BITS)),
-                          txid=(ISOTP_TX_ADDR + (can_id << CAN_EP_BITS)) )
-        self.stack = OurCanStack(can_bus, address=address, error_handler=self.stack_error_handler)
-        
-        #msg = bytearray([0,9,8,9])
-        #self.stack.send(msg)
+                          rxid=gen_arbitration_id(node_id, ISOTP_RX_ADDR),
+                          txid=gen_arbitration_id(node_id, ISOTP_TX_ADDR))
+        self.stack = OurCanStack(can_bus, address)
 
         self.update_thread = threading.Thread(target=self.stack_update, daemon=True)
         self.update_thread.start()
@@ -136,10 +96,14 @@ class ISOTPChannel(Channel):
         self.request_stop()
         self.update_thread.join()
 
-    def recv(self, deadline=0.5):
-        if self.stack.available():
-            return self.stack.recv()
-        raise ResponseError(self.can_id)
+    def recv(self, deadline=0.8, sleep_interval=0.02):
+        total_interval = 0
+        while total_interval < deadline:
+            if self.stack.available():
+                return self.stack.recv()
+            time.sleep(sleep_interval)
+            total_interval += sleep_interval
+        raise ResponseError(self.node_id)
 
     def request_stop(self):
         self.stop_requested = True
@@ -166,14 +130,14 @@ def create_frame(
     Generates and return a CAN frame using python-can Message class
     """
     return can.Message(
-        arbitration_id=create_node_id(node_id, endpoint_id),
+        arbitration_id=gen_arbitration_id(node_id, endpoint_id),
         is_extended_id=False,
         is_remote_frame=rtr,
         data=payload,
     )
 
 
-def create_node_id(node_id: int, endpoint_id: int) -> int:
+def gen_arbitration_id(node_id: int, endpoint_id: int) -> int:
     """
     Generates a CAN id from node and endpoint ids
     """
