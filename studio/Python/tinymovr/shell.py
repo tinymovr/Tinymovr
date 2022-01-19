@@ -21,6 +21,7 @@ from docopt import docopt
 import can
 from tinymovr.isotp_channel import guess_channel
 from tinymovr.discovery import Discovery
+from tinymovr.constants import app_name, base_node_name
 
 """
 This program is free software: you can redistribute it and/or modify it under
@@ -34,8 +35,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-shell_name = "Tinymovr Studio"
-base_name = "tm"
+
 
 
 def spawn_shell():
@@ -43,7 +43,7 @@ def spawn_shell():
     Spawns the Tinymovr Studio IPython shell.
     """
     version = pkg_resources.require("tinymovr")[0].version
-    arguments = docopt(__doc__, version=shell_name + " " + str(version))
+    arguments = docopt(__doc__, version=app_name + " " + str(version))
 
     logging.getLogger("can.io.logger").setLevel(logging.WARNING)
     logging.getLogger("parso").setLevel(logging.WARNING)
@@ -63,18 +63,18 @@ def spawn_shell():
     user_ns["tms"] = tms
 
     def node_appeared(node, node_id):
-        node_name = "{}{}".format(base_name, node_id)
+        node_name = "{}{}".format(base_node_name, node_id)
         print("Found {} with device id {}".format(node_name, node.uid))
         tms[node_id] = node
         user_ns[node_name] = node
 
     def node_disappeared(node_id):
-        node_name = "{}{}".format(base_name, node_id)
+        node_name = "{}{}".format(base_node_name, node_id)
         print("{} lost".format(node_name))
         del tms[node_id]
         del user_ns[node_name]
     
-    print(shell_name + " " + str(version))
+    print(app_name + " " + str(version))
     dsc = Discovery(can_bus, node_appeared, node_disappeared, logger)
     print("Listening for nodes...")
 

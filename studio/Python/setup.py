@@ -26,6 +26,8 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         "ipython",
+        "pyside2",
+        "pyqtgraph",
         "pyserial",
         "python-can>=4.0.0.dev0",
         #"python-can @ git+https://github.com/yconst/python-can.git@develop#egg=python-can-dev",
@@ -38,7 +40,8 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "tinymovr=tinymovr.shell:spawn_shell"
+            "tinymovr=tinymovr.shell:spawn_shell",
+            "tinymovr_gui=tinymovr.gui:spawn_gui"
         ],
         "can.interface": [
             "sim=tests:SimBus",

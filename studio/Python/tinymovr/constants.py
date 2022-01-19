@@ -2,6 +2,10 @@
 from enum import IntEnum
 
 
+app_name = "Tinymovr Studio"
+base_node_name = "tm"
+
+
 class ControlStates(IntEnum):
     Idle = 0
     Calibration = 1
