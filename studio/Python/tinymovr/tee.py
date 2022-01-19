@@ -3,7 +3,14 @@ tees = []
 
 class Tee:
     '''
-    Filter incoming messages based on a callback
+    Filter and distribute incoming messages based on the boolean result
+    of a filter callback.
+
+    python-can does not allow filtering messages per recipient therefore
+    this class.
+
+    Also implements a simple forwarding mechanism for sending messages, to
+    simplify interfacing with CAN bus objects.
     '''
     def __init__(self, can_bus, filter_cb):
         super().__init__()
@@ -13,6 +20,10 @@ class Tee:
         tees.append(self)
 
     def recv(self):
+        '''
+        Tries to receive a message from the bus object and if successful,
+        tests reception of each tee instance in the global index. 
+        '''
         msg = self.can_bus.recv(0)
         if msg:
             for tee in tees:
@@ -24,4 +35,7 @@ class Tee:
             return None
 
     def send(self, msg):
+        '''
+        Send a message by forwarding to the bus object
+        '''
         self.can_bus.send(msg)

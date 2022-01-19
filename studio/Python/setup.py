@@ -33,7 +33,6 @@ setup(
         "avlos @ git+ssh://git@github.com/tinymovr/avlos-client.git@main#egg=avlos"
         "pyserial",
         "docopt",
-        "pynumparser",
         "humanfriendly",
         "pint"
     ],

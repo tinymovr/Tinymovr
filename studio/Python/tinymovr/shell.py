@@ -1,33 +1,28 @@
 """Tinymovr Shell Utility
 
 Usage:
-    tinymovr [--ids=<ids>] [--bustype=<bustype>] [--chan=<chan>] [--bitrate=<bitrate>] [--no-version-check]
+    tinymovr [--bustype=<bustype>] [--chan=<chan>] [--bitrate=<bitrate>] [--no-version-check]
     tinymovr -h | --help
     tinymovr --version
 
 Options:
-    --ids=<ids>          CAN node IDs to search [default: 1-2]
     --bustype=<bustype>  CAN bus type to use [default: slcan].
     --chan=<chan>        CAN channel (i.e. device) to use [default: auto].
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
     --no-version-check   Disable firmware-studio version compatibility check.
 """
 
-import time
 from typing import Dict
 import logging
 import pkg_resources
 import IPython
 from traitlets.config import Config
 from docopt import docopt
-import pynumparser
 
 import can
-from tinymovr.isotp_channel import ISOTPChannel, guess_channel
+from tinymovr.isotp_channel import guess_channel
 from tinymovr.discovery import Discovery
-from avlos import get_object_tree
 
-#from tinymovr import UserWrapper, VersionError
 #from tinymovr.units import get_registry
 
 """
@@ -57,9 +52,6 @@ def spawn_shell():
     logging.getLogger("parso").setLevel(logging.WARNING)
     logging.getLogger("asyncio").setLevel(logging.WARNING)
     logger = make_logger()
-
-    num_parser = pynumparser.NumberSequence(limits=(0, 16))
-    node_ids = num_parser(arguments["--ids"])
     
     bustype = arguments["--bustype"]
     channel = arguments["--chan"]
@@ -68,47 +60,25 @@ def spawn_shell():
     if channel == "auto":
         channel = guess_channel(bustype, logger)
     can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
-    isotp_channels = {}
     tms = {}
     user_ns = {}
     user_ns["tms"] = tms
 
-    def node_appeared(node_id):
-        isotp_channels[node_id] = ISOTPChannel(can_bus, node_id, logger)
-        root = get_object_tree(isotp_channels[node_id])
+    def node_appeared(node, node_id):
         node_name = "{}{}".format(base_name, node_id)
-        print("{} appeared".format(node_name))
-        tms[node_id] = root
-        user_ns[node_name] = root
-        return True
+        print("Found {} with device id {}".format(node_name, node.uid))
+        tms[node_id] = node
+        user_ns[node_name] = node
 
     def node_disappeared(node_id):
-        logger.info("{} disappeared".format(base_name + str(node_id)))
+        node_name = "{}{}".format(base_name, node_id)
+        print("{} lost".format(node_name))
         del tms[node_id]
-
-    dsc = Discovery(can_bus, node_appeared, node_disappeared, logger)
+        del user_ns[node_name]
     
     print(shell_name + " " + str(version))
-#     can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
-#     if len(tms) == 0:
-#         logger.error("No Tinymovr instances detected. Exiting shell...")
-#     else:
-#         for tm_id, tm in tms.items():
-#             tm.channel = ISOTPChannel(can_bus, tm_id, logger)
-#         tms_discovered = ", ".join([base_name + str(k) for k in tms.keys()])
-#         user_ns = {}
-#         user_ns.update({base_name + str(k) : v for k, v in tms.items()})
-#         user_ns["tms"] = list(tms.values())
-#         #user_ns["plot"] = plot
-#         #user_ns["ureg"] = get_registry()
-#         print(shell_name + " " + str(version))
-#         print("Discovered instances: " + tms_discovered)
-#         print(
-#             "Access Tinymovr instances as tmx, where x \
-# is the index starting from 1"
-#         )
-#         print("e.g. the first Tinymovr instance will be tm1.")
-#         print("Instances are also available by index in the tms list.")
+    dsc = Discovery(can_bus, node_appeared, node_disappeared, logger)
+    print("Listening for nodes...")
 
     c = Config()
     c.InteractiveShellApp.gui = "tk"
