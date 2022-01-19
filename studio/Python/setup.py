@@ -36,9 +36,6 @@ setup(
         "humanfriendly",
         "pint"
     ],
-    extras_require={
-        'plot': ["matplotlib"]
-    },
     entry_points={
         "console_scripts": [
             "tinymovr=tinymovr.shell:spawn_shell"

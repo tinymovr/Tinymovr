@@ -12,7 +12,6 @@ Options:
     --no-version-check   Disable firmware-studio version compatibility check.
 """
 
-from typing import Dict
 import logging
 import pkg_resources
 import IPython
@@ -22,8 +21,6 @@ from docopt import docopt
 import can
 from tinymovr.isotp_channel import guess_channel
 from tinymovr.discovery import Discovery
-
-#from tinymovr.units import get_registry
 
 """
 This program is free software: you can redistribute it and/or modify it under
@@ -51,7 +48,8 @@ def spawn_shell():
     logging.getLogger("can.io.logger").setLevel(logging.WARNING)
     logging.getLogger("parso").setLevel(logging.WARNING)
     logging.getLogger("asyncio").setLevel(logging.WARNING)
-    logger = make_logger()
+    logger = logging.getLogger("tinymovr")
+    logger.setLevel(logging.DEBUG)
     
     bustype = arguments["--bustype"]
     channel = arguments["--chan"]
@@ -85,13 +83,3 @@ def spawn_shell():
     c.TerminalIPythonApp.display_banner = False
     IPython.start_ipython(argv=[], config=c, user_ns=user_ns)
     logger.debug("Exiting shell...")
-
-
-def make_logger():
-    """
-    Configures logging options and
-    generates a default logger instance.
-    """
-    logger = logging.getLogger("tinymovr")
-    logger.setLevel(logging.DEBUG)
-    return logger
