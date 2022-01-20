@@ -63,7 +63,9 @@ You can send these 3 setpoints as a single CAN frame when using the `set_pos_set
 You can tune separately each gain of the loop.
 
 **P**: The gain of the position proportional term
+
 **V**: The gain of the velocity proportional term
+
 **I**: The gain of the velocity integral term
 
 The latter is especially useful for tracking positions at low velocities. You can set it to zero for greater position control bandwith.
