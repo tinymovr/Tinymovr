@@ -33,8 +33,8 @@
 static IsoTpLink g_link;
 
 /* Alloc send and receive buffer statically in RAM */
-static uint8_t g_isotpRecvBuf[ISOTP_BUFSIZE];
-static uint8_t g_isotpSendBuf[ISOTP_BUFSIZE];
+static uint8_t g_isotpRecvBuf[ISOTP_RX_BUFSIZE];
+static uint8_t g_isotpSendBuf[ISOTP_TX_BUFSIZE];
 
 static const uint8_t heartbeat_byte = 0;
 
@@ -49,8 +49,8 @@ static CANState state ={0};
 void CAN_init(void)
 {
     isotp_init_link(&g_link, (config.id << CAN_EP_SIZE) | ISOTP_TX_ADDR,
-						g_isotpSendBuf, ISOTP_BUFSIZE, 
-						g_isotpRecvBuf, ISOTP_BUFSIZE);
+						g_isotpSendBuf, ISOTP_TX_BUFSIZE, 
+						g_isotpRecvBuf, ISOTP_RX_BUFSIZE);
 
 #if defined(BOARD_REV_T5)
     // Configure PD7 as GPIO output
@@ -127,8 +127,8 @@ void CAN_set_ID(uint8_t id)
     pac5xxx_can_reset_mode_set(0);  // CAN reset mode inactive
     delay_us(100);
     isotp_init_link(&g_link, (config.id << CAN_EP_SIZE) | ISOTP_TX_ADDR,
-						g_isotpSendBuf, ISOTP_BUFSIZE, 
-						g_isotpRecvBuf, ISOTP_BUFSIZE);
+						g_isotpSendBuf, ISOTP_TX_BUFSIZE, 
+						g_isotpRecvBuf, ISOTP_RX_BUFSIZE);
 }
 
 void CAN_process_interrupt(void)

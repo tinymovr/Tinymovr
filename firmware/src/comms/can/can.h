@@ -23,7 +23,8 @@
 #define CAN_EP_SIZE 6
 #define ISOTP_RX_ADDR 0x3E
 #define ISOTP_TX_ADDR 0x3F
-#define ISOTP_BUFSIZE 1536
+#define ISOTP_RX_BUFSIZE 128
+#define ISOTP_TX_BUFSIZE 2048
 
 typedef struct 
 {
