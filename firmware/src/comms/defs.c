@@ -10,7 +10,7 @@
 #include <src/system/system.h>
 #include <src/comms/defs.h>
 
-RemoteObject *store[50];
+RemoteObject *store[55];
 Server s;
 
 static inline size_t noop(uint8_t *buffer_in, uint8_t *buffer_out) {return 0;}

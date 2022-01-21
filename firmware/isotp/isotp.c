@@ -260,7 +260,10 @@ int isotp_send_with_id(IsoTpLink *link, uint32_t id, const uint8_t payload[], ui
     /* copy into local buffer */
     link->send_size = size;
     link->send_offset = 0;
-    (void) memcpy(link->send_buffer, payload, size);
+    if (link->send_buffer != payload)
+    {
+        (void) memcpy(link->send_buffer, payload, size);
+    }
 
     if (link->send_size < 8) {
         /* send single frame */

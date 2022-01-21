@@ -24,7 +24,12 @@
 #define ISOTP_RX_ADDR 0x3E
 #define ISOTP_TX_ADDR 0x3F
 #define ISOTP_RX_BUFSIZE 128
-#define ISOTP_TX_BUFSIZE 2048
+#define ISOTP_TX_BUFSIZE 1600
+
+typedef enum
+{
+    CAN_FLT_ISOTP_TX_ERROR = 0
+} CANFault;
 
 typedef struct 
 {
@@ -35,6 +40,7 @@ typedef struct
 
 typedef struct 
 {
+    uint8_t faults;
     uint32_t last_msg_ms;
 } CANState;
 
@@ -48,5 +54,7 @@ void CAN_process_interrupt(void);
 CANConfig* CAN_get_config(void);
 void CAN_restore_config(CANConfig* config_);
 void CAN_task(void);
+
+PAC5XXX_RAMFUNC uint8_t can_get_faults(void);
 
 #endif /* CAN_CAN_H_ */

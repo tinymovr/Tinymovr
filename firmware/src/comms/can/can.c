@@ -165,19 +165,18 @@ void CAN_process_interrupt(void)
         
         if (ISOTP_RET_OK == isotp_full(&g_link))
         {
-            uint8_t payload[512];
-            uint16_t payload_size = 0;
-            int ret = isotp_receive(&g_link, payload, 512, &payload_size);
+            uint8_t rx_payload[ISOTP_RX_BUFSIZE];
+            uint16_t rx_payload_size = 0;
+            int ret = isotp_receive(&g_link, rx_payload, 128, &rx_payload_size);
             if (ISOTP_RET_OK == ret) {
                 /* Handle received message */
-                const size_t response_size = handle_message(payload, payload);
-                if (response_size > 0) {
+                const size_t tx_payload_size = handle_message(rx_payload, g_isotpSendBuf);
+                if (tx_payload_size > 0) {
                     /* In case you want to send data w/ functional addressing, use isotp_send_with_id */
-                    ret = isotp_send(&g_link, payload, response_size);
-                    if (ISOTP_RET_OK == ret) {
-                        /* Send ok */
-                    } else {
-                        /* Error occur */
+                    ret = isotp_send(&g_link, g_isotpSendBuf, tx_payload_size);
+                    if (ISOTP_RET_OK != ret) 
+                    {
+                        state.faults |= CAN_FLT_ISOTP_TX_ERROR;
                     }
                 }
             }
@@ -229,4 +228,9 @@ void CAN_task(void) {
         state.last_msg_ms = msTicks;
         can_transmit(1, 0x700 | config.id, &heartbeat_byte);
     }
+}
+
+PAC5XXX_RAMFUNC uint8_t can_get_faults(void)
+{
+    return state.faults;
 }
