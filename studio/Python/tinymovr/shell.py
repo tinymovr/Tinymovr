@@ -36,8 +36,6 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 
-
-
 def spawn_shell():
     """
     Spawns the Tinymovr Studio IPython shell.
@@ -70,7 +68,7 @@ def spawn_shell():
 
     def node_disappeared(node_id):
         node_name = "{}{}".format(base_node_name, node_id)
-        print("{} lost".format(node_name))
+        print("Lost {}".format(node_name))
         del tms[node_id]
         del user_ns[node_name]
     
