@@ -17,23 +17,10 @@ ISOTP_TX_ADDR = 0x3E
 ISOTP_RX_ADDR = 0x3F
 
 
-min_fw_version = "0.8.10"
-
-
 can_devices = {
     "slcan": ("canable", "cantact"),
     "robotell": ("CP210",),
 }
-
-
-class VersionError(Exception):
-    
-    def __init__(self, kw, found, required, *args, **kwargs):
-        msg = "Node {} version incompatible (found: {}, required: {})".format(kw, found, required)
-        super().__init__(msg, *args, **kwargs)
-        self.kw = kw
-        self.found = found
-        self.required = required
 
 
 class ResponseError(Exception):
@@ -96,7 +83,7 @@ class ISOTPChannel(Channel):
         self.request_stop()
         self.update_thread.join()
 
-    def recv(self, deadline=0.8, sleep_interval=0.02):
+    def recv(self, deadline=0.8, sleep_interval=0.1):
         total_interval = 0
         while total_interval < deadline:
             if self.stack.available():
