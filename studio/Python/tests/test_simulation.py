@@ -7,11 +7,8 @@ device, which is suitable for unit testing.
 import logging
 import can
 
-from avlos import get_object_tree
-
+from avlos import ObjectFactory
 from tinymovr.isotp_channel import ISOTPChannel
-from tinymovr.constants import ErrorIDs
-
 import unittest
 
 NODE_ID = 1
@@ -23,7 +20,8 @@ class TestSimulation(unittest.TestCase):
         cls.logger = logging.getLogger("tinymovr")
         cls.logger.setLevel(logging.DEBUG)
         isotp_chan = ISOTPChannel(can_bus, NODE_ID, cls.logger)
-        cls.tm = get_object_tree(isotp_chan)
+        f = ObjectFactory(isotp_chan)
+        cls.tm = f.get_object_tree()
 
     def setUp(self):
         self.tm.reset()

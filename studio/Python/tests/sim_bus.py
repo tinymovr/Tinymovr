@@ -3,14 +3,13 @@ import json
 import math
 import threading
 from collections import deque
+
 import can
 import isotp
 import msgpack
-import avlos
-from tinymovr.constants import ErrorIDs
 from avlos.codecs import MultibyteCodec
 from avlos.types import DataType
-from tinymovr.isotp_channel import create_frame, ISOTP_RX_ADDR, ISOTP_TX_ADDR, CAN_EP_BITS
+from tinymovr.isotp_channel import CAN_EP_BITS
 
 
 AVLOS_SPEC_ADDR = 0xFFFF
