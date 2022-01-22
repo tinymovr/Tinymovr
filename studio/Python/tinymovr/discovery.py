@@ -2,13 +2,32 @@
 import time
 import threading
 
-from avlos import get_object_tree
+from avlos import ObjectFactory
 from tinymovr.isotp_channel import ISOTPChannel, ResponseError
 from tinymovr.tee import Tee
 
 
 HEARTBEAT_BASE = 0x700
 
+# Substitution strings
+# The node names coming from Tinymovr are short to conserve memory.
+# This can make them cryptic at times. We use a dictionary of shortened
+# and original key-value pairs to make the names a bit more
+# understandable
+subst = {
+    "ctrlr": "controller",
+    "pos_est": "pos_estimate",
+    "vel_est": "vel_estimate",
+    "pos_set": "pos_setpoint",
+    "vel_set": "vel_setpoint",
+    "vel_lim": "vel_limit",
+    "Iq_est": "Iq_estimate",
+    "Iq_set": "Iq_setpoint",
+    "Iq_lim": "Iq_limit",
+    "pps": "pole_pairs",
+    "calb": "calibrated",
+    "dir": "direction"
+}
 
 class Discovery:
     '''
@@ -49,7 +68,8 @@ class Discovery:
                     chan = ISOTPChannel(self.can_bus, node_id, self.logger)
                     self.isotp_channels[node_id] = chan
                     try:
-                        node = get_object_tree(chan)
+                        f = ObjectFactory(chan, self.name_cb)
+                        node = f.get_object_tree()
                         self.nodes[node_id] = node
                         self.update_stamps[node_id] = now
                         self.appeared_cb(node, node_id)
@@ -67,3 +87,9 @@ class Discovery:
             #     del self.update_stamps[node_id]
             #     self.disappeared_cb(node_id)
             time.sleep(0.5)
+
+    def name_cb(self, name):
+        try:
+            return subst[name]
+        except KeyError:
+            return name
