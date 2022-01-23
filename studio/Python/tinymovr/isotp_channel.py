@@ -36,6 +36,7 @@ class OurCanStack(isotp.TransportLayer):
     def __init__(self, can_bus, address, *args, **kwargs):
         self.tee = Tee(can_bus,
             lambda msg: msg.arbitration_id == address.rxid)
+        self.sema = threading.Semaphore()
         isotp.TransportLayer.__init__(
             self,
             rxfn=self.rx_canbus,
@@ -45,6 +46,7 @@ class OurCanStack(isotp.TransportLayer):
             )
 
     def tx_canbus(self, msg):
+        self.sema.acquire()
         can_msg = can.Message(
             arbitration_id=msg.arbitration_id,
             data = msg.data,
@@ -53,12 +55,16 @@ class OurCanStack(isotp.TransportLayer):
             bitrate_switch=msg.bitrate_switch
             )
         self.tee.send(can_msg)
+        self.sema.release()
 
     def rx_canbus(self):
+        self.sema.acquire()
         msg = self.tee.recv()
+        isotp_msg = None
         if msg is not None:
-            return isotp.CanMessage(arbitration_id=msg.arbitration_id, data=msg.data, extended_id=msg.is_extended_id, is_fd=msg.is_fd, bitrate_switch=msg.bitrate_switch)
-
+            isotp_msg = isotp.CanMessage(arbitration_id=msg.arbitration_id, data=msg.data, extended_id=msg.is_extended_id, is_fd=msg.is_fd, bitrate_switch=msg.bitrate_switch)
+        self.sema.release()
+        return isotp_msg
 
 class ISOTPChannel(Channel):
 
@@ -83,7 +89,7 @@ class ISOTPChannel(Channel):
         self.request_stop()
         self.update_thread.join()
 
-    def recv(self, deadline=0.8, sleep_interval=0.1):
+    def recv(self, deadline=0.8, sleep_interval=0.05):
         total_interval = 0
         while total_interval < deadline:
             if self.stack.available():

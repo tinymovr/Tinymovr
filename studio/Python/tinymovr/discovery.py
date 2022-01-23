@@ -77,15 +77,15 @@ class Discovery:
                         self.logger.error(e)
                 msg = self.tee.recv()
             
-            # for_removal = set()
-            # for node_id, stamp in self.update_stamps.items():
-            #     if now - stamp > self.lost_timeout:
-            #         for_removal.add(node_id)
-            # for node_id in for_removal:
-            #     del self.nodes[node_id]
-            #     del self.isotp_channels[node_id]
-            #     del self.update_stamps[node_id]
-            #     self.disappeared_cb(node_id)
+            for_removal = set()
+            for node_id, stamp in self.update_stamps.items():
+                if now - stamp > self.lost_timeout:
+                    for_removal.add(node_id)
+            for node_id in for_removal:
+                del self.nodes[node_id]
+                del self.isotp_channels[node_id]
+                del self.update_stamps[node_id]
+                self.disappeared_cb(node_id)
             time.sleep(0.5)
 
     def name_cb(self, name):
