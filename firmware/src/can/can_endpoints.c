@@ -350,19 +350,24 @@ uint8_t CAN_SetGains(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 uint8_t CAN_GetIntegratorGains(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     const float vel_I_gain = Controller_GetVelIntegratorGain();
-    *buffer_len = sizeof(float);
+    const float vel_I_antihunt = controller_get_vel_integrator_antihunt();
+    *buffer_len = 2*sizeof(float);
     memcpy(&buffer[0], &vel_I_gain, sizeof(float));
+    memcpy(&buffer[4], &vel_I_antihunt, sizeof(float));
     return CANRP_Read;
 }
 
 uint8_t CAN_SetIntegratorGains(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float vel_I_gain;
+    float vel_I_antihunt;
     memcpy(&vel_I_gain, &buffer[0], sizeof(float));
+    memcpy(&vel_I_antihunt, &buffer[4], sizeof(float));
     CAN_ResponseType response = CANRP_NoAction;
-    if (vel_I_gain >= 0.0f)
+    if (vel_I_gain >= 0.0f && vel_I_antihunt >= 0.0f)
     {
         Controller_SetVelIntegratorGain(vel_I_gain);
+        controller_set_vel_integrator_antihunt(vel_I_antihunt);
         response = CANRP_Write;
     }
     return response;

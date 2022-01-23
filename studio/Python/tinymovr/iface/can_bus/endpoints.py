@@ -145,25 +145,25 @@ can_endpoints: Dict[str, Dict] = {
         "labels": ("I_A", "I_B", "I_C"),
         "from_version": "0.7.1"
     },
-    "integrator_gains":
+    "vel_integrator_params":
     {
-        "description": "Get Integrator Gains (Velocity)",
+        "description": "Get Velocity Integrator Parameters",
         "type": "r",
         "ep_id": 0x012,
-        "types": (DataType.FLOAT, ),
-        "units": ("(A*second)/tick", ),
-        "labels": ("velocity", ),
-        "ser_map": {"integrator_gains": ("velocity", )}
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": ("(A*second)/tick", "tick"),
+        "labels": ("gain", "antihunt_window"),
+        "ser_map": {"vel_integrator_params": ("gain", "antihunt_window")}
     },
-    "set_integrator_gains":
+    "set_vel_integrator_params":
     {
-        "description": "Set Integrator Gains (Velocity)",
+        "description": "Set Velocity Integrator Parameters",
         "type": "w",
         "ep_id": 0x013,
-        "types": (DataType.FLOAT, ),
-        "units": ("(A*second)/tick", ),
-        "labels": ("velocity", ),
-        "ser_map": {"integrator_gains": ( "velocity", )}
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "units": ("(A*second)/tick", "tick"),
+        "labels": ("gain", "antihunt_window"),
+        "ser_map": {"vel_integrator_params": ("gain", "antihunt_window")}
     },
     "Iq":
     {

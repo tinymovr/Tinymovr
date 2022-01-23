@@ -65,6 +65,7 @@ static struct ControllerConfig config ={
     .pos_gain = 20.0f,
     .vel_gain = 8.0e-5f,
     .vel_integrator_gain = 0.00020f,
+    .vel_integrator_antihunt_threshold = 200.0f,
     .I_bw = 1000.0,
     .I_gain = 0.0f,
     .Iq_integrator_gain = 0.0f,
@@ -122,9 +123,9 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     }
 
     float vel_setpoint = state.vel_setpoint;
+    const float delta_pos = Observer_GetPosDiff(state.pos_setpoint);
     if (state.mode >= CTRL_POSITION)
     {
-        const float delta_pos = Observer_GetPosDiff(state.pos_setpoint);
         vel_setpoint += delta_pos * config.pos_gain;
     }
 
@@ -135,8 +136,12 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     {
         float delta_vel = vel_setpoint - vel_estimate;
         // Velocity limiting will be done later on based on the estimate
-        Iq_setpoint += (delta_vel * config.vel_gain) + state.vel_integrator_Iq;
-        state.vel_integrator_Iq += delta_vel * PWM_PERIOD_S * config.vel_integrator_gain;
+        Iq_setpoint += delta_vel * config.vel_gain;
+        if (state.mode <= CTRL_VELOCITY || fabsf(vel_setpoint) > VEL_INTEGRATOR_THRESHOLD || fabsf(delta_pos) > config.vel_integrator_antihunt_threshold)
+        {
+            Iq_setpoint += state.vel_integrator_Iq;
+            state.vel_integrator_Iq += delta_vel * PWM_PERIOD_S * config.vel_integrator_gain;
+        }
     }
     else
     {
@@ -376,6 +381,19 @@ void Controller_SetVelIntegratorGain(float gain)
     if (gain >= 0.0f)
     {
         config.vel_integrator_gain = gain;
+    }
+}
+
+float controller_get_vel_integrator_antihunt(void)
+{
+    return config.vel_integrator_antihunt_threshold;
+}
+
+void controller_set_vel_integrator_antihunt(float value)
+{
+    if (value >= 0.0f)
+    {
+        config.vel_integrator_antihunt_threshold = value;
     }
 }
 

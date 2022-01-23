@@ -68,6 +68,7 @@ struct ControllerConfig
     float pos_gain;
     float vel_gain;
     float vel_integrator_gain;
+    float vel_integrator_antihunt_threshold;
     float I_bw;
     float I_gain;
     float Iq_integrator_gain;
@@ -104,6 +105,8 @@ float Controller_GetVelGain(void);
 void Controller_SetVelGain(float gain);
 float Controller_GetVelIntegratorGain(void);
 void Controller_SetVelIntegratorGain(float gain);
+float controller_get_vel_integrator_antihunt(void);
+void controller_set_vel_integrator_antihunt(float gain);
 float Controller_GetIqGain(void);
 float Controller_GetIqBandwidth(void);
 void Controller_SetIqBandwidth(float bw);
