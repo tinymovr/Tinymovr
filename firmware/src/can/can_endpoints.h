@@ -60,6 +60,8 @@ uint8_t CAN_SaveConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_EraseConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_GetMotorConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_SetMotorConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_GetMotorRL(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+uint8_t CAN_SetMotorRL(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 
 uint8_t CAN_MoveToPosWithTimeLimit(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_MoveToPosWithVelLimit(uint8_t buffer[], uint8_t *buffer_len, bool rtr);

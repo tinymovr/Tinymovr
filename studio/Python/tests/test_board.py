@@ -174,8 +174,7 @@ class TestBoard(TMTestCase):
         '''
         Test state transitions
         '''
-        self.tm.reset()
-        time.sleep(0.5)
+        self.reset_and_wait()
         # Ensure we're idle
         self.check_state(0)
         # Start calibration
@@ -203,7 +202,8 @@ class TestBoard(TMTestCase):
         Test gimbal mode
         '''
         self.check_state(0)
-        self.tm.set_motor_config(flags=1, R=220, L=80, I_cal=5000)
+        self.tm.set_motor_config(flags=1, pole_pairs=1, I_cal=5.0) # fw will ignore pole pair value of 1
+        self.tm.set_motor_RL(R=0.2, L=20*1e-5)
         self.try_calibrate()
         self.tm.position_control()
         self.check_state(2)

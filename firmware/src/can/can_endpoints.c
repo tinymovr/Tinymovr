@@ -80,6 +80,9 @@ void CANEP_InitEndpointMap(void)
     // ---
     CANEP_AddEndpoint(&CAN_GetSetPosVel, 0x025);
     CANEP_AddEndpoint(&CAN_GetSetPosVelIq, 0x026);
+    //
+    CANEP_AddEndpoint(&CAN_GetMotorRL, 0x027);
+    CANEP_AddEndpoint(&CAN_SetMotorRL, 0x028);
 }
 
 void CANEP_AddEndpoint(CANEP_Callback callback, uint8_t id)
@@ -406,41 +409,57 @@ uint8_t CAN_EraseConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 uint8_t CAN_GetMotorConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     const uint8_t flags = (motor_is_calibrated() == true) | ((motor_is_gimbal() == true) << 1);
-    const uint16_t R = (uint16_t)(motor_get_phase_resistance() * 1e+3f);
     const uint8_t pole_pairs = motor_get_pole_pairs();
-    const uint16_t L = (uint16_t)(motor_get_phase_inductance() * 1e+6f);
-    const uint16_t I_cal = (uint16_t)(motor_get_I_cal() * 1000.f);
-    *buffer_len = 3 * sizeof(uint16_t) + 2 * sizeof(uint8_t);
+    const float I_cal = motor_get_I_cal();
+    *buffer_len = 2 * sizeof(uint8_t) + sizeof(float);
     memcpy(&buffer[0], &flags, sizeof(uint8_t));
-    memcpy(&buffer[1], &R, sizeof(uint16_t));
-    memcpy(&buffer[3], &pole_pairs, sizeof(uint8_t));
-    memcpy(&buffer[4], &L, sizeof(uint16_t));
-    memcpy(&buffer[6], &I_cal, sizeof(uint16_t));
+    memcpy(&buffer[1], &pole_pairs, sizeof(uint8_t));
+    memcpy(&buffer[2], &I_cal, sizeof(float));
     return CANRP_Read;
 }
 
 uint8_t CAN_SetMotorConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     uint8_t flags;
-    uint16_t R;
-    uint16_t L;
-    uint16_t I_cal;
+    uint8_t pole_pairs;
+    float I_cal;
     memcpy(&flags, &buffer[0], sizeof(uint8_t));
-    memcpy(&R, &buffer[1], sizeof(uint16_t));
-    memcpy(&L, &buffer[3], sizeof(uint16_t));
-    memcpy(&I_cal, &buffer[5], sizeof(uint16_t));
+    memcpy(&pole_pairs, &buffer[1], sizeof(uint8_t));
+    memcpy(&I_cal, &buffer[2], sizeof(float));
 
-    CAN_ResponseType response = CANRP_NoAction;
-
-    if ((R > 0) && (L > 0) && (I_cal > 0))
+    if (I_cal > 0 && pole_pairs > 0)
     {
         bool is_gimbal = (bool)(flags & 0x1);
         motor_set_is_gimbal(is_gimbal);
-        motor_set_phase_R_and_L(((float)R) * 1e-3f, ((float)L) * 1e-6f);
-        motor_set_I_cal(((float)I_cal) * 1e-3f);
-        response = CANRP_Write;
+        motor_set_I_cal(I_cal);
+        return CANRP_Write;
     }
-    return response;
+    return CANRP_NoAction;
+}
+
+uint8_t CAN_GetMotorRL(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+{
+    const float R = motor_get_phase_resistance();
+    const float L = motor_get_phase_inductance();
+    *buffer_len = 2 * sizeof(float);
+    memcpy(&buffer[0], &R, sizeof(float));
+    memcpy(&buffer[4], &L, sizeof(float));
+    return CANRP_Read;
+}
+
+uint8_t CAN_SetMotorRL(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+{
+    float R;
+    float L;
+    memcpy(&R, &buffer[0], sizeof(float));
+    memcpy(&L, &buffer[4], sizeof(float));
+
+    if ((R > 0) && (L > 0))
+    {
+        motor_set_phase_R_and_L(R, L);
+        return CANRP_Write;
+    }
+    return CANRP_NoAction;
 }
 
 // -----

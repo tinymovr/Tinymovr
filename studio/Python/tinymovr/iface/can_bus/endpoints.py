@@ -251,25 +251,24 @@ can_endpoints: Dict[str, Dict] = {
     "motor_config":
     {
         "description": "Get Motor Configuration (Flags (calibrated, is_gimbal), \
-Resistance, Pole Pairs, Inductance, Calibration Current)",
+ Pole Pairs, Calibration Current)",
         "type": "r",
         "ep_id": 0x01E,
-        "types": (DataType.UINT8, DataType.UINT16,
-                  DataType.UINT8, DataType.UINT16, DataType.UINT16),
-        "labels": ("flags", "R", "pole_pairs", "L", "I_cal"),
-        "units": (None, "milliohm", None, "microhenry", "milliamp"),
-        "ser_map": {"motor": ("R", "L", "pole_pairs", "I_cal")}
+        "types": (DataType.UINT8, DataType.UINT8, DataType.FLOAT),
+        "labels": ("flags", "pole_pairs", "I_cal"),
+        "units": (None, None, "ampere"),
+        "ser_map": {"motor": ("pole_pairs", "I_cal")}
     },
     "set_motor_config":
     {
         "description": "Set Motor Configuration \
-                        (Flags (is_gimbal), Resistance, Inductance, Calibration Current)",
+                        (Flags (is_gimbal), Pole Pairs, Calibration Current)",
         "type": "w",
         "ep_id": 0x01F,
-        "types": (DataType.UINT8, DataType.UINT16, DataType.UINT16, DataType.UINT16),
-        "labels": ("flags", "R", "L", "I_cal"),
-        "units": (None, "milliohm", "microhenry", "milliamp"),
-        "ser_map": {"motor": ("R", "L")}
+        "types": (DataType.UINT8, DataType.UINT8, DataType.FLOAT),
+        "labels": ("flags", "pole_pairs", "I_cal"),
+        "units": (None, None, "ampere"),
+        "ser_map": {"motor": ("pole_pairs", "I_cal")}
     },
     "plan_t_limit":
     {
@@ -328,5 +327,25 @@ for velocity-limited plan moves",
         "units": ("tick", "decatick/second", "centiampere"),
         "defaults": {"velocity_ff": 0, "current_ff": 0},
         "labels": ("position", "velocity_ff", "current_ff")
+    },
+    "motor_RL":
+    {
+        "description": "Get Motor Resistance and Inductance values",
+        "type": "r",
+        "ep_id": 0x027,
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "labels": ("R", "L"),
+        "units": ("ohm", "henry"),
+        "ser_map": {"motor": ("R", "L")}
+    },
+    "set_motor_RL":
+    {
+        "description": "Set Motor Resistance and Inductance",
+        "type": "w",
+        "ep_id": 0x028,
+        "types": (DataType.FLOAT, DataType.FLOAT),
+        "labels": ("R", "L"),
+        "units": ("ohm", "henry"),
+        "ser_map": {"motor": ("R", "L")}
     },
 }

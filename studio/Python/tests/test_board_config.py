@@ -31,8 +31,7 @@ class TestBoardConfig(TMTestCase):
             self.tm.erase_config()
             time.sleep(0.2)
 
-        self.tm.reset()
-        time.sleep(0.2)
+        self.reset_and_wait()
 
         self.check_state(0)
         self.assertEqual(self.tm.motor_config.flags, 0)
@@ -40,8 +39,7 @@ class TestBoardConfig(TMTestCase):
         self.tm.position_control()
         self.check_state(0, ErrorIDs.InvalidState)
 
-        self.tm.reset()
-        time.sleep(0.2)
+        self.reset_and_wait()
         
         self.check_state(0)
         self.assertEqual(self.tm.motor_config.flags, 0)
@@ -59,8 +57,7 @@ class TestBoardConfig(TMTestCase):
         self.tm.calibrate()
         self.check_state(0, ErrorIDs.InvalidState)
 
-        self.tm.reset()
-        time.sleep(0.2)
+        self.reset_and_wait()
 
 
     def test_b_save_load_config(self):
@@ -74,16 +71,15 @@ class TestBoardConfig(TMTestCase):
         self.assertEqual(self.tm.motor_config.flags, 0)
         self.try_calibrate()
         self.assertEqual(self.tm.motor_config.flags, 1)
-        R = self.tm.motor_config.R
-        L = self.tm.motor_config.L
+        R = self.tm.motor_RL.R
+        L = self.tm.motor_RL.L
         pole_pairs = self.tm.motor_config.pole_pairs
         self.tm.save_config()
         time.sleep(0.2)
-        self.tm.reset()
-        time.sleep(0.2)
+        self.reset_and_wait()
         self.assertEqual(self.tm.motor_config.flags, 1)
-        self.assertAlmostEqual(R, self.tm.motor_config.R)
-        self.assertAlmostEqual(L, self.tm.motor_config.L)
+        self.assertAlmostEqual(R, self.tm.motor_RL.R)
+        self.assertAlmostEqual(L, self.tm.motor_RL.L)
         self.assertAlmostEqual(pole_pairs, self.tm.motor_config.pole_pairs)
         self.tm.erase_config()
         time.sleep(0.2)
@@ -101,8 +97,7 @@ class TestBoardConfig(TMTestCase):
         self.tm.set_limits(120000, 18)
         self.tm.save_config()
         time.sleep(0.2)
-        self.tm.reset()
-        time.sleep(0.2)
+        self.reset_and_wait()
         self.assertAlmostEqual(self.tm.gains.position, 30 * 1/s)
         self.assertAlmostEqual(self.tm.gains.velocity, 3e-5 * A*s/tick)
         self.assertAlmostEqual(self.tm.integrator_gains, 2e-2 * A*s/tick)
