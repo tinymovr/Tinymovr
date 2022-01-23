@@ -36,7 +36,6 @@ class OurCanStack(isotp.TransportLayer):
     def __init__(self, can_bus, address, *args, **kwargs):
         self.tee = Tee(can_bus,
             lambda msg: msg.arbitration_id == address.rxid)
-        self.sema = threading.Semaphore()
         isotp.TransportLayer.__init__(
             self,
             rxfn=self.rx_canbus,
@@ -46,7 +45,6 @@ class OurCanStack(isotp.TransportLayer):
             )
 
     def tx_canbus(self, msg):
-        self.sema.acquire()
         can_msg = can.Message(
             arbitration_id=msg.arbitration_id,
             data = msg.data,
@@ -55,15 +53,12 @@ class OurCanStack(isotp.TransportLayer):
             bitrate_switch=msg.bitrate_switch
             )
         self.tee.send(can_msg)
-        self.sema.release()
 
     def rx_canbus(self):
-        self.sema.acquire()
         msg = self.tee.recv()
         isotp_msg = None
         if msg is not None:
             isotp_msg = isotp.CanMessage(arbitration_id=msg.arbitration_id, data=msg.data, extended_id=msg.is_extended_id, is_fd=msg.is_fd, bitrate_switch=msg.bitrate_switch)
-        self.sema.release()
         return isotp_msg
 
 class ISOTPChannel(Channel):
@@ -107,9 +102,7 @@ class ISOTPChannel(Channel):
             time.sleep(self.stack.sleep_time())
 
     def stack_error_handler(self, error: IsoTpError):
-        if (isinstance(error, FlowControlTimeoutError) or
-            isinstance(error, ConsecutiveFrameTimeoutError)):
-            self.logger.error(error)
+        self.logger.error(error)
     
     @cached_property
     def serializer(self):
