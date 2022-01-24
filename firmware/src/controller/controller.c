@@ -131,7 +131,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     if (state.mode >= CTRL_POSITION)
     {
         const float delta_pos = Observer_GetPosDiff(state.pos_setpoint);
-        const float delta_pos_integrator = sgnf(delta_pos) * fmaxf(0, fabsf(delta_pos) - config.vel_integrator_deadband);
+        const float delta_pos_integrator = sgnf(delta_pos) * our_fmaxf(0, fabsf(delta_pos) - config.vel_integrator_deadband);
         vel_setpoint += delta_pos * config.pos_gain;
         vel_setpoint_integrator += delta_pos_integrator * config.pos_gain;
     }
@@ -142,7 +142,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     if (state.mode >= CTRL_VELOCITY)
     {
         const float delta_vel = vel_setpoint - vel_estimate;
-        const float delta_vel_integrator = vel_setpoint - vel_estimate;
+        const float delta_vel_integrator = vel_setpoint_integrator - vel_estimate;
         // Velocity limiting will be done later on based on the estimate
         Iq_setpoint += delta_vel * config.vel_gain;
         Iq_setpoint += state.vel_integrator_Iq;
@@ -154,14 +154,14 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     }
     
     // Velocity-dependent current limiting
-    const float vel_limit = fminf(config.vel_limit, VEL_HARD_LIMIT);
+    const float vel_limit = our_fminf(config.vel_limit, VEL_HARD_LIMIT);
     if (Controller_LimitVelocity(-vel_limit, vel_limit, vel_estimate, config.vel_gain, &Iq_setpoint) == true)
     {
         state.vel_integrator_Iq *= 0.995f;
     }
 
     // Absolute current & velocity integrator limiting
-    const float I_limit = fminf(config.I_limit, I_HARD_LIMIT);
+    const float I_limit = our_fminf(config.I_limit, I_HARD_LIMIT);
     if (our_clamp(&Iq_setpoint, -I_limit, I_limit) == true)
     {
         state.vel_integrator_Iq *= 0.995f;
