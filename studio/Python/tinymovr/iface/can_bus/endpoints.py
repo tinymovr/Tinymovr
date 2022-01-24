@@ -147,23 +147,23 @@ can_endpoints: Dict[str, Dict] = {
     },
     "vel_integrator_params":
     {
-        "description": "Get Velocity Integrator Parameters",
+        "description": "Get velocity integrator gain and deadband parameters",
         "type": "r",
         "ep_id": 0x012,
         "types": (DataType.FLOAT, DataType.FLOAT),
         "units": ("(A*second)/tick", "tick"),
-        "labels": ("gain", "antihunt_window"),
-        "ser_map": {"vel_integrator_params": ("gain", "antihunt_window")}
+        "labels": ("gain", "deadband"),
+        "ser_map": {"vel_integrator_params": ("gain", "deadband")}
     },
     "set_vel_integrator_params":
     {
-        "description": "Set Velocity Integrator Parameters",
+        "description": "Set velocity integrator gain and deadband parameters",
         "type": "w",
         "ep_id": 0x013,
         "types": (DataType.FLOAT, DataType.FLOAT),
         "units": ("(A*second)/tick", "tick"),
-        "labels": ("gain", "antihunt_window"),
-        "ser_map": {"vel_integrator_params": ("gain", "antihunt_window")}
+        "labels": ("gain", "deadband"),
+        "ser_map": {"vel_integrator_params": ("gain", "deadband")}
     },
     "Iq":
     {
