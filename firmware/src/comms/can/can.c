@@ -23,12 +23,6 @@
 #include <src/comms/can/can_func.h>
 #include <src/comms/can/can.h>
 
-#if defined(BOARD_REV_R3)
-#define CAN_BUS_PINS CAN_PE23
-#elif defined(BOARD_REV_T5)
-#define CAN_BUS_PINS CAN_PF67
-#endif
-
 /* Alloc IsoTpLink statically in RAM */
 static IsoTpLink g_link;
 
@@ -76,7 +70,7 @@ void CAN_init(void)
     }
 #endif
 
-    can_io_config(CAN_BUS_PINS);
+    can_io_config();
 
     pac5xxx_can_reset_mode_set(1);	// CAN in reset mode, in order to configure CAN module
     PAC55XX_CAN->MR.AFM = 1;		// Single filter scheme

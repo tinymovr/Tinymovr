@@ -63,30 +63,15 @@ typedef enum
     CAN_BAUD_1000KHz            = 8,
 } CAN_BAUD_TYPE;
 
-// CAN IO Select Type
-typedef enum 
-{
-    CAN_PC01                    = 0,
-    CAN_PC45                    = 1,
-    CAN_PD01                    = 2,
-    CAN_PD56                    = 3,
-    CAN_PD67                    = 4,
-    CAN_PE23                    = 5,
-    CAN_PE67                    = 6,
-    CAN_PF67                    = 7,
-    CAN_PG56                    = 8
-} CAN_IO_TYPE;
-
 extern uint8_t tx_data[8];
 extern uint8_t rx_data[8];
 
 extern uint8_t data_length;
 extern uint16_t rx_id;
 extern uint32_t buffer;
-extern uint8_t rx_flag;
 
 void can_baud(CAN_BAUD_TYPE baud);
-void can_io_config(CAN_IO_TYPE can);
+void can_io_config(void);
 void can_transmit(uint8_t dataLen, uint16_t id, const uint8_t * data);
 
 uint16_t CAN_BaudTypeToInt(CAN_BAUD_TYPE type);
