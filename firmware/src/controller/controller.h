@@ -74,6 +74,7 @@ struct ControllerConfig
     float pos_gain;
     float vel_gain;
     float vel_integrator_gain;
+    float vel_integrator_deadband;
     float I_bw;
     float I_gain;
     float Iq_integrator_gain;
@@ -110,6 +111,8 @@ float controller_get_vel_gain(void);
 void controller_set_vel_gain(float gain);
 float controller_get_vel_integrator_gain(void);
 void controller_set_vel_integrator_gain(float gain);
+float controller_get_vel_integrator_deadband(void);
+void controller_set_vel_integrator_deadband(float gain);
 float Controller_GetIqGain(void);
 float controller_get_Iq_bandwidth(void);
 void controller_set_Iq_bandwidth(float bw);
