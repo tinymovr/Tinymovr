@@ -45,7 +45,7 @@ void encoder_init(void)
 
 PAC5XXX_RAMFUNC void encoder_send_angle_cmd(void)
 {
-	ssp_write_one(PRIMARY_ENCODER_SSP_PORT, MA_CMD_ANGLE);
+	ssp_write_one(PRIMARY_ENCODER_SSP_STRUCT, MA_CMD_ANGLE);
 }
 
 PAC5XXX_RAMFUNC int16_t encoder_get_angle(void)
