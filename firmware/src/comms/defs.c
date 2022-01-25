@@ -13,7 +13,7 @@
 RemoteObject *store[55];
 Server s;
 
-static inline size_t noop(uint8_t *buffer_in, uint8_t *buffer_out) {return 0;}
+static inline size_t noop(const uint8_t *buffer_in, uint8_t *buffer_out) {return 0;}
 
 // --- Encoder
 MAKE_GETTER(observer_get_pos_estimate_user_frame)
@@ -21,7 +21,7 @@ MAKE_GETTER(observer_get_vel_estimate_user_frame)
 MAKE_GETTER(observer_get_filter_bandwidth)
 MAKE_SETTER(observer_set_filter_bandwidth)
 MAKE_GETTER(encoder_get_faults)
-size_t ticks_getter(uint8_t *buffer_in, uint8_t *buffer_out) {return write_le((uint16_t)ENCODER_TICKS, buffer_out);}
+size_t ticks_getter(const uint8_t *buffer_in, uint8_t *buffer_out) {return write_le((uint16_t)ENCODER_TICKS, buffer_out);}
 
 // --- Motor
 MAKE_GETTER(motor_get_pole_pairs)
@@ -42,12 +42,6 @@ MAKE_SETTER(motor_set_user_direction)
 // --- Driver
 MAKE_GETTER(gate_driver_get_faults)
 
-// PAC5XXX_RAMFUNC float motor_get_user_offset(void);
-// PAC5XXX_RAMFUNC void motor_set_user_offset(float offset);
-
-// PAC5XXX_RAMFUNC int8_t motor_get_user_direction(void);
-// PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir);
-
 // --- Controller
 MAKE_GETTER(controller_get_state)
 MAKE_SETTER(controller_set_state)
@@ -66,6 +60,8 @@ MAKE_GETTER(controller_get_vel_gain)
 MAKE_SETTER(controller_set_vel_gain)
 MAKE_GETTER(controller_get_vel_integrator_gain)
 MAKE_SETTER(controller_set_vel_integrator_gain)
+MAKE_GETTER(controller_get_vel_integrator_deadband)
+MAKE_SETTER(controller_set_vel_integrator_deadband)
 MAKE_GETTER(controller_get_Iq_bandwidth)
 MAKE_SETTER(controller_set_Iq_bandwidth)
 MAKE_GETTER(Controller_GetVelLimit)
@@ -96,9 +92,9 @@ MAKE_GETTER(Scheduler_GetBusyCycles)
 MAKE_GETTER(get_unique_id)
 MAKE_GETTER(system_get_faults)
 
-size_t save_config_caller(uint8_t *buffer_in, uint8_t *buffer_out) {NVM_SaveConfig();return 0;}
-size_t erase_config_caller(uint8_t *buffer_in, uint8_t *buffer_out) {NVM_Erase();return 0;}
-size_t reset_caller(uint8_t *buffer_in, uint8_t *buffer_out) {system_reset();return 0;}
+size_t save_config_caller(const uint8_t *buffer_in, uint8_t *buffer_out) {NVM_SaveConfig();return 0;}
+size_t erase_config_caller(const uint8_t *buffer_in, uint8_t *buffer_out) {NVM_Erase();return 0;}
+size_t reset_caller(const uint8_t *buffer_in, uint8_t *buffer_out) {system_reset();return 0;}
 
 RemoteObject *make_system(void)
 {
@@ -135,11 +131,12 @@ RemoteObject *make_system(void)
     MAKE_ATTR(pos_gain, &controller_get_pos_gain, controller_get_pos_gain_getter, controller_set_pos_gain_setter)
     MAKE_ATTR(vel_gain, &controller_get_vel_gain, controller_get_vel_gain_getter, controller_set_vel_gain_setter)
     MAKE_ATTR(vel_I_gain, &controller_get_vel_integrator_gain, controller_get_vel_integrator_gain_getter, controller_set_vel_integrator_gain_setter)
+    MAKE_ATTR(vel_I_band, &controller_get_vel_integrator_deadband, controller_get_vel_integrator_deadband_getter, controller_set_vel_integrator_deadband_setter)
     MAKE_ATTR(I_bw, &controller_get_Iq_bandwidth, controller_get_Iq_bandwidth_getter, controller_set_Iq_bandwidth_setter)
     MAKE_ATTR(vel_lim, &Controller_GetVelLimit, Controller_GetVelLimit_getter, Controller_SetVelLimit_setter)
     MAKE_ATTR(Iq_lim, &Controller_GetIqLimit, Controller_GetIqLimit_getter, Controller_SetIqLimit_setter)
     MAKE_ATTR(ctrl_flt, &controller_get_faults, controller_get_faults_getter, noop)
-    MAKE_OBJECT(ctrlr, &state, &mode, &pos_set, &vel_set, &Iq_est, &Iq_set, &pos_gain, &vel_gain, &vel_I_gain, &I_bw, &vel_lim, &Iq_lim, &ctrl_flt)
+    MAKE_OBJECT(ctrlr, &state, &mode, &pos_set, &vel_set, &Iq_est, &Iq_set, &pos_gain, &vel_gain, &vel_I_gain, &vel_I_band, &I_bw, &vel_lim, &Iq_lim, &ctrl_flt)
 
     // --- Trajectory Planner
     MAKE_ATTR(max_accel, &planner_get_max_accel, planner_get_max_accel_getter, planner_set_max_accel_setter)
