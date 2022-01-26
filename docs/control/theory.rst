@@ -62,13 +62,20 @@ You can send these 3 setpoints as a single CAN frame when using the `set_pos_set
 
 You can tune separately each gain of the loop.
 
-**P**: The gain of the position proportional term
+**P_p**: The gain of the position proportional term
 
-**V**: The gain of the velocity proportional term
+**P_v**: The gain of the velocity proportional term
 
-**I**: The gain of the velocity integral term
+**I_v**: The gain of the velocity integral term
 
-The latter is especially useful for tracking positions at low velocities. You can set it to zero for greater position control bandwith.
+The integral term is especially useful for tracking positions at low velocities. You can set it to zero for greater position control bandwith.
+
+Velocity Integrator Deadband
+----------------------------
+
+Since firmware version 0.8.12, a configurable integrator deadband has been added. This is useful if you experience "hunting" where the rotor oscillates around the setpoint at standstill. This phenomenon is due to interaction of integrator windup and the non-linearities of cogging torque. The integrator deadband feature is only active in position control mode and disables the integrator term update within a configurable window around the position setpoint (the "deadband").
+
+Take a look at the :ref:`integrator-deadband` endpoint for specifics.
 
 Example applications
 --------------------

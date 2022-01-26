@@ -483,6 +483,8 @@ Example
     >>>tmx.set_gains(offset=2500, direction=-1)
 
 
+.. _integrator-deadband:
+
 vel_integrator_params
 *********************
 
