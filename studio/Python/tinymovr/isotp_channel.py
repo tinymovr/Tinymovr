@@ -34,8 +34,9 @@ class ResponseError(Exception):
 class OurCanStack(isotp.TransportLayer):
 
     def __init__(self, can_bus, address, *args, **kwargs):
+        self.address = address
         self.tee = Tee(can_bus,
-            lambda msg: msg.arbitration_id == address.rxid)
+            lambda msg: msg.arbitration_id == self.address.rxid)
         isotp.TransportLayer.__init__(
             self,
             rxfn=self.rx_canbus,
@@ -84,7 +85,7 @@ class ISOTPChannel(Channel):
         self.request_stop()
         self.update_thread.join()
 
-    def recv(self, deadline=0.8, sleep_interval=0.05):
+    def recv(self, deadline=2.0, sleep_interval=0.02):
         total_interval = 0
         while total_interval < deadline:
             if self.stack.available():
