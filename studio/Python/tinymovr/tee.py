@@ -18,7 +18,6 @@ class Tee:
     sema = Semaphore()
 
     def __init__(self, can_bus, filter_cb):
-        super().__init__()
         self.can_bus = can_bus
         self.filter_cb = filter_cb
         self.queue = []
