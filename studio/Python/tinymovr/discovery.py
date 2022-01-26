@@ -21,6 +21,8 @@ subst = {
     "pos_set": "pos_setpoint",
     "vel_set": "vel_setpoint",
     "vel_lim": "vel_limit",
+    "vel_I_gain": "vel_integrator_gain",
+    "vel_I_band": "vel_integrator_deadband",
     "Iq_est": "Iq_estimate",
     "Iq_set": "Iq_setpoint",
     "Iq_lim": "Iq_limit",
@@ -41,7 +43,6 @@ class Discovery:
         self.disappeared_cb = disappeared_cb
         self.lost_timeout = lost_timeout
 
-        self.isotp_channels = {}
         self.active_nodes = {}
         self.update_stamps = {}
         self.pending_nodes = set()
@@ -68,7 +69,6 @@ class Discovery:
                 elif node_id not in self.pending_nodes:
                     self.pending_nodes.add(node_id)
                     chan = ISOTPChannel(self.can_bus, node_id, self.logger)
-                    self.isotp_channels[node_id] = chan
                     try:
                         f = ObjectFactory(chan, self.name_cb)
                         node = f.get_object_tree()
@@ -80,16 +80,15 @@ class Discovery:
                     self.pending_nodes.remove(node_id)
                 msg = self.tee.recv()
             
-            for_removal = set()
-            for node_id, stamp in self.update_stamps.items():
-                if now - stamp > self.lost_timeout:
-                    for_removal.add(node_id)
-            for node_id in for_removal:
-                del self.active_nodes[node_id]
-                del self.isotp_channels[node_id]
-                del self.update_stamps[node_id]
-                self.disappeared_cb(node_id)
-            time.sleep(0.5)
+            # for_removal = set()
+            # for node_id, stamp in self.update_stamps.items():
+            #     if now - stamp > self.lost_timeout:
+            #         for_removal.add(node_id)
+            # for node_id in for_removal:
+            #     del self.active_nodes[node_id]
+            #     del self.update_stamps[node_id]
+            #     self.disappeared_cb(node_id)
+            time.sleep(0.1)
 
     def name_cb(self, name):
         try:
