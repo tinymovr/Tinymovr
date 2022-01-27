@@ -4,12 +4,13 @@ import time
 from functools import cached_property
 import serial.tools.list_ports as list_ports
 import can
-from humanfriendly import parse_size
-from tinymovr.tee import Tee
+
 import isotp
-from isotp import CanStack, Address, IsoTpError, FlowControlTimeoutError, ConsecutiveFrameTimeoutError
+from isotp import Address, IsoTpError
 from avlos import Channel
 from avlos.codecs import MultibyteCodec
+
+from tinymovr.tee import Tee
 
 
 CAN_EP_BITS = 6
