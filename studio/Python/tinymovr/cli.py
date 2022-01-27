@@ -1,7 +1,7 @@
-"""Tinymovr Shell Utility
+"""Tinymovr CLI
 
 Usage:
-    tinymovr [--bustype=<bustype>] [--chan=<chan>] [--bitrate=<bitrate>] [--no-version-check]
+    tinymovr [--bustype=<bustype>] [--chan=<chan>] [--bitrate=<bitrate>]
     tinymovr -h | --help
     tinymovr --version
 
@@ -9,7 +9,6 @@ Options:
     --bustype=<bustype>  CAN bus type to use [default: slcan].
     --chan=<chan>        CAN channel (i.e. device) to use [default: auto].
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
-    --no-version-check   Disable firmware-studio version compatibility check.
 """
 
 import logging
@@ -36,9 +35,9 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 
-def spawn_shell():
+def spawn():
     """
-    Spawns the Tinymovr Studio IPython shell.
+    Spawns the Tinymovr Studio IPython-based CLI.
     """
     version = pkg_resources.require("tinymovr")[0].version
     arguments = docopt(__doc__, version=app_name + " " + str(version))
@@ -52,7 +51,6 @@ def spawn_shell():
     bustype = arguments["--bustype"]
     channel = arguments["--chan"]
     bitrate = int(arguments["--bitrate"])
-    do_version_check = not arguments["--no-version-check"]
     if channel == "auto":
         channel = guess_channel(bustype, logger)
     can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
@@ -80,4 +78,4 @@ def spawn_shell():
     c.InteractiveShellApp.gui = "tk"
     c.TerminalIPythonApp.display_banner = False
     IPython.start_ipython(argv=[], config=c, user_ns=user_ns)
-    logger.debug("Exiting shell...")
+    logger.debug("Exiting...")

@@ -40,8 +40,8 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "tinymovr_cli=tinymovr.shell:spawn_shell",
-            "tinymovr=tinymovr.gui:spawn_gui"
+            "tinymovr_cli=tinymovr.cli:spawn",
+            "tinymovr=tinymovr.gui:spawn"
         ],
         "can.interface": [
             "sim=tests:SimBus",

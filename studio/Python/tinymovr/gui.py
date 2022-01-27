@@ -60,7 +60,7 @@ class MainWindow(QMainWindow):
         # plot data: x, y values
         self.graph_widget.plot(hour, temperature)
 
-def spawn_gui():
+def spawn():
     app = QApplication(sys.argv)
     w = MainWindow()
     w.show()
