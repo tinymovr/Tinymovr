@@ -91,6 +91,9 @@ class Discovery:
             time.sleep(0.1)
 
     def name_cb(self, name):
+        '''
+        Callback for substituting names of object tree nodes
+        '''
         try:
             return subst[name]
         except KeyError:
