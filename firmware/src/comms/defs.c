@@ -142,7 +142,7 @@ RemoteObject *make_system(void)
     MAKE_ATTR(max_accel, &planner_get_max_accel, planner_get_max_accel_getter, planner_set_max_accel_setter)
     MAKE_ATTR(max_decel, &planner_get_max_decel, planner_get_max_decel_getter, planner_set_max_decel_setter)
     MAKE_ATTR(max_vel, &planner_get_max_vel, planner_get_max_vel_getter, planner_set_max_vel_setter)
-    MAKE_ATTR(move_to, 10, noop, planner_move_to_vlimit_setter)
+    MAKE_ATTR(move_to, 10, controller_get_pos_setpoint_user_frame_getter, planner_move_to_vlimit_setter)
     MAKE_ATTR(pln_flt, &planner_get_faults, planner_get_faults_getter, noop)
     MAKE_OBJECT(planner, &max_accel, &max_decel, &max_vel, &move_to)
 
