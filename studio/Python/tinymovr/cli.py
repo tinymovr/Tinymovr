@@ -11,7 +11,6 @@ Options:
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
 
-import logging
 import pkg_resources
 import IPython
 from traitlets.config import Config
@@ -21,6 +20,7 @@ import can
 from tinymovr.isotp_channel import guess_channel
 from tinymovr.discovery import Discovery
 from tinymovr.constants import app_name, base_node_name
+from tinymovr.config import configure_logging
 
 """
 This program is free software: you can redistribute it and/or modify it under
@@ -42,11 +42,7 @@ def spawn():
     version = pkg_resources.require("tinymovr")[0].version
     arguments = docopt(__doc__, version=app_name + " " + str(version))
 
-    logging.getLogger("can.io.logger").setLevel(logging.WARNING)
-    logging.getLogger("parso").setLevel(logging.WARNING)
-    logging.getLogger("asyncio").setLevel(logging.WARNING)
-    logger = logging.getLogger("tinymovr")
-    logger.setLevel(logging.DEBUG)
+    logger = configure_logging()
     
     bustype = arguments["--bustype"]
     channel = arguments["--chan"]
