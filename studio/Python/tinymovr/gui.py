@@ -22,8 +22,9 @@ from tinymovr.isotp_channel import guess_channel
 from tinymovr.discovery import Discovery
 from tinymovr.constants import app_name, base_node_name
 from tinymovr.config import configure_logging
+from queue import Queue
 from PySide2 import QtCore
-from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QFrame, QHBoxLayout, QVBoxLayout, QPushButton, QComboBox, QTreeWidget, QTreeWidgetItem
+from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QFrame, QHBoxLayout, QVBoxLayout, QHeaderView, QTreeWidget, QTreeWidgetItem
 import pyqtgraph as pg
 
 from tinymovr.constants import app_name
@@ -45,6 +46,7 @@ class MainWindow(QMainWindow):
     def __init__(self, arguments):
         super(MainWindow, self).__init__()
 
+        self.start_time = time.time()
         logger = configure_logging()
         bustype = arguments["--bustype"]
         channel = arguments["--chan"]
@@ -54,66 +56,121 @@ class MainWindow(QMainWindow):
         can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
         
         self.dsc = Discovery(can_bus, self.node_appeared, self.node_disappeared, logger)
-        self.nodes = {}
+        self.tms_by_id = {}
         self.attribute_widgets = []
+        self.last_values = {}
+        self.graphs_and_data_by_attr_id = {}
 
         self.setWindowTitle(app_name)
         self.tree_widget = QTreeWidget()
         headers = ["Attribute", "Value"]
         self.tree_widget.setHeaderLabels(headers)
-        self.make_graph()
 
-        left_frame = QFrame(self)
-        left_layout = QVBoxLayout()
-        left_frame.setLayout(left_layout)
-        left_layout.addWidget(self.tree_widget)
+        self.left_frame = QFrame(self)
+        self.left_layout = QVBoxLayout()
+        self.left_layout.addWidget(self.tree_widget)
+        self.left_layout.setSpacing(0)
+        self.left_layout.setContentsMargins(0, 0, 0, 0)
+        self.left_frame.setLayout(self.left_layout)
+        self.left_frame.setMinimumWidth(340)
+        self.left_frame.setMaximumWidth(460)
+        self.left_frame.setStyleSheet("border:0;")
+
+        self.right_frame = QFrame(self)
+        self.right_layout = QVBoxLayout()
+        self.right_layout.setSpacing(0)
+        self.right_layout.setContentsMargins(0, 0, 0, 0)
+        self.right_frame.setLayout(self.right_layout)
+        self.right_frame.setMinimumWidth(820)
+        #self.right_frame.setStyleSheet("padding: 0; margin:0; border:0;")
 
         main_layout = QHBoxLayout()
-        main_layout.addWidget(left_frame)
-        main_layout.addWidget(self.graph_widget)
+        main_layout.addWidget(self.left_frame)
+        main_layout.addWidget(self.right_frame)
+        main_layout.setSpacing(0)
+        main_layout.setContentsMargins(0, 0, 0, 0)
 
         main_widget = QWidget()
         main_widget.setLayout(main_layout)
+        main_widget.setMinimumHeight(600)
+        #main_widget.setStyleSheet("padding: 0; margin:0; border:0;")
         self.setCentralWidget(main_widget)
 
         self.update_thread = threading.Thread(target=self.update_thread, daemon=True)
         self.update_thread.start()
 
-    def make_graph(self):
-        self.graph_widget = pg.PlotWidget()
+    def get_rel_time(self):
+        return time.time() - self.start_time
 
-        hour = [1,2,3,4,5,6,7,8,9,10]
-        temperature = [30,32,34,32,33,31,29,32,35,45]
-
-        # plot data: x, y values
-        self.graph_widget.plot(hour, temperature)
+    def make_graph(self, attr):
+        graph_widget = pg.PlotWidget()
+        x = [self.get_rel_time()]
+        y = [attr.get_value()]
+        data_line =  graph_widget.plot(x, y)
+        return ({
+            "graph_widget": graph_widget,
+            "graph_data": {"x": x, "y": y},
+            "data_line": data_line
+        })
 
     def node_appeared(self, node, node_id):
         node_name = "{}{}".format(base_node_name, node_id)
-        self.nodes[node_name] = node
+        self.tms_by_id[node_name] = node
         self.regen_tree()
 
     def node_disappeared(self, node_id):
         node_name = "{}{}".format(base_node_name, node_id)
-        del self.nodes[node_name]
+        del self.tms_by_id[node_name]
         self.regen_tree()
 
     def regen_tree(self):
         self.attribute_widgets = []
         self.tree_widget.clear()
-        for name, node in self.nodes.items():
+        for name, node in self.tms_by_id.items():
             self.tree_widget.addTopLevelItem(parse_node(node, name, self.attribute_widgets))
+        header = self.tree_widget.header()
+        header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        header.setStretchLastSection(False)
+        #header.setSectionResizeMode(5, QHeaderView.Stretch)
 
     def update_thread(self):
         while True:
-            self.update_values()
+            QApplication.instance().processEvents()
+            self.get_values()
+            invoke_in_main_thread(self.update_graphs)
             time.sleep(0.02)
 
-    def update_values(self):
-        for node, qt_node in self.attribute_widgets:
+    def get_values(self):
+        for attr, qt_node in self.attribute_widgets:
             if qt_node.checkState(0) == QtCore.Qt.Checked:
-                val = node.get_value()
+                self.last_values[attr.id] = attr.get_value()
+    
+    def update_graphs(self):
+        for attr, qt_node in self.attribute_widgets:
+            if qt_node.checkState(0) == QtCore.Qt.Checked:
+                val = self.last_values[attr.id]
                 qt_node.setText(1, str(val))
+                if attr.id not in self.graphs_and_data_by_attr_id:
+                    print("Added")
+                    graph_info = self.make_graph(attr)
+                    self.graphs_and_data_by_attr_id[attr.id] = graph_info
+                    self.right_layout.addWidget(graph_info["graph_widget"])
+            else:
+                if attr.id in self.graphs_and_data_by_attr_id:
+                    print("Removed")
+                    graph_info = self.graphs_and_data_by_attr_id[attr.id]
+                    graph_info["graph_widget"].deleteLater()
+                    del self.graphs_and_data_by_attr_id[attr.id]
+        for attr_id, graph_info in self.graphs_and_data_by_attr_id.items():
+            data_line = graph_info["data_line"]
+            x = graph_info["graph_data"]["x"]
+            y = graph_info["graph_data"]["y"]
+            if (len(x) >= 200):
+                x.pop(0)
+                y.pop(0)
+            x.append(self.get_rel_time())
+            y.append(self.last_values[attr_id])
+            data_line.setData(x, y)
 
 
 def parse_node(node, name, attribute_widgets):
@@ -142,3 +199,23 @@ def spawn():
     w = MainWindow(arguments)
     w.show()
     app.exec_()
+
+
+class Invoker(QtCore.QObject):
+    def __init__(self):
+        super(Invoker, self).__init__()
+        self.queue = Queue()
+
+    def invoke(self, func, *args):
+        f = lambda: func(*args)
+        self.queue.put(f)
+        QtCore.QMetaObject.invokeMethod(self, "handler", QtCore.Qt.QueuedConnection)
+
+    @QtCore.Slot()
+    def handler(self):
+        f = self.queue.get()
+        f()
+invoker = Invoker()
+
+def invoke_in_main_thread(func, *args):
+    invoker.invoke(func,*args)
