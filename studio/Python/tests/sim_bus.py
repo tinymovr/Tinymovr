@@ -1,4 +1,5 @@
 import time
+import random
 import json
 import math
 import threading
@@ -20,6 +21,8 @@ rad_to_ticks = ENC_TICKS / (2 * math.pi)
 
 TEST_TM_RX_ADDR = 0x3E
 TEST_TM_TX_ADDR = 0x3F
+
+HEARTBEAT_BYTE = 0x0
 
 
 class TestEndpoint:
@@ -64,6 +67,8 @@ class SimBus(can.BusABC):
         self.TICKS: int = ENC_TICKS
 
         # Live values
+        self.pos_estimate = 0.0
+        self.vel_estimate = 0.0
         self.pos_setpoint = 0.0
         self.vel_setpoint = 0.0
 
@@ -73,15 +78,19 @@ class SimBus(can.BusABC):
                 """
             {
                 "version": {"id":0, "K":"A", "T":2},
+                "encoder":{
+                    "pos_est": {"id":1, "K":"A", "T":10},
+                    "vel_est": {"id":2, "K":"A", "T":10}
+                },
                 "controller":{
-                    "pos_setpoint": {"id":1, "K":"A", "T":10},
-                    "vel_setpoint": {"id":2, "K":"A", "T":10}
+                    "pos_set": {"id":3, "K":"A", "T":10},
+                    "vel_set": {"id":4, "K":"A", "T":10}
                 },
                 "motor":{
-                    "R": {"id":3, "K":"A", "T":10},
-                    "L": {"id":4, "K":"A", "T":10}
+                    "R": {"id":5, "K":"A", "T":10},
+                    "L": {"id":6, "K":"A", "T":10}
                 },
-                "reset": {"id":5, "K":"F", "T":0}
+                "reset": {"id":7, "K":"F", "T":0}
             }
         """
             )
@@ -90,6 +99,8 @@ class SimBus(can.BusABC):
         # Endpoints
         self.endpoints = [
             TestEndpoint(self._get_version, None, self.codec, DataType.UINT16),
+            TestEndpoint(self._get_pos_estimate, None, self.codec, DataType.FLOAT),
+            TestEndpoint(self._get_vel_estimate, None, self.codec, DataType.FLOAT),
             TestEndpoint(self._get_pos_setpoint, self._set_pos_setpoint, self.codec, DataType.FLOAT),
             TestEndpoint(self._get_vel_setpoint, self._set_vel_setpoint, self.codec, DataType.FLOAT),
             TestEndpoint(self._get_R, self._null_setter, self.codec, DataType.FLOAT),
@@ -108,6 +119,16 @@ class SimBus(can.BusABC):
         self.stop_requested = False
         self.update_thread = threading.Thread(target=self.isotp_update, daemon=True)
         self.update_thread.start()
+
+        self.heartbeat_thread = threading.Thread(target=self.heartbeat_update, daemon=True)
+        self.heartbeat_thread.start()
+
+    def heartbeat_update(self):
+        while True:
+            # It's not really ISOTP but anyway..
+            msg = isotp.CanMessage(arbitration_id=(0x700 | self.node_id), dlc=1, data=[HEARTBEAT_BYTE])
+            self.tx_q.appendleft(msg)
+            time.sleep(1)
 
     def isotp_update(self):
         while False == self.stop_requested:
@@ -141,9 +162,9 @@ class SimBus(can.BusABC):
         except IndexError:
             return None
 
-    def isotp_tx(self, payload):
+    def isotp_tx(self, msg):
         # This transmits on the Tinymovr side
-        self.tx_q.appendleft(payload)
+        self.tx_q.appendleft(msg)
 
     # -- PC Side
 
@@ -167,18 +188,19 @@ class SimBus(can.BusABC):
                 data=isotp_frame.data)
             return (can_frame, False)
         except IndexError:
-            # Wait and retry
-            time.sleep(0.02)
-            try:
-                return self.tx_q.pop()
-            except IndexError:
-                return (None, False)
+            return (None, False)
 
 
     # Bunch of definitions
 
     def _get_version(self):
         return 1
+
+    def _get_pos_estimate(self):
+        return self.pos_estimate + random.uniform(-50, 50)
+
+    def _get_vel_estimate(self):
+        return self.vel_estimate + random.uniform(-500, 500)
 
     def _get_pos_setpoint(self):
         return self.pos_setpoint
