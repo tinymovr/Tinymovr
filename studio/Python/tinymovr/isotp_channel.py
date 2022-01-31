@@ -86,7 +86,7 @@ class ISOTPChannel(Channel):
         self.request_stop()
         self.update_thread.join()
 
-    def recv(self, deadline=2.0, sleep_interval=0.02):
+    def recv(self, deadline=2.0, sleep_interval=0.01):
         total_interval = 0
         while total_interval < deadline:
             if self.stack.available():
