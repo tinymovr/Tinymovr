@@ -24,7 +24,9 @@ from tinymovr.constants import app_name, base_node_name
 from tinymovr.config import configure_logging
 from queue import Queue
 from PySide2 import QtCore
-from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QFrame, QHBoxLayout, QVBoxLayout, QHeaderView, QTreeWidget, QTreeWidgetItem
+from PySide2.QtWidgets import (QApplication, QMainWindow,
+    QWidget, QFrame, QHBoxLayout, QVBoxLayout, QHeaderView,
+    QLabel, QTreeWidget, QTreeWidgetItem)
 import pyqtgraph as pg
 
 from tinymovr.constants import app_name
@@ -45,7 +47,8 @@ class MainWindow(QMainWindow):
 
     def __init__(self, arguments):
         super(MainWindow, self).__init__()
-
+        self.set_period = 0.01
+        self.meas_period = 1
         self.start_time = time.time()
         logger = configure_logging()
         bustype = arguments["--bustype"]
@@ -66,9 +69,13 @@ class MainWindow(QMainWindow):
         headers = ["Attribute", "Value"]
         self.tree_widget.setHeaderLabels(headers)
 
+        self.status_label = QLabel()
+        self.status_label.setStyleSheet("margin: 5px;")
+
         self.left_frame = QFrame(self)
         self.left_layout = QVBoxLayout()
         self.left_layout.addWidget(self.tree_widget)
+        self.left_layout.addWidget(self.status_label)
         self.left_layout.setSpacing(0)
         self.left_layout.setContentsMargins(0, 0, 0, 0)
         self.left_frame.setLayout(self.left_layout)
@@ -135,10 +142,18 @@ class MainWindow(QMainWindow):
 
     def update_thread(self):
         while True:
+            start_all = time.time()
             QApplication.instance().processEvents()
+            start_can = time.time()
             self.get_values()
+            delta_can = time.time() - start_can
             invoke_in_main_thread(self.update_graphs)
-            time.sleep(0.02)
+            delta_all = time.time() - start_all
+            self.meas_period = delta_all
+            hz = min(1.0/self.set_period, 1.0/delta_all)
+            self.status_label.setText("can: {0:.3f} s\t total: {1:.3f} s\t {2:.1f} Hz".format(delta_can, delta_all, hz))
+            if (delta_all < self.set_period):
+                time.sleep(self.set_period - delta_all)
 
     def get_values(self):
         for attr, qt_node in self.attribute_widgets:
