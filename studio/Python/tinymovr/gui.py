@@ -47,8 +47,14 @@ class MainWindow(QMainWindow):
 
     def __init__(self, arguments):
         super(MainWindow, self).__init__()
-        self.set_period = 0.01
-        self.meas_period = 1
+        
+        self.timings = {
+            "set_period": 0.01,
+            "total_meas_period": {"last":1, "ravg":1},
+            "can_meas_period": {"last":1, "ravg":1}
+        }
+        self.tau=0.02
+
         self.start_time = time.time()
         logger = configure_logging()
         bustype = arguments["--bustype"]
@@ -66,7 +72,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle(app_name)
         self.tree_widget = QTreeWidget()
-        headers = ["Attribute", "Value"]
+        headers = ["Attribute", "Value", "Set Value"]
         self.tree_widget.setHeaderLabels(headers)
 
         self.status_label = QLabel()
@@ -89,7 +95,6 @@ class MainWindow(QMainWindow):
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_frame.setLayout(self.right_layout)
         self.right_frame.setMinimumWidth(820)
-        #self.right_frame.setStyleSheet("padding: 0; margin:0; border:0;")
 
         main_layout = QHBoxLayout()
         main_layout.addWidget(self.left_frame)
@@ -100,7 +105,6 @@ class MainWindow(QMainWindow):
         main_widget = QWidget()
         main_widget.setLayout(main_layout)
         main_widget.setMinimumHeight(600)
-        #main_widget.setStyleSheet("padding: 0; margin:0; border:0;")
         self.setCentralWidget(main_widget)
 
         self.update_thread = threading.Thread(target=self.update_thread, daemon=True)
@@ -110,7 +114,7 @@ class MainWindow(QMainWindow):
         return time.time() - self.start_time
 
     def make_graph(self, attr):
-        graph_widget = pg.PlotWidget()
+        graph_widget = pg.PlotWidget(title=attr.name)
         x = [self.get_rel_time()]
         y = [attr.get_value()]
         data_line =  graph_widget.plot(x, y)
@@ -138,7 +142,6 @@ class MainWindow(QMainWindow):
         header = self.tree_widget.header()
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
         header.setStretchLastSection(False)
-        #header.setSectionResizeMode(5, QHeaderView.Stretch)
 
     def update_thread(self):
         while True:
@@ -149,11 +152,21 @@ class MainWindow(QMainWindow):
             delta_can = time.time() - start_can
             invoke_in_main_thread(self.update_graphs)
             delta_all = time.time() - start_all
-            self.meas_period = delta_all
-            hz = min(1.0/self.set_period, 1.0/delta_all)
-            self.status_label.setText("can: {0:.3f} s\t total: {1:.3f} s\t {2:.1f} Hz".format(delta_can, delta_all, hz))
-            if (delta_all < self.set_period):
-                time.sleep(self.set_period - delta_all)
+            self.timings["total_meas_period"]["last"] = delta_all
+            self.timings["total_meas_period"]["ravg"] = self.timings["total_meas_period"]["ravg"] * (1-self.tau) + delta_all * self.tau
+            self.timings["can_meas_period"]["last"] = delta_can
+            self.timings["can_meas_period"]["ravg"] = self.timings["total_meas_period"]["ravg"] * (1-self.tau) + delta_can * self.tau
+            try:
+                hz = min(1.0/self.timings["set_period"], 1.0/self.timings["total_meas_period"]["ravg"])
+            except ZeroDivisionError:
+                pass
+            self.status_label.setText(
+                "can: {0:.3f} s\t total: {1:.3f} s\t {2:.1f} Hz".format(
+                    self.timings["can_meas_period"]["ravg"],
+                    self.timings["total_meas_period"]["ravg"],
+                    hz))
+            if delta_all < self.timings["set_period"]:
+                time.sleep(self.timings["set_period"] - delta_all)
 
     def get_values(self):
         for attr, qt_node in self.attribute_widgets:
@@ -189,7 +202,7 @@ class MainWindow(QMainWindow):
 
 
 def parse_node(node, name, attribute_widgets):
-    qt_node = QTreeWidgetItem([name, 0])
+    qt_node = QTreeWidgetItem([name, 0, ""])
     try:
         # Let's assume it's a RemoteObject
         for name, child in node.children.items():
@@ -203,7 +216,7 @@ def parse_node(node, name, attribute_widgets):
             attribute_widgets.append((node, qt_node))
         except AttributeError:
             # Must be a RemoteFunction then
-            qt_node.setText(1, "CALL")
+            qt_node.setText(2, "CALL")
     return qt_node
 
 
