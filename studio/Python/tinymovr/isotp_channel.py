@@ -45,6 +45,7 @@ class OurCanStack(isotp.TransportLayer):
             address=address,
             *args, **kwargs
             )
+        self.set_sleep_timing(0.005, 0.001)
 
     def tx_canbus(self, msg):
         can_msg = can.Message(
@@ -86,7 +87,7 @@ class ISOTPChannel(Channel):
         self.request_stop()
         self.update_thread.join()
 
-    def recv(self, deadline=2.0, sleep_interval=0.01):
+    def recv(self, deadline=2.0, sleep_interval=0.001):
         total_interval = 0
         while total_interval < deadline:
             if self.stack.available():
