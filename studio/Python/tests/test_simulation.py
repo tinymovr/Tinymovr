@@ -6,9 +6,13 @@ device, which is suitable for unit testing.
 
 from tests import TMTestCase
 import unittest
-
+import can
 
 class TestSimulation(TMTestCase):
+
+    @classmethod
+    def setUpCAN(cls, node_id):
+        return can.Bus(bustype="sim", channel="sim", node_id=node_id)
 
     def test_set_get_pos(self):
         """

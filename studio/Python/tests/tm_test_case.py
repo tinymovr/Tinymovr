@@ -7,6 +7,7 @@ import time
 import can
 from avlos import ObjectFactory
 from tinymovr.isotp_channel import ISOTPChannel
+from tinymovr.discovery import name_cb
 
 import logging
 import unittest
@@ -24,12 +25,16 @@ class TMTestCase(unittest.TestCase):
         '''
         cls.logger = logging.getLogger("tinymovr")
         cls.logger.setLevel(logging.DEBUG)
-        can_bus = can.Bus(bustype="slcan", channel="auto", node_id=NODE_ID)
-        isotp_chan = ISOTPChannel(can_bus, NODE_ID, cls.logger)
-        f = ObjectFactory(isotp_chan)
+        cls.can_bus = cls.setUpCAN(NODE_ID)
+        isotp_chan = ISOTPChannel(cls.can_bus, NODE_ID, cls.logger)
+        f = ObjectFactory(isotp_chan, name_cb)
         cls.tm = f.get_object_tree()
         cls.tm.reset()
         time.sleep(3)
+
+    @classmethod
+    def setUpCAN(cls, node_id):
+        return can.Bus(bustype="slcan", channel="auto", node_id=node_id)
 
     def tearDown(self):
         '''

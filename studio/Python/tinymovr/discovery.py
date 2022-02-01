@@ -70,7 +70,7 @@ class Discovery:
                     self.pending_nodes.add(node_id)
                     chan = ISOTPChannel(self.can_bus, node_id, self.logger)
                     try:
-                        f = ObjectFactory(chan, self.name_cb)
+                        f = ObjectFactory(chan, name_cb)
                         node = f.get_object_tree()
                         self.active_nodes[node_id] = node
                         self.update_stamps[node_id] = now
@@ -90,11 +90,12 @@ class Discovery:
             #     self.disappeared_cb(node_id)
             time.sleep(0.1)
 
-    def name_cb(self, name):
-        '''
-        Callback for substituting names of object tree nodes
-        '''
-        try:
-            return subst[name]
-        except KeyError:
-            return name
+
+def name_cb(name):
+    '''
+    Callback for substituting names of object tree nodes
+    '''
+    try:
+        return subst[name]
+    except KeyError:
+        return name
