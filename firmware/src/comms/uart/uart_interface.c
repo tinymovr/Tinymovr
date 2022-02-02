@@ -26,7 +26,7 @@ void UART_ProcessMessage(void)
     // Ensure buffer is null-terminated
     uart_rx_msg[uart_rx_msg_len] = '\0';
 
-    size_t tx_size = handle_message(uart_rx_msg, uart_tx_msg);
+    size_t tx_size = handle_message(uart_rx_msg, uart_rx_msg_len, uart_tx_msg);
     if (tx_size > 0)
     {
         // Ensure buffer is newline-terminated

@@ -171,7 +171,7 @@ void init_server(void)
     make_server(&s, make_system(), store);
 }
 
-size_t handle_message(uint8_t *buffer_in, uint8_t *buffer_out)
+size_t handle_message(uint8_t *buffer_in, size_t buffer_in_size, uint8_t *buffer_out)
 {
-    return avlos_handle(&s, buffer_in, buffer_out);
+    return avlos_handle(&s, buffer_in, buffer_in_size, buffer_out);
 }
