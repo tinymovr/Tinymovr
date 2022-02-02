@@ -153,8 +153,7 @@ void CAN_process_interrupt(void)
     
     if (ISOTP_RX_ADDR == command_id) {
         isotp_on_can_message(&g_link, rx_data, data_length);
-
-        /* Poll link to handle multiple frame transmition */
+        /* Poll link to handle multiple frame transmission */
         isotp_poll(&g_link);
         
         if (ISOTP_RET_OK == isotp_full(&g_link))
@@ -162,7 +161,8 @@ void CAN_process_interrupt(void)
             uint8_t rx_payload[ISOTP_RX_BUFSIZE];
             uint16_t rx_payload_size = 0;
             int ret = isotp_receive(&g_link, rx_payload, 128, &rx_payload_size);
-            if (ISOTP_RET_OK == ret) {
+            if (ISOTP_RET_OK == ret)
+            {
                 /* Handle received message */
                 const size_t tx_payload_size = handle_message(rx_payload, rx_payload_size, isotp_tx_buffer);
                 if (tx_payload_size > 0)
@@ -173,6 +173,10 @@ void CAN_process_interrupt(void)
                         state.faults |= CAN_FLT_ISOTP_TX_ERROR;
                     }
                 }
+            }
+            else
+            {
+                state.faults |= CAN_FLT_ISOTP_RX_ERROR;
             }
         }
     }

@@ -28,7 +28,8 @@
 
 typedef enum
 {
-    CAN_FLT_ISOTP_TX_ERROR = 0
+    CAN_FLT_ISOTP_RX_ERROR = 0,
+    CAN_FLT_ISOTP_TX_ERROR = 1
 } CANFault;
 
 typedef struct 
