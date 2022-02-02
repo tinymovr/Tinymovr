@@ -27,8 +27,8 @@
 static IsoTpLink g_link;
 
 /* Alloc send and receive buffer statically in RAM */
-static uint8_t g_isotpRecvBuf[ISOTP_RX_BUFSIZE];
-static uint8_t g_isotpSendBuf[ISOTP_TX_BUFSIZE];
+static uint8_t isotp_rx_buffer[ISOTP_RX_BUFSIZE];
+static uint8_t isotp_tx_buffer[ISOTP_TX_BUFSIZE];
 
 static const uint8_t heartbeat_byte = 0;
 
@@ -43,8 +43,8 @@ static CANState state ={0};
 void CAN_init(void)
 {
     isotp_init_link(&g_link, (config.id << CAN_EP_SIZE) | ISOTP_TX_ADDR,
-						g_isotpSendBuf, ISOTP_TX_BUFSIZE, 
-						g_isotpRecvBuf, ISOTP_RX_BUFSIZE);
+						isotp_tx_buffer, ISOTP_TX_BUFSIZE, 
+						isotp_rx_buffer, ISOTP_RX_BUFSIZE);
 
 #if defined(BOARD_REV_T5)
     // Configure PD7 as GPIO output
@@ -121,8 +121,8 @@ void CAN_set_ID(uint8_t id)
     pac5xxx_can_reset_mode_set(0);  // CAN reset mode inactive
     delay_us(100);
     isotp_init_link(&g_link, (config.id << CAN_EP_SIZE) | ISOTP_TX_ADDR,
-						g_isotpSendBuf, ISOTP_TX_BUFSIZE, 
-						g_isotpRecvBuf, ISOTP_RX_BUFSIZE);
+						isotp_tx_buffer, ISOTP_TX_BUFSIZE, 
+						isotp_rx_buffer, ISOTP_RX_BUFSIZE);
 }
 
 void CAN_process_interrupt(void)
@@ -164,10 +164,10 @@ void CAN_process_interrupt(void)
             int ret = isotp_receive(&g_link, rx_payload, 128, &rx_payload_size);
             if (ISOTP_RET_OK == ret) {
                 /* Handle received message */
-                const size_t tx_payload_size = handle_message(rx_payload, g_isotpSendBuf);
-                if (tx_payload_size > 0) {
-                    /* In case you want to send data w/ functional addressing, use isotp_send_with_id */
-                    ret = isotp_send(&g_link, g_isotpSendBuf, tx_payload_size);
+                const size_t tx_payload_size = handle_message(rx_payload, rx_payload_size, isotp_tx_buffer);
+                if (tx_payload_size > 0)
+                {
+                    ret = isotp_send(&g_link, isotp_tx_buffer, tx_payload_size);
                     if (ISOTP_RET_OK != ret) 
                     {
                         state.faults |= CAN_FLT_ISOTP_TX_ERROR;
