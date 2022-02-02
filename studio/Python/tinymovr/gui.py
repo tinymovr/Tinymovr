@@ -16,20 +16,20 @@ import time
 import threading
 import pkg_resources
 from docopt import docopt
-
 import can
-from tinymovr.isotp_channel import guess_channel
-from tinymovr.discovery import Discovery
-from tinymovr.constants import app_name, base_node_name
-from tinymovr.config import configure_logging
 from queue import Queue
 from PySide2 import QtCore
 from PySide2.QtWidgets import (QApplication, QMainWindow,
     QWidget, QFrame, QHBoxLayout, QVBoxLayout, QHeaderView,
     QLabel, QTreeWidget, QTreeWidgetItem)
 import pyqtgraph as pg
-
+from avlos import get_all
+from tinymovr.isotp_channel import guess_channel
+from tinymovr.discovery import Discovery
+from tinymovr.constants import app_name, base_node_name
+from tinymovr.config import configure_logging
 from tinymovr.constants import app_name
+
 
 """
 This program is free software: you can redistribute it and/or modify it under
@@ -169,9 +169,10 @@ class MainWindow(QMainWindow):
                 time.sleep(self.timings["set_period"] - delta_all)
 
     def get_values(self):
-        for attr, qt_node in self.attribute_widgets:
-            if qt_node.checkState(0) == QtCore.Qt.Checked:
-                self.last_values[attr.id] = attr.get_value()
+        attrs = [attr for attr, qt_node in self.attribute_widgets if qt_node.checkState(0) == QtCore.Qt.Checked]
+        vals = get_all(attrs)
+        for attr, val in zip(attrs, vals):
+            self.last_values[attr.id] = val
     
     def update_graphs(self):
         for attr, qt_node in self.attribute_widgets:
