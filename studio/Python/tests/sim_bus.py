@@ -8,7 +8,7 @@ from collections import deque
 import can
 import isotp
 import msgpack
-from avlos.codecs import MultibyteCodec
+from avlos.codecs import MultibyteCodec, sizes
 from avlos.types import DataType
 from tinymovr.isotp_channel import CAN_EP_BITS
 
@@ -35,10 +35,10 @@ class TestEndpoint:
 
     def process(self, trimmed_data):
         if AVLOS_CMD_GET == trimmed_data[0]:
-            return self.codec.serialize([self.getter()], self.datatype)
+            return self.codec.serialize([self.getter()], self.datatype), 1, sizes[self.datatype]
         elif AVLOS_CMD_SET == trimmed_data[0]:
             v = self.codec.deserialize(trimmed_data[1:], self.datatype)[0]
-            return self.setter(v)
+            return self.setter(v), sizes[self.datatype] + 1, 0
 
 
 class SimBus(can.BusABC):
@@ -142,15 +142,27 @@ class SimBus(can.BusABC):
             if return_data:
                 self.layer.send(return_data)
 
-    def process_isotp(self, data):
-        ep_idx = self.codec.deserialize(data[:2], DataType.UINT16)[0]
-        if AVLOS_SPEC_ADDR == ep_idx:
-            return self.spec
-        try:
-            ep = self.endpoints[ep_idx]
-            return ep.process(data[2:])
-        except IndexError:
-            pass
+    def process_isotp(self, data_in):
+        data_in_offset = 0
+        data_out = bytearray()
+        data_out_offset = 0
+        while data_in_offset < len(data_in):
+            ep_idx = self.codec.deserialize(
+                data_in[data_in_offset:data_in_offset+2],
+                DataType.UINT16)[0]
+            data_in_offset += 2
+            if AVLOS_SPEC_ADDR == ep_idx:
+                return self.spec 
+            try:
+                ep = self.endpoints[ep_idx]
+                new_data, data_in_incr, _ = ep.process(data_in[data_in_offset:])
+                data_out.extend(new_data)
+                data_in_offset += data_in_incr
+            except IndexError:
+                pass
+        if len(data_out):
+            return data_out
+        return None
 
     # -- Tinymovr Side
         

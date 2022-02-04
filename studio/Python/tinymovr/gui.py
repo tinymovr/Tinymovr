@@ -15,6 +15,7 @@ import sys
 import time
 import threading
 import pkg_resources
+import struct
 from docopt import docopt
 import can
 from queue import Queue
@@ -56,15 +57,15 @@ class MainWindow(QMainWindow):
         self.tau=0.02
 
         self.start_time = time.time()
-        logger = configure_logging()
+        self.logger = configure_logging()
         bustype = arguments["--bustype"]
         channel = arguments["--chan"]
         bitrate = int(arguments["--bitrate"])
         if channel == "auto":
-            channel = guess_channel(bustype, logger)
-        can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
+            channel = guess_channel(bustype, self.logger)
+        self.can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
         
-        self.dsc = Discovery(can_bus, self.node_appeared, self.node_disappeared, logger)
+        self.dsc = Discovery(self.can_bus, self.node_appeared, self.node_disappeared, self.logger)
         self.tms_by_id = {}
         self.attribute_widgets = []
         self.last_values = {}
@@ -106,6 +107,8 @@ class MainWindow(QMainWindow):
         main_widget.setLayout(main_layout)
         main_widget.setMinimumHeight(600)
         self.setCentralWidget(main_widget)
+
+        pg.setConfigOptions(antialias=True)
 
         self.update_thread = threading.Thread(target=self.update_thread, daemon=True)
         self.update_thread.start()
@@ -170,20 +173,27 @@ class MainWindow(QMainWindow):
 
     def get_values(self):
         attrs = [attr for attr, qt_node in self.attribute_widgets if qt_node.checkState(0) == QtCore.Qt.Checked]
-        vals = get_all(attrs)
-        for attr, val in zip(attrs, vals):
-            self.last_values[attr.id] = val
+        if len(attrs) > 0:
+            try:
+                vals = get_all(attrs, attrs[0].root.serializer)
+                for attr, val in zip(attrs, vals):
+                    self.last_values[attr.id] = val
+            except struct.error as e:
+                self.logger.warn("Error while getting multiple values: {}".format(str(e)))
     
     def update_graphs(self):
         for attr, qt_node in self.attribute_widgets:
             if qt_node.checkState(0) == QtCore.Qt.Checked:
-                val = self.last_values[attr.id]
-                qt_node.setText(1, str(val))
-                if attr.id not in self.graphs_and_data_by_attr_id:
-                    print("Added")
-                    graph_info = self.make_graph(attr)
-                    self.graphs_and_data_by_attr_id[attr.id] = graph_info
-                    self.right_layout.addWidget(graph_info["graph_widget"])
+                try:
+                    val = self.last_values[attr.id]
+                    qt_node.setText(1, str(val))
+                    if attr.id not in self.graphs_and_data_by_attr_id:
+                        print("Added")
+                        graph_info = self.make_graph(attr)
+                        self.graphs_and_data_by_attr_id[attr.id] = graph_info
+                        self.right_layout.addWidget(graph_info["graph_widget"])
+                except KeyError:
+                    pass
             else:
                 if attr.id in self.graphs_and_data_by_attr_id:
                     print("Removed")

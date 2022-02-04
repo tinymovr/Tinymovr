@@ -6,4 +6,4 @@ def configure_logging():
     logging.getLogger("asyncio").setLevel(logging.WARNING)
     logger = logging.getLogger("tinymovr")
     logger.setLevel(logging.DEBUG)
-    return 
+    return logger
