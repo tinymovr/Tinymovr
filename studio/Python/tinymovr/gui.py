@@ -46,7 +46,7 @@ class MainWindow(QMainWindow):
 
     TreeItemCheckedSignal = Signal(dict)
 
-    def __init__(self, arguments):
+    def __init__(self, app, arguments):
         super(MainWindow, self).__init__()
         
         self.timings = {
@@ -110,7 +110,14 @@ class MainWindow(QMainWindow):
         self.worker.moveToThread(self.thread)
         self.worker.regen.connect(self.regen_tree)
         self.worker.update_attrs.connect(self.update_attrs)
+        app.aboutToQuit.connect(self.about_to_quit)
         self.thread.start()
+
+    @QtCore.Slot()
+    def about_to_quit(self):
+        self.worker.stop()
+        self.thread.quit()
+        self.thread.wait()
 
     def get_rel_time(self):
         return time.time() - self.start_time
@@ -199,12 +206,17 @@ class Worker(QObject):
         self.dsc = Discovery(self.bus, self.node_appeared, self.node_disappeared, self.logger)
         self.active_attrs = []
         self.tms_by_id = {}
+        self.running = True
 
     def run(self):
-        while True:
+        while self.running:
             self.get_values()
             QApplication.processEvents()
             time.sleep(0.01)
+
+    @QtCore.Slot()
+    def stop(self):
+        self.running = False
             
     def get_values(self):
         updated_attrs = {attr.id: attr.get_value() for attr in self.active_attrs}
@@ -240,6 +252,6 @@ def spawn():
     version = pkg_resources.require("tinymovr")[0].version
     arguments = docopt(__doc__, version=app_name + " " + str(version))
     app = QApplication(sys.argv)
-    w = MainWindow(arguments)
+    w = MainWindow(app, arguments)
     w.show()
-    app.exec_()
+    sys.exit(app.exec_())
