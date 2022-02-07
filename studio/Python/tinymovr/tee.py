@@ -1,4 +1,19 @@
-from threading import Semaphore
+from threading import Lock
+
+
+class TFrame:
+    def __init__(self, arbitration_id, data, ts=0):
+        self.arbitration_id = arbitration_id
+        self.data = bytes(data)
+        self.ts = ts
+
+
+class TBus:
+    def recv(self, timeout=0):
+        raise NotImplementedError()
+
+    def send(self, frame):
+        raise NotImplementedError()
 
 
 class Tee:
@@ -13,10 +28,10 @@ class Tee:
     simplify interfacing with CAN bus objects.
     '''
     tees = []
-    sema = Semaphore()
+    lock = Lock()
 
-    def __init__(self, can_bus, filter_cb):
-        self.can_bus = can_bus
+    def __init__(self, bus, filter_cb):
+        self.bus = bus
         self.filter_cb = filter_cb
         self.queue = []
         self.tees.append(self)
@@ -26,24 +41,24 @@ class Tee:
         Tries to receive a message from the bus object and if successful,
         tests reception of each tee instance in the global index. 
         '''
-        self.sema.acquire()
+        self.lock.acquire()
         response = None
-        msg = self.can_bus.recv(0)
-        if msg:
+        frame = self.bus.recv(1)
+        if frame:
             for tee in self.tees:
-                if tee.filter_cb(msg):
-                    tee.queue.append(msg)
+                if tee.filter_cb(frame):
+                    tee.queue.append(frame)
         try:
             response = self.queue.pop(0)
         except IndexError:
             pass
-        self.sema.release()
+        self.lock.release()
         return response
 
-    def send(self, msg):
+    def send(self, frame):
         '''
-        Send a message by forwarding to the bus object
+        Send a frame by forwarding to the bus object
         '''
-        self.sema.acquire()
-        self.can_bus.send(msg)
-        self.sema.release()
+        self.lock.acquire()
+        self.bus.send(frame)
+        self.lock.release()

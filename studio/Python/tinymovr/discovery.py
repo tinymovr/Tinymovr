@@ -36,8 +36,8 @@ class Discovery:
     Discover Tinymovr instances on the CAN bus using the periodically
     transmitted heartbeat frame.
     '''
-    def __init__(self, can_bus, appeared_cb, disappeared_cb, logger, lost_timeout = 2.0):
-        self.can_bus = can_bus
+    def __init__(self, bus, appeared_cb, disappeared_cb, logger, lost_timeout = 2.0):
+        self.bus = bus
         self.logger = logger
         self.appeared_cb = appeared_cb
         self.disappeared_cb = disappeared_cb
@@ -47,7 +47,7 @@ class Discovery:
         self.update_stamps = {}
         self.pending_nodes = set()
 
-        self.tee = Tee(can_bus, lambda msg: HEARTBEAT_BASE == msg.arbitration_id & HEARTBEAT_BASE)
+        self.tee = Tee(bus, lambda msg: HEARTBEAT_BASE == msg.arbitration_id & HEARTBEAT_BASE)
 
         self.update_thread = threading.Thread(target=self.update, daemon=True)
         self.update_thread.start()
@@ -68,7 +68,7 @@ class Discovery:
                     self.update_stamps[node_id] = now
                 elif node_id not in self.pending_nodes:
                     self.pending_nodes.add(node_id)
-                    chan = ISOTPChannel(self.can_bus, node_id, self.logger)
+                    chan = ISOTPChannel(self.bus, node_id, self.logger)
                     try:
                         f = ObjectFactory(chan, name_cb)
                         node = f.get_object_tree()

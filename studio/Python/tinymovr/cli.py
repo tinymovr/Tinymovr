@@ -1,13 +1,11 @@
 """Tinymovr CLI
 
 Usage:
-    tinymovr [--bustype=<bustype>] [--chan=<chan>] [--bitrate=<bitrate>]
+    tinymovr [--bitrate=<bitrate>]
     tinymovr -h | --help
     tinymovr --version
 
 Options:
-    --bustype=<bustype>  CAN bus type to use [default: slcan].
-    --chan=<chan>        CAN channel (i.e. device) to use [default: auto].
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
 
@@ -16,8 +14,7 @@ import IPython
 from traitlets.config import Config
 from docopt import docopt
 
-import can
-from tinymovr.isotp_channel import guess_channel
+from tinymovr.isotp_channel import LiteBus
 from tinymovr.discovery import Discovery
 from tinymovr.constants import app_name, base_node_name
 from tinymovr.config import configure_logging
@@ -44,12 +41,8 @@ def spawn():
 
     logger = configure_logging()
     
-    bustype = arguments["--bustype"]
-    channel = arguments["--chan"]
     bitrate = int(arguments["--bitrate"])
-    if channel == "auto":
-        channel = guess_channel(bustype, logger)
-    can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
+    bus = LiteBus(bitrate)
     tms = {}
     user_ns = {}
     user_ns["tms"] = tms
@@ -67,7 +60,7 @@ def spawn():
         del user_ns[node_name]
     
     print(app_name + " " + str(version))
-    dsc = Discovery(can_bus, node_appeared, node_disappeared, logger)
+    dsc = Discovery(bus, node_appeared, node_disappeared, logger)
     print("Listening for nodes...")
 
     c = Config()

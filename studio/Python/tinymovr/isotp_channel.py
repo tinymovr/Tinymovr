@@ -3,14 +3,14 @@ import threading
 import time
 from functools import cached_property
 import serial.tools.list_ports as list_ports
-import can
 
+import candle_driver
 import isotp
 from isotp import Address, IsoTpError
 from avlos import Channel
 from avlos.codecs import MultibyteCodec
 
-from tinymovr.tee import Tee
+from tinymovr.tee import Tee, TFrame, TBus
 
 
 CAN_EP_BITS = 6
@@ -18,22 +18,39 @@ ISOTP_TX_ADDR = 0x3E
 ISOTP_RX_ADDR = 0x3F
 
 
-can_devices = {
-    "slcan": ("canable", "cantact"),
-    "robotell": ("CP210",),
-}
-
-
 class ResponseError(Exception):
-
     def __init__(self, kw, *args, **kwargs):
         msg = "Node {} did not respond".format(kw)
         super().__init__(msg, *args, **kwargs)
         self.kw = kw
 
 
-class OurCanStack(isotp.TransportLayer):
+class LiteBus(TBus):
+    def __init__(self, bitrate):
+        devices = candle_driver.list_devices()
 
+        try:
+            self.device = devices[0]
+        except IndexError:
+            raise RuntimeError("No CANine (or Candlelight-enabled) devices found")
+        self.device.open()
+        self.ch = self.device.channel(0)
+        self.ch.set_bitrate(bitrate)
+        self.ch.start()
+
+    def recv(self, timeout=0):
+        try:
+            _, can_id, can_data, _, ts = self.ch.read(timeout)
+            return TFrame(can_id, can_data, ts)
+        except TimeoutError:
+            pass
+        return None
+
+    def send(self, frame):
+        self.ch.write(frame.arbitration_id, frame.data)
+
+
+class OurCanStack(isotp.TransportLayer):
     def __init__(self, can_bus, address, *args, **kwargs):
         self.address = address
         self.tee = Tee(can_bus,
@@ -45,27 +62,19 @@ class OurCanStack(isotp.TransportLayer):
             address=address,
             *args, **kwargs
             )
-        self.set_sleep_timing(0.005, 0.001)
+        self.set_sleep_timing(0.001, 0.001)
 
     def tx_canbus(self, msg):
-        can_msg = can.Message(
-            arbitration_id=msg.arbitration_id,
-            data = msg.data,
-            is_extended_id=msg.is_extended_id,
-            is_fd=msg.is_fd,
-            bitrate_switch=msg.bitrate_switch
-            )
-        self.tee.send(can_msg)
+        self.tee.send(TFrame(msg.arbitration_id, msg.data))
 
     def rx_canbus(self):
-        msg = self.tee.recv()
-        isotp_msg = None
-        if msg is not None:
-            isotp_msg = isotp.CanMessage(arbitration_id=msg.arbitration_id, data=msg.data, extended_id=msg.is_extended_id, is_fd=msg.is_fd, bitrate_switch=msg.bitrate_switch)
-        return isotp_msg
+        frame = self.tee.recv()
+        if frame:
+            return isotp.CanMessage(arbitration_id=frame.arbitration_id, data=frame.data)
+        return None
+
 
 class ISOTPChannel(Channel):
-
     def __init__(self, can_bus, node_id, logger):
         super().__init__()
         self.node_id = node_id
@@ -87,7 +96,7 @@ class ISOTPChannel(Channel):
         self.request_stop()
         self.update_thread.join()
 
-    def recv(self, deadline=2.0, sleep_interval=0.001):
+    def recv(self, deadline=1.0, sleep_interval=0.001):
         total_interval = 0
         while total_interval < deadline:
             if self.stack.available():
@@ -112,42 +121,8 @@ class ISOTPChannel(Channel):
         return MultibyteCodec()
 
 
-def create_frame(
-    node_id: int, endpoint_id: int, rtr: bool = False, payload: bytearray = None
-) -> can.Message:
-    """
-    Generates and return a CAN frame using python-can Message class
-    """
-    return can.Message(
-        arbitration_id=gen_arbitration_id(node_id, endpoint_id),
-        is_extended_id=False,
-        is_remote_frame=rtr,
-        data=payload,
-    )
-
-
 def gen_arbitration_id(node_id: int, endpoint_id: int) -> int:
     """
     Generates a CAN id from node and endpoint ids
     """
     return (node_id << CAN_EP_BITS) | endpoint_id
-
-
-def guess_channel(bustype_hint, logger):
-    """
-    Tries to guess a channel based on a bustype hint.
-    """
-    if "sim" == bustype_hint:
-        return None
-    device_strings = [s.lower() for s in can_devices[bustype_hint]]
-    ports = []
-    for p in list_ports.comports():
-        desc_lower = p.description.lower()
-        if any([s in desc_lower for s in device_strings]):
-            ports.append(p.device)
-    if not ports:
-        raise IOError("Could not autodiscover CAN channel")
-    if len(ports) > 1:
-        logger.warning("Multiple channels discovered - using the first")
-
-    return ports[0]
