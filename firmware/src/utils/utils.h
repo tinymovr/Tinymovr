@@ -40,7 +40,22 @@ PAC5XXX_RAMFUNC char checksum(char* msg, uint8_t len);
 PAC5XXX_RAMFUNC float wrapf_max(float x, float max);
 PAC5XXX_RAMFUNC float wrapf_min_max(float x, float min, float max);
 
-static inline void delay_us(uint32_t us)
+PAC5XXX_RAMFUNC static inline float our_fminf(float a, float b)
+{
+    return a > b ? b : a;
+}
+
+PAC5XXX_RAMFUNC static inline float our_fmaxf(float a, float b)
+{
+    return a > b ? a : b;
+}
+
+PAC5XXX_RAMFUNC static inline float sgnf(float v)
+{
+    return (v > 0.0f) - (v < 0.0f);
+}
+
+PAC5XXX_RAMFUNC static inline void delay_us(uint32_t us)
 {
     pac_delay_asm(us * 16u);
 }

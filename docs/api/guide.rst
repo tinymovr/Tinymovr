@@ -483,55 +483,59 @@ Example
     >>>tmx.set_gains(offset=2500, direction=-1)
 
 
-integrator_gains
-****************
+.. _integrator-deadband:
+
+vel_integrator_params
+*********************
 
 | **endpoint**: ``0x18``
 | **type**: Read-only
 
-Retrieves the velocity integrator gain of the controller.
+Retrieves the velocity integrator gain and deadband parameters.
 
 Return Values
 -------------
 
-=============  =========================   =========  =========== ==================
-Member         Description                 Data Type  Data Offset Default Unit
--------------  -------------------------   ---------  ----------- ------------------
-``velocity``   Velocity Integrator Gain    float32    0           ampere*second/tick
-=============  =========================   =========  =========== ==================
+=============  ============================   =========  =========== ==================
+Member         Description                    Data Type  Data Offset Default Unit
+-------------  ----------------------------   ---------  ----------- ------------------
+``gain``       Velocity Integrator Gain       float32    0           ampere*second/tick
+``deadband``   Velocity Integrator Deadband   float32    4           tick
+=============  ============================   =========  =========== ==================
 
 Example
 -------
 
 .. code-block:: python
 
-    >>>tmx.integrator_gains
-    {"velocity": 0.0001}
+    >>>tmx.vel_integrator_params
+    {"gain": 0.0001, deadband: 200}
 
 
-set_integrator_gains()
-**********************
+set_vel_integrator_params()
+***************************
 
 | **endpoint**: ``0x19``
 | **type**: Write-only
 
-Sets the velocity integrator gain of the controller.
+Sets the velocity integrator gain and deadband parameters.
 
 Arguments
 ---------
 
-=============  =========================   =========  =========== ==================
-Member         Description                 Data Type  Data Offset Default Unit
--------------  -------------------------   ---------  ----------- ------------------
-``velocity``   Velocity Integrator Gain    float32    0           ampere*second/tick
-=============  =========================   =========  =========== ==================
+=============  ============================   =========  =========== ==================
+Member         Description                    Data Type  Data Offset Default Unit
+-------------  ----------------------------   ---------  ----------- ------------------
+``gain``       Velocity Integrator Gain       float32    0           ampere*second/tick
+``deadband``   Velocity Integrator Deadband   float32    4           tick
+=============  ============================   =========  =========== ==================
 
 Example
 -------
 
 .. code-block:: python
 
-    >>>tmx.set_integrator_gains(velocity=0.0001)
+    >>>tmx.set_integrator_gains(gain=0.0001, deadband=300)
 
 
 Iq
@@ -708,7 +712,7 @@ motor_config
 | **endpoint**: ``0x1E``
 | **type**: Read-only
 
-Retrieves attached motor config.
+Retrieves motor config (flags, pole pairs, calibration current).
 
 Return Values
 -------------
@@ -738,7 +742,7 @@ set_motor_config
 | **endpoint**: ``0x1F``
 | **type**: Write-only
 
-Sets attached motor properties.
+Sets motor properties.
 
 Arguments
 ---------
@@ -956,6 +960,59 @@ Example
 
     >>>tmx.get_set_pos_vel_Iq(1000.0, 0, 0)
     {"position":0.0, "velocity": 0.0, "current": 0.0}
+
+
+motor_RL
+********
+
+| **endpoint**: ``0x27``
+| **type**: Read-only
+
+Retrieves motor resistance and inductance values.
+
+Return Values
+-------------
+
+===============   ===================  =========  =========== ================
+Member            Description          Data Type  Data Offset Default Unit
+---------------   -------------------  ---------  ----------- ----------------
+``R``             Phase Resistance     float32    0           ohm
+``L``             Phase Inductance     float32    4           henry
+===============   ===================  =========  =========== ================
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.motor_RL
+    {"R": 0.2, "L": 0.00005}
+
+
+set_motor_RL
+************
+
+| **endpoint**: ``0x28``
+| **type**: Write-only
+
+Sets attached motor resistance and inductance values.
+
+Arguments
+---------
+
+===============   ===================  =========  =========== ================
+Member            Description          Data Type  Data Offset Default Unit
+---------------   -------------------  ---------  ----------- ----------------
+``R``             Phase Resistance     float32    0           ohm
+``L``             Phase Inductance     float32    4           henry
+===============   ===================  =========  =========== ================
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.set_motor_RL(0.5, 0.0001)
 
 
 Error Codes

@@ -24,7 +24,7 @@ from tinymovr.constants import ControlStates, ControlModes
 from pint import Quantity as _Q
 
 
-min_fw_version = "0.8.10"
+min_fw_version = "0.8.12"
 
 
 class VersionError(Exception):
@@ -55,8 +55,9 @@ class Tinymovr:
             # Check studio version
             msv = self.min_studio_version
             msv_str = ".".join([str(msv.fw_major), str(msv.fw_minor), str(msv.fw_patch)])
-            if version.parse(pkg_resources.require("tinymovr")[0].version) < version.parse(msv_str):
-                raise VersionError(kw="studio", found=self.fw_version, required=msv_str)
+            studio_version_string = pkg_resources.require("tinymovr")[0].version
+            if version.parse(studio_version_string) < version.parse(msv_str):
+                raise VersionError(kw="studio", found=studio_version_string, required=msv_str)
 
     def __getattr__(self, attr: str):
         

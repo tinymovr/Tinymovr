@@ -5,7 +5,6 @@ of Tinymovr boards.
 import random
 import time
 import can
-import statistics as st
 
 import tinymovr
 from tinymovr import Tinymovr
@@ -27,8 +26,7 @@ class TMTestCase(unittest.TestCase):
         )
         iface: IFace = CANBus(cls.can_bus)
         cls.tm = Tinymovr(node_id=1, iface=iface)
-        cls.tm.reset()
-        time.sleep(0.2)
+        cls.reset_and_wait()
 
     def tearDown(self):
         self.tm.idle()
@@ -37,6 +35,11 @@ class TMTestCase(unittest.TestCase):
     def tearDownClass(cls):
         cls.tm.reset()
         cls.can_bus.shutdown()
+
+    @classmethod
+    def reset_and_wait(cls, timeout=3):
+        cls.tm.reset()
+        time.sleep(timeout)
 
     def try_calibrate(self, *args, **kwargs):
         motor_config = self.tm.motor_config

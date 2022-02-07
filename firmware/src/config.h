@@ -20,12 +20,12 @@
 // Firmware Version
 #define VERSION_MAJOR (0u)
 #define VERSION_MINOR (8u)
-#define VERSION_PATCH (11u)
+#define VERSION_PATCH (12u)
 
 // Required Studio version
 #define STUDIO_MIN_VERSION_MAJOR (0u)
 #define STUDIO_MIN_VERSION_MINOR (3u)
-#define STUDIO_MIN_VERSION_PATCH (10u)
+#define STUDIO_MIN_VERSION_PATCH (12u)
 
 /// TINYMOVR CONFIGURATION OPTIONS ///
 
@@ -42,13 +42,14 @@
 // Desired PWM Frequency (Hz).
 #define PWM_FREQ_HZ              (20000)
 
-// Limits
+// Control parameters
 #define PWM_LIMIT                   (0.8f)
 #define I_INTEGRATOR_DECAY_FACTOR   (0.995f)
-#define I_TRIP_MARGIN               (1.35f)
-#define VBUS_LOW_THRESHOLD          (10.4f)  // V
-#define VEL_HARD_LIMIT              (600000) // ticks/s
-#define I_HARD_LIMIT                (60.0)   // A
+#define I_TRIP_MARGIN               (1.5f)
+#define VBUS_LOW_THRESHOLD          (10.4f)   // V
+#define VEL_HARD_LIMIT              (600000.0f)  // ticks/s
+#define I_HARD_LIMIT                (60.0f)    // A
+#define VEL_INTEGRATOR_THRESHOLD    (2000.0f) // ticks/s
 
 // Calibration
 #define CAL_R_LEN             (2 * PWM_FREQ_HZ)

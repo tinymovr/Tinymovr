@@ -69,7 +69,7 @@ Using VSCode
 
 VSCode-based Tinymovr development is a cross-platform solution (Linux, Macos and Windows supported) for building, flashing and debugging firmware. As of November 2021, it is the official approach to Tinymovr development.
 
-The Tinymovr repo includes all VSCode settings configured. You will need to install the `GNU Arm Embedded Toolchain <https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads>`_, and J-Link drivers. 
+The Tinymovr repo includes all VSCode settings configured, except for the JLink `serverpath` variable in `launch.json`, which you'll need to update to reflect your system. You will also need to install the `GNU Arm Embedded Toolchain <https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads>`_, and J-Link drivers. 
 
 The required J-Link drivers and software, together with instructions, can be found in the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_, under the download 'Segger J-Link Support'. This download includes a nacessary patch to enable J-Link to work with Qorvo devices. Instructions on how to apply the patch are included.
 
