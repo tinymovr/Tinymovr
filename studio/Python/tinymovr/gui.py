@@ -60,7 +60,7 @@ class MainWindow(QMainWindow):
         self.logger = configure_logging()
         bitrate = int(arguments["--bitrate"])
 
-        self.attribute_widgets = []
+        self.attribute_widgets_by_id = {}
 
         self.setWindowTitle(app_name)
         self.tree_widget = QTreeWidget()
@@ -101,15 +101,15 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(main_widget)
 
         pg.setConfigOptions(antialias=True)
+        self.graphs_by_id = {}
 
-        ############ THREAD
         self.thread = QtCore.QThread()
         self.worker = Worker(bitrate, self.logger)
-        self.TreeItemCheckedSignal.connect(self.worker.update_attrs)
+        self.TreeItemCheckedSignal.connect(self.worker.update_checkstates)
         self.thread.started.connect(self.worker.run)
         self.worker.moveToThread(self.thread)
         self.worker.regen.connect(self.regen_tree)
-        self.worker.recv.connect(self.update_data)
+        self.worker.update_attrs.connect(self.update_attrs)
         self.thread.start()
 
     def get_rel_time(self):
@@ -117,62 +117,79 @@ class MainWindow(QMainWindow):
 
     def make_graph(self, attr):
         graph_widget = pg.PlotWidget(title=attr.name)
-        x = [self.get_rel_time()]
-        y = [attr.get_value()]
+        x = []
+        y = []
         data_line =  graph_widget.plot(x, y)
         return ({
-            "graph_widget": graph_widget,
-            "graph_data": {"x": x, "y": y},
+            "widget": graph_widget,
+            "data": {"x": x, "y": y},
             "data_line": data_line
         })
 
     @QtCore.Slot()
     def regen_tree(self, tms_by_id):
-        self.attribute_widgets = []
+        self.attribute_widgets_by_id = {}
         self.tree_widget.clear()
         for name, node in tms_by_id.items():
-            self.tree_widget.addTopLevelItem(self.parse_node(node, name, self.attribute_widgets))
+            self.tree_widget.addTopLevelItem(self.parse_node(node, name, self.attribute_widgets_by_id))
         header = self.tree_widget.header()
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
         header.setStretchLastSection(False)
 
-    def parse_node(self, node, name, attribute_widgets):
-        qt_node = QTreeWidgetItem([name, 0, ""])
+    def parse_node(self, node, name, attribute_widgets_by_id):
+        widget = QTreeWidgetItem([name, 0, ""])
         try:
             # Let's assume it's a RemoteObject
-            for name, child in node.children.items():
-                qt_node.addChild(self.parse_node(child, name, attribute_widgets))
+            for child_name, child in node.children.items():
+                widget.addChild(self.parse_node(child, child_name, attribute_widgets_by_id))
         except AttributeError:
             # Maybe a RemoteAttribute
             try:
                 val = node.get_value()
-                qt_node.setText(1, format_value(val))
-                qt_node.setCheckState(0, QtCore.Qt.Unchecked)
-                attribute_widgets.append((node, qt_node))
+                widget.setText(1, format_value(val))
+                widget.setCheckState(0, QtCore.Qt.Unchecked)
+                attribute_widgets_by_id[node.id] = {"node": node, "widget": widget}
             except AttributeError:
                 # Must be a RemoteFunction then
-                qt_node.setText(2, "CALL")
-        return qt_node
+                widget.setText(2, "CALL")
+        return widget
 
     @QtCore.Slot()
     def item_changed(self, item):
         enabled = (item.checkState(0) == QtCore.Qt.Checked)
-        for attr, widget in self.attribute_widgets:
-            if item == widget:
+        for attr_id, data in self.attribute_widgets_by_id.items():
+            if item == data["widget"]:
+                attr = data["node"]
                 self.TreeItemCheckedSignal.emit({"attr":attr, "enabled": enabled})
+                if enabled and attr_id not in self.graphs_by_id:
+                    graph = self.make_graph(attr)
+                    self.graphs_by_id[attr_id] = graph
+                    self.right_layout.addWidget(graph["widget"])
+                elif not enabled and attr_id in self.graphs_by_id:
+                    self.graphs_by_id[attr_id]["widget"].deleteLater()
+                    del self.graphs_by_id[attr_id]
                 break
 
     @QtCore.Slot()
-    def update_data(self, data):
-        print(data)
-
-    def update_graphs(self):
-        pass
+    def update_attrs(self, data):
+        for attr_id, val in data.items():
+            self.attribute_widgets_by_id[attr_id]["widget"].setText(1, format_value(val))
+            if attr_id in self.graphs_by_id:
+                graph_info = self.graphs_by_id[attr_id]
+                data_line = graph_info["data_line"]
+                x = graph_info["data"]["x"]
+                y = graph_info["data"]["y"]
+                if (len(x) >= 200):
+                    x.pop(0)
+                    y.pop(0)
+                x.append(self.get_rel_time())
+                y.append(val)
+                data_line.setData(x, y)
 
 
 class Worker(QObject):
 
-    recv = QtCore.Signal(dict)
+    update_attrs = QtCore.Signal(dict)
     regen = QtCore.Signal(dict)
 
     def __init__(self, bitrate, logger):
@@ -185,32 +202,32 @@ class Worker(QObject):
 
     def run(self):
         while True:
-            QApplication.processEvents()
             self.get_values()
+            QApplication.processEvents()
             time.sleep(0.01)
             
     def get_values(self):
-        for attr in self.active_attrs:
-            print(attr.get_value())
+        updated_attrs = {attr.id: attr.get_value() for attr in self.active_attrs}
+        if len(updated_attrs) > 0:
+            self.update_attrs.emit(updated_attrs)
 
-    def node_appeared(self, node, node_id):
-        node_name = "{}{}".format(base_node_name, node_id)
+    def node_appeared(self, node, name):
+        node_name = "{}{}".format(base_node_name, name)
         self.tms_by_id[node_name] = node
         self.regen.emit(self.tms_by_id)
 
-    def node_disappeared(self, node_id):
-        node_name = "{}{}".format(base_node_name, node_id)
+    def node_disappeared(self, name):
+        node_name = "{}{}".format(base_node_name, name)
         del self.tms_by_id[node_name]
         self.regen.emit(self.tms_by_id)
 
     @QtCore.Slot( dict )
-    def update_attrs(self, d):
+    def update_checkstates(self, d):
         attr = d["attr"]
         if d["enabled"] == True and attr not in self.active_attrs:
             self.active_attrs.append(attr)
         elif d["enabled"] == False and attr in self.active_attrs:
             self.active_attrs.remove(attr)
-        print(self.active_attrs)
 
 
 def format_value(value):
