@@ -54,7 +54,7 @@ class TestBoard(TMTestCase):
         self.assertEqual(self.tm.vel_integrator_params.gain, 0)
 
         # Bring it back
-        self.tm.set_vel_integrator_params(init_params)
+        self.tm.set_vel_integrator_params(**init_params)
 
     def test_c_calibrate(self):
         '''
