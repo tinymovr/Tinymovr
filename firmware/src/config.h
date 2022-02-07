@@ -45,7 +45,7 @@
 // Control parameters
 #define PWM_LIMIT                   (0.8f)
 #define I_INTEGRATOR_DECAY_FACTOR   (0.995f)
-#define I_TRIP_MARGIN               (1.35f)
+#define I_TRIP_MARGIN               (1.5f)
 #define VBUS_LOW_THRESHOLD          (10.4f)   // V
 #define VEL_HARD_LIMIT              (600000.0f)  // ticks/s
 #define I_HARD_LIMIT                (60.0f)    // A
