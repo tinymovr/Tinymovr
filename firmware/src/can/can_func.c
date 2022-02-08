@@ -12,6 +12,7 @@
 //=============================================================================
 
 #include "can_func.h"
+#include <src/common.h>
 
 uint8_t tx_data[8] = {0,1,2,3,4,5,6,7};
 uint8_t rx_data[8];
@@ -19,88 +20,66 @@ uint8_t rx_data[8];
 uint8_t data_length;
 uint16_t rx_id;
 uint32_t buffer;
-uint8_t rx_flag;
 
-void can_io_config(CAN_IO_TYPE can)
+void can_io_config(void)
 {
-    switch (can)
-    {
-    case CAN_PC01:
+#ifdef CAN_PC01
         // Select CAN peripheral on PC0 and PC1
         PAC55XX_GPIOC->MODE.P0 = 3;                     //RXD High-Impedance Input
         PAC55XX_GPIOC->MODE.P1 = 1;                     //TXD Pull-Pull Output
         PAC55XX_SCC->PCMUXSEL.P0 = 6;                   //CANRXD
         PAC55XX_SCC->PCMUXSEL.P1 = 6;                   //CANTXD
-        break;
-
-    case CAN_PC45:
+#elif defined CAN_PC45
         // Select CAN peripheral on PC4 and PC5
         PAC55XX_GPIOC->MODE.P4 = 3;                     //RXD High-Impedance Input
         PAC55XX_GPIOC->MODE.P5 = 1;                     //TXD Pull-Pull Output
         PAC55XX_SCC->PCMUXSEL.P4 = 6;                   //CANRXD
         PAC55XX_SCC->PCMUXSEL.P5 = 6;                   //CANTXD
-        break;
-
-    case CAN_PD01:
+#elif defined CAN_PD01
         // Select CAN peripheral on PD0 and PD1
         PAC55XX_GPIOD->MODE.P1 = 3;                     //RXD High-Impedance Input
         PAC55XX_GPIOD->MODE.P0 = 1;                     //TXD Pull-Pull Output
         PAC55XX_SCC->PDMUXSEL.P1 = 6;                   //CANRXD
         PAC55XX_SCC->PDMUXSEL.P0 = 6;                   //CANTXD
-        break;
-
-    case CAN_PD56:
+#elif defined CAN_PD56
         // Select CAN peripheral on PD5 and PD6
         PAC55XX_GPIOD->MODE.P5 = 3;                     //RXD High-Impedance Input
         PAC55XX_GPIOD->MODE.P6 = 1;                     //TXD Pull-Pull Output
         PAC55XX_SCC->PDMUXSEL.P5 = 6;                   //CANRXD
         PAC55XX_SCC->PDMUXSEL.P6 = 6;                   //CANTXD
-        break;
-
-    case CAN_PD67:
+#elif defined CAN_PD67
         // Select CAN peripheral on PD6 and PD7
         PAC55XX_GPIOD->MODE.P7 = 3;                     //RXD High-Impedance Input
         PAC55XX_GPIOD->MODE.P6 = 1;                     //TXD Pull-Pull Output
         PAC55XX_SCC->PDMUXSEL.P7 = 6;                   //CANRXD
         PAC55XX_SCC->PDMUXSEL.P6 = 6;                   //CANTXD
-        break;
-
-    case CAN_PE23:
+#elif defined CAN_PE23
         // Select CAN peripheral on PE2 and PE3
         PAC55XX_GPIOE->MODE.P2 = 3;                     //RXD High-Impedance Input
         PAC55XX_GPIOE->MODE.P3 = 1;                     //TXD Pull-Pull Output
         PAC55XX_SCC->PEMUXSEL.P2 = 6;                   //CANRXD
         PAC55XX_SCC->PEMUXSEL.P3 = 6;                   //CANTXD
-        break;
-
-    case CAN_PE67:
+#elif defined CAN_PE67
         // Select CAN peripheral on PE6 and PE7
         PAC55XX_GPIOE->MODE.P6 = 3;                     //RXD High-Impedance Input
         PAC55XX_GPIOE->MODE.P7 = 1;                     //TXD Pull-Pull Output
         PAC55XX_SCC->PEMUXSEL.P6 = 6;                   //CANRXD
         PAC55XX_SCC->PEMUXSEL.P7 = 6;                   //CANTXD
-        break;
-
-    case CAN_PF67:
+#elif defined CAN_PF67
         // Select CAN peripheral on PF6 and PF7
         PAC55XX_GPIOF->MODE.P6 = 3;                     //RXD High-Impedance Input
         PAC55XX_GPIOF->MODE.P7 = 1;                     //TXD Pull-Pull Output
         PAC55XX_SCC->PFMUXSEL.P6 = 6;                   //CANRXD
         PAC55XX_SCC->PFMUXSEL.P7 = 6;                   //CANTXD
-        break;
-
-    case CAN_PG56:
+#elif defined CAN_PG56
         // Select CAN peripheral on PG5 and PG6
         PAC55XX_GPIOG->MODE.P5 = 3;                     //RXD High-Impedance Input
         PAC55XX_GPIOG->MODE.P6 = 1;                     //TXD Pull-Pull Output
         PAC55XX_SCC->PGMUXSEL.P5 = 6;                   //CANRXD
         PAC55XX_SCC->PGMUXSEL.P6 = 6;                   //CANTXD
-        break;
-
-    default:
-        // No action
-        break;
-    }
+#else
+    #error "No CAN interface constant defined"
+#endif
 }
 
 void can_baud(CAN_BAUD_TYPE baud)
@@ -171,7 +150,7 @@ void can_baud(CAN_BAUD_TYPE baud)
     }
 }
 
-void can_transmit(uint8_t dataLen, uint16_t id, uint8_t * data)
+void can_transmit(uint8_t dataLen, uint16_t id, const uint8_t * data)
 {
     while (PAC55XX_CAN->SR.TBS == 0) {};           // wait for TX buffer free
     PAC55XX_CAN->TXBUF = (dataLen << 0)    |       // DLC - Data Length Code
