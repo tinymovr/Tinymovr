@@ -18,10 +18,11 @@
 #include <src/system/system.h>
 #include <src/ssp/ssp_func.h>
 #include <src/utils/utils.h>
-#include <src/encoder/encoder.h>
+#include <src/encoder/ma7xx.h>
 
 static EncoderState state = { 0 };
 
+#define MAX_ALLOWED_DELTA     (ENCODER_TICKS / 6)
 #define MAX_ALLOWED_DELTA_ADD (MAX_ALLOWED_DELTA + ENCODER_TICKS)
 #define MAX_ALLOWED_DELTA_SUB (MAX_ALLOWED_DELTA - ENCODER_TICKS)
 #define MIN_ALLOWED_DELTA_ADD (-MAX_ALLOWED_DELTA + ENCODER_TICKS)
@@ -35,25 +36,25 @@ static EncoderState state = { 0 };
 #define PRIMARY_ENCODER_SSP_STRUCT PAC55XX_SSPC
 #endif
 
-void encoder_init(void)
+void ma7xx_init(void)
 {
     ssp_init(PRIMARY_ENCODER_SSP_PORT, SSP_MS_MASTER, 0, 0); // Mode 0
     delay_us(16000); // ensure 16ms sensor startup time as per the datasheet
-    encoder_send_angle_cmd();
-    encoder_update_angle(false);
+    ma7xx_send_angle_cmd();
+    ma7xx_update_angle(false);
 }
 
-PAC5XXX_RAMFUNC void encoder_send_angle_cmd(void)
+PAC5XXX_RAMFUNC void ma7xx_send_angle_cmd(void)
 {
 	ssp_write_one(PRIMARY_ENCODER_SSP_STRUCT, MA_CMD_ANGLE);
 }
 
-PAC5XXX_RAMFUNC int16_t encoder_get_angle(void)
+PAC5XXX_RAMFUNC int16_t ma7xx_get_angle(void)
 {
     return state.angle;
 }
 
-PAC5XXX_RAMFUNC void encoder_update_angle(bool check_error)
+PAC5XXX_RAMFUNC void ma7xx_update_angle(bool check_error)
 {
     while (!PRIMARY_ENCODER_SSP_STRUCT->STAT.RNE) {}
     const int16_t angle = (PRIMARY_ENCODER_SSP_STRUCT->DAT.DATA) >> 3;

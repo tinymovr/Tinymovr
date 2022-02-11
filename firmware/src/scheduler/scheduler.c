@@ -20,7 +20,7 @@
 #include <src/can/can.h>
 #include <src/uart/uart_interface.h>
 #include <src/uart/uart_lowlevel.h>
-#include <src/encoder/encoder.h>
+#include <src/encoder/ma7xx.h>
 #include <src/observer/observer.h>
 
 struct SchedulerState
@@ -66,10 +66,10 @@ void WaitForControlLoopInterrupt(void)
 	state.busy_loop_start = DWT->CYCCNT;
 	// We have to service the control loop by updating
 	// current measurements and encoder estimates.
-	encoder_send_angle_cmd();
+	ma7xx_send_angle_cmd();
 	ADC_UpdateMeasurements();
-	encoder_update_angle(true);
-	observer_update_estimates(encoder_get_angle());
+	ma7xx_update_angle(true);
+	observer_update_estimates(ma7xx_get_angle());
 	// At this point control is returned to main loop.
 }
 

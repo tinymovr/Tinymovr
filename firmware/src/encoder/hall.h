@@ -15,40 +15,10 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <src/encoder/ma7xx.h>
-#include "src/common.h"
-#include "src/system/system.h"
+#pragma once
 
-#include "src/uart/uart_lowlevel.h"
-#include "src/observer/observer.h"
-#include "src/adc/adc.h"
-#include "src/motor/motor.h"
-#include "src/controller/controller.h"
-#include "src/gatedriver/gatedriver.h"
-#include "src/timer/timer.h"
-#include "src/can/can.h"
-#include "src/nvm/nvm.h"
+#include <src/encoder/encoder_struct.h>
 
-int test_div(int lho, int rho)
-{
-    return lho/rho;
-}
-
-int main(void)
-{
-  	__disable_irq();
-    system_init();
-    ma7xx_init();
-    NVM_Init();
-    NVM_LoadConfig(); // This will TRY to deserialize and import config
-    UART_Init();
-	Observer_Init();
-	ADC_Init();
-	GateDriver_Init();
-    CAN_init();
-    Timer_Init();
-    __enable_irq();
-
-    Controller_ControlLoop();
-}
-
+void hall_init(void);
+PAC5XXX_RAMFUNC int16_t hall_get_angle(void);
+PAC5XXX_RAMFUNC void hall_update_angle();

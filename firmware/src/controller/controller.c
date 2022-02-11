@@ -22,7 +22,6 @@
 #include "src/gatedriver/gatedriver.h"
 #include "src/utils/utils.h"
 #include <src/scheduler/scheduler.h>
-#include <src/encoder/encoder.h>
 #include <src/motor/calibration.h>
 #include <src/controller/controller.h>
 
@@ -130,13 +129,13 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     
     if (state.mode >= CTRL_POSITION)
     {
-        const float delta_pos = Observer_GetPosDiff(state.pos_setpoint);
+        const float delta_pos = observer_get_diff(state.pos_setpoint);
         const float delta_pos_integrator = sgnf(delta_pos) * our_fmaxf(0, fabsf(delta_pos) - config.vel_integrator_deadband);
         vel_setpoint += delta_pos * config.pos_gain;
         vel_setpoint_integrator += delta_pos_integrator * config.pos_gain;
     }
 
-    const float vel_estimate = Observer_GetVelEstimate();
+    const float vel_estimate = observer_get_vel_estimate();
     float Iq_setpoint = state.Iq_setpoint;
 
     if (state.mode >= CTRL_VELOCITY)
@@ -167,7 +166,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         state.vel_integrator_Iq *= 0.995f;
     }
 
-    const float e_phase = Observer_GetPosEstimateWrappedRadians() * motor_get_pole_pairs();
+    const float e_phase = observer_get_epos();
     const float c_I = fast_cos(e_phase);
     const float s_I = fast_sin(e_phase);
     const float VBus = ADC_GetVBus();
@@ -175,7 +174,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     float Vd; float Vq;
     if (motor_is_gimbal() == true)
     {
-    	const float e_phase_vel = Observer_GetVelEstimateRadians() * motor_get_pole_pairs();
+    	const float e_phase_vel = observer_get_evel();
         Vd = - e_phase_vel * motor_get_phase_inductance() * Iq_setpoint;
         Vq = motor_get_phase_resistance() * Iq_setpoint;
     }

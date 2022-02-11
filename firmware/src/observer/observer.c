@@ -16,7 +16,7 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <string.h>
-#include <src/encoder/encoder.h>
+#include <src/encoder/ma7xx.h>
 #include <src/motor/motor.h>
 #include <src/common.h>
 #include <src/utils/utils.h>
@@ -85,41 +85,36 @@ PAC5XXX_RAMFUNC float Observer_GetPosEstimate(void)
 	return primary + state.pos_estimate;
 }
 
-PAC5XXX_RAMFUNC float Observer_GetPosDiff(float target)
+PAC5XXX_RAMFUNC float observer_get_diff(float target)
 {
 	const float primary = 2 * config.sector_half_interval * state.pos_sector;
 	const float diff_sector = target - primary;
 	return diff_sector - state.pos_estimate;
 }
 
-PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrapped(void)
-{
-	return state.pos_estimate_wrapped;
-}
-
-PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrappedRadians(void)
-{
-	return Observer_GetPosEstimateWrapped() * twopi_by_enc_ticks;
-}
-
-PAC5XXX_RAMFUNC float Observer_GetVelEstimate(void)
+PAC5XXX_RAMFUNC float observer_get_vel_estimate(void)
 {
 	return state.vel_estimate;
 }
 
-PAC5XXX_RAMFUNC float Observer_GetVelEstimateRadians(void)
+PAC5XXX_RAMFUNC float observer_get_epos(void)
 {
-	return Observer_GetVelEstimate() * twopi_by_enc_ticks;
+	return state.pos_estimate_wrapped * twopi_by_enc_ticks * motor_get_pole_pairs();
+}
+
+PAC5XXX_RAMFUNC float observer_get_evel(void)
+{
+	return state.vel_estimate * twopi_by_enc_ticks * motor_get_pole_pairs();
 }
 
 PAC5XXX_RAMFUNC float observer_get_pos_estimate_user_frame(void)
 {
-	return (Observer_GetPosEstimate() - motor_get_user_offset()) * motor_get_user_direction();
+	return (state.pos_estimate - motor_get_user_offset()) * motor_get_user_direction();
 }
 
 PAC5XXX_RAMFUNC float observer_get_vel_estimate_user_frame(void)
 {
-	return Observer_GetVelEstimate() * motor_get_user_direction();
+	return state.vel_estimate * motor_get_user_direction();
 }
 
 void Observer_ClearEccentricityTable(void)

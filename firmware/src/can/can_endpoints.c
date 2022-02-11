@@ -16,7 +16,6 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <src/common.h>
-#include <src/encoder/encoder.h>
 #include <string.h>
 
 #include <src/system/system.h>

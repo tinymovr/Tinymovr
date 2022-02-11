@@ -45,11 +45,10 @@ struct ObserverConfig
 void Observer_Init(void);
 PAC5XXX_RAMFUNC void observer_update_estimates(const int16_t raw_pos);
 PAC5XXX_RAMFUNC float Observer_GetPosEstimate(void);
-PAC5XXX_RAMFUNC float Observer_GetPosDiff(float target);
-PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrapped(void);
-PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrappedRadians(void);
-PAC5XXX_RAMFUNC float Observer_GetVelEstimate(void);
-PAC5XXX_RAMFUNC float Observer_GetVelEstimateRadians(void);
+PAC5XXX_RAMFUNC float observer_get_diff(float target);
+PAC5XXX_RAMFUNC float observer_get_vel_estimate(void);
+PAC5XXX_RAMFUNC float observer_get_epos(void);
+PAC5XXX_RAMFUNC float observer_get_evel(void);
 
 PAC5XXX_RAMFUNC float observer_get_pos_estimate_user_frame(void);
 PAC5XXX_RAMFUNC float observer_get_vel_estimate_user_frame(void);
