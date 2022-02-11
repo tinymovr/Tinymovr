@@ -20,11 +20,6 @@
 
 #include "src/common.h"
 
-typedef enum {
-    SYSTEM_ERR_NO_ERROR        			= 0x0000,
-	SYSTEM_ERR_VBUS_UNDERVOLTAGE        = 0x0001
-} SystemError;
-
 void system_init(void);
 void system_reset(void);
 

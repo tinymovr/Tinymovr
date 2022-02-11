@@ -47,7 +47,7 @@ bool CalibrateResistance(void)
             GateDriver_SetDutyCycle(&modulation_values);
             WaitForControlLoopInterrupt();
         }
-        const float R = fabsf(V_setpoint / I_cal);
+        const float R = our_fabsf(V_setpoint / I_cal);
         if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
         {
             add_error_flag(ERROR_PHASE_RESISTANCE_OUT_OF_RANGE);

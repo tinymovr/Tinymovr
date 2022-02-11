@@ -31,16 +31,14 @@
 #include <src/can/can_endpoints.h>
 
 #define EP_LIST_SIZE 64
-#define EP_MAP_SIZE 256
+#define EP_MAP_SIZE 64
 
-CANEP_Callback EPList[EP_LIST_SIZE];
+CANEP_Callback EPList[EP_LIST_SIZE] = {0};
 uint8_t currentIndex = 0;
 uint8_t EPMap[EP_MAP_SIZE] = {0};
 
 void CANEP_InitEndpointMap(void)
 {
-    (void)memset(EPList, '\0', sizeof(EPList));
-
     // 0x001 AVAIL
     CANEP_AddEndpoint(&CAN_GetOffsetAndDirection, 0x002);
     CANEP_AddEndpoint(&CAN_GetState, 0x003);
@@ -72,17 +70,21 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_EraseConfig, 0x01D);
     CANEP_AddEndpoint(&CAN_GetMotorConfig, 0x01E);
     CANEP_AddEndpoint(&CAN_SetMotorConfig, 0x01F);
-    // ---
     CANEP_AddEndpoint(&CAN_MoveToPosWithTimeLimit, 0x020);
     CANEP_AddEndpoint(&CAN_MoveToPosWithVelLimit, 0x021);
     CANEP_AddEndpoint(&CAN_SetMaxPlanAccelDecel, 0x022);
     CANEP_AddEndpoint(&CAN_GetMaxPlanAccelDecel, 0x023);
-    // ---
     CANEP_AddEndpoint(&CAN_GetSetPosVel, 0x025);
     CANEP_AddEndpoint(&CAN_GetSetPosVelIq, 0x026);
-    //
     CANEP_AddEndpoint(&CAN_GetMotorRL, 0x027);
     CANEP_AddEndpoint(&CAN_SetMotorRL, 0x028);
+    // 0x029 AVAIL
+    // 0x02A AVAIL
+    // 0x02B AVAIL
+    // 0x02C AVAIL
+    // 0x02D AVAIL
+    // 0x02E AVAIL
+    // 0x02F AVAIL
 }
 
 void CANEP_AddEndpoint(CANEP_Callback callback, uint8_t id)

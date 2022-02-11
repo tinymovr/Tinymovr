@@ -73,6 +73,13 @@
 #define ENCODER_HALF_TICKS          (ENCODER_TICKS / 2)
 #define ENCODER_TICKS_FLOAT         (8192.f)
 
+#if defined BOARD_REV_R32 || defined BOARD_REV_R33
+#define BOARD_REV_R3
+#define CAN_PE23
+#elif defined BOARD_REV_M1 
+#define CAN_PF67
+#endif
+
 #define PI       (3.141592f)
 #define TWOPI    (6.283185f)
 #define INVTWOPI (0.159155f)

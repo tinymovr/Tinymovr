@@ -30,7 +30,7 @@ static EncoderState state = { 0 };
 #if defined(BOARD_REV_R3)
 #define PRIMARY_ENCODER_SSP_PORT SSPD
 #define PRIMARY_ENCODER_SSP_STRUCT PAC55XX_SSPD
-#elif defined(BOARD_REV_T5)
+#elif defined(BOARD_REV_M1)
 #define PRIMARY_ENCODER_SSP_PORT SSPC
 #define PRIMARY_ENCODER_SSP_STRUCT PAC55XX_SSPC
 #endif
@@ -45,7 +45,7 @@ void encoder_init(void)
 
 PAC5XXX_RAMFUNC void encoder_send_angle_cmd(void)
 {
-	ssp_write_one(PRIMARY_ENCODER_SSP_PORT, MA_CMD_ANGLE);
+	ssp_write_one(PRIMARY_ENCODER_SSP_STRUCT, MA_CMD_ANGLE);
 }
 
 PAC5XXX_RAMFUNC int16_t encoder_get_angle(void)
