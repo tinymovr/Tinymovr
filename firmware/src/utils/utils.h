@@ -18,22 +18,9 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#pragma once
 
 #include "src/common.h"
-
-#ifndef UTILS_UTILS_H_
-#define UTILS_UTILS_H_
-
-#define MACRO_MAX(x, y) (((x) > (y)) ? (x) : (y))
-#define MACRO_MIN(x, y) (((x) < (y)) ? (x) : (y))
-
-PAC5XXX_RAMFUNC float fast_cos(float angle);
-PAC5XXX_RAMFUNC float fast_sin(float angle);
-PAC5XXX_RAMFUNC float floorf(float x);
-PAC5XXX_RAMFUNC float fmodf(float a, float b);
-PAC5XXX_RAMFUNC char checksum(char* msg, uint8_t len);
-PAC5XXX_RAMFUNC float wrapf_max(float x, float max);
-PAC5XXX_RAMFUNC float wrapf_min_max(float x, float min, float max);
 
 #if __ARM_FEATURE_FMA && __ARM_FP&4 && !__SOFTFP__ && !BROKEN_VFP_ASM
 
@@ -98,6 +85,76 @@ static inline bool our_clamp(float *d, float min, float max)
     const float t = *d < min ? min : *d;
     *d = t > max ? max : t;
     return (*d == min) || (*d == max);
+}
+
+static inline float our_floorf(float x)
+{
+	if (x >= 0.0f)
+	{
+		return (float)((int)x);
+	}
+	return (float)((int)x - 1);
+}
+
+static inline float our_fmodf(float a, float b)
+{
+    return (a - b * our_floorf(a / b));
+}
+
+/* wrap x -> [0,max) */
+static inline float wrapf_max(float x, float max)
+{
+    return our_fmodf(max + our_fmodf(x, max), max);
+}
+/* wrap x -> [min,max) */
+static inline float wrapf_min_max(float x, float min, float max)
+{
+    return min + wrapf_max(x - min, max - min);
+}
+
+// based on https://github.com/divideconcept/FastTrigo/blob/master/fasttrigo.cpp
+static inline float cos_32s(float x)
+{
+    const float c1= 0.99940307f;
+    const float c2=-0.49558072f;
+    const float c3= 0.03679168f;
+    float x2;      // The input argument squared
+    x2=x * x;
+    return (c1 + x2*(c2 + c3 * x2));
+}
+
+static inline float fast_cos(float angle)
+{
+    //clamp to the range 0..2pi
+    angle=angle-our_floorf(angle * INVTWOPI) * TWOPI;
+    angle=angle>0.f?angle:-angle;
+
+    if(angle<halfpi) return cos_32s(angle);
+    if(angle<pi) return -cos_32s(pi-angle);
+    if(angle<threehalfpi) return -cos_32s(angle-pi);
+    return cos_32s(TWOPI - angle);
+}
+
+static inline float fast_sin(float angle)
+{
+    return fast_cos(halfpi-angle);
+}
+
+static inline uint16_t crc16_ccitt(const uint32_t block[], uint16_t blockLength, uint16_t crc)
+{
+    PAC55XX_CRC->SEED.CRCSEED = crc;
+
+    // Compute CRC using 32-bit input on memory that is 32-bit aligned 
+    while(blockLength)    
+    {
+        PAC55XX_CRC->DATAIN = *block++;             // Input a 32-bit word
+        blockLength = blockLength - 4;              // Decrement Length by 4 bytes
+    }
+    
+    __asm__("NOP");
+    __asm__("NOP");
+
+    return PAC55XX_CRC->OUT.CRCOUT;
 }
 
 // https://github.com/madcowswe/ODrive/blob/3113aedf081cf40e942d25d3b0b36c8806f11f23/Firmware/MotorControl/utils.c
@@ -256,5 +313,3 @@ static inline int SVM(float alpha, float beta, float* tA, float* tB, float* tC)
          && *tC >= 0.0f && *tC <= 1.0f;
     return result_valid ? 0 : -1;
 }
-
-#endif /* UTILS_UTILS_H_ */
