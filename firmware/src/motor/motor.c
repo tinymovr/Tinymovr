@@ -15,9 +15,10 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/observer/observer.h"
-#include "src/controller/controller.h"
-#include "motor.h"
+#include <src/observer/observer.h>
+#include <src/controller/controller.h>
+#include <src/utils/utils.h>
+#include <src/motor/motor.h>
 
 static struct MotorConfig config = {
     .pole_pairs = 7u,
@@ -39,11 +40,11 @@ static struct MotorConfig config = {
 
 PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad)
 {
-    const float mpos_diff = fabsf(mpos_end - mpos_start);
+    const float mpos_diff = our_fabsf(mpos_end - mpos_start);
     float mpos_diff_rad = TWOPI * mpos_diff/ticks;
     const float pairs_f = epos_rad / mpos_diff_rad;
     const uint8_t pairs_i = (uint8_t)floorf(pairs_f + 0.5f);
-    const float residual = fabsf(pairs_f - (float)pairs_i);
+    const float residual = our_fabsf(pairs_f - (float)pairs_i);
 
     bool found = false;
     if (residual <= 0.30f)

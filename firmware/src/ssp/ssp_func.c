@@ -765,11 +765,7 @@ void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t cph, uint8_t cpol)
 ///     Write a 16-bit data to SSP manually
 ///
 ///@param[in]
-///     SSP_TYPE:
-///         SSPA
-///         SSPB
-///         SSPC
-///         SSPD
+///     PAC55XX_SSP_TYPEDEF: pointer to SSP struct
 ///     data: The data to write.
 ///
 ///@param[out]
@@ -780,34 +776,10 @@ void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t cph, uint8_t cpol)
 ///     others: Some error occurs.
 ///
 //==============================================================================
-PAC5XXX_RAMFUNC uint32_t ssp_write_one(SSP_TYPE ssp, uint16_t data)
+PAC5XXX_RAMFUNC uint32_t ssp_write_one(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t data)
 {
     uint32_t result = PAC5XXX_OK;
     uint32_t wait_tick = 0;
-    PAC55XX_SSP_TYPEDEF *ssp_ptr;
-
-    switch (ssp)
-    {
-        case SSPA:
-            ssp_ptr = PAC55XX_SSPA;
-            break;
-
-        case SSPB:
-            ssp_ptr = PAC55XX_SSPB;
-            break;
-
-        case SSPC:
-            ssp_ptr = PAC55XX_SSPC;
-            break;
-
-        case SSPD:
-            ssp_ptr = PAC55XX_SSPD;
-            break;
-
-        default:
-            ssp_ptr = PAC55XX_SSPD;
-            break;
-    }
 
     // Write 16-bits Data
     ssp_ptr->DAT.DATA = data;
@@ -830,11 +802,7 @@ PAC5XXX_RAMFUNC uint32_t ssp_write_one(SSP_TYPE ssp, uint16_t data)
 ///     Write a serial 16-bit data to SSP manually
 ///
 ///@param[in]
-///     SSP_TYPE:
-///         SSPA
-///         SSPB
-///         SSPC
-///         SSPD
+///     PAC55XX_SSP_TYPEDEF: pointer to SSP struct
 ///     data_p: The data pointer to write.
 ///     byte_num: the number to write.
 ///
@@ -846,7 +814,7 @@ PAC5XXX_RAMFUNC uint32_t ssp_write_one(SSP_TYPE ssp, uint16_t data)
 ///     others: Some error occurs.
 ///
 //==============================================================================
-PAC5XXX_RAMFUNC uint32_t ssp_write_multi(SSP_TYPE ssp, uint16_t *data_p, uint32_t byte_num)
+PAC5XXX_RAMFUNC uint32_t ssp_write_multi(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t *data_p, uint32_t byte_num)
 {
     uint16_t *data;
     data = data_p;
@@ -854,30 +822,6 @@ PAC5XXX_RAMFUNC uint32_t ssp_write_multi(SSP_TYPE ssp, uint16_t *data_p, uint32_
     uint32_t result = PAC5XXX_OK;
     uint32_t wait_tick = 0;
     uint32_t byte_num_temp;
-    PAC55XX_SSP_TYPEDEF *ssp_ptr;
-
-    switch (ssp)
-    {
-        case SSPA:
-            ssp_ptr = PAC55XX_SSPA;
-            break;
-
-        case SSPB:
-            ssp_ptr = PAC55XX_SSPB;
-            break;
-
-        case SSPC:
-            ssp_ptr = PAC55XX_SSPC;
-            break;
-
-        case SSPD:
-            ssp_ptr = PAC55XX_SSPD;
-            break;
-
-        default:
-            ssp_ptr = PAC55XX_SSPD;
-            break;
-    }
 
     for (byte_num_temp=0; byte_num_temp<byte_num; byte_num_temp++)
     {

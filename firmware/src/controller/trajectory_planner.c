@@ -48,7 +48,7 @@ bool planner_prepare_plan_tlimit(float p_target, float deltat_tot, float deltat_
     {
     	add_error_flag(ERROR_PLANNER_INVALID_INPUT);
     }
-    else if (fabsf(v_cruise) > Controller_GetVelLimit())
+    else if (our_fabsf(v_cruise) > Controller_GetVelLimit())
     {
     	add_error_flag(ERROR_PLANNER_VCRUISE_OVER_LIMIT);
     }
@@ -92,7 +92,7 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 		response = false;
 	}
 	// Case 1. Distance to v=0 > desired distance. Full stop trajectory.
-	if (v_0*v_0 > fabsf(2*d_max*S))
+	if (v_0*v_0 > our_fabsf(2*d_max*S))
 	{
 		const float sign_fs = v_0 >= 0 ? 1.0f : -1.0f;
 		const float deltat_dec = sign_fs * v_0/d_max;
@@ -129,11 +129,11 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 //		response = true;
 //	}
 	// Case 3. Triangular profile
-	else if (fabsf(S) < (v_max*v_max-v_0*v_0)/(2*a_max) + (v_max*v_max)/(2*d_max))
+	else if (our_fabsf(S) < (v_max*v_max-v_0*v_0)/(2*a_max) + (v_max*v_max)/(2*d_max))
 	{
 		const float acc = sign * a_max;
 		const float dec = sign * d_max;
-		const float v_reached = sign * fast_sqrt( (2 * a_max * d_max * fabsf(S) + d_max * v_0 * v_0)/(a_max + d_max) );
+		const float v_reached = sign * fast_sqrt( (2 * a_max * d_max * our_fabsf(S) + d_max * v_0 * v_0)/(a_max + d_max) );
 		const float deltat_acc = (v_reached - v_0) / acc;
 		const float deltat_dec = v_reached / dec;
 		const float t_end = deltat_acc + deltat_dec;

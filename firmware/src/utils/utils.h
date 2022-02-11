@@ -27,37 +27,77 @@
 #define MACRO_MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MACRO_MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-PAC5XXX_RAMFUNC float fast_sqrt(float n);
-PAC5XXX_RAMFUNC float fast_inv_sqrt(float n);
 PAC5XXX_RAMFUNC float fast_cos(float angle);
 PAC5XXX_RAMFUNC float fast_sin(float angle);
-PAC5XXX_RAMFUNC float fminf(float x, float y);
-PAC5XXX_RAMFUNC float fabsf(float x);
 PAC5XXX_RAMFUNC float floorf(float x);
 PAC5XXX_RAMFUNC float fmodf(float a, float b);
-PAC5XXX_RAMFUNC bool our_clamp(float *d, float min, float max);
 PAC5XXX_RAMFUNC char checksum(char* msg, uint8_t len);
 PAC5XXX_RAMFUNC float wrapf_max(float x, float max);
 PAC5XXX_RAMFUNC float wrapf_min_max(float x, float min, float max);
 
-PAC5XXX_RAMFUNC static inline float our_fminf(float a, float b)
+#if __ARM_FEATURE_FMA && __ARM_FP&4 && !__SOFTFP__ && !BROKEN_VFP_ASM
+
+PAC5XXX_RAMFUNC static inline float fast_sqrt(float x)
+{
+	__asm__ ("vsqrt.f32 %0, %1" : "=t"(x) : "t"(x));
+	return x;
+}
+
+static inline float our_fabsf(float x)
+{
+    __asm__ ("vabs.f32 %0, %1" : "=t"(x) : "t"(x));
+    return x;
+}
+
+#else
+
+#error No math implemented without Arm FPU!
+
+#endif
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+static inline float fast_inv_sqrt(float n)
+{
+	long i;
+	float y;
+
+	const float x = n * 0.5f;
+	y = n;
+	i = *(long *)&y;
+	i = 0x5f3759df - (i >> 1);
+	y = *(float *)&i;
+	y = y * (1.5f - (x * y * y));
+
+	return y;
+}
+#pragma GCC diagnostic pop
+
+static inline float our_fminf(float a, float b)
 {
     return a > b ? b : a;
 }
 
-PAC5XXX_RAMFUNC static inline float our_fmaxf(float a, float b)
+static inline float our_fmaxf(float a, float b)
 {
     return a > b ? a : b;
 }
 
-PAC5XXX_RAMFUNC static inline float sgnf(float v)
+static inline float sgnf(float v)
 {
     return (v > 0.0f) - (v < 0.0f);
 }
 
-PAC5XXX_RAMFUNC static inline void delay_us(uint32_t us)
+static inline void delay_us(uint32_t us)
 {
     pac_delay_asm(us * 16u);
+}
+
+static inline bool our_clamp(float *d, float min, float max)
+{
+    const float t = *d < min ? min : *d;
+    *d = t > max ? max : t;
+    return (*d == min) || (*d == max);
 }
 
 // https://github.com/madcowswe/ODrive/blob/3113aedf081cf40e942d25d3b0b36c8806f11f23/Firmware/MotorControl/utils.c
@@ -84,8 +124,7 @@ PAC5XXX_RAMFUNC static inline void delay_us(uint32_t us)
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Needs to be defined in header for inlining
-PAC5XXX_RAMFUNC static inline int SVM(float alpha, float beta, float* tA, float* tB, float* tC)
+static inline int SVM(float alpha, float beta, float* tA, float* tB, float* tC)
 {
     int Sextant;
 
