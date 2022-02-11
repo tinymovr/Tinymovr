@@ -53,11 +53,15 @@ typedef enum {
 
 // Tinymovr R3.3 (alpha2) and later have 2mOhm shunts
 // ^12 * 3.3 / 0.002 / 16 ~= 0.025177
+#if defined BOARD_REV_R33
 #define SHUNT_SCALING_FACTOR ( 0.025177f )
 
 // Tinymovr R3.2 (alpha1) and earlier have 1mOhm shunts
 // 1/2^12 * 3,3 / 0,001 / 16 ~= 0.0503
-// #define SHUNT_SCALING_FACTOR ( 0.0503f )
+#elif defined BOARD_REV_R32
+#define SHUNT_SCALING_FACTOR ( 0.0503f )
+
+#endif
 
 // Inverse of sensing multiplier
 #define ONE_OVER_SHUNT_SCALING_FACTOR ( 1.0f / SHUNT_SCALING_FACTOR )
