@@ -348,4 +348,12 @@ for velocity-limited plan moves",
         "units": ("ohm", "henry"),
         "ser_map": {"motor": ("R", "L")}
     },
+    "hall_sector":
+    {
+        "description": "Get Hall effect sensor sector",
+        "type": "r",
+        "ep_id": 0x029,
+        "types": (DataType.UINT8, ),
+        "labels": ("sector", )
+    },
 }

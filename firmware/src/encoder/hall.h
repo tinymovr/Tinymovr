@@ -17,8 +17,15 @@
 
 #pragma once
 
-#include <src/encoder/encoder_struct.h>
+#include <src/common.h>
+
+typedef struct
+{
+	int16_t angle;
+    uint8_t sector;
+} HAllState;
 
 void hall_init(void);
 PAC5XXX_RAMFUNC int16_t hall_get_angle(void);
-PAC5XXX_RAMFUNC void hall_update_angle();
+PAC5XXX_RAMFUNC void hall_update_angle(bool check_error);
+PAC5XXX_RAMFUNC uint8_t hall_get_sector(void);

@@ -21,6 +21,7 @@
 #include <src/system/system.h>
 #include <src/adc/adc.h>
 #include <src/motor/motor.h>
+#include <src/encoder/hall.h>
 #include <src/observer/observer.h>
 #include <src/controller/controller.h>
 #include <src/controller/trajectory_planner.h>
@@ -77,7 +78,7 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_GetSetPosVelIq, 0x026);
     CANEP_AddEndpoint(&CAN_GetMotorRL, 0x027);
     CANEP_AddEndpoint(&CAN_SetMotorRL, 0x028);
-    // 0x029 AVAIL
+    CANEP_AddEndpoint(&CAN_GetHallSector, 0x029);
     // 0x02A AVAIL
     // 0x02B AVAIL
     // 0x02C AVAIL
@@ -567,4 +568,12 @@ uint8_t CAN_GetSetPosVelIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     memcpy(&buffer[4], &vel_ff, sizeof(int16_t));
     memcpy(&buffer[6], &Iq_ff, sizeof(int16_t));
     return CANRP_ReadWrite;
+}
+
+uint8_t CAN_GetHallSector(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+{
+	const uint8_t sector = hall_get_sector();
+    *buffer_len = sizeof(uint8_t);
+	memcpy(&buffer[0], &sector, sizeof(uint8_t));
+	return CANRP_Read;
 }

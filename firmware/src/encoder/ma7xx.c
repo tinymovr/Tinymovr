@@ -20,7 +20,7 @@
 #include <src/utils/utils.h>
 #include <src/encoder/ma7xx.h>
 
-static EncoderState state = { 0 };
+static MA7xxState state = { 0 };
 
 #define MAX_ALLOWED_DELTA     (ENCODER_TICKS / 6)
 #define MAX_ALLOWED_DELTA_ADD (MAX_ALLOWED_DELTA + ENCODER_TICKS)

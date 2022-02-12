@@ -21,6 +21,7 @@
 #include <src/uart/uart_interface.h>
 #include <src/uart/uart_lowlevel.h>
 #include <src/encoder/ma7xx.h>
+#include <src/encoder/hall.h>
 #include <src/observer/observer.h>
 
 struct SchedulerState
@@ -69,6 +70,7 @@ void WaitForControlLoopInterrupt(void)
 	ma7xx_send_angle_cmd();
 	ADC_UpdateMeasurements();
 	ma7xx_update_angle(true);
+	hall_update_angle(false);
 	observer_update_estimates(ma7xx_get_angle());
 	// At this point control is returned to main loop.
 }

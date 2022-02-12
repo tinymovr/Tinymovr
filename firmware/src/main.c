@@ -16,6 +16,7 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <src/encoder/ma7xx.h>
+#include <src/encoder/hall.h>
 #include "src/common.h"
 #include "src/system/system.h"
 
@@ -39,6 +40,7 @@ int main(void)
   	__disable_irq();
     system_init();
     ma7xx_init();
+    hall_init();
     NVM_Init();
     NVM_LoadConfig(); // This will TRY to deserialize and import config
     UART_Init();

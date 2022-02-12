@@ -17,7 +17,12 @@
 
 #pragma once
 
-#include <src/encoder/encoder_struct.h>
+#include <src/common.h>
+
+typedef struct
+{
+	int16_t angle;
+} MA7xxState;
 
 typedef enum {
     ENCODER_ERR_NO_ERROR        = 0x0000,
