@@ -57,6 +57,14 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
             Controller_SetVelIntegratorGain((float)data * ONE_OVER_UART_VEL_INT_SCALING_FACTOR);
         break;
 
+        case 'Y': // Position gain 
+            Controller_SetPosGain(data);
+        break;
+
+        case 'F': // Velocity gain
+            Controller_SetVelGain(data * ONE_OVER_UART_VEL_GAIN_SCALING_FACTOR);
+        break;
+
         case 'H': // phase resistance
             motor_set_phase_resistance((float)data * ONE_OVER_UART_R_SCALING_FACTOR);
         break;
@@ -145,11 +153,11 @@ int32_t UART_ReadAddr(uint8_t addr)
             ret_val = (int32_t)(Controller_GetVelIntegratorGain() * UART_VEL_INT_SCALING_FACTOR);
         break;
 
-        case 'h': // phase resistance
+        case 'H': // phase resistance
             ret_val = motor_get_phase_resistance() * UART_R_SCALING_FACTOR;
         break;
 
-        case 'l': // phase inductance
+        case 'L': // phase inductance
             ret_val = motor_get_phase_inductance() * UART_L_SCALING_FACTOR;
         break;
 
@@ -161,8 +169,16 @@ int32_t UART_ReadAddr(uint8_t addr)
             ret_val = CAN_get_ID();
         break;
 
-        case 'm': // Is motor gimbal?
+        case 'M': // Is motor gimbal?
             ret_val = motor_is_gimbal();
+        break;
+
+        case 'Y': // 
+            ret_val = Controller_GetPosGain();
+        break;
+
+        case 'F': // 
+            ret_val = Controller_GetVelGain() * UART_VEL_GAIN_SCALING_FACTOR;
         break;
 
         case 'Q': // calibrate
