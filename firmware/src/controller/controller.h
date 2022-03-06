@@ -34,7 +34,7 @@ typedef enum {
     CTRL_TRAJECTORY = 3
 } ControlMode;
 
-struct ControllerState
+typedef struct
 {
 	// TODO: State.state is very confusing, name appropriately
 	ControlState state;
@@ -57,9 +57,9 @@ struct ControllerState
     float Id_integrator_Vd;
 
     float t_plan;
-};
+} ControllerState;
 
-struct ControllerConfig
+typedef struct 
 {
     float vel_limit;
     float vel_ramp_limit;
@@ -74,7 +74,7 @@ struct ControllerConfig
     float Iq_integrator_gain;
     float Id_integrator_gain;
     float I_k;
-};
+} ControllerConfig;
 
 void Controller_ControlLoop(void);
 
@@ -118,11 +118,9 @@ void Controller_SetIqLimit(float limit);
 
 void controller_set_motion_plan(MotionPlan mp);
 
-PAC5XXX_RAMFUNC bool Controller_Calibrated(void);
-
 PAC5XXX_RAMFUNC void Controller_UpdateCurrentGains(void);
 
-struct ControllerConfig* Controller_GetConfig(void);
-void Controller_RestoreConfig(struct ControllerConfig* config_);
+ControllerConfig* Controller_GetConfig(void);
+void Controller_RestoreConfig(ControllerConfig* config_);
 
 #endif /* CONTROLLER_CONTROLLER_H_ */

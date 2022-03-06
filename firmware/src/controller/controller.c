@@ -32,7 +32,7 @@ PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, flo
 
 static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 static MotionPlan motion_plan;
-static struct ControllerState state = {
+static ControllerState state = {
 
     .state = STATE_IDLE,
     .mode = CTRL_CURRENT,
@@ -56,7 +56,7 @@ static struct ControllerState state = {
     .t_plan = 0.0f
 };
 
-static struct ControllerConfig config ={
+static ControllerConfig config ={
 
     .vel_limit = 300000.0f,
     .I_limit = 10.0f,
@@ -91,7 +91,14 @@ void Controller_ControlLoop(void)
 		if (state.state == STATE_CALIBRATE)
 		{
 			state.is_calibrating = true;
-			(void) ((CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && CalibrateOffsetAndEccentricity());
+            if (ENCODER_MA7XX == system_get_encoder_type())
+            {
+                (void) ((CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && calibrate_offset_and_rectification());
+            }
+            else if (ENCODER_HALL == system_get_encoder_type())
+            {
+                (void) ((CalibrateResistance() && CalibrateInductance()) && calibrate_hall_sequence());
+            }
 			state.is_calibrating = false;
 			Controller_SetState(STATE_IDLE);
 		}
@@ -241,7 +248,7 @@ PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
 	if ((new_state != state.state) && (state.is_calibrating == false))
 	{
 		if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE)
-				&& (!error_flags_exist()) && Controller_Calibrated())
+				&& (!error_flags_exist()) && motor_is_calibrated())
 		{
 			state.pos_setpoint = Observer_GetPosEstimate();
 			GateDriver_Enable();
@@ -452,17 +459,12 @@ void controller_set_motion_plan(MotionPlan mp)
     state.t_plan = 0.0f;
 }
 
-PAC5XXX_RAMFUNC bool Controller_Calibrated(void)
-{
-    return motor_is_calibrated() & Observer_Calibrated();
-}
-
-struct ControllerConfig* Controller_GetConfig(void)
+ControllerConfig* Controller_GetConfig(void)
 {
     return &config;
 }
 
-void Controller_RestoreConfig(struct ControllerConfig* config_)
+void Controller_RestoreConfig(ControllerConfig* config_)
 {
     config = *config_;
 }

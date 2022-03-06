@@ -15,21 +15,18 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <string.h>
 #include <src/encoder/ma7xx.h>
 #include <src/motor/motor.h>
 #include <src/common.h>
 #include <src/utils/utils.h>
 #include <src/observer/observer.h>
 
-static struct ObserverState state = {0};
+static ObserverState state = {0};
 
-static struct ObserverConfig config = {
+static ObserverConfig config = {
 		.track_bw = 1500.0f,
 		.kp = 0.0f,
 		.ki = 0.0f,
-		.eccentricity_table = {0},
-		.eccentricity_calibrated = 0
 };
 
 void Observer_Init(void)
@@ -40,13 +37,8 @@ void Observer_Init(void)
 	config.sector_half_interval = ENCODER_TICKS * 10;
 }
 
-PAC5XXX_RAMFUNC void observer_update_estimates(const int16_t raw_pos)
+PAC5XXX_RAMFUNC void observer_update_estimates(const int16_t angle_meas)
 {
-	const int16_t off_1 = config.eccentricity_table[raw_pos>>ECN_BITS];
-	const int16_t off_2 = config.eccentricity_table[((raw_pos>>ECN_BITS) + 1) % ECN_SIZE];
-	const int16_t off_interp = off_1 + ((off_2 - off_1)* (raw_pos - ((raw_pos>>ECN_BITS)<<ECN_BITS))>>ECN_BITS);
-	const int16_t angle_meas = raw_pos + off_interp;
-
 	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;
 	const float delta_pos_meas = wrapf_min_max((float)angle_meas - state.pos_estimate, -ENCODER_HALF_TICKS, ENCODER_HALF_TICKS);
 	const float delta_pos_error = delta_pos_meas - delta_pos_est;
@@ -117,33 +109,12 @@ PAC5XXX_RAMFUNC float observer_get_vel_estimate_user_frame(void)
 	return state.vel_estimate * motor_get_user_direction();
 }
 
-void Observer_ClearEccentricityTable(void)
-{
-    (void)memset(config.eccentricity_table, 0, sizeof(config.eccentricity_table));
-	config.eccentricity_calibrated = false;
-}
-
-void Observer_SetEccentricityCalibrated(void)
-{
-	config.eccentricity_calibrated = true;
-}
-
-int16_t *Observer_GetEccentricityTablePointer(void)
-{
-    return config.eccentricity_table;
-}
-
-PAC5XXX_RAMFUNC bool Observer_Calibrated(void)
-{
-	return config.eccentricity_calibrated;
-}
-
-struct ObserverConfig* Observer_GetConfig(void)
+ObserverConfig* Observer_GetConfig(void)
 {
 	return &config;
 }
 
-void Observer_RestoreConfig(struct ObserverConfig* config_)
+void Observer_RestoreConfig(ObserverConfig* config_)
 {
 	config = *config_;
 }

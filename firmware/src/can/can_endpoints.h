@@ -39,7 +39,7 @@ uint8_t CAN_SetState(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_SetOffsetAndDirection(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_GetEncoderEstimates(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_GetSetpoints(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
-
+uint8_t CAN_SetEncoderType(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_SetPosSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_SetVelSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_SetIqSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr);

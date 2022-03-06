@@ -16,6 +16,7 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <src/common.h>
+#include <src/system/system.h>
 #include <src/adc/adc.h>
 #include <src/can/can.h>
 #include <src/uart/uart_interface.h>
@@ -67,11 +68,22 @@ void WaitForControlLoopInterrupt(void)
 	state.busy_loop_start = DWT->CYCCNT;
 	// We have to service the control loop by updating
 	// current measurements and encoder estimates.
-	ma7xx_send_angle_cmd();
+	const EncoderType e_type = system_get_encoder_type();
+	if (ENCODER_MA7XX == e_type)
+	{
+		ma7xx_send_angle_cmd();
+	}
 	ADC_UpdateMeasurements();
-	ma7xx_update_angle(true);
-	hall_update_angle(false);
-	observer_update_estimates(ma7xx_get_angle());
+	if (ENCODER_MA7XX == e_type)
+	{
+		ma7xx_update_angle(true);
+		observer_update_estimates(ma7xx_get_angle_rectified());
+	}
+	else if (ENCODER_HALL == e_type)
+	{
+		hall_update_angle(false);
+		observer_update_estimates(hall_get_angle());
+	}
 	// At this point control is returned to main loop.
 }
 

@@ -20,11 +20,11 @@
 
 #define CAN_EP_SIZE 6
 
-struct CANConfig
+typedef struct
 {
     uint8_t id;
     uint8_t kbaud_rate;
-};
+} CANConfig;
 
 void CAN_init(void);
 uint16_t CAN_get_kbit_rate(void);
@@ -33,7 +33,7 @@ uint8_t CAN_get_ID(void);
 void CAN_set_ID(uint8_t id);
 void CAN_process_interrupt(void);
 
-struct CANConfig* CAN_get_config(void);
-void CAN_restore_config(struct CANConfig* config_);
+CANConfig* CAN_get_config(void);
+void CAN_restore_config(CANConfig* config_);
 
 #endif /* CAN_CAN_H_ */

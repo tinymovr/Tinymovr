@@ -20,7 +20,7 @@
 #include <src/utils/utils.h>
 #include <src/motor/motor.h>
 
-static struct MotorConfig config = {
+static MotorConfig config = {
     .pole_pairs = 7u,
 	.phase_resistance = 0.1f,
 	.phase_inductance = 1e-5f,
@@ -183,12 +183,12 @@ PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir)
 	}
 }
 
-struct MotorConfig* Motor_GetConfig(void)
+MotorConfig* Motor_GetConfig(void)
 {
     return &config;
 }
 
-void Motor_RestoreConfig(struct MotorConfig* config_)
+void Motor_RestoreConfig(MotorConfig* config_)
 {
     config = *config_;
 }

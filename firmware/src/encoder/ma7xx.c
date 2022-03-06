@@ -15,11 +15,13 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include <string.h>
 #include <src/system/system.h>
 #include <src/ssp/ssp_func.h>
 #include <src/utils/utils.h>
 #include <src/encoder/ma7xx.h>
 
+static MA7xxConfig config = { 0 };
 static MA7xxState state = { 0 };
 
 #define MAX_ALLOWED_DELTA     (ENCODER_TICKS / 6)
@@ -54,6 +56,15 @@ PAC5XXX_RAMFUNC int16_t ma7xx_get_angle(void)
     return state.angle;
 }
 
+PAC5XXX_RAMFUNC int16_t ma7xx_get_angle_rectified(void)
+{
+    const int16_t angle = state.angle;
+    const int16_t off_1 = config.rec_table[angle>>ECN_BITS];
+	const int16_t off_2 = config.rec_table[((angle>>ECN_BITS) + 1) % ECN_SIZE];
+	const int16_t off_interp = off_1 + ((off_2 - off_1)* (angle - ((angle>>ECN_BITS)<<ECN_BITS))>>ECN_BITS);
+	return angle + off_interp;
+}
+
 PAC5XXX_RAMFUNC void ma7xx_update_angle(bool check_error)
 {
     while (!PRIMARY_ENCODER_SSP_STRUCT->STAT.RNE) {}
@@ -70,4 +81,20 @@ PAC5XXX_RAMFUNC void ma7xx_update_angle(bool check_error)
 		}
     }
     state.angle = angle;
+}
+
+void ma7xx_clear_rec_table(void)
+{
+    (void)memset(config.rec_table, 0, sizeof(config.rec_table));
+	config.rec_calibrated = false;
+}
+
+void ma7xx_set_rec_calibrated(void)
+{
+    config.rec_calibrated = true;
+}
+
+int16_t *ma7xx_get_rec_table_ptr(void)
+{
+    return config.rec_table;
 }

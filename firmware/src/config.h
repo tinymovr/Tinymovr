@@ -64,7 +64,7 @@
 #define CAL_V_GAIN (0.0005f)
 #define CAL_V_INDUCTANCE (2.0f)
 
-// Eccentricity correction lookup table size
+// Encoder rectification lookup table size
 #define ECN_BITS (6)
 #define ECN_SIZE (2 << ECN_BITS)
 

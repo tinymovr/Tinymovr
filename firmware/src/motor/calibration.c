@@ -145,7 +145,7 @@ bool CalibrateDirectionAndPolePairs(void)
     {
     	epos_end = Observer_GetPosEstimate();
     }
-    // Go back to start epos
+    // Move back to start epos
     for (uint32_t i=0; i<CAL_DIR_LEN; i++)
     {
         set_epos_and_wait(epos_target * (1.0f - ((float)i/CAL_DIR_LEN)), I_setpoint);
@@ -158,7 +158,39 @@ bool CalibrateDirectionAndPolePairs(void)
     return success;
 }
 
-bool CalibrateOffsetAndEccentricity(void)
+bool calibrate_hall_sequence(void)
+{
+    // We'll just do a single electrical cycle
+    const float I_setpoint = motor_get_I_cal();
+    bool success = true;
+    // Stay a bit at starting epos
+	for (uint32_t i=0; i<CAL_STAY_LEN; i++)
+	{
+		set_epos_and_wait(0, I_setpoint);
+	}
+    // Move to target epos
+    for (uint32_t i=0; i<CAL_DIR_LEN; i++)
+    {
+        set_epos_and_wait(TWOPI * ((float)i/CAL_DIR_LEN), I_setpoint);
+        // We assume 6 hall sectors in a full electrical cycle.
+        // 7 if the starting sector is counted twice.
+        
+    }
+    // Stay a bit at target epos
+	for (uint32_t i=0; i<CAL_STAY_LEN; i++)
+	{
+		set_epos_and_wait(TWOPI, I_setpoint);
+	}
+    // TODO: Assert all expected sectors covered
+    // Move back to start epos
+    for (uint32_t i=0; i<CAL_DIR_LEN; i++)
+    {
+        set_epos_and_wait(TWOPI * (1.0f - ((float)i/CAL_DIR_LEN)), I_setpoint);
+    }
+    return success;
+}
+
+bool calibrate_offset_and_rectification(void)
 {
     // Size below is an arbitrary large number ie > ECN_SIZE * npp
     int16_t error_ticks[ECN_SIZE * 24];
@@ -169,8 +201,8 @@ bool CalibrateOffsetAndEccentricity(void)
     const float e_pos_to_ticks = ((float)ENCODER_TICKS)/(2 * PI * npp);
     float e_pos_ref = 0.f;
     const float I_setpoint = motor_get_I_cal();
-    Observer_ClearEccentricityTable();
-    int16_t *lut = Observer_GetEccentricityTablePointer();
+    ma7xx_clear_rec_table();
+    int16_t *lut = ma7xx_get_rec_table_ptr();
     wait_a_while();
     int16_t offset_raw = ma7xx_get_angle();
     // Perform measuerments, store only mean of F + B error
@@ -225,7 +257,7 @@ bool CalibrateOffsetAndEccentricity(void)
         lut[write_idx] = (int16_t)acc;
     }
     wait_a_while();
-    Observer_SetEccentricityCalibrated();
+    ma7xx_set_rec_calibrated();
     return true;
 }
 

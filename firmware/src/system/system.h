@@ -20,6 +20,16 @@
 
 #include "src/common.h"
 
+typedef enum {
+	ENCODER_MA7XX = 0,
+	ENCODER_HALL = 1
+} EncoderType;
+
+typedef struct
+{
+    EncoderType encoder_type;
+} SystemConfig;
+
 void system_init(void);
 void system_reset(void);
 
@@ -27,5 +37,11 @@ PAC5XXX_RAMFUNC bool error_flags_exist(void);
 PAC5XXX_RAMFUNC uint8_t* get_error_flags(void);
 PAC5XXX_RAMFUNC void add_error_flag(uint8_t error);
 PAC5XXX_RAMFUNC bool health_check(void);
+
+EncoderType system_get_encoder_type(void);
+void system_set_encoder_type(EncoderType enc_type);
+
+SystemConfig* system_get_config(void);
+void system_restore_config(SystemConfig* config_);
 
 #endif /* SYSTEM_SYSTEM_H_ */

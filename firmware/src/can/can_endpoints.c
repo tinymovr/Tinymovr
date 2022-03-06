@@ -49,7 +49,7 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_SetOffsetAndDirection, 0x008);
     CANEP_AddEndpoint(&CAN_GetEncoderEstimates, 0x009);
     CANEP_AddEndpoint(&CAN_GetSetpoints, 0x00A);
-    // 0x00B AVAIL
+    CANEP_AddEndpoint(&CAN_SetEncoderType, 0x00B);
     CANEP_AddEndpoint(&CAN_SetPosSetpoint, 0x00C);
     CANEP_AddEndpoint(&CAN_SetVelSetpoint, 0x00D);
     CANEP_AddEndpoint(&CAN_SetIqSetpoint, 0x00E);
@@ -225,14 +225,22 @@ uint8_t CAN_GetSetpoints(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     return CANRP_Read;
 }
 
+uint8_t CAN_SetEncoderType(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+{
+    uint8_t enc_type;
+    memcpy(&enc_type, &buffer[0], sizeof(enc_type));
+    system_set_encoder_type(enc_type); // check done in setter
+    return CANRP_Write;
+}
+
 uint8_t CAN_SetPosSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float pos;
     int16_t vel_ff;
     int16_t Iq_ff;
-    memcpy(&pos, &buffer[0], sizeof(float));
-    memcpy(&vel_ff, &buffer[4], sizeof(int16_t));
-    memcpy(&Iq_ff, &buffer[6], sizeof(int16_t));
+    memcpy(&pos, &buffer[0], sizeof(pos));
+    memcpy(&vel_ff, &buffer[4], sizeof(vel_ff));
+    memcpy(&Iq_ff, &buffer[6], sizeof(Iq_ff));
     float velFF_float = vel_ff * 10.0f;
     float iqFF_float = Iq_ff * 0.01f;
     controller_set_pos_setpoint_user_frame(pos);

@@ -33,7 +33,7 @@ typedef enum {
 	MOTOR_ERR_INVALID_POLE_PAIRS	               = 0x0004
 } MotorError;
 
-struct MotorConfig
+typedef struct
 {
 	uint8_t pole_pairs;
 	float phase_resistance;
@@ -50,7 +50,7 @@ struct MotorConfig
 
 	bool phases_swapped;
 	bool is_gimbal;
-};
+} MotorConfig;
 
 PAC5XXX_RAMFUNC uint8_t motor_get_pole_pairs(void);
 PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad);
@@ -81,7 +81,7 @@ PAC5XXX_RAMFUNC void motor_set_user_offset(float offset);
 PAC5XXX_RAMFUNC int8_t motor_get_user_direction(void);
 PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir);
 
-struct MotorConfig* Motor_GetConfig(void);
-void Motor_RestoreConfig(struct MotorConfig* config_);
+MotorConfig* Motor_GetConfig(void);
+void Motor_RestoreConfig(MotorConfig* config_);
 
 #endif /* MOTOR_MOTOR_H_ */
