@@ -21,6 +21,7 @@
 #include <src/scheduler/scheduler.h>
 #include <src/utils/utils.h>
 #include <src/encoder/ma7xx.h>
+#include <src/encoder/hall.h>
 #include <src/controller/controller.h>
 #include <src/system/system.h>
 #include <src/motor/calibration.h>
@@ -160,6 +161,8 @@ bool CalibrateDirectionAndPolePairs(void)
 
 bool calibrate_hall_sequence(void)
 {
+    hall_clear_sector_map();
+    uint8_t *sector_map = hall_get_sector_map_ptr();
     // We'll just do a single electrical cycle
     const float I_setpoint = motor_get_I_cal();
     bool success = true;
@@ -168,25 +171,24 @@ bool calibrate_hall_sequence(void)
 	{
 		set_epos_and_wait(0, I_setpoint);
 	}
-    // Move to target epos
-    for (uint32_t i=0; i<CAL_DIR_LEN; i++)
+
+    // Make a full ecycle and store the sector every 60 deg
+    for (uint8_t j=0; j<HALL_SECTORS; j++)
     {
-        set_epos_and_wait(TWOPI * ((float)i/CAL_DIR_LEN), I_setpoint);
-        // We assume 6 hall sectors in a full electrical cycle.
-        // 7 if the starting sector is counted twice.
-        
+        sector_map[hall_get_sector()] = j;
+        // Move to next epos
+        for (uint32_t i=0; i<CAL_DIR_LEN_PER_SECTOR; i++)
+        {
+            set_epos_and_wait(HALL_SECTOR_ANGLE * (j + (float)i/CAL_DIR_LEN_PER_SECTOR), I_setpoint);
+        }
     }
-    // Stay a bit at target epos
-	for (uint32_t i=0; i<CAL_STAY_LEN; i++)
-	{
-		set_epos_and_wait(TWOPI, I_setpoint);
-	}
     // TODO: Assert all expected sectors covered
     // Move back to start epos
     for (uint32_t i=0; i<CAL_DIR_LEN; i++)
     {
         set_epos_and_wait(TWOPI * (1.0f - ((float)i/CAL_DIR_LEN)), I_setpoint);
     }
+    hall_set_sector_map_calibrated();
     return success;
 }
 
