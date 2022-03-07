@@ -35,8 +35,6 @@ typedef struct
 	float track_bw;
 	float kp;
 	float ki;
-
-	int32_t sector_half_interval;
 } ObserverConfig;
 
 void Observer_Init(void);

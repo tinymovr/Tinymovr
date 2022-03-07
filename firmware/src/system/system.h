@@ -38,7 +38,7 @@ PAC5XXX_RAMFUNC uint8_t* get_error_flags(void);
 PAC5XXX_RAMFUNC void add_error_flag(uint8_t error);
 PAC5XXX_RAMFUNC bool health_check(void);
 
-EncoderType system_get_encoder_type(void);
+PAC5XXX_RAMFUNC EncoderType system_get_encoder_type(void);
 void system_set_encoder_type(EncoderType enc_type);
 
 SystemConfig* system_get_config(void);

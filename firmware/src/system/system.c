@@ -18,6 +18,7 @@
 #include <src/adc/adc.h>
 #include <src/utils/utils.h>
 #include <src/rtt/SEGGER_RTT.h>
+#include <src/controller/controller.h>
 #include <src/system/system.h>
 
 uint8_t error_flags[ERROR_FLAG_MAX_SIZE] = {0};
@@ -138,15 +139,18 @@ EncoderType system_get_encoder_type(void)
 {
     return config.encoder_type;
 }
-void system_set_encoder_type(EncoderType enc_type)
+PAC5XXX_RAMFUNC void system_set_encoder_type(EncoderType enc_type)
 {
-    if (ENCODER_MA7XX == enc_type)
+    if (STATE_IDLE == Controller_GetState())
     {
-        config.encoder_type = ENCODER_MA7XX;
-    }
-    else if (ENCODER_HALL == enc_type)
-    {
-        config.encoder_type = ENCODER_HALL;
+        if (ENCODER_MA7XX == enc_type)
+        {
+            config.encoder_type = ENCODER_MA7XX;
+        }
+        else if (ENCODER_HALL == enc_type)
+        {
+            config.encoder_type = ENCODER_HALL;
+        }
     }
 }
 

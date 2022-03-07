@@ -21,7 +21,13 @@
 
 typedef struct
 {
-	int16_t angle;
+	uint8_t sector_map[8];
+    bool sector_map_calibrated;
+} HallConfig;
+
+typedef struct
+{
+	uint16_t angle;
     uint8_t sector;
 } HAllState;
 
@@ -29,3 +35,8 @@ void hall_init(void);
 PAC5XXX_RAMFUNC int16_t hall_get_angle(void);
 PAC5XXX_RAMFUNC void hall_update_angle(bool check_error);
 PAC5XXX_RAMFUNC uint8_t hall_get_sector(void);
+
+void hall_clear_sector_map(void);
+void hall_set_sector_map_calibrated(void);
+bool hall_sector_map_is_calibrated(void);
+uint8_t *hall_get_sector_map_ptr(void);

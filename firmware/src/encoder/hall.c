@@ -1,10 +1,12 @@
 
+#include <string.h>
 #include <src/system/system.h>
 #include <src/encoder/hall.h>
 
 #define AIO6789_IO_MODE                 0x00
 #define AIO_INPUT                       0x00
 
+static HallConfig config = { 0 };
 static HAllState state = { 0 };
 
 void hall_init(void)
@@ -27,10 +29,31 @@ PAC5XXX_RAMFUNC void hall_update_angle(bool check_error)
     {
     	// add_error_flag(ERROR_ENCODER_READING_UNSTABLE);
     }
-    //state.angle = angle;
+    state.angle = config.sector_map[state.sector];
 }
 
 PAC5XXX_RAMFUNC uint8_t hall_get_sector(void)
 {
     return state.sector;
+}
+
+void hall_clear_sector_map(void)
+{
+    (void)memset(config.sector_map, 0, sizeof(config.sector_map));
+	config.sector_map_calibrated = false;
+}
+
+void hall_set_sector_map_calibrated(void)
+{
+    config.sector_map_calibrated = true;
+}
+
+bool hall_sector_map_is_calibrated(void)
+{
+    return config.sector_map_calibrated;
+}
+
+uint8_t *hall_get_sector_map_ptr(void)
+{
+    return config.sector_map;
 }

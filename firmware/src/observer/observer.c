@@ -19,12 +19,13 @@
 #include <src/motor/motor.h>
 #include <src/common.h>
 #include <src/utils/utils.h>
+#include <src/system/system.h>
 #include <src/observer/observer.h>
 
 static ObserverState state = {0};
 
 static ObserverConfig config = {
-		.track_bw = 1500.0f,
+		.track_bw = 150.0f,
 		.kp = 0.0f,
 		.ki = 0.0f,
 };
@@ -33,26 +34,26 @@ void Observer_Init(void)
 {
     config.kp = 2.0f * config.track_bw;
     config.ki = 0.25f * (config.kp * config.kp);
-
-	config.sector_half_interval = ENCODER_TICKS * 10;
 }
 
 PAC5XXX_RAMFUNC void observer_update_estimates(const int16_t angle_meas)
 {
+	const int16_t ticks = ENCODER_MA7XX == system_get_encoder_type() ? ENCODER_HALF_TICKS : HALL_HALF_SECTORS * motor_get_pole_pairs();
+	const int16_t half_ticks = ticks / 2;
 	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;
-	const float delta_pos_meas = wrapf_min_max((float)angle_meas - state.pos_estimate, -ENCODER_HALF_TICKS, ENCODER_HALF_TICKS);
+	const float delta_pos_meas = wrapf_min_max((float)angle_meas - state.pos_estimate, -half_ticks, half_ticks);
 	const float delta_pos_error = delta_pos_meas - delta_pos_est;
 	const float incr_pos = delta_pos_est + (PWM_PERIOD_S * config.kp * delta_pos_error);
 	state.pos_estimate += incr_pos;
-	state.pos_estimate_wrapped = wrapf_min_max(state.pos_estimate_wrapped + incr_pos, -ENCODER_HALF_TICKS, ENCODER_HALF_TICKS);
-	if (state.pos_estimate > config.sector_half_interval)
+	state.pos_estimate_wrapped = wrapf_min_max(state.pos_estimate_wrapped + incr_pos, -half_ticks, half_ticks);
+	if (state.pos_estimate > OBSERVER_SECTOR_HALF_INTERVAL)
 	{
-		state.pos_estimate -= 2 * config.sector_half_interval;
+		state.pos_estimate -= 2 * OBSERVER_SECTOR_HALF_INTERVAL;
 		state.pos_sector += 1;
 	}
-	else if (state.pos_estimate < -(config.sector_half_interval) )
+	else if (state.pos_estimate < -OBSERVER_SECTOR_HALF_INTERVAL )
 	{
-		state.pos_estimate += 2 * config.sector_half_interval;
+		state.pos_estimate += 2 * OBSERVER_SECTOR_HALF_INTERVAL;
 		state.pos_sector -= 1;
 	}
 	state.vel_estimate += PWM_PERIOD_S * config.ki * delta_pos_error;
@@ -73,13 +74,13 @@ void Observer_SetFilterBandwidth(float bw)
 
 PAC5XXX_RAMFUNC float Observer_GetPosEstimate(void)
 {
-	const float primary = 2 * config.sector_half_interval * state.pos_sector;
+	const float primary = 2 * OBSERVER_SECTOR_HALF_INTERVAL * state.pos_sector;
 	return primary + state.pos_estimate;
 }
 
 PAC5XXX_RAMFUNC float observer_get_diff(float target)
 {
-	const float primary = 2 * config.sector_half_interval * state.pos_sector;
+	const float primary = 2 * OBSERVER_SECTOR_HALF_INTERVAL * state.pos_sector;
 	const float diff_sector = target - primary;
 	return diff_sector - state.pos_estimate;
 }
@@ -91,12 +92,20 @@ PAC5XXX_RAMFUNC float observer_get_vel_estimate(void)
 
 PAC5XXX_RAMFUNC float observer_get_epos(void)
 {
-	return state.pos_estimate_wrapped * twopi_by_enc_ticks * motor_get_pole_pairs();
+	if (ENCODER_MA7XX == system_get_encoder_type())
+	{
+		return state.pos_estimate_wrapped * twopi_by_enc_ticks * motor_get_pole_pairs();
+	}
+	return state.pos_estimate_wrapped * twopi_by_hall_sectors;
 }
 
 PAC5XXX_RAMFUNC float observer_get_evel(void)
 {
-	return state.vel_estimate * twopi_by_enc_ticks * motor_get_pole_pairs();
+	if (ENCODER_MA7XX == system_get_encoder_type())
+	{
+		return state.vel_estimate * twopi_by_enc_ticks * motor_get_pole_pairs();
+	}
+	return state.vel_estimate * twopi_by_hall_sectors;
 }
 
 PAC5XXX_RAMFUNC float observer_get_pos_estimate_user_frame(void)

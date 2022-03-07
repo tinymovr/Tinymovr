@@ -62,16 +62,26 @@
 #define PAC5XXX_ERROR   1
 #endif
 
-#define PWM_PERIOD_S                (1.0f / PWM_FREQ_HZ)
+#define PI       (3.141592f)
+#define TWOPI    (6.283185f)
+#define INVTWOPI (0.159155f)
+#define EPSILON  (2.718281f)
 
-#define READ_UINT16(address)        (*((uint16_t *) address))
-#define READ_UINT32(address)        (*((uint32_t *) address))
+#define PWM_PERIOD_S           (1.0f / PWM_FREQ_HZ)
 
-#define ERROR_FLAG_MAX_SIZE 5u
+#define READ_UINT16(address)   (*((uint16_t *) address))
+#define READ_UINT32(address)   (*((uint32_t *) address))
 
-#define ENCODER_TICKS               (8192)
-#define ENCODER_HALF_TICKS          (ENCODER_TICKS / 2)
-#define ENCODER_TICKS_FLOAT         (8192.f)
+#define ERROR_FLAG_MAX_SIZE    (5u)
+
+#define ENCODER_TICKS          (8192)
+#define ENCODER_HALF_TICKS     (ENCODER_TICKS / 2)
+#define ENCODER_TICKS_FLOAT    (8192.f)
+
+#define HALL_SECTORS           (6)
+#define HALL_HALF_SECTORS      (HALL_SECTORS / 2)
+#define HALL_SECTOR_ANGLE      (TWOPI / HALL_SECTORS)
+#define CAL_DIR_LEN_PER_SECTOR (CAL_DIR_LEN / HALL_SECTORS)
 
 #if defined BOARD_REV_R32 || defined BOARD_REV_R33
 #define BOARD_REV_R3
@@ -79,11 +89,6 @@
 #elif defined BOARD_REV_M1 
 #define CAN_PF67
 #endif
-
-#define PI       (3.141592f)
-#define TWOPI    (6.283185f)
-#define INVTWOPI (0.159155f)
-#define EPSILON  (2.718281f)
 
 static const float one_by_sqrt3 = 0.57735026919f;
 static const float two_by_sqrt3 = 1.15470053838f;
@@ -93,6 +98,7 @@ static const float halfpi = PI*0.5f;
 static const float quarterpi = PI*0.25f;
 static const int32_t timer_freq_hz = ACLK_FREQ_HZ / (pow(2, TXCTL_PS_DIV));
 static const float twopi_by_enc_ticks = TWOPI / ENCODER_TICKS;
+static const float twopi_by_hall_sectors = TWOPI / HALL_SECTORS;
 
 struct FloatTriplet
 {
