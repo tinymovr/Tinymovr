@@ -49,13 +49,13 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_SetOffsetAndDirection, 0x008);
     CANEP_AddEndpoint(&CAN_GetEncoderEstimates, 0x009);
     CANEP_AddEndpoint(&CAN_GetSetpoints, 0x00A);
-    CANEP_AddEndpoint(&CAN_SetEncoderType, 0x00B);
-    CANEP_AddEndpoint(&CAN_SetPosSetpoint, 0x00C);
+    CANEP_AddEndpoint(&CAN_GetEncoderType, 0x00B);
+    CANEP_AddEndpoint(&CAN_SetPosSetpoint, 0x00C);  
     CANEP_AddEndpoint(&CAN_SetVelSetpoint, 0x00D);
     CANEP_AddEndpoint(&CAN_SetIqSetpoint, 0x00E);
     CANEP_AddEndpoint(&CAN_SetLimits, 0x00F);
     CANEP_AddEndpoint(&CAN_GetPhaseCurrents, 0x010);
-    // 0x011 AVAIL
+    CANEP_AddEndpoint(&CAN_SetEncoderType, 0x011); 
     CANEP_AddEndpoint(&CAN_GetIntegratorGains, 0x012);
     CANEP_AddEndpoint(&CAN_SetIntegratorGains, 0x013);
     CANEP_AddEndpoint(&CAN_GetIq, 0x014);
@@ -225,12 +225,11 @@ uint8_t CAN_GetSetpoints(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     return CANRP_Read;
 }
 
-uint8_t CAN_SetEncoderType(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+uint8_t CAN_GetEncoderType(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
-    uint8_t enc_type;
-    memcpy(&enc_type, &buffer[0], sizeof(enc_type));
-    system_set_encoder_type(enc_type); // check done in setter
-    return CANRP_Write;
+    const bool enc_type = system_get_encoder_type();
+    memcpy(&buffer[0], &enc_type, sizeof(bool));
+    return CANRP_Read;
 }
 
 uint8_t CAN_SetPosSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
@@ -301,6 +300,14 @@ uint8_t CAN_GetPhaseCurrents(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     memcpy(&buffer[2], &IB, sizeof(int16_t));
     memcpy(&buffer[4], &IC, sizeof(int16_t));
     return CANRP_Read;
+}
+
+uint8_t CAN_SetEncoderType(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+{
+    uint8_t enc_type;
+    memcpy(&enc_type, &buffer[0], sizeof(enc_type));
+    system_set_encoder_type(enc_type); // check done in setter
+    return CANRP_Write;
 }
 
 uint8_t CAN_GetIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
