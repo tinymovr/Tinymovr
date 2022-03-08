@@ -15,7 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <src/encoder/ma7xx.h>
+#include <src/encoder/encoder.h>
 #include <src/motor/motor.h>
 #include <src/common.h>
 #include <src/utils/utils.h>
@@ -36,10 +36,10 @@ void Observer_Init(void)
     config.ki = 0.25f * (config.kp * config.kp);
 }
 
-PAC5XXX_RAMFUNC void observer_update_estimates(const int16_t angle_meas)
+PAC5XXX_RAMFUNC void observer_update_estimates(void)
 {
-	const int16_t ticks = ENCODER_MA7XX == system_get_encoder_type() ? ENCODER_HALF_TICKS : HALL_HALF_SECTORS * motor_get_pole_pairs();
-	const int16_t half_ticks = ticks / 2;
+	const int16_t angle_meas = encoder_get_angle();
+	const int16_t half_ticks = encoder_get_half_ticks() * motor_get_pole_pairs();
 	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;
 	const float delta_pos_meas = wrapf_min_max((float)angle_meas - state.pos_estimate, -half_ticks, half_ticks);
 	const float delta_pos_error = delta_pos_meas - delta_pos_est;
@@ -92,7 +92,7 @@ PAC5XXX_RAMFUNC float observer_get_vel_estimate(void)
 
 PAC5XXX_RAMFUNC float observer_get_epos(void)
 {
-	if (ENCODER_MA7XX == system_get_encoder_type())
+	if (ENCODER_MA7XX == encoder_get_type())
 	{
 		return state.pos_estimate_wrapped * twopi_by_enc_ticks * motor_get_pole_pairs();
 	}
@@ -101,7 +101,7 @@ PAC5XXX_RAMFUNC float observer_get_epos(void)
 
 PAC5XXX_RAMFUNC float observer_get_evel(void)
 {
-	if (ENCODER_MA7XX == system_get_encoder_type())
+	if (ENCODER_MA7XX == encoder_get_type())
 	{
 		return state.vel_estimate * twopi_by_enc_ticks * motor_get_pole_pairs();
 	}

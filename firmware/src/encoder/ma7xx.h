@@ -43,7 +43,7 @@ typedef enum {
 
 void ma7xx_init(void);
 PAC5XXX_RAMFUNC void ma7xx_send_angle_cmd(void);
-PAC5XXX_RAMFUNC int16_t ma7xx_get_angle(void);
+PAC5XXX_RAMFUNC int16_t ma7xx_get_angle_raw(void);
 PAC5XXX_RAMFUNC int16_t ma7xx_get_angle_rectified(void);
 PAC5XXX_RAMFUNC void ma7xx_update_angle(bool check_error);
 

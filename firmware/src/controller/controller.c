@@ -16,7 +16,8 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "src/system/system.h"
-#include "src/observer/observer.h"
+#include <src/encoder/encoder.h>
+#include <src/observer/observer.h>
 #include "src/adc/adc.h"
 #include "src/motor/motor.h"
 #include "src/gatedriver/gatedriver.h"
@@ -91,11 +92,11 @@ void Controller_ControlLoop(void)
 		if (state.state == STATE_CALIBRATE)
 		{
 			state.is_calibrating = true;
-            if (ENCODER_MA7XX == system_get_encoder_type())
+            if (ENCODER_MA7XX == encoder_get_type())
             {
                 (void) ((CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && calibrate_offset_and_rectification());
             }
-            else if (ENCODER_HALL == system_get_encoder_type())
+            else if (ENCODER_HALL == encoder_get_type())
             {
                 (void) ((CalibrateResistance() && CalibrateInductance()) && calibrate_hall_sequence());
             }

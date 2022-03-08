@@ -24,8 +24,6 @@
 uint8_t error_flags[ERROR_FLAG_MAX_SIZE] = {0};
 uint8_t error_count = 0;
 
-SystemConfig config = {0};
-
 void system_init(void)
 {
     // --- Mandatory System Init from Qorvo
@@ -133,35 +131,6 @@ PAC5XXX_RAMFUNC bool health_check(void)
         success = false;
     }
     return success;
-}
-
-EncoderType system_get_encoder_type(void)
-{
-    return config.encoder_type;
-}
-PAC5XXX_RAMFUNC void system_set_encoder_type(EncoderType enc_type)
-{
-    if (STATE_IDLE == Controller_GetState())
-    {
-        if (ENCODER_MA7XX == enc_type)
-        {
-            config.encoder_type = ENCODER_MA7XX;
-        }
-        else if (ENCODER_HALL == enc_type)
-        {
-            config.encoder_type = ENCODER_HALL;
-        }
-    }
-}
-
-SystemConfig* system_get_config(void)
-{
-    return &config;
-}
-
-void system_restore_config(SystemConfig* config_)
-{
-    config = *config_;
 }
 
 void printUsageErrorMsg(uint32_t CFSRValue)

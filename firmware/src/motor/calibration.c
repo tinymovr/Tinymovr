@@ -206,7 +206,7 @@ bool calibrate_offset_and_rectification(void)
     ma7xx_clear_rec_table();
     int16_t *lut = ma7xx_get_rec_table_ptr();
     wait_a_while();
-    int16_t offset_raw = ma7xx_get_angle();
+    int16_t offset_raw = ma7xx_get_angle_raw();
     // Perform measuerments, store only mean of F + B error
     for (uint32_t i=0; i<n; i++)
     {
@@ -219,7 +219,7 @@ bool calibrate_offset_and_rectification(void)
         const float pos_meas = Observer_GetPosEstimate();
         error_ticks[i] = (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
     }
-    offset_raw = (offset_raw + ma7xx_get_angle()) / 2;
+    offset_raw = (offset_raw + ma7xx_get_angle_raw()) / 2;
     for (uint32_t i=0; i<n; i++)
     {
         for (uint8_t j=0; j<nconv; j++)

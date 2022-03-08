@@ -15,8 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <src/encoder/ma7xx.h>
-#include <src/encoder/hall.h>
+#include <src/encoder/encoder.h>
 #include "src/common.h"
 #include "src/system/system.h"
 
@@ -39,10 +38,9 @@ int main(void)
 {
   	__disable_irq();
     system_init();
-    ma7xx_init();
-    hall_init();
     NVM_Init();
     NVM_LoadConfig(); // This will TRY to deserialize and import config
+    encoder_init();
     UART_Init();
 	Observer_Init();
 	ADC_Init();

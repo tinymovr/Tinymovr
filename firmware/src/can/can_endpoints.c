@@ -21,6 +21,7 @@
 #include <src/system/system.h>
 #include <src/adc/adc.h>
 #include <src/motor/motor.h>
+#include <src/encoder/encoder.h>
 #include <src/encoder/hall.h>
 #include <src/observer/observer.h>
 #include <src/controller/controller.h>
@@ -227,7 +228,7 @@ uint8_t CAN_GetSetpoints(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 
 uint8_t CAN_GetEncoderType(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
-    const bool enc_type = system_get_encoder_type();
+    const bool enc_type = encoder_get_type();
     memcpy(&buffer[0], &enc_type, sizeof(bool));
     return CANRP_Read;
 }
@@ -306,7 +307,7 @@ uint8_t CAN_SetEncoderType(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     uint8_t enc_type;
     memcpy(&enc_type, &buffer[0], sizeof(enc_type));
-    system_set_encoder_type(enc_type); // check done in setter
+    encoder_set_type(enc_type); // check done in setter
     return CANRP_Write;
 }
 

@@ -51,7 +51,7 @@ PAC5XXX_RAMFUNC void ma7xx_send_angle_cmd(void)
 	ssp_write_one(PRIMARY_ENCODER_SSP_STRUCT, MA_CMD_ANGLE);
 }
 
-PAC5XXX_RAMFUNC int16_t ma7xx_get_angle(void)
+PAC5XXX_RAMFUNC int16_t ma7xx_get_angle_raw(void)
 {
     return state.angle;
 }
