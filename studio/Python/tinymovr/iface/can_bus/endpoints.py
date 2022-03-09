@@ -96,6 +96,14 @@ can_endpoints: Dict[str, Dict] = {
         "units": ("tick", "tick/second"),
         "labels": ("position", "velocity")
     },
+    "encoder_type":
+    {
+        "description": "Get encoder type",
+        "type": "r",
+        "ep_id": 0x00B,
+        "types": (DataType.UINT8,),
+        "labels": ("type",)
+    },
     "set_pos_setpoint":
     {
         "description": "Set Position Setpoint",
@@ -144,6 +152,14 @@ can_endpoints: Dict[str, Dict] = {
         "units": ("milliampere", "milliampere", "milliampere"),
         "labels": ("I_A", "I_B", "I_C"),
         "from_version": "0.7.1"
+    },
+    "set_encoder_type":
+    {
+        "description": "Set encoder type",
+        "type": "w",
+        "ep_id": 0x011,
+        "types": (DataType.UINT8,),
+        "labels": ("type",)
     },
     "vel_integrator_params":
     {
