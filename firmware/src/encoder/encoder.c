@@ -82,13 +82,3 @@ void encoder_restore_config(EncoderConfig* config_)
 {
     config = *config_;
 }
-
-EncoderConfig* encoder_get_config(void)
-{
-    return &config;
-}
-
-void encoder_restore_config(EncoderConfig* config_)
-{
-    config = *config_;
-}
