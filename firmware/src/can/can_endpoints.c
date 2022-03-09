@@ -419,13 +419,13 @@ uint8_t CAN_Timings(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 
 uint8_t CAN_SaveConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
-    NVM_SaveConfig();
+    nvm_save_config();
     return CANRP_Write;
 }
 
 uint8_t CAN_EraseConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
-    NVM_Erase();
+    nvm_erase();
     return CANRP_Write;
 }
 

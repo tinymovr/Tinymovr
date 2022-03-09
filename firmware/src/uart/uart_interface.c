@@ -177,11 +177,11 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
         case 'S': // save config
-            NVM_SaveConfig();
+            nvm_save_config();
         break;
 
         case 'X': // erase config
-            NVM_Erase();
+            nvm_erase();
         break;
 
         default:
