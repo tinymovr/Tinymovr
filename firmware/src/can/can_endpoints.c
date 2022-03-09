@@ -229,6 +229,7 @@ uint8_t CAN_GetSetpoints(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 uint8_t CAN_GetEncoderType(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     const bool enc_type = encoder_get_type();
+    *buffer_len = sizeof(bool);
     memcpy(&buffer[0], &enc_type, sizeof(bool));
     return CANRP_Read;
 }
@@ -454,6 +455,7 @@ uint8_t CAN_SetMotorConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     {
         bool is_gimbal = (bool)(flags & 0x1);
         motor_set_is_gimbal(is_gimbal);
+        motor_set_pole_pairs(pole_pairs);
         motor_set_I_cal(I_cal);
         return CANRP_Write;
     }
