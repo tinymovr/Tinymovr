@@ -15,7 +15,7 @@ void encoder_init(void)
         ma7xx_init();
         state.current_encoder_type = ENCODER_MA7XX;
         state.get_angle_ptr = &ma7xx_get_angle_rectified;
-        state.update_angle_ptr = ma7xx_update_angle;
+        state.update_angle_ptr = &ma7xx_update_angle;
         state.half_ticks = ENCODER_HALF_TICKS;
     }
     else if (ENCODER_HALL == config.encoder_type)
@@ -23,6 +23,7 @@ void encoder_init(void)
         hall_init();
         state.current_encoder_type = ENCODER_HALL;
         state.get_angle_ptr = &hall_get_angle;
+        state.update_angle_ptr = &hall_update_angle;
         state.half_ticks = HALL_HALF_SECTORS;
     }
 }
