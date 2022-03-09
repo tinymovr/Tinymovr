@@ -39,7 +39,7 @@ void Observer_Init(void)
 PAC5XXX_RAMFUNC void observer_update_estimates(void)
 {
 	const int16_t angle_meas = encoder_get_angle();
-	const int16_t half_ticks = encoder_get_half_ticks() * motor_get_pole_pairs();
+	const int16_t half_ticks = encoder_get_half_ticks();
 	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;
 	const float delta_pos_meas = wrapf_min_max((float)angle_meas - state.pos_estimate, -half_ticks, half_ticks);
 	const float delta_pos_error = delta_pos_meas - delta_pos_est;
