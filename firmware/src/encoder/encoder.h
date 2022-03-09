@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include <src/common.h>
 
 typedef void (*bool_setter)(bool);
