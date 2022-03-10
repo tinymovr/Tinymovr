@@ -24,7 +24,6 @@
 
 typedef struct 
 {
-	float pos_estimate;
 	int32_t pos_sector;
 	float pos_estimate_wrapped;
 	float vel_estimate;

@@ -75,11 +75,9 @@
 #define ERROR_FLAG_MAX_SIZE    (5u)
 
 #define ENCODER_TICKS          (8192)
-#define ENCODER_HALF_TICKS     (ENCODER_TICKS / 2)
 #define ENCODER_TICKS_FLOAT    (8192.f)
 
 #define HALL_SECTORS           (6)
-#define HALL_HALF_SECTORS      (HALL_SECTORS / 2)
 #define HALL_SECTOR_ANGLE      (TWOPI / HALL_SECTORS)
 #define CAL_DIR_LEN_PER_SECTOR (CAL_DIR_LEN / HALL_SECTORS)
 

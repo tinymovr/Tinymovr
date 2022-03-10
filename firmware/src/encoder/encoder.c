@@ -16,7 +16,8 @@ void encoder_init(void)
         state.current_encoder_type = ENCODER_MA7XX;
         state.get_angle_ptr = &ma7xx_get_angle_rectified;
         state.update_angle_ptr = &ma7xx_update_angle;
-        state.half_ticks = ENCODER_HALF_TICKS;
+        state.ticks = ENCODER_TICKS;
+        state.half_ticks = ENCODER_TICKS / 2;
     }
     else if (ENCODER_HALL == config.encoder_type)
     {
@@ -24,7 +25,8 @@ void encoder_init(void)
         state.current_encoder_type = ENCODER_HALL;
         state.get_angle_ptr = &hall_get_angle;
         state.update_angle_ptr = &hall_update_angle;
-        state.half_ticks = HALL_HALF_SECTORS;
+        state.ticks = HALL_SECTORS;
+        state.half_ticks = HALL_SECTORS / 2;
     }
 }
 
@@ -39,6 +41,11 @@ PAC5XXX_RAMFUNC void encoder_update_angle(bool check_error)
     {
         state.update_angle_ptr(check_error);
     }
+}
+
+PAC5XXX_RAMFUNC uint16_t encoder_get_ticks(void)
+{
+    return state.ticks;
 }
 
 PAC5XXX_RAMFUNC uint16_t encoder_get_half_ticks(void)

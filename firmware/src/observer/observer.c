@@ -39,22 +39,29 @@ void Observer_Init(void)
 PAC5XXX_RAMFUNC void observer_update_estimates(void)
 {
 	const int16_t angle_meas = encoder_get_angle();
-	const int16_t half_ticks = encoder_get_half_ticks();
+	const int16_t ticks = encoder_get_ticks();
 	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;
-	const float delta_pos_meas = wrapf_min_max((float)angle_meas - state.pos_estimate, -half_ticks, half_ticks);
+	const float delta_pos_meas = angle_meas - state.pos_estimate_wrapped;
+	if (delta_pos_meas < 0)
+	{
+		delta_pos_meas += ticks;
+	}
+	else if (delta_pos_meas >= ticks)
+	{
+		delta_pos_meas -= ticks;
+	}
 	const float delta_pos_error = delta_pos_meas - delta_pos_est;
 	const float incr_pos = delta_pos_est + (PWM_PERIOD_S * config.kp * delta_pos_error);
-	state.pos_estimate += incr_pos;
-	state.pos_estimate_wrapped = wrapf_min_max(state.pos_estimate_wrapped + incr_pos, -half_ticks, half_ticks);
-	if (state.pos_estimate > OBSERVER_SECTOR_HALF_INTERVAL)
+	state.pos_estimate_wrapped += incr_pos;
+	if (state.pos_estimate_wrapped < 0)
 	{
-		state.pos_estimate -= 2 * OBSERVER_SECTOR_HALF_INTERVAL;
-		state.pos_sector += 1;
-	}
-	else if (state.pos_estimate < -OBSERVER_SECTOR_HALF_INTERVAL )
-	{
-		state.pos_estimate += 2 * OBSERVER_SECTOR_HALF_INTERVAL;
+		state.pos_estimate_wrapped += ticks;
 		state.pos_sector -= 1;
+	}
+	else if (state.pos_estimate_wrapped >= ticks)
+	{
+		state.pos_estimate_wrapped -= ticks;
+		state.pos_sector += 1;
 	}
 	state.vel_estimate += PWM_PERIOD_S * config.ki * delta_pos_error;
 }
@@ -74,13 +81,13 @@ void Observer_SetFilterBandwidth(float bw)
 
 PAC5XXX_RAMFUNC float Observer_GetPosEstimate(void)
 {
-	const float primary = 2 * OBSERVER_SECTOR_HALF_INTERVAL * state.pos_sector;
+	const float primary = encoder_get_ticks() * state.pos_sector;
 	return primary + state.pos_estimate;
 }
 
 PAC5XXX_RAMFUNC float observer_get_diff(float target)
 {
-	const float primary = 2 * OBSERVER_SECTOR_HALF_INTERVAL * state.pos_sector;
+	const float primary = encoder_get_ticks() * state.pos_sector;
 	const float diff_sector = target - primary;
 	return diff_sector - state.pos_estimate;
 }
