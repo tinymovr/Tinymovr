@@ -366,10 +366,13 @@ for velocity-limited plan moves",
     },
     "hall_sector":
     {
-        "description": "Get Hall effect sensor sector",
+        "description": "Get Hall effect sensor sector map and current sector",
         "type": "r",
         "ep_id": 0x029,
-        "types": (DataType.UINT8, ),
-        "labels": ("sector", )
+        "types": (DataType.UINT8, DataType.UINT8,
+            DataType.UINT8, DataType.UINT8,
+            DataType.UINT8, DataType.UINT8,
+            DataType.UINT8, DataType.UINT8),
+        "labels": ("s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "current")
     },
 }

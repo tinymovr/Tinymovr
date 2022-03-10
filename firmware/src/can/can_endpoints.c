@@ -79,7 +79,7 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_GetSetPosVelIq, 0x026);
     CANEP_AddEndpoint(&CAN_GetMotorRL, 0x027);
     CANEP_AddEndpoint(&CAN_SetMotorRL, 0x028);
-    CANEP_AddEndpoint(&CAN_GetHallSector, 0x029);
+    CANEP_AddEndpoint(&CAN_GetHallSectorMap, 0x029);
     // 0x02A AVAIL
     // 0x02B AVAIL
     // 0x02C AVAIL
@@ -588,10 +588,13 @@ uint8_t CAN_GetSetPosVelIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     return CANRP_ReadWrite;
 }
 
-uint8_t CAN_GetHallSector(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+uint8_t CAN_GetHallSectorMap(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
+    const uint8_t *sector_map = hall_get_sector_map_ptr();
 	const uint8_t sector = hall_get_sector();
+    
     *buffer_len = sizeof(uint8_t);
-	memcpy(&buffer[0], &sector, sizeof(uint8_t));
+    memcpy(&buffer[0], sector_map, sizeof(uint8_t) * 7);
+	memcpy(&buffer[8], &sector, sizeof(uint8_t));
 	return CANRP_Read;
 }

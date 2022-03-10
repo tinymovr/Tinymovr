@@ -15,8 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef CAN_CAN_H_
-#define CAN_CAN_H_
+#pragma once
 
 #define CAN_EP_SIZE 6
 
@@ -36,4 +35,3 @@ void CAN_process_interrupt(void);
 CANConfig* CAN_get_config(void);
 void CAN_restore_config(CANConfig* config_);
 
-#endif /* CAN_CAN_H_ */
