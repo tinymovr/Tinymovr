@@ -57,3 +57,13 @@ uint8_t *hall_get_sector_map_ptr(void)
 {
     return config.sector_map;
 }
+
+HallConfig* hall_get_config(void)
+{
+    return &config
+}
+
+void hall_restore_config(HallConfig* config_)
+{
+    config = *config_;
+}

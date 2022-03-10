@@ -28,6 +28,7 @@ bool nvm_save_config(void)
 	bool commited = false;
 	uint8_t data[sizeof(struct NVMStruct)];
 	s.motor_config = *Motor_GetConfig();
+	s.hall_config = *hall_get_config();
 	s.encoder_config = *encoder_get_config();
 	s.observer_config = *Observer_GetConfig();
 	s.controller_config = *Controller_GetConfig();

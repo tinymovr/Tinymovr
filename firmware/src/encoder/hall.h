@@ -40,3 +40,6 @@ void hall_clear_sector_map(void);
 void hall_set_sector_map_calibrated(void);
 bool hall_sector_map_is_calibrated(void);
 uint8_t *hall_get_sector_map_ptr(void);
+
+HallConfig* hall_get_config(void);
+void hall_restore_config(HallConfig* config_);

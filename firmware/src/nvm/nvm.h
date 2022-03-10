@@ -18,6 +18,7 @@
 #pragma once
 
 #include <src/motor/motor.h>
+#include <src/encoder/hall.h>
 #include <src/encoder/encoder.h>
 #include <src/observer/observer.h>
 #include <src/controller/controller.h>
@@ -28,6 +29,7 @@
 
 struct NVMStruct {
     MotorConfig motor_config;
+    HallConfig hall_config;
     EncoderConfig encoder_config;
     ObserverConfig observer_config;
     ControllerConfig controller_config;
