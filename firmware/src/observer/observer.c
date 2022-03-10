@@ -41,7 +41,7 @@ PAC5XXX_RAMFUNC void observer_update_estimates(void)
 	const int16_t angle_meas = encoder_get_angle();
 	const int16_t ticks = encoder_get_ticks();
 	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;
-	const float delta_pos_meas = angle_meas - state.pos_estimate_wrapped;
+	float delta_pos_meas = angle_meas - state.pos_estimate_wrapped;
 	if (delta_pos_meas < 0)
 	{
 		delta_pos_meas += ticks;
@@ -82,14 +82,14 @@ void Observer_SetFilterBandwidth(float bw)
 PAC5XXX_RAMFUNC float Observer_GetPosEstimate(void)
 {
 	const float primary = encoder_get_ticks() * state.pos_sector;
-	return primary + state.pos_estimate;
+	return primary + state.pos_estimate_wrapped;
 }
 
 PAC5XXX_RAMFUNC float observer_get_diff(float target)
 {
 	const float primary = encoder_get_ticks() * state.pos_sector;
 	const float diff_sector = target - primary;
-	return diff_sector - state.pos_estimate;
+	return diff_sector - state.pos_estimate_wrapped;
 }
 
 PAC5XXX_RAMFUNC float observer_get_vel_estimate(void)
@@ -117,7 +117,7 @@ PAC5XXX_RAMFUNC float observer_get_evel(void)
 
 PAC5XXX_RAMFUNC float observer_get_pos_estimate_user_frame(void)
 {
-	return (state.pos_estimate - motor_get_user_offset()) * motor_get_user_direction();
+	return (Observer_GetPosEstimate() - motor_get_user_offset()) * motor_get_user_direction();
 }
 
 PAC5XXX_RAMFUNC float observer_get_vel_estimate_user_frame(void)

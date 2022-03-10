@@ -87,6 +87,16 @@ static inline bool our_clamp(float *d, float min, float max)
     return (*d == min) || (*d == max);
 }
 
+static inline float our_floorf(float x)
+{
+	if (x >= 0.0f)
+	{
+		return (float)((int)x);
+	}
+	return (float)((int)x - 1);
+}
+
+
 // based on https://github.com/divideconcept/FastTrigo/blob/master/fasttrigo.cpp
 static inline float cos_32s(float x)
 {
