@@ -40,13 +40,14 @@ PAC5XXX_RAMFUNC void observer_update_estimates(void)
 {
 	const int16_t angle_meas = encoder_get_angle();
 	const int16_t ticks = encoder_get_ticks();
+	const int16_t half_ticks = ticks/2;
 	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;
 	float delta_pos_meas = angle_meas - state.pos_estimate_wrapped;
-	if (delta_pos_meas < 0)
+	if (delta_pos_meas < -half_ticks)
 	{
 		delta_pos_meas += ticks;
 	}
-	else if (delta_pos_meas >= ticks)
+	else if (delta_pos_meas >= half_ticks)
 	{
 		delta_pos_meas -= ticks;
 	}
