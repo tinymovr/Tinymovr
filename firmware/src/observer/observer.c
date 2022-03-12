@@ -32,8 +32,7 @@ static ObserverConfig config = {
 
 void Observer_Init(void)
 {
-    config.kp = 2.0f * config.track_bw;
-    config.ki = 0.25f * (config.kp * config.kp);
+    observer_set_bw(config.track_bw);
 }
 
 PAC5XXX_RAMFUNC void observer_update_estimates(void)
@@ -67,16 +66,18 @@ PAC5XXX_RAMFUNC void observer_update_estimates(void)
 	state.vel_estimate += PWM_PERIOD_S * config.ki * delta_pos_error;
 }
 
-PAC5XXX_RAMFUNC float Observer_GetFilterBandwidth(void)
+float observer_get_bw(void)
 {
     return config.track_bw;
 }
 
-void Observer_SetFilterBandwidth(float bw)
+void observer_set_bw(float bw)
 {
     if (bw > 0.0f)
     {
         config.track_bw = bw;
+		config.kp = 2.0f * config.track_bw;
+    	config.ki = 0.25f * (config.kp * config.kp);
     }
 }
 

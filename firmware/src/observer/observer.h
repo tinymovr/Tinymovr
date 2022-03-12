@@ -47,8 +47,8 @@ PAC5XXX_RAMFUNC float observer_get_evel(void);
 PAC5XXX_RAMFUNC float observer_get_pos_estimate_user_frame(void);
 PAC5XXX_RAMFUNC float observer_get_vel_estimate_user_frame(void);
 
-PAC5XXX_RAMFUNC float Observer_GetFilterBandwidth(void);
-void Observer_SetFilterBandwidth(float bw);
+float observer_get_bw(void);
+void observer_set_bw(float bw);
 
 ObserverConfig* Observer_GetConfig(void);
 void Observer_RestoreConfig(ObserverConfig* config_);

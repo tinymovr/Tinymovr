@@ -96,13 +96,13 @@ can_endpoints: Dict[str, Dict] = {
         "units": ("tick", "tick/second"),
         "labels": ("position", "velocity")
     },
-    "encoder_type":
+    "encoder_config":
     {
-        "description": "Get encoder type",
+        "description": "Get encoder config",
         "type": "r",
         "ep_id": 0x00B,
-        "types": (DataType.UINT8,),
-        "labels": ("type",)
+        "types": (DataType.UINT8, DataType.FLOAT),
+        "labels": ("type", "bandwidth")
     },
     "set_pos_setpoint":
     {
@@ -153,13 +153,13 @@ can_endpoints: Dict[str, Dict] = {
         "labels": ("I_A", "I_B", "I_C"),
         "from_version": "0.7.1"
     },
-    "set_encoder_type":
+    "set_encoder_config":
     {
-        "description": "Set encoder type",
+        "description": "Set encoder configuration",
         "type": "w",
         "ep_id": 0x011,
-        "types": (DataType.UINT8,),
-        "labels": ("type",)
+        "types": (DataType.UINT8, DataType.FLOAT),
+        "labels": ("type", "bandwidth")
     },
     "vel_integrator_params":
     {
@@ -366,7 +366,7 @@ for velocity-limited plan moves",
     },
     "hall_sector":
     {
-        "description": "Get Hall effect sensor sector map and current sector",
+        "description": "`G`et Hall effect sensor sector map and current sector",
         "type": "r",
         "ep_id": 0x029,
         "types": (DataType.UINT8, DataType.UINT8,

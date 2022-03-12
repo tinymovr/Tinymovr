@@ -50,13 +50,13 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_SetOffsetAndDirection, 0x008);
     CANEP_AddEndpoint(&CAN_GetEncoderEstimates, 0x009);
     CANEP_AddEndpoint(&CAN_GetSetpoints, 0x00A);
-    CANEP_AddEndpoint(&CAN_GetEncoderType, 0x00B);
+    CANEP_AddEndpoint(&CAN_GetEncoderConfig, 0x00B);
     CANEP_AddEndpoint(&CAN_SetPosSetpoint, 0x00C);  
     CANEP_AddEndpoint(&CAN_SetVelSetpoint, 0x00D);
     CANEP_AddEndpoint(&CAN_SetIqSetpoint, 0x00E);
     CANEP_AddEndpoint(&CAN_SetLimits, 0x00F);
     CANEP_AddEndpoint(&CAN_GetPhaseCurrents, 0x010);
-    CANEP_AddEndpoint(&CAN_SetEncoderType, 0x011); 
+    CANEP_AddEndpoint(&CAN_SetEncoderConfig, 0x011); 
     CANEP_AddEndpoint(&CAN_GetIntegratorGains, 0x012);
     CANEP_AddEndpoint(&CAN_SetIntegratorGains, 0x013);
     CANEP_AddEndpoint(&CAN_GetIq, 0x014);
@@ -226,11 +226,13 @@ uint8_t CAN_GetSetpoints(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     return CANRP_Read;
 }
 
-uint8_t CAN_GetEncoderType(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+uint8_t CAN_GetEncoderConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
-    const bool enc_type = encoder_get_type();
-    *buffer_len = sizeof(bool);
-    memcpy(&buffer[0], &enc_type, sizeof(bool));
+    const uint8_t enc_type = encoder_get_type();
+    const float bw = observer_get_bw();
+    *buffer_len = sizeof(enc_type) + sizeof(bw);
+    memcpy(&buffer[0], &enc_type, sizeof(uint8_t));
+    memcpy(&buffer[1], &bw, sizeof(bw));
     return CANRP_Read;
 }
 
@@ -304,11 +306,14 @@ uint8_t CAN_GetPhaseCurrents(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     return CANRP_Read;
 }
 
-uint8_t CAN_SetEncoderType(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+uint8_t CAN_SetEncoderConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     uint8_t enc_type;
+    float bw;
     memcpy(&enc_type, &buffer[0], sizeof(enc_type));
+    memcpy(&bw, &buffer[1], sizeof(bw));
     encoder_set_type(enc_type); // check done in setter
+    observer_set_bw(bw); // check done in setter
     return CANRP_Write;
 }
 
