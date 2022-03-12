@@ -81,7 +81,7 @@ PAC5XXX_RAMFUNC void motor_set_user_offset(float offset);
 PAC5XXX_RAMFUNC int8_t motor_get_user_direction(void);
 PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir);
 
-MotorConfig* Motor_GetConfig(void);
-void Motor_RestoreConfig(MotorConfig* config_);
+MotorConfig* motor_get_config(void);
+void motor_restore_config(MotorConfig* config_);
 
 #endif /* MOTOR_MOTOR_H_ */

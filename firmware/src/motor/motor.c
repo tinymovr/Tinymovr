@@ -182,12 +182,12 @@ PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir)
 	}
 }
 
-MotorConfig* Motor_GetConfig(void)
+MotorConfig* motor_get_config(void)
 {
     return &config;
 }
 
-void Motor_RestoreConfig(MotorConfig* config_)
+void motor_restore_config(MotorConfig* config_)
 {
     config = *config_;
 }
