@@ -14,7 +14,7 @@ class ControlModes(IntEnum):
 
 class ErrorIDs(IntEnum):
     InvalidState = 1
-    IllegalValue = 2
+    ControlBlockReentered = 2
     VBusUndervoltage = 3
     OverCurrent = 4
     PWMLimitExceeded = 5
