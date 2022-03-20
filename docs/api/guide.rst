@@ -535,7 +535,7 @@ Example
 
 .. code-block:: python
 
-    >>>tmx.set_integrator_gains(gain=0.0001, deadband=300)
+    >>>tmx.set_vel_integrator_params(gain=0.0001, deadband=300)
 
 
 Iq

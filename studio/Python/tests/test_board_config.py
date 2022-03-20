@@ -93,7 +93,7 @@ class TestBoardConfig(TMTestCase):
         self.tm.erase_config()
         time.sleep(0.2)
         self.tm.set_gains(30, 3e-5)
-        self.tm.set_integrator_gains(2e-2)
+        self.tm.set_vel_integrator_params(2e-2)
         self.tm.set_limits(120000, 18)
         self.tm.save_config()
         time.sleep(0.2)
