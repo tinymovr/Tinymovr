@@ -231,7 +231,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
 
     SVM(mod_a, mod_b, &state.modulation_values.A,
         &state.modulation_values.B, &state.modulation_values.C);
-    GateDriver_SetDutyCycle(&state.modulation_values);
+    gate_driver_set_duty_cycle(&state.modulation_values);
 }
 
 PAC5XXX_RAMFUNC void IdleStep(void)
@@ -251,20 +251,20 @@ PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
 		if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE)
 				&& (!error_flags_exist()) && motor_is_calibrated())
 		{
-			state.pos_setpoint = Observer_GetPosEstimate();
-			GateDriver_Enable();
+			state.pos_setpoint = observer_get_pos_estimate();
+			gate_driver_enable();
 			state.state = STATE_CL_CONTROL;
 		}
 		else if ((new_state == STATE_CALIBRATE) && (state.state == STATE_IDLE)
 				&& (!error_flags_exist()))
 		{
-			GateDriver_Enable();
+			gate_driver_enable();
 			state.state = STATE_CALIBRATE;
 		}
 		else // state != STATE_IDLE --> Got to idle state anyway
 		{
-			GateDriver_SetDutyCycle(&zeroDC);
-			GateDriver_Disable();
+			gate_driver_set_duty_cycle(&zeroDC);
+			gate_driver_disable();
 			state.state = STATE_IDLE;
 		}
 	}

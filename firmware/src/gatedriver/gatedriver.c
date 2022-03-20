@@ -26,56 +26,55 @@ struct GateDriver_ gateDriver =
 
 void GateDriver_Init(void) {}
 
-PAC5XXX_RAMFUNC void GateDriver_Enable(void)
+PAC5XXX_RAMFUNC void gate_driver_enable(void)
 {
-    if (gateDriver.state == GATEDRIVER_DISABLED)
-    {
-        // Select PWMA peripheral for Port B
-        PAC55XX_SCC->PBMUXSEL.w =  0x01110111;
+    // Select PWMA peripheral for Port B
+    PAC55XX_SCC->PBMUXSEL.w =  0x01110111;
 
-        // Select GPIO mode for Port B
-        PAC55XX_GPIOB->MODE.w = 0x1515;
+    // Select GPIO mode for Port B
+    PAC55XX_GPIOB->MODE.w = 0x1515;
 
-        // Turn on output enables
-        PAC55XX_GPIOB->OUTMASK.w = 0x00;
+    // Turn on output enables
+    PAC55XX_GPIOB->OUTMASK.w = 0x00;
 
-        // Set slew rate
-        // 01000101: push: 750mA pull: 750mA
-        pac5xxx_tile_register_write(ADDR_DRVILIMLS, 0x45);
-        pac5xxx_tile_register_write(ADDR_DRVILIMHS, 0x45);
+    // Set slew rate
+    // 01000101: push: 750mA pull: 750mA
+    pac5xxx_tile_register_write(ADDR_DRVILIMLS, 0x45);
+    pac5xxx_tile_register_write(ADDR_DRVILIMHS, 0x45);
 
-        // Enable driver manager and verify active - need to enable even in PAC5210 to get ENHS pin to work
-        pac5xxx_tile_register_write(ADDR_ENDRV, 1);
+    // Enable driver manager and verify active - need to enable even in PAC5210 to get ENHS pin to work
+    pac5xxx_tile_register_write(ADDR_ENDRV, 1);
 
-        pac5xxx_tile_register_write(ADDR_CFGDRV4,
-                pac5xxx_tile_register_read(ADDR_CFGDRV4) | 0x1); // BBM is bit 0
-        gateDriver.state = GATEDRIVER_ENABLED;
-    }
+    pac5xxx_tile_register_write(ADDR_CFGDRV4,
+            pac5xxx_tile_register_read(ADDR_CFGDRV4) | 0x1); // BBM is bit 0
+    gateDriver.state = GATEDRIVER_ENABLED;
 }
 
-PAC5XXX_RAMFUNC void GateDriver_Disable(void)
+PAC5XXX_RAMFUNC void gate_driver_disable(void)
 {
-    if (gateDriver.state == GATEDRIVER_ENABLED)
-    {
-        // Disable driver manager and verify active - need to enable even in PAC5210 to get ENHS pin to work
-        pac5xxx_tile_register_write(ADDR_ENDRV, 0);
+    // Disable driver manager and verify active - need to enable even in PAC5210 to get ENHS pin to work
+    pac5xxx_tile_register_write(ADDR_ENDRV, 0);
 
-        // Set IO state of all pins to 0
-        PAC55XX_GPIOB->OUT.w = 0x00;
+    // Set IO state of all pins to 0
+    PAC55XX_GPIOB->OUT.w = 0x00;
 
-        // Select GPIO peripheral for Port B
-        PAC55XX_SCC->PBMUXSEL.w =  0x00000000;
+    // Select GPIO peripheral for Port B
+    PAC55XX_SCC->PBMUXSEL.w =  0x00000000;
 
-        // Select GPIO mode for Port B
-        PAC55XX_GPIOB->MODE.w = 0x1515;
+    // Select GPIO mode for Port B
+    PAC55XX_GPIOB->MODE.w = 0x1515;
 
-        // Turn on output enables
-        PAC55XX_GPIOB->OUTMASK.w = 0x00;
-        gateDriver.state = GATEDRIVER_DISABLED;
-    }
+    // Turn on output enables
+    PAC55XX_GPIOB->OUTMASK.w = 0x00;
+    gateDriver.state = GATEDRIVER_DISABLED;
 }
 
-PAC5XXX_RAMFUNC void GateDriver_SetDutyCycle(struct FloatTriplet *dutycycles)
+PAC5XXX_RAMFUNC bool gate_driver_is_enabled(void)
+{
+    return (GATEDRIVER_ENABLED == gateDriver.state);
+}
+
+PAC5XXX_RAMFUNC void gate_driver_set_duty_cycle(struct FloatTriplet *dutycycles)
 {
 	m1_u_set_duty(dutycycles->A);
 	if (motor_phases_swapped())
