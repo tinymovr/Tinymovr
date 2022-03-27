@@ -20,12 +20,12 @@
 // Firmware Version
 #define VERSION_MAJOR (0u)
 #define VERSION_MINOR (8u)
-#define VERSION_PATCH (12u)
+#define VERSION_PATCH (13u)
 
 // Required Studio version
 #define STUDIO_MIN_VERSION_MAJOR (0u)
 #define STUDIO_MIN_VERSION_MINOR (3u)
-#define STUDIO_MIN_VERSION_PATCH (12u)
+#define STUDIO_MIN_VERSION_PATCH (13u)
 
 /// TINYMOVR CONFIGURATION OPTIONS ///
 
@@ -64,7 +64,7 @@
 #define CAL_V_GAIN (0.0005f)
 #define CAL_V_INDUCTANCE (2.0f)
 
-// Eccentricity correction lookup table size
+// Encoder rectification lookup table size
 #define ECN_BITS (6)
 #define ECN_SIZE (2 << ECN_BITS)
 

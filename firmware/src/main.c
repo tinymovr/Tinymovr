@@ -29,18 +29,12 @@
 #include "src/can/can.h"
 #include "src/nvm/nvm.h"
 
-int test_div(int lho, int rho)
-{
-    return lho/rho;
-}
-
 int main(void)
 {
   	__disable_irq();
     system_init();
+    nvm_load_config(); // This will TRY to deserialize and import config
     encoder_init();
-    NVM_Init();
-    NVM_LoadConfig(); // This will TRY to deserialize and import config
     UART_Init();
 	Observer_Init();
 	ADC_Init();

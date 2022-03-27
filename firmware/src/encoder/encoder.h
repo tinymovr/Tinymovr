@@ -15,32 +15,40 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ENCODERS_MA702_H_
-#define ENCODERS_MA702_H_
+#pragma once
 
-#include "src/common.h"
+#include <src/common.h>
 
-#define MAX_ALLOWED_DELTA			 (1024)
+typedef void (*bool_setter)(bool);
+typedef int16_t (*int16_getter)(void);
 
 typedef enum {
-    ENCODER_ERR_NO_ERROR        = 0x0000,
-    ENCODER_ERR_UNSTABLE        = 0x0001
-} EncoderError;
+	ENCODER_MA7XX = 0,
+	ENCODER_HALL = 1
+} EncoderType;
 
-// MA702 commands
-typedef enum {
-    MA_CMD_NOP              = 0x0000,
-    MA_CMD_ANGLE            = 0x0000
-} MA702Command;
+typedef struct {
+    EncoderType current_encoder_type;
+    bool_setter update_angle_ptr;
+    int16_getter get_angle_ptr;
+    uint16_t ticks;
+} EncoderState;
 
 typedef struct
 {
-	int16_t angle;
-} EncoderState;
+    EncoderType encoder_type;
+} EncoderConfig;
 
 void encoder_init(void);
-PAC5XXX_RAMFUNC void encoder_send_angle_cmd(void);
 PAC5XXX_RAMFUNC int16_t encoder_get_angle(void);
 PAC5XXX_RAMFUNC void encoder_update_angle(bool check_error);
 
-#endif /* ENCODERS_MA702_H_ */
+PAC5XXX_RAMFUNC uint16_t encoder_get_ticks(void);
+PAC5XXX_RAMFUNC float encoder_ticks_to_eangle(void);
+
+PAC5XXX_RAMFUNC EncoderType encoder_get_type(void);
+void encoder_set_type(EncoderType enc_type);
+
+EncoderConfig* encoder_get_config(void);
+void encoder_restore_config(EncoderConfig* config_);
+

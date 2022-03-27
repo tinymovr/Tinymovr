@@ -15,29 +15,29 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef NVM_NVM_H_
-#define NVM_NVM_H_
+#pragma once
 
-#include "src/motor/motor.h"
-#include "src/observer/observer.h"
-#include "src/controller/controller.h"
-#include "src/can/can.h"
+#include <src/motor/motor.h>
+#include <src/encoder/hall.h>
+#include <src/encoder/encoder.h>
+#include <src/observer/observer.h>
+#include <src/controller/controller.h>
+#include <src/can/can.h>
 
 #define SETTINGS_PAGE (120)
 #define SETTINGS_PAGE_HEX (0x0001E000)
 
-
 struct NVMStruct {
-    struct MotorConfig motor_config;
-    struct ObserverConfig observer_config;
-    struct ControllerConfig controller_config;
-    struct CANConfig can_config;
+    MotorConfig motor_config;
+    HallConfig hall_config;
+    EncoderConfig encoder_config;
+    ObserverConfig observer_config;
+    ControllerConfig controller_config;
+    CANConfig can_config;
     uint32_t version;
 };
 
-void NVM_Init(void);
-bool NVM_SaveConfig(void);
-bool NVM_LoadConfig(void);
-void NVM_Erase(void);
+bool nvm_save_config(void);
+bool nvm_load_config(void);
+void nvm_erase(void);
 
-#endif /* NVM_NVM_H_ */

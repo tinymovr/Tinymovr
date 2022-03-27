@@ -67,7 +67,7 @@ typedef enum {
 #define ONE_OVER_SHUNT_SCALING_FACTOR ( 1.0f / SHUNT_SCALING_FACTOR )
 
 // VBus scaling factor
-#define VBUS_SCALING_FACTOR ( 0.0127f )
+#define VBUS_SCALING_FACTOR ( 0.0128f )
 
 struct ADCState
 {

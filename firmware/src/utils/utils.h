@@ -96,21 +96,6 @@ static inline float our_floorf(float x)
 	return (float)((int)x - 1);
 }
 
-static inline float our_fmodf(float a, float b)
-{
-    return (a - b * our_floorf(a / b));
-}
-
-/* wrap x -> [0,max) */
-static inline float wrapf_max(float x, float max)
-{
-    return our_fmodf(max + our_fmodf(x, max), max);
-}
-/* wrap x -> [min,max) */
-static inline float wrapf_min_max(float x, float min, float max)
-{
-    return min + wrapf_max(x - min, max - min);
-}
 
 // based on https://github.com/divideconcept/FastTrigo/blob/master/fasttrigo.cpp
 static inline float cos_32s(float x)

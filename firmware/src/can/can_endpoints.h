@@ -39,13 +39,13 @@ uint8_t CAN_SetState(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_SetOffsetAndDirection(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_GetEncoderEstimates(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_GetSetpoints(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
-
+uint8_t CAN_GetEncoderConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_SetPosSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_SetVelSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_SetIqSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_SetLimits(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_GetPhaseCurrents(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
-
+uint8_t CAN_SetEncoderConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_GetIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_GetLimits(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_Reset(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
@@ -70,3 +70,5 @@ uint8_t CAN_GetMaxPlanAccelDecel(uint8_t buffer[], uint8_t *buffer_len, bool rtr
 
 uint8_t CAN_GetSetPosVel(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_GetSetPosVelIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+
+uint8_t CAN_GetHallSectorMap(uint8_t buffer[], uint8_t *buffer_len, bool rtr);

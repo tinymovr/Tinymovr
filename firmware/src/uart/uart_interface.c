@@ -16,7 +16,6 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "string.h"
-#include <src/encoder/encoder.h>
 #include "src/system/system.h"
 #include "src/motor/motor.h"
 #include "src/observer/observer.h"
@@ -121,10 +120,6 @@ int32_t UART_ReadAddr(uint8_t addr)
             memcpy(&ret_val, error_flags, sizeof(uint32_t));}
         break;
 
-        case 'o': // encoder pos
-            ret_val =  encoder_get_angle();
-        break;
-
         case 'p': // pos estimate
             ret_val = observer_get_pos_estimate_user_frame();
         break;
@@ -198,11 +193,11 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
         case 'S': // save config
-            NVM_SaveConfig();
+            nvm_save_config();
         break;
 
         case 'X': // erase config
-            NVM_Erase();
+            nvm_erase();
         break;
 
         default:

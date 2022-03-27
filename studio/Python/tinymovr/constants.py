@@ -14,7 +14,7 @@ class ControlModes(IntEnum):
 
 class ErrorIDs(IntEnum):
     InvalidState = 1
-    IllegalValue = 2
+    ControlBlockReentered = 2
     VBusUndervoltage = 3
     OverCurrent = 4
     PWMLimitExceeded = 5
@@ -28,7 +28,7 @@ class ErrorIDs(IntEnum):
 
 error_descriptions = {
     ErrorIDs.InvalidState: "Attempt to transition to invalid state",
-    ErrorIDs.IllegalValue: "Illegal value passed to endpoint",
+    ErrorIDs.ControlBlockReentered: "Control block re-entered before last instance completed",
     ErrorIDs.VBusUndervoltage: "Power supply bus under low voltage threshold",
     ErrorIDs.OverCurrent: "Phase current limit has been exceeded",
     ErrorIDs.PWMLimitExceeded: "Phase voltage modulation limit has been exceeded",

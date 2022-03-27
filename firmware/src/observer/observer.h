@@ -20,49 +20,41 @@
 #define OBSERVER_OBSERVER_H_
 
 #include <stdint.h>
-#include "src/common.h"
+#include <src/common.h>
+#include <src/encoder/encoder.h>
 
-struct ObserverState
+typedef struct 
 {
-	float pos_estimate;
 	int32_t pos_sector;
 	float pos_estimate_wrapped;
 	float vel_estimate;
-};
+	uint16_t encoder_ticks;
+	uint16_t encoder_half_ticks;
+	EncoderType encoder_type;
+} ObserverState;
 
-struct ObserverConfig
+typedef struct 
 {
 	float track_bw;
 	float kp;
 	float ki;
-
-	int32_t sector_half_interval;
-
-	bool eccentricity_calibrated;
-	int16_t eccentricity_table[ECN_SIZE];
-};
+} ObserverConfig;
 
 void Observer_Init(void);
-PAC5XXX_RAMFUNC void observer_update_estimates(const int16_t raw_pos);
-PAC5XXX_RAMFUNC float Observer_GetPosEstimate(void);
-PAC5XXX_RAMFUNC float Observer_GetPosDiff(float target);
-PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrapped(void);
-PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrappedRadians(void);
-PAC5XXX_RAMFUNC float Observer_GetVelEstimate(void);
-PAC5XXX_RAMFUNC float Observer_GetVelEstimateRadians(void);
+PAC5XXX_RAMFUNC void observer_update_estimates(void);
+PAC5XXX_RAMFUNC float observer_get_pos_estimate(void);
+PAC5XXX_RAMFUNC float observer_get_diff(float target);
+PAC5XXX_RAMFUNC float observer_get_vel_estimate(void);
+PAC5XXX_RAMFUNC float observer_get_epos(void);
+PAC5XXX_RAMFUNC float observer_get_evel(void);
 
 PAC5XXX_RAMFUNC float observer_get_pos_estimate_user_frame(void);
 PAC5XXX_RAMFUNC float observer_get_vel_estimate_user_frame(void);
 
-PAC5XXX_RAMFUNC float Observer_GetFilterBandwidth(void);
-void Observer_SetFilterBandwidth(float bw);
-void Observer_ClearEccentricityTable(void);
-void Observer_SetEccentricityCalibrated(void);
-int16_t *Observer_GetEccentricityTablePointer(void);
+float observer_get_bw(void);
+void observer_set_bw(float bw);
 
-PAC5XXX_RAMFUNC bool Observer_Calibrated(void);
-
-struct ObserverConfig* Observer_GetConfig(void);
-void Observer_RestoreConfig(struct ObserverConfig* config_);
+ObserverConfig* Observer_GetConfig(void);
+void Observer_RestoreConfig(ObserverConfig* config_);
 
 #endif /* OBSERVER_OBSERVER_H_ */

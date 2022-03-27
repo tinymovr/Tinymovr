@@ -234,6 +234,33 @@ Example
     {"position": 1000.0, "velocity": 0.0}
 
 
+encoder_config
+**************
+
+| **endpoint**: ``0x0B``
+| **type**: Read-only
+
+Retrieves the encoder configuration.
+
+Return Values
+-------------
+
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``type``       Encoder Type        uint8      0           
+``bandwidth``  Encoder Bandwidth   float32    1           radians/second
+=============  =================   =========  =========== ================
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.encoder_config
+    {"type": 0, "bandwidth": 1500.0}
+
+
 set_pos_setpoint()
 ******************
 
@@ -535,7 +562,7 @@ Example
 
 .. code-block:: python
 
-    >>>tmx.set_integrator_gains(gain=0.0001, deadband=300)
+    >>>tmx.set_vel_integrator_params(gain=0.0001, deadband=300)
 
 
 Iq
@@ -591,6 +618,32 @@ Example
 
     >>>tmx.Iphase
     {"A": 1.0, "B": -0.6, "C": -0.4}
+
+
+set_encoder_config
+******************
+
+| **endpoint**: ``0x11``
+| **type**: Write-only
+
+Sets the encoder configuration.
+
+Arguments
+-------------
+
+=============  =================   =========  =========== ================
+Member         Description         Data Type  Data Offset Default Unit
+-------------  -----------------   ---------  ----------- ----------------
+``type``       Encoder Type        uint8      0           
+``bandwidth``  Encoder Bandwidth   float32    1           radians/second
+=============  =================   =========  =========== ================
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.set_encoder_config(0, 1500)
 
 
 plan_t_limit

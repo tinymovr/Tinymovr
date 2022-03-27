@@ -15,12 +15,11 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <src/observer/observer.h>
 #include <src/controller/controller.h>
 #include <src/utils/utils.h>
 #include <src/motor/motor.h>
 
-static struct MotorConfig config = {
+static MotorConfig config = {
     .pole_pairs = 7u,
 	.phase_resistance = 0.1f,
 	.phase_inductance = 1e-5f,
@@ -183,12 +182,12 @@ PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir)
 	}
 }
 
-struct MotorConfig* Motor_GetConfig(void)
+MotorConfig* motor_get_config(void)
 {
     return &config;
 }
 
-void Motor_RestoreConfig(struct MotorConfig* config_)
+void motor_restore_config(MotorConfig* config_)
 {
     config = *config_;
 }

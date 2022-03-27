@@ -29,7 +29,7 @@
 #define CAN_BUS_PINS CAN_PF67
 #endif
 
-static struct CANConfig config = {
+static CANConfig config = {
     .id = 1,
     .kbaud_rate = CAN_BAUD_1000KHz
 };
@@ -157,12 +157,12 @@ void CAN_process_interrupt(void)
     }
 }
 
-struct CANConfig* CAN_get_config(void)
+CANConfig* CAN_get_config(void)
 {
     return &config;
 }
 
-void CAN_restore_config(struct CANConfig* config_)
+void CAN_restore_config(CANConfig* config_)
 {
     config = *config_;
 }

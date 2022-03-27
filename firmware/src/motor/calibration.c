@@ -20,7 +20,8 @@
 #include <src/gatedriver/gatedriver.h>
 #include <src/scheduler/scheduler.h>
 #include <src/utils/utils.h>
-#include <src/encoder/encoder.h>
+#include <src/encoder/ma7xx.h>
+#include <src/encoder/hall.h>
 #include <src/controller/controller.h>
 #include <src/system/system.h>
 #include <src/motor/calibration.h>
@@ -44,7 +45,7 @@ bool CalibrateResistance(void)
             V_setpoint += CAL_V_GAIN * (I_cal - I_phase_meas.A);
             const float pwm_setpoint = V_setpoint / ADC_GetVBus();
             SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
-            GateDriver_SetDutyCycle(&modulation_values);
+            gate_driver_set_duty_cycle(&modulation_values);
             WaitForControlLoopInterrupt();
         }
         const float R = our_fabsf(V_setpoint / I_cal);
@@ -57,7 +58,7 @@ bool CalibrateResistance(void)
         {
             motor_set_phase_resistance(R);
         }
-        GateDriver_SetDutyCycle(&zeroDC);
+        gate_driver_set_duty_cycle(&zeroDC);
     }
     return success;
 }
@@ -88,7 +89,7 @@ bool CalibrateInductance(void)
             }
             const float pwm_setpoint = V_setpoint / ADC_GetVBus();
             SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
-            GateDriver_SetDutyCycle(&modulation_values);
+            gate_driver_set_duty_cycle(&modulation_values);
             WaitForControlLoopInterrupt();
         }
         const float num_cycles = CAL_L_LEN / 2;
@@ -104,7 +105,7 @@ bool CalibrateInductance(void)
             motor_set_phase_inductance(L);
             Controller_UpdateCurrentGains();
         }
-        GateDriver_SetDutyCycle(&zeroDC);
+        gate_driver_set_duty_cycle(&zeroDC);
     }
     return success;
 }
@@ -123,7 +124,7 @@ bool CalibrateDirectionAndPolePairs(void)
 	{
 		set_epos_and_wait(0, I_setpoint);
 	}
-    const float epos_start = Observer_GetPosEstimate();
+    const float epos_start = observer_get_pos_estimate();
     float epos_end = 0;
     // Move to target epos
     for (uint32_t i=0; i<CAL_DIR_LEN; i++)
@@ -136,21 +137,21 @@ bool CalibrateDirectionAndPolePairs(void)
 		set_epos_and_wait(epos_target, I_setpoint);
 	}
     // Try to calibrate
-    if (!motor_find_pole_pairs(ENCODER_TICKS, epos_start, Observer_GetPosEstimate(), epos_target))
+    if (!motor_find_pole_pairs(ENCODER_TICKS, epos_start, observer_get_pos_estimate(), epos_target))
     {
         add_error_flag(ERROR_INVALID_POLE_PAIRS);
         success = false;
     }
     else
     {
-    	epos_end = Observer_GetPosEstimate();
+    	epos_end = observer_get_pos_estimate();
     }
-    // Go back to start epos
+    // Move back to start epos
     for (uint32_t i=0; i<CAL_DIR_LEN; i++)
     {
         set_epos_and_wait(epos_target * (1.0f - ((float)i/CAL_DIR_LEN)), I_setpoint);
     }
-    GateDriver_SetDutyCycle(&zeroDC);
+    gate_driver_set_duty_cycle(&zeroDC);
     if (success && epos_start > epos_end)
 	{
     	motor_set_phases_swapped(true);
@@ -158,7 +159,40 @@ bool CalibrateDirectionAndPolePairs(void)
     return success;
 }
 
-bool CalibrateOffsetAndEccentricity(void)
+bool calibrate_hall_sequence(void)
+{
+    hall_clear_sector_map();
+    uint8_t *sector_map = hall_get_sector_map_ptr();
+    // We'll just do a single electrical cycle
+    const float I_setpoint = motor_get_I_cal();
+    bool success = true;
+    // Stay a bit at starting epos
+	for (uint32_t i=0; i<CAL_STAY_LEN; i++)
+	{
+		set_epos_and_wait(0, I_setpoint);
+	}
+
+    // Make a full ecycle and store the sector every 60 deg
+    for (uint8_t j=0; j<HALL_SECTORS; j++)
+    {
+        sector_map[hall_get_sector()] = j;
+        // Move to next epos
+        for (uint32_t i=0; i<CAL_DIR_LEN_PER_SECTOR; i++)
+        {
+            set_epos_and_wait(HALL_SECTOR_ANGLE * (j + (float)i/CAL_DIR_LEN_PER_SECTOR), I_setpoint);
+        }
+    }
+    // TODO: Assert all expected sectors covered
+    // Move back to start epos
+    for (uint32_t i=0; i<CAL_DIR_LEN; i++)
+    {
+        set_epos_and_wait(TWOPI * (1.0f - ((float)i/CAL_DIR_LEN)), I_setpoint);
+    }
+    hall_set_sector_map_calibrated();
+    return success;
+}
+
+bool calibrate_offset_and_rectification(void)
 {
     // Size below is an arbitrary large number ie > ECN_SIZE * npp
     int16_t error_ticks[ECN_SIZE * 24];
@@ -169,10 +203,10 @@ bool CalibrateOffsetAndEccentricity(void)
     const float e_pos_to_ticks = ((float)ENCODER_TICKS)/(2 * PI * npp);
     float e_pos_ref = 0.f;
     const float I_setpoint = motor_get_I_cal();
-    Observer_ClearEccentricityTable();
-    int16_t *lut = Observer_GetEccentricityTablePointer();
+    ma7xx_clear_rec_table();
+    int16_t *lut = ma7xx_get_rec_table_ptr();
     wait_a_while();
-    int16_t offset_raw = encoder_get_angle();
+    int16_t offset_raw = ma7xx_get_angle_raw();
     // Perform measuerments, store only mean of F + B error
     for (uint32_t i=0; i<n; i++)
     {
@@ -182,10 +216,10 @@ bool CalibrateOffsetAndEccentricity(void)
             set_epos_and_wait(e_pos_ref, I_setpoint);
         }
         WaitForControlLoopInterrupt();
-        const float pos_meas = Observer_GetPosEstimate();
+        const float pos_meas = observer_get_pos_estimate();
         error_ticks[i] = (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
     }
-    offset_raw = (offset_raw + encoder_get_angle()) / 2;
+    offset_raw = (offset_raw + ma7xx_get_angle_raw()) / 2;
     for (uint32_t i=0; i<n; i++)
     {
         for (uint8_t j=0; j<nconv; j++)
@@ -194,10 +228,11 @@ bool CalibrateOffsetAndEccentricity(void)
             set_epos_and_wait(e_pos_ref, I_setpoint);
         }
         WaitForControlLoopInterrupt();
-        const float pos_meas = Observer_GetPosEstimate();
+        const float pos_meas = observer_get_pos_estimate();
         error_ticks[n-i-1] = (int16_t)(0.5f * ((float)error_ticks[n-i-1] + e_pos_ref * e_pos_to_ticks - pos_meas));
     }
-    GateDriver_SetDutyCycle(&zeroDC);
+    gate_driver_set_duty_cycle(&zeroDC);
+    gate_driver_disable();
 
     // FIR and map measurements to lut
     for (int16_t i=0; i<ECN_SIZE; i++)
@@ -225,7 +260,7 @@ bool CalibrateOffsetAndEccentricity(void)
         lut[write_idx] = (int16_t)acc;
     }
     wait_a_while();
-    Observer_SetEccentricityCalibrated();
+    ma7xx_set_rec_calibrated();
     return true;
 }
 
@@ -236,7 +271,7 @@ static inline void set_epos_and_wait(float angle, float I_setpoint)
 	our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
 	SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),
 		&modulation_values.A, &modulation_values.B, &modulation_values.C);
-	GateDriver_SetDutyCycle(&modulation_values);
+	gate_driver_set_duty_cycle(&modulation_values);
 	WaitForControlLoopInterrupt();
 }
 

@@ -18,6 +18,7 @@
 #include <src/adc/adc.h>
 #include <src/utils/utils.h>
 #include <src/rtt/SEGGER_RTT.h>
+#include <src/controller/controller.h>
 #include <src/system/system.h>
 
 uint8_t error_flags[ERROR_FLAG_MAX_SIZE] = {0};

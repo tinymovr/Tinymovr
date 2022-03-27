@@ -15,140 +15,127 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <string.h>
-#include <src/encoder/encoder.h>
 #include <src/motor/motor.h>
 #include <src/common.h>
 #include <src/utils/utils.h>
+#include <src/system/system.h>
 #include <src/observer/observer.h>
 
-static struct ObserverState state = {0};
+static ObserverState state = {0};
 
-static struct ObserverConfig config = {
+static ObserverConfig config = {
 		.track_bw = 1500.0f,
 		.kp = 0.0f,
 		.ki = 0.0f,
-		.eccentricity_table = {0},
-		.eccentricity_calibrated = 0
 };
 
 void Observer_Init(void)
 {
-    config.kp = 2.0f * config.track_bw;
-    config.ki = 0.25f * (config.kp * config.kp);
-
-	config.sector_half_interval = ENCODER_TICKS * 10;
+    observer_set_bw(config.track_bw);
+	// We keep local copies of a few key variables from
+	// the encoder, because it is faster than calling
+	// the encoder function pointer
+	state.encoder_type = encoder_get_type();
+	state.encoder_ticks = encoder_get_ticks();
+	state.encoder_half_ticks = state.encoder_ticks/2;
 }
 
-PAC5XXX_RAMFUNC void observer_update_estimates(const int16_t raw_pos)
+PAC5XXX_RAMFUNC void observer_update_estimates(void)
 {
-	const int16_t off_1 = config.eccentricity_table[raw_pos>>ECN_BITS];
-	const int16_t off_2 = config.eccentricity_table[((raw_pos>>ECN_BITS) + 1) % ECN_SIZE];
-	const int16_t off_interp = off_1 + ((off_2 - off_1)* (raw_pos - ((raw_pos>>ECN_BITS)<<ECN_BITS))>>ECN_BITS);
-	const int16_t angle_meas = raw_pos + off_interp;
-
+	const int16_t angle_meas = encoder_get_angle();
 	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;
-	const float delta_pos_meas = wrapf_min_max((float)angle_meas - state.pos_estimate, -ENCODER_HALF_TICKS, ENCODER_HALF_TICKS);
+	float delta_pos_meas = angle_meas - state.pos_estimate_wrapped;
+	if (delta_pos_meas < -state.encoder_half_ticks)
+	{
+		delta_pos_meas += state.encoder_ticks;
+	}
+	else if (delta_pos_meas >= state.encoder_half_ticks)
+	{
+		delta_pos_meas -= state.encoder_ticks;
+	}
 	const float delta_pos_error = delta_pos_meas - delta_pos_est;
 	const float incr_pos = delta_pos_est + (PWM_PERIOD_S * config.kp * delta_pos_error);
-	state.pos_estimate += incr_pos;
-	state.pos_estimate_wrapped = wrapf_min_max(state.pos_estimate_wrapped + incr_pos, -ENCODER_HALF_TICKS, ENCODER_HALF_TICKS);
-	if (state.pos_estimate > config.sector_half_interval)
+	state.pos_estimate_wrapped += incr_pos;
+	if (state.pos_estimate_wrapped < 0)
 	{
-		state.pos_estimate -= 2 * config.sector_half_interval;
-		state.pos_sector += 1;
-	}
-	else if (state.pos_estimate < -(config.sector_half_interval) )
-	{
-		state.pos_estimate += 2 * config.sector_half_interval;
+		state.pos_estimate_wrapped += state.encoder_ticks;
 		state.pos_sector -= 1;
+	}
+	else if (state.pos_estimate_wrapped >= state.encoder_ticks)
+	{
+		state.pos_estimate_wrapped -= state.encoder_ticks;
+		state.pos_sector += 1;
 	}
 	state.vel_estimate += PWM_PERIOD_S * config.ki * delta_pos_error;
 }
 
-PAC5XXX_RAMFUNC float Observer_GetFilterBandwidth(void)
+float observer_get_bw(void)
 {
     return config.track_bw;
 }
 
-void Observer_SetFilterBandwidth(float bw)
+void observer_set_bw(float bw)
 {
     if (bw > 0.0f)
     {
         config.track_bw = bw;
+		config.kp = 2.0f * config.track_bw;
+    	config.ki = 0.25f * (config.kp * config.kp);
     }
 }
 
-PAC5XXX_RAMFUNC float Observer_GetPosEstimate(void)
+PAC5XXX_RAMFUNC float observer_get_pos_estimate(void)
 {
-	const float primary = 2 * config.sector_half_interval * state.pos_sector;
-	return primary + state.pos_estimate;
+	const float primary = state.encoder_ticks * state.pos_sector;
+	return primary + state.pos_estimate_wrapped;
 }
 
-PAC5XXX_RAMFUNC float Observer_GetPosDiff(float target)
+PAC5XXX_RAMFUNC float observer_get_diff(float target)
 {
-	const float primary = 2 * config.sector_half_interval * state.pos_sector;
+	const float primary = state.encoder_ticks * state.pos_sector;
 	const float diff_sector = target - primary;
-	return diff_sector - state.pos_estimate;
+	return diff_sector - state.pos_estimate_wrapped;
 }
 
-PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrapped(void)
-{
-	return state.pos_estimate_wrapped;
-}
-
-PAC5XXX_RAMFUNC float Observer_GetPosEstimateWrappedRadians(void)
-{
-	return Observer_GetPosEstimateWrapped() * twopi_by_enc_ticks;
-}
-
-PAC5XXX_RAMFUNC float Observer_GetVelEstimate(void)
+PAC5XXX_RAMFUNC float observer_get_vel_estimate(void)
 {
 	return state.vel_estimate;
 }
 
-PAC5XXX_RAMFUNC float Observer_GetVelEstimateRadians(void)
+PAC5XXX_RAMFUNC float observer_get_epos(void)
 {
-	return Observer_GetVelEstimate() * twopi_by_enc_ticks;
+	if (ENCODER_MA7XX == state.encoder_type)
+	{
+		return state.pos_estimate_wrapped * twopi_by_enc_ticks * motor_get_pole_pairs();
+	}
+	return state.pos_estimate_wrapped * twopi_by_hall_sectors;
+}
+
+PAC5XXX_RAMFUNC float observer_get_evel(void)
+{
+	if (ENCODER_MA7XX == state.encoder_type)
+	{
+		return state.vel_estimate * twopi_by_enc_ticks * motor_get_pole_pairs();
+	}
+	return state.vel_estimate * twopi_by_hall_sectors;
 }
 
 PAC5XXX_RAMFUNC float observer_get_pos_estimate_user_frame(void)
 {
-	return (Observer_GetPosEstimate() - motor_get_user_offset()) * motor_get_user_direction();
+	return (observer_get_pos_estimate() - motor_get_user_offset()) * motor_get_user_direction();
 }
 
 PAC5XXX_RAMFUNC float observer_get_vel_estimate_user_frame(void)
 {
-	return Observer_GetVelEstimate() * motor_get_user_direction();
+	return state.vel_estimate * motor_get_user_direction();
 }
 
-void Observer_ClearEccentricityTable(void)
-{
-    (void)memset(config.eccentricity_table, 0, sizeof(config.eccentricity_table));
-	config.eccentricity_calibrated = false;
-}
-
-void Observer_SetEccentricityCalibrated(void)
-{
-	config.eccentricity_calibrated = true;
-}
-
-int16_t *Observer_GetEccentricityTablePointer(void)
-{
-    return config.eccentricity_table;
-}
-
-PAC5XXX_RAMFUNC bool Observer_Calibrated(void)
-{
-	return config.eccentricity_calibrated;
-}
-
-struct ObserverConfig* Observer_GetConfig(void)
+ObserverConfig* Observer_GetConfig(void)
 {
 	return &config;
 }
 
-void Observer_RestoreConfig(struct ObserverConfig* config_)
+void Observer_RestoreConfig(ObserverConfig* config_)
 {
 	config = *config_;
 }

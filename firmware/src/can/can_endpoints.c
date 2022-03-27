@@ -16,12 +16,13 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <src/common.h>
-#include <src/encoder/encoder.h>
 #include <string.h>
 
 #include <src/system/system.h>
 #include <src/adc/adc.h>
 #include <src/motor/motor.h>
+#include <src/encoder/encoder.h>
+#include <src/encoder/hall.h>
 #include <src/observer/observer.h>
 #include <src/controller/controller.h>
 #include <src/controller/trajectory_planner.h>
@@ -49,13 +50,13 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_SetOffsetAndDirection, 0x008);
     CANEP_AddEndpoint(&CAN_GetEncoderEstimates, 0x009);
     CANEP_AddEndpoint(&CAN_GetSetpoints, 0x00A);
-    // 0x00B AVAIL
-    CANEP_AddEndpoint(&CAN_SetPosSetpoint, 0x00C);
+    CANEP_AddEndpoint(&CAN_GetEncoderConfig, 0x00B);
+    CANEP_AddEndpoint(&CAN_SetPosSetpoint, 0x00C);  
     CANEP_AddEndpoint(&CAN_SetVelSetpoint, 0x00D);
     CANEP_AddEndpoint(&CAN_SetIqSetpoint, 0x00E);
     CANEP_AddEndpoint(&CAN_SetLimits, 0x00F);
     CANEP_AddEndpoint(&CAN_GetPhaseCurrents, 0x010);
-    // 0x011 AVAIL
+    CANEP_AddEndpoint(&CAN_SetEncoderConfig, 0x011); 
     CANEP_AddEndpoint(&CAN_GetIntegratorGains, 0x012);
     CANEP_AddEndpoint(&CAN_SetIntegratorGains, 0x013);
     CANEP_AddEndpoint(&CAN_GetIq, 0x014);
@@ -78,7 +79,7 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_GetSetPosVelIq, 0x026);
     CANEP_AddEndpoint(&CAN_GetMotorRL, 0x027);
     CANEP_AddEndpoint(&CAN_SetMotorRL, 0x028);
-    // 0x029 AVAIL
+    CANEP_AddEndpoint(&CAN_GetHallSectorMap, 0x029);
     // 0x02A AVAIL
     // 0x02B AVAIL
     // 0x02C AVAIL
@@ -225,14 +226,24 @@ uint8_t CAN_GetSetpoints(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     return CANRP_Read;
 }
 
+uint8_t CAN_GetEncoderConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+{
+    const uint8_t enc_type = encoder_get_type();
+    const float bw = observer_get_bw();
+    *buffer_len = sizeof(enc_type) + sizeof(bw);
+    memcpy(&buffer[0], &enc_type, sizeof(uint8_t));
+    memcpy(&buffer[1], &bw, sizeof(bw));
+    return CANRP_Read;
+}
+
 uint8_t CAN_SetPosSetpoint(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
     float pos;
     int16_t vel_ff;
     int16_t Iq_ff;
-    memcpy(&pos, &buffer[0], sizeof(float));
-    memcpy(&vel_ff, &buffer[4], sizeof(int16_t));
-    memcpy(&Iq_ff, &buffer[6], sizeof(int16_t));
+    memcpy(&pos, &buffer[0], sizeof(pos));
+    memcpy(&vel_ff, &buffer[4], sizeof(vel_ff));
+    memcpy(&Iq_ff, &buffer[6], sizeof(Iq_ff));
     float velFF_float = vel_ff * 10.0f;
     float iqFF_float = Iq_ff * 0.01f;
     controller_set_pos_setpoint_user_frame(pos);
@@ -293,6 +304,17 @@ uint8_t CAN_GetPhaseCurrents(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     memcpy(&buffer[2], &IB, sizeof(int16_t));
     memcpy(&buffer[4], &IC, sizeof(int16_t));
     return CANRP_Read;
+}
+
+uint8_t CAN_SetEncoderConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+{
+    uint8_t enc_type;
+    float bw;
+    memcpy(&enc_type, &buffer[0], sizeof(enc_type));
+    memcpy(&bw, &buffer[1], sizeof(bw));
+    encoder_set_type(enc_type); // check done in setter
+    observer_set_bw(bw); // check done in setter
+    return CANRP_Write;
 }
 
 uint8_t CAN_GetIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
@@ -403,13 +425,13 @@ uint8_t CAN_Timings(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 
 uint8_t CAN_SaveConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
-    NVM_SaveConfig();
+    nvm_save_config();
     return CANRP_Write;
 }
 
 uint8_t CAN_EraseConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
-    NVM_Erase();
+    nvm_erase();
     return CANRP_Write;
 }
 
@@ -438,6 +460,7 @@ uint8_t CAN_SetMotorConfig(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     {
         bool is_gimbal = (bool)(flags & 0x1);
         motor_set_is_gimbal(is_gimbal);
+        motor_set_pole_pairs(pole_pairs);
         motor_set_I_cal(I_cal);
         return CANRP_Write;
     }
@@ -568,4 +591,15 @@ uint8_t CAN_GetSetPosVelIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     memcpy(&buffer[4], &vel_ff, sizeof(int16_t));
     memcpy(&buffer[6], &Iq_ff, sizeof(int16_t));
     return CANRP_ReadWrite;
+}
+
+uint8_t CAN_GetHallSectorMap(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+{
+    const uint8_t *sector_map = hall_get_sector_map_ptr();
+	const uint8_t sector = hall_get_sector();
+    
+    *buffer_len = sizeof(uint8_t);
+    memcpy(&buffer[0], sector_map, sizeof(uint8_t) * 7);
+	memcpy(&buffer[8], &sector, sizeof(uint8_t));
+	return CANRP_Read;
 }
