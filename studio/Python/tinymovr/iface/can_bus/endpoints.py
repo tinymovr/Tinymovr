@@ -102,6 +102,7 @@ can_endpoints: Dict[str, Dict] = {
         "type": "r",
         "ep_id": 0x00B,
         "types": (DataType.UINT8, DataType.FLOAT),
+        "units": (None, "radians/second"),
         "labels": ("type", "bandwidth")
     },
     "set_pos_setpoint":
@@ -366,7 +367,7 @@ for velocity-limited plan moves",
     },
     "hall_sector":
     {
-        "description": "`G`et Hall effect sensor sector map and current sector",
+        "description": "Get Hall effect sensor sector map and current sector",
         "type": "r",
         "ep_id": 0x029,
         "types": (DataType.UINT8, DataType.UINT8,
