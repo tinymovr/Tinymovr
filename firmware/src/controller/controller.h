@@ -2,17 +2,17 @@
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
 //  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
-//  * 
-//  * This program is free software: you can redistribute it and/or modify  
-//  * it under the terms of the GNU General Public License as published by  
+//  *
+//  * This program is free software: you can redistribute it and/or modify
+//  * it under the terms of the GNU General Public License as published by
 //  * the Free Software Foundation, version 3.
 //  *
-//  * This program is distributed in the hope that it will be useful, but 
-//  * WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  * This program is distributed in the hope that it will be useful, but
+//  * WITHOUT ANY WARRANTY; without even the implied warranty of
+//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  * General Public License for more details.
 //  *
-//  * You should have received a copy of the GNU General Public License 
+//  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef CONTROLLER_CONTROLLER_H_
@@ -21,25 +21,26 @@
 #include <src/common.h>
 #include <src/controller/trajectory_planner.h>
 
-typedef enum {
-	STATE_IDLE = 0,
-	STATE_CALIBRATE = 1,
+typedef enum
+{
+    STATE_IDLE = 0,
+    STATE_CALIBRATE = 1,
     STATE_CL_CONTROL = 2
 } ControlState;
 
-typedef enum {
-	CTRL_CURRENT = 0,
-	CTRL_VELOCITY = 1,
+typedef enum
+{
+    CTRL_CURRENT = 0,
+    CTRL_VELOCITY = 1,
     CTRL_POSITION = 2,
     CTRL_TRAJECTORY = 3
 } ControlMode;
 
 typedef struct
 {
-	// TODO: State.state is very confusing, name appropriately
-	ControlState state;
+    // TODO: State.state is very confusing, name appropriately
+    ControlState state;
     ControlMode mode;
-    bool is_calibrating;
 
     struct FloatTriplet I_phase_meas;
     struct FloatTriplet modulation_values;
@@ -59,7 +60,7 @@ typedef struct
     float t_plan;
 } ControllerState;
 
-typedef struct 
+typedef struct
 {
     float vel_limit;
     float vel_ramp_limit;
@@ -120,7 +121,7 @@ void controller_set_motion_plan(MotionPlan mp);
 
 PAC5XXX_RAMFUNC void Controller_UpdateCurrentGains(void);
 
-ControllerConfig* Controller_GetConfig(void);
-void Controller_RestoreConfig(ControllerConfig* config_);
+ControllerConfig *Controller_GetConfig(void);
+void Controller_RestoreConfig(ControllerConfig *config_);
 
 #endif /* CONTROLLER_CONTROLLER_H_ */
