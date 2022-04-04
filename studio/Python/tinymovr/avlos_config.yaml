@@ -5,10 +5,17 @@ generators:
   generator_c:
     enabled: true
     paths:
-      output_header: ../../../firmware/src/can/endpoints.h
-      output_impl: ../../../firmware/src/can/endpoints.c
-    c_includes:
+      output_header: ../../../firmware/src/can/can_endpoints.h
+      output_impl: ../../../firmware/src/can/can_endpoints.c
+    c_header_includes:
     - src/common.h
+    c_impl_includes:
+    - src/system/system.h
+    - src/encoder/encoder.h
+    - src/observer/observer.h
+    - src/motor/motor.h
+    - src/controller/controller.h
+    - src/nvm/nvm.h
   generator_rst:
     enabled: true
     paths:

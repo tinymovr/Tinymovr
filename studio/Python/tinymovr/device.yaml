@@ -1,40 +1,51 @@
 
 name: tm
 remote_attributes:
-  - name: sn
+  - name: uid
     dtype: uint32
-    c_getter: system_get_sn
-    description: Retrieve the unique device serial number.
+    c_getter: system_get_uid
+    description: Retrieves the unique device ID.
   - name: Vbus
     dtype: float
     unit: volt
     c_getter: system_get_vbus
-    description: Retrieve the bus voltage.
+    description: Retrieves the bus voltage.
   - name: motor
     remote_attributes:
-    - name: R
-      dtype: float
-      unit: ohm
-      c_getter: motor_get_R
-      c_setter: motor_set_R
-      description: Access the motor Resistance value.
-    - name: L
-      dtype: float
-      unit: henry
-      c_getter: motor_get_L
-      c_setter: motor_set_L
-      description: Access the motor Inductance value.
+      - name: R
+        dtype: float
+        unit: ohm
+        c_getter: motor_get_R
+        c_setter: motor_set_R
+        description: Accesses the motor Resistance value.
+      - name: L
+        dtype: float
+        unit: henry
+        c_getter: motor_get_L
+        c_setter: motor_set_L
+        description: Accesses the motor Inductance value.
+      - name: pole_pairs
+        dtype: uint8
+        c_getter: motor_get_pole_pairs
+        c_setter: motor_set_pole_pairs
+        description: Accesses the motor pole pair count.
+      - name: type
+        #values: [HIGH_CURRENT, GIMBAL]
+        dtype: uint8
+        c_getter: motor_get_type
+        c_setter: motor_set_type
+        description: Accesses the motor type.
   - name: encoder
     remote_attributes:
-    - name: position_estimate
-      dtype: float
-      unit: ticks
-      c_getter: encoder_get_pos_estimate
-      description: Retrieve the encoder position estimate.
-    - name: bandwidth
-      dtype: float
-      unit: rad/s
-      c_getter: encoder_get_bandwidth
-      c_setter: encoder_set_bandwidth
-      description: Access the encoder observer bandwidth.
+      - name: position_estimate
+        dtype: float
+        unit: ticks
+        c_getter: encoder_get_pos_estimate
+        description: Retrieves the encoder position estimate.
+      - name: bandwidth
+        dtype: float
+        unit: rad/s
+        c_getter: encoder_get_bandwidth
+        c_setter: encoder_set_bandwidth
+        description: Accesses the encoder observer bandwidth.
 
