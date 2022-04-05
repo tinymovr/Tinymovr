@@ -2,17 +2,17 @@
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
 //  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
-//  * 
-//  * This program is free software: you can redistribute it and/or modify  
-//  * it under the terms of the GNU General Public License as published by  
+//  *
+//  * This program is free software: you can redistribute it and/or modify
+//  * it under the terms of the GNU General Public License as published by
 //  * the Free Software Foundation, version 3.
 //  *
-//  * This program is distributed in the hope that it will be useful, but 
-//  * WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  * This program is distributed in the hope that it will be useful, but
+//  * WITHOUT ANY WARRANTY; without even the implied warranty of
+//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  * General Public License for more details.
 //  *
-//  * You should have received a copy of the GNU General Public License 
+//  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <src/adc/adc.h>
@@ -31,10 +31,10 @@ void system_init(void)
     PAC55XX_MEMCTL->FLASHLOCK = FLASH_LOCK_ALLOW_WRITE_MEMCTL;
 
     // Turn on Flache Cache
-    PAC55XX_MEMCTL->MEMCTL.CACHEDIS = 0;                        //Enable Flash CACHE
+    PAC55XX_MEMCTL->MEMCTL.CACHEDIS = 0; // Enable Flash CACHE
 
     // Always make sure MCLK is set to use ROSC CLK when making changes to FRCLK, SCLK, or HCLK
-    PAC55XX_MEMCTL->MEMCTL.MCLKSEL = MEMCTL_MCLK_ROSCCLK;       // MCLK = ROSCCLK
+    PAC55XX_MEMCTL->MEMCTL.MCLKSEL = MEMCTL_MCLK_ROSCCLK; // MCLK = ROSCCLK
 
     // Select SCLK = FRCLK before making changes to FRCLK or PLLCLK
     PAC55XX_SCC->CCSCTL.SCLKMUXSEL = CCSCTL_SCLK_FRCLK;
@@ -42,19 +42,19 @@ void system_init(void)
     // Select 4 MHz CLKREF for Free Running Clock FRCLK
     PAC55XX_SCC->CCSCTL.FRCLKMUXSEL = CCSCTL_CLKIN_CLKREF;
 
-    pac5xxx_sys_pll_config_enable(4, 300, 0);                   // PLLCLK = 300 MHz = (4/4 * 300) /1
+    pac5xxx_sys_pll_config_enable(4, 300, 0); // PLLCLK = 300 MHz = (4/4 * 300) /1
 
     // Configure SCLK=PLLCLK=300 MHz, HCLK=150 MHz, PCLK=150 MHz, ACLK=300 MHz and WaitStates;  Use default PCLKDIV=1
-    PAC55XX_SCC->CCSCTL.HCLKDIV = CCSCTL_HCLKDIV_DIV2;          // HCLK = 150 MHz = SCLK/2; when SCLK = PLLCLK
+    PAC55XX_SCC->CCSCTL.HCLKDIV = CCSCTL_HCLKDIV_DIV2; // HCLK = 150 MHz = SCLK/2; when SCLK = PLLCLK
     PAC55XX_SCC->CCSCTL.ACLKDIV = CCSCTL_ACLKDIV_DIV1;
-    PAC55XX_MEMCTL->MEMCTL.WSTATE = 5 + 1;                      // Flash = 150/25 = 6 clocks = 5 WS; So, need 5 + 1 Extra WS
-    PAC55XX_SCC->CCSCTL.SCLKMUXSEL = CCSCTL_SCLK_PLLCLK;        // SCLK = PLLCLK
+    PAC55XX_MEMCTL->MEMCTL.WSTATE = 5 + 1;               // Flash = 150/25 = 6 clocks = 5 WS; So, need 5 + 1 Extra WS
+    PAC55XX_SCC->CCSCTL.SCLKMUXSEL = CCSCTL_SCLK_PLLCLK; // SCLK = PLLCLK
 
     // Set MCLK for Flash write & erase in addition to read
-    PAC55XX_MEMCTL->MEMCTL.MCLKDIV = MEMCTL_MCLK_DIV5;          // MCLK will = HCLK/5 when MCLKSEL = MEMCTL_MCLK_HCLKDIV
-    PAC55XX_MEMCTL->MEMCTL.MCLKSEL = MEMCTL_MCLK_HCLKDIV;       // MCLK = HCLK/5 = 30 MHz; allows reading and writing of Flash
+    PAC55XX_MEMCTL->MEMCTL.MCLKDIV = MEMCTL_MCLK_DIV5;    // MCLK will = HCLK/5 when MCLKSEL = MEMCTL_MCLK_HCLKDIV
+    PAC55XX_MEMCTL->MEMCTL.MCLKSEL = MEMCTL_MCLK_HCLKDIV; // MCLK = HCLK/5 = 30 MHz; allows reading and writing of Flash
 
-    PAC55XX_MEMCTL->FLASHLOCK = 0;                              // Disallow write access to MEMCTL
+    PAC55XX_MEMCTL->FLASHLOCK = 0; // Disallow write access to MEMCTL
 
     // Enable GPIO Input clock synchronization; should always be enabled, especially when using GPIO edge based interrupts
     PAC55XX_GPIOA->CLKSYNC.w = 0xFF;
@@ -73,7 +73,7 @@ void system_init(void)
     // System Configuration Power Options
     // Vp = 10V , 440mA-540mA, Charge Pump Enable
     pac5xxx_tile_register_write(ADDR_SYSCONF, 0x01);
-    
+
     // Configure reporting of mcu cycles
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
     DWT->CYCCNT = 0;
@@ -86,7 +86,7 @@ void system_init(void)
 void system_reset(void)
 {
     pac5xxx_tile_register_write(ADDR_WATCHDOG,
-        pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
+                                pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
 }
 
 PAC5XXX_RAMFUNC bool error_flags_exist(void)
@@ -94,7 +94,7 @@ PAC5XXX_RAMFUNC bool error_flags_exist(void)
     return error_count > 0u;
 }
 
-PAC5XXX_RAMFUNC uint8_t* get_error_flags(void)
+PAC5XXX_RAMFUNC uint8_t *get_error_flags(void)
 {
     return error_flags;
 }
@@ -123,7 +123,7 @@ PAC5XXX_RAMFUNC void add_error_flag(uint8_t flag)
 
 PAC5XXX_RAMFUNC bool health_check(void)
 {
-    const float VBus = ADC_GetVBus();
+    const float VBus = adc_get_Vbus();
     bool success = true;
     if (VBus < VBUS_LOW_THRESHOLD)
     {
@@ -135,25 +135,29 @@ PAC5XXX_RAMFUNC bool health_check(void)
 
 void printUsageErrorMsg(uint32_t CFSRValue)
 {
-	SEGGER_RTT_WriteString(0, "Usage fault: ");
-	CFSRValue >>= 16;                  // right shift to lsb
-	if((CFSRValue & (1 << 9)) != 0) {
-		SEGGER_RTT_WriteString(0, "Divide by zero\r\n");
-	}
+    SEGGER_RTT_WriteString(0, "Usage fault: ");
+    CFSRValue >>= 16; // right shift to lsb
+    if ((CFSRValue & (1 << 9)) != 0)
+    {
+        SEGGER_RTT_WriteString(0, "Divide by zero\r\n");
+    }
 }
 
 void HardFault_Handler(void)
 {
-	SEGGER_RTT_WriteString(0, "In Hard Fault Handler\r\n");
-	SEGGER_RTT_printf(0, "SCB->HFSR = 0x%08x\r\n", SCB->HFSR);
-	if ((SCB->HFSR & (1 << 30)) != 0) {
-		SEGGER_RTT_WriteString(0, "Forced Hard Fault\r\n");
-		SEGGER_RTT_printf(0, "SCB->CFSR = 0x%08x\r\n", SCB->CFSR );
-		if((SCB->CFSR & 0xFFFF0000) != 0) {
-			printUsageErrorMsg(SCB->CFSR);
-		}
-	}
-	__ASM volatile("BKPT #01");
-	while(1)
-	{};
+    SEGGER_RTT_WriteString(0, "In Hard Fault Handler\r\n");
+    SEGGER_RTT_printf(0, "SCB->HFSR = 0x%08x\r\n", SCB->HFSR);
+    if ((SCB->HFSR & (1 << 30)) != 0)
+    {
+        SEGGER_RTT_WriteString(0, "Forced Hard Fault\r\n");
+        SEGGER_RTT_printf(0, "SCB->CFSR = 0x%08x\r\n", SCB->CFSR);
+        if ((SCB->CFSR & 0xFFFF0000) != 0)
+        {
+            printUsageErrorMsg(SCB->CFSR);
+        }
+    }
+    __ASM volatile("BKPT #01");
+    while (1)
+    {
+    };
 }

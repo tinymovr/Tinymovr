@@ -35,8 +35,6 @@ static CANConfig config = {
 
 void CAN_init(void)
 {
-    CANEP_InitEndpointMap();
-
 #if defined(BOARD_REV_M1)
     // Configure PD7 as GPIO output
     PAC55XX_GPIOD->MODE.P7 = IO_PUSH_PULL_OUTPUT; // GPIO configured as an output
@@ -144,8 +142,8 @@ void CAN_process_interrupt(void)
     {
         uint8_t (*callback)(uint8_t buffer[], uint8_t * buffer_length, Avlos_Command cmd) = avlos_endpoints[command_id];
         uint8_t can_msg_buffer[8];
-        memcpy(can_msg_buffer, &rx_data, data_length, (uint8_t)rtr);
-        uint8_t response_type = callback(can_msg_buffer, &data_length);
+        memcpy(can_msg_buffer, &rx_data, data_length);
+        uint8_t response_type = callback(can_msg_buffer, &data_length, (uint8_t)rtr);
         if (AVLOS_RET_READ == response_type)
         {
             can_transmit(data_length, (config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);

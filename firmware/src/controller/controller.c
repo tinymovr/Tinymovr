@@ -2,17 +2,17 @@
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
 //  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
-//  * 
-//  * This program is free software: you can redistribute it and/or modify  
-//  * it under the terms of the GNU General Public License as published by  
+//  *
+//  * This program is free software: you can redistribute it and/or modify
+//  * it under the terms of the GNU General Public License as published by
 //  * the Free Software Foundation, version 3.
 //  *
-//  * This program is distributed in the hope that it will be useful, but 
-//  * WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  * This program is distributed in the hope that it will be useful, but
+//  * WITHOUT ANY WARRANTY; without even the implied warranty of
+//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  * General Public License for more details.
 //  *
-//  * You should have received a copy of the GNU General Public License 
+//  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "src/system/system.h"
@@ -29,7 +29,7 @@
 PAC5XXX_RAMFUNC void CLControlStep(void);
 PAC5XXX_RAMFUNC void IdleStep(void);
 PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
-    float vel_gain, float *I);
+                                                            float vel_gain, float *I);
 
 static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 static MotionPlan motion_plan;
@@ -54,10 +54,9 @@ static ControllerState state = {
     .Iq_integrator_Vq = 0.0f,
     .Id_integrator_Vd = 0.0f,
 
-    .t_plan = 0.0f
-};
+    .t_plan = 0.0f};
 
-static ControllerConfig config ={
+static ControllerConfig config = {
 
     .vel_limit = 300000.0f,
     .I_limit = 10.0f,
@@ -70,49 +69,48 @@ static ControllerConfig config ={
     .I_gain = 0.0f,
     .Iq_integrator_gain = 0.0f,
     .Id_integrator_gain = 0.0f,
-    .I_k = 0.3f
-};
+    .I_k = 0.3f};
 
 void Controller_ControlLoop(void)
 {
-	while (true)
-	{
-		health_check();
-		const float Iq = controller_get_Iq_estimate();
-		if ( (Iq > (config.I_limit * I_TRIP_MARGIN)) ||
-					  (Iq < -(config.I_limit * I_TRIP_MARGIN)) )
-		{
-			add_error_flag(ERROR_OVERCURRENT);
-		}
-		if (error_flags_exist() && (state.state != STATE_IDLE))
-		{
-			Controller_SetState(STATE_IDLE);
-		}
+    while (true)
+    {
+        health_check();
+        const float Iq = controller_get_Iq_estimate();
+        if ((Iq > (config.I_limit * I_TRIP_MARGIN)) ||
+            (Iq < -(config.I_limit * I_TRIP_MARGIN)))
+        {
+            add_error_flag(ERROR_OVERCURRENT);
+        }
+        if (error_flags_exist() && (state.state != STATE_IDLE))
+        {
+            Controller_SetState(STATE_IDLE);
+        }
 
-		if (state.state == STATE_CALIBRATE)
-		{
-			state.is_calibrating = true;
+        if (state.state == STATE_CALIBRATE)
+        {
+            state.is_calibrating = true;
             if (ENCODER_MA7XX == encoder_get_type())
             {
-                (void) ((CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && calibrate_offset_and_rectification());
+                (void)((CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && calibrate_offset_and_rectification());
             }
             else if (ENCODER_HALL == encoder_get_type())
             {
-                (void) ((CalibrateResistance() && CalibrateInductance()) && calibrate_hall_sequence());
+                (void)((CalibrateResistance() && CalibrateInductance()) && calibrate_hall_sequence());
             }
-			state.is_calibrating = false;
-			Controller_SetState(STATE_IDLE);
-		}
-		else if (state.state == STATE_CL_CONTROL)
-		{
-			CLControlStep();
-		}
-		else
-		{
-			IdleStep();
-		}
-		WaitForControlLoopInterrupt();
-	}
+            state.is_calibrating = false;
+            Controller_SetState(STATE_IDLE);
+        }
+        else if (state.state == STATE_CL_CONTROL)
+        {
+            CLControlStep();
+        }
+        else
+        {
+            IdleStep();
+        }
+        WaitForControlLoopInterrupt();
+    }
 }
 
 PAC5XXX_RAMFUNC void CLControlStep(void)
@@ -123,7 +121,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         // This will set state.pos_setpoint state.vel_setpoint (in user frame)
         if (!planner_evaluate(state.t_plan, &motion_plan))
         {
-        	// Drop to position mode on error or completion
+            // Drop to position mode on error or completion
             Controller_SetMode(CTRL_POSITION);
             state.t_plan = 0;
         }
@@ -134,7 +132,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     // around the position setpoint, where the integrator "sees" no error
     float vel_setpoint = state.vel_setpoint;
     float vel_setpoint_integrator = state.vel_setpoint;
-    
+
     if (state.mode >= CTRL_POSITION)
     {
         const float delta_pos = observer_get_diff(state.pos_setpoint);
@@ -159,7 +157,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     {
         state.vel_integrator_Iq = 0.0f;
     }
-    
+
     // Velocity-dependent current limiting
     const float vel_limit = our_fminf(config.vel_limit, VEL_HARD_LIMIT);
     if (Controller_LimitVelocity(-vel_limit, vel_limit, vel_estimate, config.vel_gain, &Iq_setpoint) == true)
@@ -177,13 +175,14 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     const float e_phase = observer_get_epos();
     const float c_I = fast_cos(e_phase);
     const float s_I = fast_sin(e_phase);
-    const float VBus = ADC_GetVBus();
+    const float VBus = adc_get_Vbus();
 
-    float Vd; float Vq;
+    float Vd;
+    float Vq;
     if (motor_is_gimbal() == true)
     {
-    	const float e_phase_vel = observer_get_evel();
-        Vd = - e_phase_vel * motor_get_phase_inductance() * Iq_setpoint;
+        const float e_phase_vel = observer_get_evel();
+        Vd = -e_phase_vel * motor_get_phase_inductance() * Iq_setpoint;
         Vq = motor_get_phase_resistance() * Iq_setpoint;
     }
     else
@@ -210,7 +209,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         Vd = (delta_Id * config.I_gain) + state.Id_integrator_Vd;
         Vq = (delta_Iq * config.I_gain) + state.Iq_integrator_Vq;
     }
-    
+
     float mod_q = Vq / VBus;
     float mod_d = Vd / VBus;
 
@@ -236,7 +235,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
 
 PAC5XXX_RAMFUNC void IdleStep(void)
 {
-    //pass
+    // pass
 }
 
 PAC5XXX_RAMFUNC ControlState Controller_GetState(void)
@@ -246,55 +245,53 @@ PAC5XXX_RAMFUNC ControlState Controller_GetState(void)
 
 PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
 {
-	if ((new_state != state.state) && (state.is_calibrating == false))
-	{
-		if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE)
-				&& (!error_flags_exist()) && motor_is_calibrated())
-		{
-			state.pos_setpoint = observer_get_pos_estimate();
-			gate_driver_enable();
-			state.state = STATE_CL_CONTROL;
-		}
-		else if ((new_state == STATE_CALIBRATE) && (state.state == STATE_IDLE)
-				&& (!error_flags_exist()))
-		{
-			gate_driver_enable();
-			state.state = STATE_CALIBRATE;
-		}
-		else // state != STATE_IDLE --> Got to idle state anyway
-		{
-			gate_driver_set_duty_cycle(&zeroDC);
-			gate_driver_disable();
-			state.state = STATE_IDLE;
-		}
-	}
+    if ((new_state != state.state) && (state.is_calibrating == false))
+    {
+        if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE) && (!error_flags_exist()) && motor_is_calibrated())
+        {
+            state.pos_setpoint = observer_get_pos_estimate();
+            gate_driver_enable();
+            state.state = STATE_CL_CONTROL;
+        }
+        else if ((new_state == STATE_CALIBRATE) && (state.state == STATE_IDLE) && (!error_flags_exist()))
+        {
+            gate_driver_enable();
+            state.state = STATE_CALIBRATE;
+        }
+        else // state != STATE_IDLE --> Got to idle state anyway
+        {
+            gate_driver_set_duty_cycle(&zeroDC);
+            gate_driver_disable();
+            state.state = STATE_IDLE;
+        }
+    }
 }
 
 PAC5XXX_RAMFUNC ControlMode Controller_GetMode(void)
 {
-	return state.mode;
+    return state.mode;
 }
 
 PAC5XXX_RAMFUNC void Controller_SetMode(ControlMode new_mode)
 {
     if (new_mode != state.mode)
     {
-		if (new_mode == CTRL_TRAJECTORY)
-		{
-			state.mode = CTRL_TRAJECTORY;
-		}
-		else if (new_mode == CTRL_POSITION)
-		{
-			state.mode = CTRL_POSITION;
-		}
-		else if (new_mode == CTRL_VELOCITY)
-		{
-			state.mode = CTRL_VELOCITY;
-		}
-		else if (new_mode == CTRL_CURRENT)
-		{
-			state.mode = CTRL_CURRENT;
-		}
+        if (new_mode == CTRL_TRAJECTORY)
+        {
+            state.mode = CTRL_TRAJECTORY;
+        }
+        else if (new_mode == CTRL_POSITION)
+        {
+            state.mode = CTRL_POSITION;
+        }
+        else if (new_mode == CTRL_VELOCITY)
+        {
+            state.mode = CTRL_VELOCITY;
+        }
+        else if (new_mode == CTRL_CURRENT)
+        {
+            state.mode = CTRL_CURRENT;
+        }
     }
 }
 
@@ -305,7 +302,7 @@ PAC5XXX_RAMFUNC float controller_get_pos_setpoint_user_frame(void)
 
 PAC5XXX_RAMFUNC void controller_set_pos_setpoint_user_frame(float value)
 {
-	// direction is either 1 or -1 so we can multiply instead of divide
+    // direction is either 1 or -1 so we can multiply instead of divide
     state.pos_setpoint = value * motor_get_user_direction() + motor_get_user_offset();
 }
 
@@ -316,7 +313,7 @@ PAC5XXX_RAMFUNC float controller_get_vel_setpoint_user_frame(void)
 
 PAC5XXX_RAMFUNC void controller_set_vel_setpoint_user_frame(float value)
 {
-	// direction is either 1 or -1 so we can multiply instead of divide
+    // direction is either 1 or -1 so we can multiply instead of divide
     state.vel_setpoint = value * motor_get_user_direction();
 }
 
@@ -337,17 +334,17 @@ PAC5XXX_RAMFUNC void controller_set_Iq_setpoint(float value)
 
 PAC5XXX_RAMFUNC float controller_get_Iq_estimate_user_frame(void)
 {
-	return state.Iq_meas * motor_get_user_direction();
+    return state.Iq_meas * motor_get_user_direction();
 }
 
 PAC5XXX_RAMFUNC float controller_get_Iq_setpoint_user_frame(void)
 {
-	return state.Iq_setpoint * motor_get_user_direction();
+    return state.Iq_setpoint * motor_get_user_direction();
 }
 
 PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value)
 {
-	state.Iq_setpoint = value * motor_get_user_direction();
+    state.Iq_setpoint = value * motor_get_user_direction();
 }
 
 void Controller_GetModulationValues(struct FloatTriplet *dc)
@@ -460,18 +457,18 @@ void controller_set_motion_plan(MotionPlan mp)
     state.t_plan = 0.0f;
 }
 
-ControllerConfig* Controller_GetConfig(void)
+ControllerConfig *Controller_GetConfig(void)
 {
     return &config;
 }
 
-void Controller_RestoreConfig(ControllerConfig* config_)
+void Controller_RestoreConfig(ControllerConfig *config_)
 {
     config = *config_;
 }
 
 static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
-    float vel_gain, float *I)
+                                            float vel_gain, float *I)
 {
     float Imax = (max_limit - vel_estimate) * vel_gain;
     float Imin = (min_limit - vel_estimate) * vel_gain;

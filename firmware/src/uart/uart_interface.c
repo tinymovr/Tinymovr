@@ -2,17 +2,17 @@
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
 //  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
-//  * 
-//  * This program is free software: you can redistribute it and/or modify  
-//  * it under the terms of the GNU General Public License as published by  
+//  *
+//  * This program is free software: you can redistribute it and/or modify
+//  * it under the terms of the GNU General Public License as published by
 //  * the Free Software Foundation, version 3.
 //  *
-//  * This program is distributed in the hope that it will be useful, but 
-//  * WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  * This program is distributed in the hope that it will be useful, but
+//  * WITHOUT ANY WARRANTY; without even the implied warranty of
+//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  * General Public License for more details.
 //  *
-//  * You should have received a copy of the GNU General Public License 
+//  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "string.h"
@@ -28,80 +28,79 @@
 #include "src/uart/uart_lowlevel.h"
 #include "src/uart/uart_interface.h"
 
-
 void UART_WriteAddr(uint8_t addr, int32_t data)
 {
     switch (addr)
     {
-        case 'P': // pos setpoint
-            controller_set_Iq_setpoint_user_frame(0);
-            controller_set_vel_setpoint_user_frame(0);
-            controller_set_pos_setpoint_user_frame(data);
-            Controller_SetMode(CTRL_POSITION);
+    case 'P': // pos setpoint
+        controller_set_Iq_setpoint_user_frame(0);
+        controller_set_vel_setpoint_user_frame(0);
+        controller_set_pos_setpoint_user_frame(data);
+        Controller_SetMode(CTRL_POSITION);
         break;
 
-        case 'V': // vel setpoint
-            controller_set_Iq_setpoint_user_frame(0);
-            controller_set_vel_setpoint_user_frame(data);
-            Controller_SetMode(CTRL_VELOCITY);
-            controller_set_vel_setpoint_user_frame((float)data);
+    case 'V': // vel setpoint
+        controller_set_Iq_setpoint_user_frame(0);
+        controller_set_vel_setpoint_user_frame(data);
+        Controller_SetMode(CTRL_VELOCITY);
+        controller_set_vel_setpoint_user_frame((float)data);
         break;
 
-        case 'I': // current setpoint
-            Controller_SetMode(CTRL_CURRENT);
-            controller_set_Iq_setpoint_user_frame((float)data * ONE_OVER_UART_I_SCALING_FACTOR);
+    case 'I': // current setpoint
+        Controller_SetMode(CTRL_CURRENT);
+        controller_set_Iq_setpoint_user_frame((float)data * ONE_OVER_UART_I_SCALING_FACTOR);
         break;
 
-        case 'G': // velocity integrator gain
-            Controller_SetVelIntegratorGain((float)data * ONE_OVER_UART_VEL_INT_SCALING_FACTOR);
+    case 'G': // velocity integrator gain
+        Controller_SetVelIntegratorGain((float)data * ONE_OVER_UART_VEL_INT_SCALING_FACTOR);
         break;
 
-        case 'Y': // Position gain 
-            Controller_SetPosGain(data);
+    case 'Y': // Position gain
+        Controller_SetPosGain(data);
         break;
 
-        case 'F': // Velocity gain
-            Controller_SetVelGain(data * ONE_OVER_UART_VEL_GAIN_SCALING_FACTOR);
+    case 'F': // Velocity gain
+        Controller_SetVelGain(data * ONE_OVER_UART_VEL_GAIN_SCALING_FACTOR);
         break;
 
-        case 'H': // phase resistance
-            motor_set_phase_resistance((float)data * ONE_OVER_UART_R_SCALING_FACTOR);
+    case 'H': // phase resistance
+        motor_set_phase_resistance((float)data * ONE_OVER_UART_R_SCALING_FACTOR);
         break;
 
-        case 'L': // phase inductance
-            motor_set_phase_inductance((float)data * ONE_OVER_UART_L_SCALING_FACTOR);
+    case 'L': // phase inductance
+        motor_set_phase_inductance((float)data * ONE_OVER_UART_L_SCALING_FACTOR);
         break;
 
-        case 'M': // Set is motor gimbal?
-            motor_set_is_gimbal((bool)data);
-        break;
-        
-        case 'U': // CAN Baud Rate
-            CAN_set_kbit_rate((uint16_t)data);
+    case 'M': // Set is motor gimbal?
+        motor_set_is_gimbal((bool)data);
         break;
 
-        case 'C': // CAN ID
-            CAN_set_ID((uint8_t)data);
+    case 'U': // CAN Baud Rate
+        CAN_set_kbit_rate((uint16_t)data);
         break;
 
-        case '<': // Max Decel
-        	planner_set_max_decel((float)data);
-		break;
+    case 'C': // CAN ID
+        CAN_set_ID((uint8_t)data);
+        break;
 
-        case '>': // Max Accel
-        	planner_set_max_accel((float)data);
-		break;
+    case '<': // Max Decel
+        planner_set_max_decel((float)data);
+        break;
 
-        case '^': // Max Vel
-			planner_set_max_vel((float)data);
-		break;
+    case '>': // Max Accel
+        planner_set_max_accel((float)data);
+        break;
 
-        case 'T': // Plan trajectory
-        	planner_move_to_vlimit((float)data);
-		break;
+    case '^': // Max Vel
+        planner_set_max_vel((float)data);
+        break;
 
-        default:
-            // No action
+    case 'T': // Plan trajectory
+        planner_move_to_vlimit((float)data);
+        break;
+
+    default:
+        // No action
         break;
     }
 }
@@ -111,99 +110,100 @@ int32_t UART_ReadAddr(uint8_t addr)
     int32_t ret_val = 0;
     switch (addr)
     {
-        case 'b': // vbus value
-            ret_val = (int32_t)(ADC_GetVBus() * UART_V_SCALING_FACTOR);
+    case 'b': // vbus value
+        ret_val = (int32_t)(adc_get_Vbus() * UART_V_SCALING_FACTOR);
         break;
 
-        case 'e': // controller error
-            {uint8_t *error_flags = get_error_flags();
-            memcpy(&ret_val, error_flags, sizeof(uint32_t));}
+    case 'e': // controller error
+    {
+        uint8_t *error_flags = get_error_flags();
+        memcpy(&ret_val, error_flags, sizeof(uint32_t));
+    }
+    break;
+
+    case 'p': // pos estimate
+        ret_val = observer_get_pos_estimate_user_frame();
         break;
 
-        case 'p': // pos estimate
-            ret_val = observer_get_pos_estimate_user_frame();
+    case 'P': // pos setpoint
+        ret_val = controller_get_pos_setpoint_user_frame();
         break;
 
-        case 'P': // pos setpoint
-            ret_val = controller_get_pos_setpoint_user_frame();
+    case 'v': // vel estimate
+        ret_val = (int32_t)observer_get_vel_estimate_user_frame();
         break;
 
-        case 'v': // vel estimate
-            ret_val = (int32_t)observer_get_vel_estimate_user_frame();
+    case 'V': // vel setpoint
+        ret_val = (int32_t)controller_get_vel_setpoint_user_frame();
         break;
 
-        case 'V': // vel setpoint
-            ret_val = (int32_t)controller_get_vel_setpoint_user_frame();
+    case 'i': // current estimate
+        ret_val = (int32_t)(controller_get_Iq_estimate_user_frame() * UART_I_SCALING_FACTOR);
         break;
 
-        case 'i': // current estimate
-            ret_val = (int32_t)(controller_get_Iq_estimate_user_frame() * UART_I_SCALING_FACTOR);
+    case 'I': // current setpoint
+        ret_val = (int32_t)(controller_get_Iq_setpoint_user_frame() * UART_I_SCALING_FACTOR);
         break;
 
-        case 'I': // current setpoint
-            ret_val = (int32_t)(controller_get_Iq_setpoint_user_frame() * UART_I_SCALING_FACTOR);
+    case 'G': // velocity integrator setpoint
+        ret_val = (int32_t)(Controller_GetVelIntegratorGain() * UART_VEL_INT_SCALING_FACTOR);
         break;
 
-        case 'G': // velocity integrator setpoint
-            ret_val = (int32_t)(Controller_GetVelIntegratorGain() * UART_VEL_INT_SCALING_FACTOR);
+    case 'H': // phase resistance
+        ret_val = motor_get_phase_resistance() * UART_R_SCALING_FACTOR;
         break;
 
-        case 'H': // phase resistance
-            ret_val = motor_get_phase_resistance() * UART_R_SCALING_FACTOR;
+    case 'L': // phase inductance
+        ret_val = motor_get_phase_inductance() * UART_L_SCALING_FACTOR;
         break;
 
-        case 'L': // phase inductance
-            ret_val = motor_get_phase_inductance() * UART_L_SCALING_FACTOR;
+    case 'U': // CAN Baud Rate
+        ret_val = CAN_get_kbit_rate();
         break;
 
-        case 'U': // CAN Baud Rate
-            ret_val = CAN_get_kbit_rate();
+    case 'C': // CAN ID
+        ret_val = CAN_get_ID();
         break;
 
-        case 'C': // CAN ID
-            ret_val = CAN_get_ID();
+    case 'M': // Is motor gimbal?
+        ret_val = motor_is_gimbal();
         break;
 
-        case 'M': // Is motor gimbal?
-            ret_val = motor_is_gimbal();
+    case 'Y': //
+        ret_val = Controller_GetPosGain();
         break;
 
-        case 'Y': // 
-            ret_val = Controller_GetPosGain();
+    case 'F': //
+        ret_val = Controller_GetVelGain() * UART_VEL_GAIN_SCALING_FACTOR;
         break;
 
-        case 'F': // 
-            ret_val = Controller_GetVelGain() * UART_VEL_GAIN_SCALING_FACTOR;
+    case 'Q': // calibrate
+        Controller_SetState(STATE_CALIBRATE);
         break;
 
-        case 'Q': // calibrate
-            Controller_SetState(STATE_CALIBRATE);
+    case 'A': // closed loop
+        Controller_SetState(STATE_CL_CONTROL);
         break;
 
-        case 'A': // closed loop
-            Controller_SetState(STATE_CL_CONTROL);
+    case 'Z': // idle
+        Controller_SetState(STATE_IDLE);
         break;
 
-        case 'Z': // idle
-            Controller_SetState(STATE_IDLE);
+    case 'R': // reset mcu
+        system_reset();
         break;
 
-        case 'R': // reset mcu
-            system_reset();
+    case 'S': // save config
+        nvm_save_config();
         break;
 
-        case 'S': // save config
-            nvm_save_config();
+    case 'X': // erase config
+        nvm_erase();
         break;
 
-        case 'X': // erase config
-            nvm_erase();
+    default:
+        // No action
         break;
-
-        default:
-            // No action
-        break;
-
     }
     return ret_val;
 }
@@ -237,7 +237,7 @@ void UART_ProcessMessage(void)
 void UART_SendInt32(int32_t val)
 {
     (void)itoa(val, uart_tx_msg, 10);
-    for (uint8_t i=0; i<UART_BYTE_LIMIT; i++)
+    for (uint8_t i = 0; i < UART_BYTE_LIMIT; i++)
     {
         if (uart_tx_msg[i] == '\0')
         {

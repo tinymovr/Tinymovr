@@ -8,7 +8,7 @@ remote_attributes:
   - name: Vbus
     dtype: float
     unit: volt
-    c_getter: system_get_vbus
+    c_getter: adc_get_Vbus
     description: Retrieves the bus voltage.
   - name: motor
     remote_attributes:
