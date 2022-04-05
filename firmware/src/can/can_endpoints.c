@@ -24,7 +24,7 @@ uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len) { const uint32_t 
 uint8_t avlos_tm_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     uint32_t v;
-    if (AVLOS_DIR_READ == cmd) {
+    if (AVLOS_CMD_READ == cmd) {
         v = system_get_uid();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
@@ -36,7 +36,7 @@ uint8_t avlos_tm_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 uint8_t avlos_tm_Vbus(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     float v;
-    if (AVLOS_DIR_READ == cmd) {
+    if (AVLOS_CMD_READ == cmd) {
         v = system_get_vbus();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
@@ -48,13 +48,13 @@ uint8_t avlos_tm_Vbus(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 uint8_t avlos_tm_motor_R(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     float v;
-    if (AVLOS_DIR_READ == cmd) {
+    if (AVLOS_CMD_READ == cmd) {
         v = motor_get_R();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
     }
-    else if (AVLOS_DIR_WRITE == cmd) {
+    else if (AVLOS_CMD_WRITE == cmd) {
         memcpy(&v, buffer, sizeof(v));
         motor_set_R(v);
         return AVLOS_RET_WRITE;
@@ -65,13 +65,13 @@ uint8_t avlos_tm_motor_R(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command c
 uint8_t avlos_tm_motor_L(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     float v;
-    if (AVLOS_DIR_READ == cmd) {
+    if (AVLOS_CMD_READ == cmd) {
         v = motor_get_L();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
     }
-    else if (AVLOS_DIR_WRITE == cmd) {
+    else if (AVLOS_CMD_WRITE == cmd) {
         memcpy(&v, buffer, sizeof(v));
         motor_set_L(v);
         return AVLOS_RET_WRITE;
@@ -82,13 +82,13 @@ uint8_t avlos_tm_motor_L(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command c
 uint8_t avlos_tm_motor_pole_pairs(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     uint8_t v;
-    if (AVLOS_DIR_READ == cmd) {
+    if (AVLOS_CMD_READ == cmd) {
         v = motor_get_pole_pairs();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
     }
-    else if (AVLOS_DIR_WRITE == cmd) {
+    else if (AVLOS_CMD_WRITE == cmd) {
         memcpy(&v, buffer, sizeof(v));
         motor_set_pole_pairs(v);
         return AVLOS_RET_WRITE;
@@ -99,13 +99,13 @@ uint8_t avlos_tm_motor_pole_pairs(uint8_t * buffer, uint8_t * buffer_len, Avlos_
 uint8_t avlos_tm_motor_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     uint8_t v;
-    if (AVLOS_DIR_READ == cmd) {
+    if (AVLOS_CMD_READ == cmd) {
         v = motor_get_type();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
     }
-    else if (AVLOS_DIR_WRITE == cmd) {
+    else if (AVLOS_CMD_WRITE == cmd) {
         memcpy(&v, buffer, sizeof(v));
         motor_set_type(v);
         return AVLOS_RET_WRITE;
@@ -116,7 +116,7 @@ uint8_t avlos_tm_motor_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comman
 uint8_t avlos_tm_encoder_position_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     float v;
-    if (AVLOS_DIR_READ == cmd) {
+    if (AVLOS_CMD_READ == cmd) {
         v = encoder_get_pos_estimate();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
@@ -128,13 +128,13 @@ uint8_t avlos_tm_encoder_position_estimate(uint8_t * buffer, uint8_t * buffer_le
 uint8_t avlos_tm_encoder_bandwidth(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     float v;
-    if (AVLOS_DIR_READ == cmd) {
+    if (AVLOS_CMD_READ == cmd) {
         v = encoder_get_bandwidth();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
     }
-    else if (AVLOS_DIR_WRITE == cmd) {
+    else if (AVLOS_CMD_WRITE == cmd) {
         memcpy(&v, buffer, sizeof(v));
         encoder_set_bandwidth(v);
         return AVLOS_RET_WRITE;
