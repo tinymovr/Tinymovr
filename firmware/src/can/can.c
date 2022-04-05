@@ -142,9 +142,9 @@ void CAN_process_interrupt(void)
     // Process message
     if (sizeof(avlos_endpoints) / sizeof(avlos_endpoints[0]) > command_id)
     {
-        uint8_t (*callback)(uint8_t buffer[], uint8_t * buffer_length, bool rtr) = avlos_endpoints[command_id];
+        uint8_t (*callback)(uint8_t buffer[], uint8_t * buffer_length, Avlos_Command cmd) = avlos_endpoints[command_id];
         uint8_t can_msg_buffer[8];
-        memcpy(can_msg_buffer, &rx_data, data_length);
+        memcpy(can_msg_buffer, &rx_data, data_length, (uint8_t)rtr);
         uint8_t response_type = callback(can_msg_buffer, &data_length);
         if (AVLOS_RET_READ == response_type)
         {
