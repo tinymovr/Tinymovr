@@ -16,6 +16,7 @@ Welcome to Tinymovr documentation!
    studio/usage
    planner/planner
    api/guide
+   api/reference
    interfaces/interfaces
    upgrade/upgrade
    hardware/gimbal
