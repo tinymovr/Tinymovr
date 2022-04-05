@@ -11,6 +11,8 @@
 * https://pypi.org/project/csnake
 */
 
+#include <string.h>
+#include "src/adc/adc.h"
 #include "src/system/system.h"
 #include "src/encoder/encoder.h"
 #include "src/observer/observer.h"
@@ -19,7 +21,7 @@
 #include "src/nvm/nvm.h"
 #include "can_endpoints.h"
 
-uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len, uint8_t cmd) { const uint32_t v = 0x67669c7; memcpy(buffer, &v, sizeof(v)); return AVLOS_RET_READ; }
+uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len, uint8_t cmd) { const uint32_t v = 0xe5e760bf; memcpy(buffer, &v, sizeof(v)); return AVLOS_RET_READ; }
 
 uint8_t avlos_tm_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
@@ -41,6 +43,23 @@ uint8_t avlos_tm_Vbus(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_comms_can_rate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    uint32_t v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = can_get_rate();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    else if (AVLOS_CMD_WRITE == cmd) {
+        memcpy(&v, buffer, sizeof(v));
+        can_set_rate(v);
+        return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;
 }
@@ -117,7 +136,7 @@ uint8_t avlos_tm_encoder_position_estimate(uint8_t * buffer, uint8_t * buffer_le
 {
     float v;
     if (AVLOS_CMD_READ == cmd) {
-        v = encoder_get_pos_estimate();
+        v = observer_get_pos_estimate();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
@@ -129,14 +148,14 @@ uint8_t avlos_tm_encoder_bandwidth(uint8_t * buffer, uint8_t * buffer_len, Avlos
 {
     float v;
     if (AVLOS_CMD_READ == cmd) {
-        v = encoder_get_bandwidth();
+        v = observer_get_bandwidth();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
     }
     else if (AVLOS_CMD_WRITE == cmd) {
         memcpy(&v, buffer, sizeof(v));
-        encoder_set_bandwidth(v);
+        observer_set_bandwidth(v);
         return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;

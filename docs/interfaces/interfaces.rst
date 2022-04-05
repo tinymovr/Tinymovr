@@ -11,7 +11,7 @@ CAN Bus is the primary interface for communicating with Tinymovr. The physical a
 Data rate
 #########
 
-By default, the CAN baud rate is set to 1Mbit/s. This is customizable both through CAN as well as through UART. See :ref:`api-can-config`. Possible values are 125kbit/s, 250kbit/s, 500kbit/s and 1Mbit/s.
+By default, the CAN baud rate is set to 1Mbit/s. This is customizable both through CAN as well as through UART. See :ref:`api-can-rate`. Possible values are 125kbit/s, 250kbit/s, 500kbit/s and 1Mbit/s.
 
 Addressing
 ##########

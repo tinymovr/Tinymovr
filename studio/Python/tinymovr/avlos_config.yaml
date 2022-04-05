@@ -10,6 +10,8 @@ generators:
     c_header_includes:
     - src/common.h
     c_impl_includes:
+    - <string.h>
+    - src/adc/adc.h
     - src/system/system.h
     - src/encoder/encoder.h
     - src/observer/observer.h

@@ -10,6 +10,16 @@ remote_attributes:
     unit: volt
     c_getter: adc_get_Vbus
     description: Retrieves the bus voltage.
+  - name: comms
+    remote_attributes:
+    - name: can
+      remote_attributes:
+      - name: rate
+        dtype: uint32
+        c_getter: can_get_rate
+        c_setter: can_set_rate
+        rst_target: api-can-rate
+        description: Accesses the CAN baud rate.
   - name: motor
     remote_attributes:
       - name: R
@@ -40,12 +50,12 @@ remote_attributes:
       - name: position_estimate
         dtype: float
         unit: ticks
-        c_getter: encoder_get_pos_estimate
+        c_getter: observer_get_pos_estimate
         description: Retrieves the encoder position estimate.
       - name: bandwidth
         dtype: float
         unit: rad/s
-        c_getter: encoder_get_bandwidth
-        c_setter: encoder_set_bandwidth
+        c_getter: observer_get_bandwidth
+        c_setter: observer_set_bandwidth
         description: Accesses the encoder observer bandwidth.
 
