@@ -15,14 +15,14 @@ remote_attributes:
       - name: R
         dtype: float
         unit: ohm
-        c_getter: motor_get_R
-        c_setter: motor_set_R
+        c_getter: motor_get_phase_resistance
+        c_setter: motor_set_phase_resistance
         description: Accesses the motor Resistance value.
       - name: L
         dtype: float
         unit: henry
-        c_getter: motor_get_L
-        c_setter: motor_set_L
+        c_getter: motor_get_phase_inductance
+        c_setter: motor_set_phase_inductance
         description: Accesses the motor Inductance value.
       - name: pole_pairs
         dtype: uint8
@@ -32,8 +32,8 @@ remote_attributes:
       - name: type
         #values: [HIGH_CURRENT, GIMBAL]
         dtype: uint8
-        c_getter: motor_get_type
-        c_setter: motor_set_type
+        c_getter: motor_get_is_gimbal
+        c_setter: motor_set_is_gimbal
         description: Accesses the motor type.
   - name: encoder
     remote_attributes:

@@ -179,7 +179,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
 
     float Vd;
     float Vq;
-    if (motor_is_gimbal() == true)
+    if (motor_get_is_gimbal() == true)
     {
         const float e_phase_vel = observer_get_evel();
         Vd = -e_phase_vel * motor_get_phase_inductance() * Iq_setpoint;

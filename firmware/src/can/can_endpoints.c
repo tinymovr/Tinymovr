@@ -19,7 +19,7 @@
 #include "src/nvm/nvm.h"
 #include "can_endpoints.h"
 
-uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len, uint8_t cmd) { const uint32_t v = 0x3e087a7c; memcpy(buffer, &v, sizeof(v)); return AVLOS_RET_READ; }
+uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len, uint8_t cmd) { const uint32_t v = 0x67669c7; memcpy(buffer, &v, sizeof(v)); return AVLOS_RET_READ; }
 
 uint8_t avlos_tm_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
@@ -49,14 +49,14 @@ uint8_t avlos_tm_motor_R(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command c
 {
     float v;
     if (AVLOS_CMD_READ == cmd) {
-        v = motor_get_R();
+        v = motor_get_phase_resistance();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
     }
     else if (AVLOS_CMD_WRITE == cmd) {
         memcpy(&v, buffer, sizeof(v));
-        motor_set_R(v);
+        motor_set_phase_resistance(v);
         return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;
@@ -66,14 +66,14 @@ uint8_t avlos_tm_motor_L(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command c
 {
     float v;
     if (AVLOS_CMD_READ == cmd) {
-        v = motor_get_L();
+        v = motor_get_phase_inductance();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
     }
     else if (AVLOS_CMD_WRITE == cmd) {
         memcpy(&v, buffer, sizeof(v));
-        motor_set_L(v);
+        motor_set_phase_inductance(v);
         return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;
@@ -100,14 +100,14 @@ uint8_t avlos_tm_motor_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comman
 {
     uint8_t v;
     if (AVLOS_CMD_READ == cmd) {
-        v = motor_get_type();
+        v = motor_get_is_gimbal();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
     }
     else if (AVLOS_CMD_WRITE == cmd) {
         memcpy(&v, buffer, sizeof(v));
-        motor_set_type(v);
+        motor_set_is_gimbal(v);
         return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;

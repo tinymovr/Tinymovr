@@ -166,7 +166,7 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
     case 'M': // Is motor gimbal?
-        ret_val = motor_is_gimbal();
+        ret_val = motor_get_is_gimbal();
         break;
 
     case 'Y': //
