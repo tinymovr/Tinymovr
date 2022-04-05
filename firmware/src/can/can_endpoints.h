@@ -110,4 +110,4 @@ uint8_t avlos_tm_encoder_position_estimate(uint8_t * buffer, uint8_t * buffer_le
 */
 uint8_t avlos_tm_encoder_bandwidth(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
-uint8_t (*avlos_endpoints[9])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_get_hash, &avlos_system_get_uid, &avlos_system_get_vbus, &avlos_motor_get_R, &avlos_motor_get_L, &avlos_motor_get_pole_pairs, &avlos_motor_get_type, &avlos_encoder_get_pos_estimate, &avlos_encoder_get_bandwidth};
+uint8_t (*avlos_endpoints[9])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_get_hash, &avlos_tm_uid, &avlos_tm_Vbus, &avlos_tm_motor_R, &avlos_tm_motor_L, &avlos_tm_motor_pole_pairs, &avlos_tm_motor_type, &avlos_tm_encoder_position_estimate, &avlos_tm_encoder_bandwidth};
