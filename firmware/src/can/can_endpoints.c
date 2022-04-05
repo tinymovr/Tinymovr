@@ -17,7 +17,7 @@
 #include "src/motor/motor.h"
 #include "src/controller/controller.h"
 #include "src/nvm/nvm.h"
-#include "/home/ihatz/Tinymovr/firmware/src/can/can_endpoints.h"
+#include "can_endpoints.h"
 
 uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len) { const uint32_t v = 0x9db7dc73; memcpy(buffer, &v, sizeof(v)); return AVLOS_RET_READ; }
 
