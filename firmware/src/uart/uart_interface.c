@@ -52,7 +52,7 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
         break;
 
     case 'G': // velocity integrator gain
-        Controller_SetVelIntegratorGain((float)data * ONE_OVER_UART_VEL_INT_SCALING_FACTOR);
+        controller_set_vel_integrator_gain((float)data * ONE_OVER_UART_VEL_INT_SCALING_FACTOR);
         break;
 
     case 'Y': // Position gain
@@ -146,7 +146,7 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
     case 'G': // velocity integrator setpoint
-        ret_val = (int32_t)(Controller_GetVelIntegratorGain() * UART_VEL_INT_SCALING_FACTOR);
+        ret_val = (int32_t)(controller_get_vel_integrator_gain() * UART_VEL_INT_SCALING_FACTOR);
         break;
 
     case 'H': // phase resistance

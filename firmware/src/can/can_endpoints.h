@@ -33,7 +33,7 @@ uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len, uint8_t cmd);
 /*
 * avlos_tm_uid
 *
-* Retrieves the unique device ID.
+* The unique device ID, unique to each PAC55xx chip produced.
 *
 * @param buffer
 * @param buffer_len
@@ -43,7 +43,7 @@ uint8_t avlos_tm_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 /*
 * avlos_tm_Vbus
 *
-* Retrieves the bus voltage.
+* The bus voltage.
 *
 * @param buffer
 * @param buffer_len
@@ -51,9 +51,49 @@ uint8_t avlos_tm_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 uint8_t avlos_tm_Vbus(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
+* avlos_tm_temp
+*
+* The internal temperature of the PAC55xx MCU.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_tm_temp(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_tm_controller_state
+*
+* The state of the controller.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_tm_controller_state(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_tm_controller_mode
+*
+* The control mode of the controller.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_tm_controller_mode(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_tm_controller_vel_integrator_gain
+*
+* The gain of the velocity integrator.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_tm_controller_vel_integrator_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
 * avlos_tm_controller_vel_integrator_deadband
 *
-* Accesses the velocity integrator deadband.
+* The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
 *
 * @param buffer
 * @param buffer_len
@@ -63,7 +103,7 @@ uint8_t avlos_tm_controller_vel_integrator_deadband(uint8_t * buffer, uint8_t * 
 /*
 * avlos_tm_comms_can_rate
 *
-* Accesses the CAN baud rate.
+* The baud rate of the CAN interface.
 *
 * @param buffer
 * @param buffer_len
@@ -71,9 +111,19 @@ uint8_t avlos_tm_controller_vel_integrator_deadband(uint8_t * buffer, uint8_t * 
 uint8_t avlos_tm_comms_can_rate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
+* avlos_tm_comms_can_id
+*
+* The ID of the CAN interface.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_tm_comms_can_id(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
 * avlos_tm_motor_R
 *
-* Accesses the motor Resistance value.
+* The motor Resistance value.
 *
 * @param buffer
 * @param buffer_len
@@ -83,7 +133,7 @@ uint8_t avlos_tm_motor_R(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command c
 /*
 * avlos_tm_motor_L
 *
-* Accesses the motor Inductance value.
+* The motor Inductance value.
 *
 * @param buffer
 * @param buffer_len
@@ -93,7 +143,7 @@ uint8_t avlos_tm_motor_L(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command c
 /*
 * avlos_tm_motor_pole_pairs
 *
-* Accesses the motor pole pair count.
+* The motor pole pair count.
 *
 * @param buffer
 * @param buffer_len
@@ -103,7 +153,7 @@ uint8_t avlos_tm_motor_pole_pairs(uint8_t * buffer, uint8_t * buffer_len, Avlos_
 /*
 * avlos_tm_motor_type
 *
-* Accesses the motor type.
+* The type of the motor. Either high current or gimbal.
 *
 * @param buffer
 * @param buffer_len
@@ -113,7 +163,7 @@ uint8_t avlos_tm_motor_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comman
 /*
 * avlos_tm_encoder_position_estimate
 *
-* Retrieves the encoder position estimate.
+* The filtered encoder position estimate.
 *
 * @param buffer
 * @param buffer_len
@@ -123,11 +173,11 @@ uint8_t avlos_tm_encoder_position_estimate(uint8_t * buffer, uint8_t * buffer_le
 /*
 * avlos_tm_encoder_bandwidth
 *
-* Accesses the encoder observer bandwidth.
+* The encoder observer bandwidth.
 *
 * @param buffer
 * @param buffer_len
 */
 uint8_t avlos_tm_encoder_bandwidth(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
-static uint8_t (*avlos_endpoints[11])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_get_hash, &avlos_tm_uid, &avlos_tm_Vbus, &avlos_tm_controller_vel_integrator_deadband, &avlos_tm_comms_can_rate, &avlos_tm_motor_R, &avlos_tm_motor_L, &avlos_tm_motor_pole_pairs, &avlos_tm_motor_type, &avlos_tm_encoder_position_estimate, &avlos_tm_encoder_bandwidth};
+static uint8_t (*avlos_endpoints[16])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_get_hash, &avlos_tm_uid, &avlos_tm_Vbus, &avlos_tm_temp, &avlos_tm_controller_state, &avlos_tm_controller_mode, &avlos_tm_controller_vel_integrator_gain, &avlos_tm_controller_vel_integrator_deadband, &avlos_tm_comms_can_rate, &avlos_tm_comms_can_id, &avlos_tm_motor_R, &avlos_tm_motor_L, &avlos_tm_motor_pole_pairs, &avlos_tm_motor_type, &avlos_tm_encoder_position_estimate, &avlos_tm_encoder_bandwidth};

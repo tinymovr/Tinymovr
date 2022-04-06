@@ -380,12 +380,12 @@ void Controller_SetVelGain(float gain)
     }
 }
 
-float Controller_GetVelIntegratorGain(void)
+float controller_get_vel_integrator_gain(void)
 {
     return config.vel_integrator_gain;
 }
 
-void Controller_SetVelIntegratorGain(float gain)
+void controller_set_vel_integrator_gain(float gain)
 {
     if (gain >= 0.0f)
     {

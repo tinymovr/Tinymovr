@@ -21,7 +21,7 @@
 #include "src/nvm/nvm.h"
 #include "can_endpoints.h"
 
-uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len, uint8_t cmd) { const uint32_t v = 0xb2b55f4a; memcpy(buffer, &v, sizeof(v)); return AVLOS_RET_READ; }
+uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len, uint8_t cmd) { const uint32_t v = 0xa6bbb274; memcpy(buffer, &v, sizeof(v)); return AVLOS_RET_READ; }
 
 uint8_t avlos_tm_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
@@ -43,6 +43,69 @@ uint8_t avlos_tm_Vbus(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_temp(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    float v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = adc_get_mcu_temp();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_controller_state(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    uint8_t v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = controller_get_state();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    else if (AVLOS_CMD_WRITE == cmd) {
+        memcpy(&v, buffer, sizeof(v));
+        controller_set_state(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_controller_mode(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    uint8_t v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = controller_get_mode();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    else if (AVLOS_CMD_WRITE == cmd) {
+        memcpy(&v, buffer, sizeof(v));
+        controller_set_mode(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_controller_vel_integrator_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    float v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = controller_get_vel_integrator_gain();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    else if (AVLOS_CMD_WRITE == cmd) {
+        memcpy(&v, buffer, sizeof(v));
+        controller_set_vel_integrator_gain(v);
+        return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;
 }
@@ -76,6 +139,23 @@ uint8_t avlos_tm_comms_can_rate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Co
     else if (AVLOS_CMD_WRITE == cmd) {
         memcpy(&v, buffer, sizeof(v));
         CAN_set_kbit_rate(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_comms_can_id(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    uint32_t v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = CAN_get_ID();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    else if (AVLOS_CMD_WRITE == cmd) {
+        memcpy(&v, buffer, sizeof(v));
+        CAN_set_ID(v);
         return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;

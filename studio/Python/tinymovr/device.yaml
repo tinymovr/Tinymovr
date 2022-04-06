@@ -12,13 +12,28 @@ remote_attributes:
     description: The bus voltage.
   - name: temp
     dtype: float
-    unit: degrees_celsius
+    unit: degC
     c_getter: adc_get_mcu_temp
     description: The internal temperature of the PAC55xx MCU.
   - name: controller
     remote_attributes:
+    - name: state
+      dtype: uint8
+      c_getter: controller_get_state
+      c_setter: controller_set_state
+      description: The state of the controller.
+    - name: mode
+      dtype: uint8
+      c_getter: controller_get_mode
+      c_setter: controller_set_mode
+      description: The control mode of the controller.
     - name: vel_integrator
       remote_attributes:
+      - name: gain
+        dtype: float
+        c_getter: controller_get_vel_integrator_gain
+        c_setter: controller_set_vel_integrator_gain
+        description: The gain of the velocity integrator.
       - name: deadband
         dtype: float
         c_getter: controller_get_vel_integrator_deadband
