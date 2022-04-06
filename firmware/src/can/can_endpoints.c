@@ -21,7 +21,7 @@
 #include "src/nvm/nvm.h"
 #include "can_endpoints.h"
 
-uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len, uint8_t cmd) { const uint32_t v = 0xe5e760bf; memcpy(buffer, &v, sizeof(v)); return AVLOS_RET_READ; }
+uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len, uint8_t cmd) { const uint32_t v = 0x94e0de6d; memcpy(buffer, &v, sizeof(v)); return AVLOS_RET_READ; }
 
 uint8_t avlos_tm_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
@@ -43,6 +43,23 @@ uint8_t avlos_tm_Vbus(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_controller_vel_integrator_deadband(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    float v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = controller_get_vel_integrator_deadband();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    else if (AVLOS_CMD_WRITE == cmd) {
+        memcpy(&v, buffer, sizeof(v));
+        controller_set_vel_integrator_deadband(v);
+        return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;
 }
@@ -148,14 +165,14 @@ uint8_t avlos_tm_encoder_bandwidth(uint8_t * buffer, uint8_t * buffer_len, Avlos
 {
     float v;
     if (AVLOS_CMD_READ == cmd) {
-        v = observer_get_bandwidth();
+        v = observer_get_bw();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
     }
     else if (AVLOS_CMD_WRITE == cmd) {
         memcpy(&v, buffer, sizeof(v));
-        observer_set_bandwidth(v);
+        observer_set_bw(v);
         return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;

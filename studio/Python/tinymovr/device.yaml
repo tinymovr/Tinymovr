@@ -10,6 +10,16 @@ remote_attributes:
     unit: volt
     c_getter: adc_get_Vbus
     description: Retrieves the bus voltage.
+  - name: controller
+    remote_attributes:
+    - name: vel_integrator
+      remote_attributes:
+      - name: deadband
+        dtype: float
+        c_getter: controller_get_vel_integrator_deadband
+        c_setter: controller_set_vel_integrator_deadband
+        rst_target: integrator-deadband
+        description: Accesses the velocity integrator deadband.
   - name: comms
     remote_attributes:
     - name: can
@@ -55,7 +65,7 @@ remote_attributes:
       - name: bandwidth
         dtype: float
         unit: rad/s
-        c_getter: observer_get_bandwidth
-        c_setter: observer_set_bandwidth
+        c_getter: observer_get_bw
+        c_setter: observer_set_bw
         description: Accesses the encoder observer bandwidth.
 
