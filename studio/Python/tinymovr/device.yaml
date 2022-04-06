@@ -26,8 +26,8 @@ remote_attributes:
       remote_attributes:
       - name: rate
         dtype: uint32
-        c_getter: can_get_rate
-        c_setter: can_set_rate
+        c_getter: CAN_get_kbit_rate
+        c_setter: CAN_set_kbit_rate
         rst_target: api-can-rate
         description: Accesses the CAN baud rate.
   - name: motor
