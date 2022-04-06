@@ -89,7 +89,7 @@ struct ADCConfig
 
 void ADC_Init(void);
 PAC5XXX_RAMFUNC float adc_get_Vbus(void);
-PAC5XXX_RAMFUNC int16_t ADC_GetMCUTemp(void);
+PAC5XXX_RAMFUNC int16_t adc_get_mcu_temp(void);
 PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc);
 PAC5XXX_RAMFUNC void ADC_UpdateMeasurements(void);
 

@@ -236,7 +236,7 @@ PAC5XXX_RAMFUNC float adc_get_Vbus(void)
     return adc.vbus_val;
 }
 
-PAC5XXX_RAMFUNC int16_t ADC_GetMCUTemp(void)
+PAC5XXX_RAMFUNC int16_t adc_get_mcu_temp(void)
 {
     return adc.temp;
 }
