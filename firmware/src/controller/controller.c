@@ -84,7 +84,7 @@ void Controller_ControlLoop(void)
         }
         if (error_flags_exist() && (state.state != STATE_IDLE))
         {
-            Controller_SetState(STATE_IDLE);
+            controller_set_state(STATE_IDLE);
         }
 
         if (state.state == STATE_CALIBRATE)
@@ -99,7 +99,7 @@ void Controller_ControlLoop(void)
                 (void)((CalibrateResistance() && CalibrateInductance()) && calibrate_hall_sequence());
             }
             state.is_calibrating = false;
-            Controller_SetState(STATE_IDLE);
+            controller_set_state(STATE_IDLE);
         }
         else if (state.state == STATE_CL_CONTROL)
         {
@@ -122,7 +122,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         if (!planner_evaluate(state.t_plan, &motion_plan))
         {
             // Drop to position mode on error or completion
-            Controller_SetMode(CTRL_POSITION);
+            controller_set_mode(CTRL_POSITION);
             state.t_plan = 0;
         }
     }
@@ -238,12 +238,12 @@ PAC5XXX_RAMFUNC void IdleStep(void)
     // pass
 }
 
-PAC5XXX_RAMFUNC ControlState Controller_GetState(void)
+PAC5XXX_RAMFUNC ControlState controller_get_state(void)
 {
     return state.state;
 }
 
-PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
+PAC5XXX_RAMFUNC void controller_set_state(ControlState new_state)
 {
     if ((new_state != state.state) && (state.is_calibrating == false))
     {
@@ -267,12 +267,12 @@ PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
     }
 }
 
-PAC5XXX_RAMFUNC ControlMode Controller_GetMode(void)
+PAC5XXX_RAMFUNC ControlMode controller_get_mode(void)
 {
     return state.mode;
 }
 
-PAC5XXX_RAMFUNC void Controller_SetMode(ControlMode new_mode)
+PAC5XXX_RAMFUNC void controller_set_mode(ControlMode new_mode)
 {
     if (new_mode != state.mode)
     {
@@ -347,7 +347,7 @@ PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value)
     state.Iq_setpoint = value * motor_get_user_direction();
 }
 
-void Controller_GetModulationValues(struct FloatTriplet *dc)
+void controller_get_modulation_values(struct FloatTriplet *dc)
 {
     dc->A = state.modulation_values.A;
     dc->B = state.modulation_values.B;

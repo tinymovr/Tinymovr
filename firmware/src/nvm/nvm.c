@@ -2,17 +2,17 @@
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
 //  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
-//  * 
-//  * This program is free software: you can redistribute it and/or modify  
-//  * it under the terms of the GNU General Public License as published by  
+//  *
+//  * This program is free software: you can redistribute it and/or modify
+//  * it under the terms of the GNU General Public License as published by
 //  * the Free Software Foundation, version 3.
 //  *
-//  * This program is distributed in the hope that it will be useful, but 
-//  * WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  * This program is distributed in the hope that it will be useful, but
+//  * WITHOUT ANY WARRANTY; without even the implied warranty of
+//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  * General Public License for more details.
 //  *
-//  * You should have received a copy of the GNU General Public License 
+//  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <string.h>
@@ -35,9 +35,9 @@ bool nvm_save_config(void)
 	s.can_config = *CAN_get_config();
 	s.version = (VERSION_MAJOR << 16) + (VERSION_MINOR << 8) + VERSION_PATCH;
 	memcpy(data, &s, sizeof(struct NVMStruct));
-	if (STATE_IDLE == Controller_GetState())
+	if (STATE_IDLE == controller_get_state())
 	{
-		uint8_t* dataBuffer = data;
+		uint8_t *dataBuffer = data;
 		__disable_irq();
 		flash_erase_page(SETTINGS_PAGE);
 		flash_write((uint8_t *)SETTINGS_PAGE_HEX, dataBuffer, sizeof(struct NVMStruct));
@@ -67,7 +67,7 @@ bool nvm_load_config(void)
 
 void nvm_erase(void)
 {
-	if (STATE_IDLE == Controller_GetState())
+	if (STATE_IDLE == controller_get_state())
 	{
 		flash_erase_page(SETTINGS_PAGE);
 		system_reset();

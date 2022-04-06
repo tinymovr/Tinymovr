@@ -4,12 +4,17 @@ remote_attributes:
   - name: uid
     dtype: uint32
     c_getter: system_get_uid
-    description: Retrieves the unique device ID.
+    description: The unique device ID, unique to each PAC55xx chip produced.
   - name: Vbus
     dtype: float
     unit: volt
     c_getter: adc_get_Vbus
-    description: Retrieves the bus voltage.
+    description: The bus voltage.
+  - name: temp
+    dtype: float
+    unit: degrees_celsius
+    c_getter: adc_get_mcu_temp
+    description: The internal temperature of the PAC55xx MCU.
   - name: controller
     remote_attributes:
     - name: vel_integrator
@@ -19,7 +24,7 @@ remote_attributes:
         c_getter: controller_get_vel_integrator_deadband
         c_setter: controller_set_vel_integrator_deadband
         rst_target: integrator-deadband
-        description: Accesses the velocity integrator deadband.
+        description: The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
   - name: comms
     remote_attributes:
     - name: can
@@ -29,7 +34,12 @@ remote_attributes:
         c_getter: CAN_get_kbit_rate
         c_setter: CAN_set_kbit_rate
         rst_target: api-can-rate
-        description: Accesses the CAN baud rate.
+        description: The baud rate of the CAN interface.
+      - name: id
+        dtype: uint32
+        c_getter: CAN_get_ID
+        c_setter: CAN_set_ID
+        description: The ID of the CAN interface.
   - name: motor
     remote_attributes:
       - name: R
@@ -37,35 +47,35 @@ remote_attributes:
         unit: ohm
         c_getter: motor_get_phase_resistance
         c_setter: motor_set_phase_resistance
-        description: Accesses the motor Resistance value.
+        description: The motor Resistance value.
       - name: L
         dtype: float
         unit: henry
         c_getter: motor_get_phase_inductance
         c_setter: motor_set_phase_inductance
-        description: Accesses the motor Inductance value.
+        description: The motor Inductance value.
       - name: pole_pairs
         dtype: uint8
         c_getter: motor_get_pole_pairs
         c_setter: motor_set_pole_pairs
-        description: Accesses the motor pole pair count.
+        description: The motor pole pair count.
       - name: type
         #values: [HIGH_CURRENT, GIMBAL]
         dtype: uint8
         c_getter: motor_get_is_gimbal
         c_setter: motor_set_is_gimbal
-        description: Accesses the motor type.
+        description: The type of the motor. Either high current or gimbal.
   - name: encoder
     remote_attributes:
       - name: position_estimate
         dtype: float
         unit: ticks
         c_getter: observer_get_pos_estimate
-        description: Retrieves the encoder position estimate.
+        description: The filtered encoder position estimate.
       - name: bandwidth
         dtype: float
         unit: rad/s
         c_getter: observer_get_bw
         c_setter: observer_set_bw
-        description: Accesses the encoder observer bandwidth.
+        description: The encoder observer bandwidth.
 
