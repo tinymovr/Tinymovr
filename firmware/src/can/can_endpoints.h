@@ -81,6 +81,86 @@ uint8_t avlos_tm_controller_state(uint8_t * buffer, uint8_t * buffer_len, Avlos_
 uint8_t avlos_tm_controller_mode(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
+* avlos_tm_controller_pos_setpoint
+*
+* The position setpoint.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_tm_controller_pos_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_tm_controller_vel_setpoint
+*
+* The velocity setpoint.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_tm_controller_vel_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_tm_controller_Iq_setpoint
+*
+* The Iq setpoint.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_tm_controller_Iq_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_tm_controller_Iq_estimate
+*
+* The Iq estimate.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_tm_controller_Iq_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_tm_controller_pos_p_gain
+*
+* The proportional gain of the position controller.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_tm_controller_pos_p_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_tm_controller_vel_p_gain
+*
+* The proportional gain of the velocity controller.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_tm_controller_vel_p_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_tm_controller_vel_i_gain
+*
+* The integral gain of the velocity controller.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_tm_controller_vel_i_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_tm_controller_Iq_p_gain
+*
+* The current controller proportional gain.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_tm_controller_Iq_p_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
 * avlos_tm_controller_vel_integrator_gain
 *
 * The gain of the velocity integrator.
@@ -180,4 +260,4 @@ uint8_t avlos_tm_encoder_position_estimate(uint8_t * buffer, uint8_t * buffer_le
 */
 uint8_t avlos_tm_encoder_bandwidth(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
-static uint8_t (*avlos_endpoints[16])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_get_hash, &avlos_tm_uid, &avlos_tm_Vbus, &avlos_tm_temp, &avlos_tm_controller_state, &avlos_tm_controller_mode, &avlos_tm_controller_vel_integrator_gain, &avlos_tm_controller_vel_integrator_deadband, &avlos_tm_comms_can_rate, &avlos_tm_comms_can_id, &avlos_tm_motor_R, &avlos_tm_motor_L, &avlos_tm_motor_pole_pairs, &avlos_tm_motor_type, &avlos_tm_encoder_position_estimate, &avlos_tm_encoder_bandwidth};
+static uint8_t (*avlos_endpoints[24])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_get_hash, &avlos_tm_uid, &avlos_tm_Vbus, &avlos_tm_temp, &avlos_tm_controller_state, &avlos_tm_controller_mode, &avlos_tm_controller_pos_setpoint, &avlos_tm_controller_vel_setpoint, &avlos_tm_controller_Iq_setpoint, &avlos_tm_controller_Iq_estimate, &avlos_tm_controller_pos_p_gain, &avlos_tm_controller_vel_p_gain, &avlos_tm_controller_vel_i_gain, &avlos_tm_controller_Iq_p_gain, &avlos_tm_controller_vel_integrator_gain, &avlos_tm_controller_vel_integrator_deadband, &avlos_tm_comms_can_rate, &avlos_tm_comms_can_id, &avlos_tm_motor_R, &avlos_tm_motor_L, &avlos_tm_motor_pole_pairs, &avlos_tm_motor_type, &avlos_tm_encoder_position_estimate, &avlos_tm_encoder_bandwidth};

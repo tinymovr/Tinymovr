@@ -56,11 +56,11 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
         break;
 
     case 'Y': // Position gain
-        Controller_SetPosGain(data);
+        controller_set_pos_gain(data);
         break;
 
     case 'F': // Velocity gain
-        Controller_SetVelGain(data * ONE_OVER_UART_VEL_GAIN_SCALING_FACTOR);
+        controller_set_vel_gain(data * ONE_OVER_UART_VEL_GAIN_SCALING_FACTOR);
         break;
 
     case 'H': // phase resistance
@@ -170,11 +170,11 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
     case 'Y': //
-        ret_val = Controller_GetPosGain();
+        ret_val = controller_get_pos_gain();
         break;
 
     case 'F': //
-        ret_val = Controller_GetVelGain() * UART_VEL_GAIN_SCALING_FACTOR;
+        ret_val = controller_get_vel_gain() * UART_VEL_GAIN_SCALING_FACTOR;
         break;
 
     case 'Q': // calibrate

@@ -17,29 +17,67 @@ remote_attributes:
     description: The internal temperature of the PAC55xx MCU.
   - name: controller
     remote_attributes:
-    - name: state
-      dtype: uint8
-      c_getter: controller_get_state
-      c_setter: controller_set_state
-      description: The state of the controller.
-    - name: mode
-      dtype: uint8
-      c_getter: controller_get_mode
-      c_setter: controller_set_mode
-      description: The control mode of the controller.
-    - name: vel_integrator
-      remote_attributes:
-      - name: gain
+      - name: state
+        dtype: uint8
+        c_getter: controller_get_state
+        c_setter: controller_set_state
+        description: The state of the controller.
+      - name: mode
+        dtype: uint8
+        c_getter: controller_get_mode
+        c_setter: controller_set_mode
+        description: The control mode of the controller.
+      - name: pos_setpoint
+        dtype: float
+        c_getter: controller_get_pos_setpoint_user_frame
+        c_setter: controller_set_pos_setpoint_user_frame
+        description: The position setpoint.
+      - name: vel_setpoint
+        dtype: float
+        c_getter: controller_get_vel_setpoint_user_frame
+        c_setter: controller_set_vel_setpoint_user_frame
+        description: The velocity setpoint.
+      - name: Iq_setpoint
+        dtype: float
+        c_getter: controller_get_Iq_setpoint_user_frame
+        c_setter: controller_set_Iq_setpoint_user_frame
+        description: The Iq setpoint.
+      - name: Iq_estimate
+        dtype: float
+        c_getter: controller_get_Iq_estimate_user_frame
+        description: The Iq estimate.
+      - name: pos_p_gain
+        dtype: float
+        c_getter: controller_get_pos_gain
+        c_setter: controller_set_pos_gain
+        description: The proportional gain of the position controller.
+      - name: vel_p_gain
+        dtype: float
+        c_getter: controller_get_vel_gain
+        c_setter: controller_set_vel_gain
+        description: The proportional gain of the velocity controller.
+      - name: vel_i_gain
         dtype: float
         c_getter: controller_get_vel_integrator_gain
         c_setter: controller_set_vel_integrator_gain
-        description: The gain of the velocity integrator.
-      - name: deadband
+        description: The integral gain of the velocity controller.
+      - name: Iq_p_gain
         dtype: float
-        c_getter: controller_get_vel_integrator_deadband
-        c_setter: controller_set_vel_integrator_deadband
-        rst_target: integrator-deadband
-        description: The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
+        c_getter: controller_get_Iq_gain
+        description: The current controller proportional gain.
+      - name: vel_integrator
+        remote_attributes:
+          - name: gain
+            dtype: float
+            c_getter: controller_get_vel_integrator_gain
+            c_setter: controller_set_vel_integrator_gain
+            description: The gain of the velocity integrator.
+          - name: deadband
+            dtype: float
+            c_getter: controller_get_vel_integrator_deadband
+            c_setter: controller_set_vel_integrator_deadband
+            rst_target: integrator-deadband
+            description: The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
   - name: comms
     remote_attributes:
     - name: can

@@ -21,7 +21,7 @@
 #include "src/nvm/nvm.h"
 #include "can_endpoints.h"
 
-uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len, uint8_t cmd) { const uint32_t v = 0xa6bbb274; memcpy(buffer, &v, sizeof(v)); return AVLOS_RET_READ; }
+uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len, uint8_t cmd) { const uint32_t v = 0x3e18a6aa; memcpy(buffer, &v, sizeof(v)); return AVLOS_RET_READ; }
 
 uint8_t avlos_tm_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
@@ -89,6 +89,132 @@ uint8_t avlos_tm_controller_mode(uint8_t * buffer, uint8_t * buffer_len, Avlos_C
         memcpy(&v, buffer, sizeof(v));
         controller_set_mode(v);
         return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_controller_pos_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    float v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = controller_get_pos_setpoint_user_frame();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    else if (AVLOS_CMD_WRITE == cmd) {
+        memcpy(&v, buffer, sizeof(v));
+        controller_set_pos_setpoint_user_frame(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_controller_vel_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    float v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = controller_get_vel_setpoint_user_frame();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    else if (AVLOS_CMD_WRITE == cmd) {
+        memcpy(&v, buffer, sizeof(v));
+        controller_set_vel_setpoint_user_frame(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_controller_Iq_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    float v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = controller_get_Iq_setpoint_user_frame();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    else if (AVLOS_CMD_WRITE == cmd) {
+        memcpy(&v, buffer, sizeof(v));
+        controller_set_Iq_setpoint_user_frame(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_controller_Iq_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    float v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = controller_get_Iq_estimate_user_frame();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_controller_pos_p_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    float v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = controller_get_pos_gain();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    else if (AVLOS_CMD_WRITE == cmd) {
+        memcpy(&v, buffer, sizeof(v));
+        controller_set_pos_gain(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_controller_vel_p_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    float v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = controller_get_vel_gain();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    else if (AVLOS_CMD_WRITE == cmd) {
+        memcpy(&v, buffer, sizeof(v));
+        controller_set_vel_gain(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_controller_vel_i_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    float v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = controller_get_vel_integrator_gain();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    else if (AVLOS_CMD_WRITE == cmd) {
+        memcpy(&v, buffer, sizeof(v));
+        controller_set_vel_integrator_gain(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_tm_controller_Iq_p_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    float v;
+    if (AVLOS_CMD_READ == cmd) {
+        v = controller_get_Iq_gain();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
     }
     return AVLOS_RET_NOACTION;
 }

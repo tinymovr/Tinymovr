@@ -101,15 +101,15 @@ PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value);
 
 void controller_get_modulation_values(struct FloatTriplet *dc);
 
-float Controller_GetPosGain(void);
-void Controller_SetPosGain(float gain);
-float Controller_GetVelGain(void);
-void Controller_SetVelGain(float gain);
+float controller_get_pos_gain(void);
+void controller_set_pos_gain(float gain);
+float controller_get_vel_gain(void);
+void controller_set_vel_gain(float gain);
 float controller_get_vel_integrator_gain(void);
 void controller_set_vel_integrator_gain(float gain);
 float controller_get_vel_integrator_deadband(void);
 void controller_set_vel_integrator_deadband(float gain);
-float Controller_GetIqGain(void);
+float controller_get_Iq_gain(void);
 float Controller_GetIqBandwidth(void);
 void Controller_SetIqBandwidth(float bw);
 

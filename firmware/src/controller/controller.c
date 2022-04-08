@@ -354,12 +354,12 @@ void controller_get_modulation_values(struct FloatTriplet *dc)
     dc->C = state.modulation_values.C;
 }
 
-float Controller_GetPosGain(void)
+float controller_get_pos_gain(void)
 {
     return config.pos_gain;
 }
 
-void Controller_SetPosGain(float gain)
+void controller_set_pos_gain(float gain)
 {
     if (gain >= 0.0f)
     {
@@ -367,12 +367,12 @@ void Controller_SetPosGain(float gain)
     }
 }
 
-float Controller_GetVelGain(void)
+float controller_get_vel_gain(void)
 {
     return config.vel_gain;
 }
 
-void Controller_SetVelGain(float gain)
+void controller_set_vel_gain(float gain)
 {
     if (gain >= 0.0f)
     {
@@ -406,7 +406,7 @@ void controller_set_vel_integrator_deadband(float value)
     }
 }
 
-float Controller_GetIqGain(void)
+float controller_get_Iq_gain(void)
 {
     return config.I_gain;
 }
