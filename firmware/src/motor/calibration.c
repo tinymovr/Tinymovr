@@ -264,6 +264,12 @@ bool calibrate_offset_and_rectification(void)
     return true;
 }
 
+void reset_calibration(void)
+{
+    encoder_reset();
+    motor_reset_calibration();
+}
+
 static inline void set_epos_and_wait(float angle, float I_setpoint)
 {
 	struct FloatTriplet modulation_values = {0.0f};

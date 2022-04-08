@@ -15,8 +15,7 @@
 //  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef MOTOR_MOTOR_H_
-#define MOTOR_MOTOR_H_
+#pragma once
 
 #define MIN_PHASE_RESISTANCE (0.005f)
 #define MAX_PHASE_RESISTANCE (1.0f)
@@ -87,4 +86,3 @@ PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir);
 MotorConfig *motor_get_config(void);
 void motor_restore_config(MotorConfig *config_);
 
-#endif /* MOTOR_MOTOR_H_ */

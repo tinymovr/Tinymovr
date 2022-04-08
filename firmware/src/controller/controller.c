@@ -88,7 +88,7 @@ void Controller_ControlLoop(void)
 
         if (state.state == STATE_CALIBRATE)
         {
-            motor_reset_calibration();
+            reset_calibration();
             if (ENCODER_MA7XX == encoder_get_type())
             {
                 (void)((CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && calibrate_offset_and_rectification());

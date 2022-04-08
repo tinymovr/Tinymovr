@@ -45,6 +45,7 @@ void motor_reset_calibration()
 	config.user_direction = 1;
 	config.resistance_calibrated = false;
 	config.inductance_calibrated = false;
+	config.poles_calibrated = false;
 	config.phases_swapped = false;
 }
 
