@@ -267,7 +267,9 @@ bool calibrate_offset_and_rectification(void)
 void reset_calibration(void)
 {
     encoder_reset();
+    observer_reset();
     motor_reset_calibration();
+    wait_a_while();
 }
 
 static inline void set_epos_and_wait(float angle, float I_setpoint)
