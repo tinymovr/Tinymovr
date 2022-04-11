@@ -49,6 +49,7 @@ bool CalibrateResistance(void)
             WaitForControlLoopInterrupt();
         }
         const float R = our_fabsf(V_setpoint / I_cal);
+        gate_driver_set_duty_cycle(&zeroDC);
         if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
         {
             add_error_flag(ERROR_PHASE_RESISTANCE_OUT_OF_RANGE);
@@ -58,7 +59,6 @@ bool CalibrateResistance(void)
         {
             motor_set_phase_resistance(R);
         }
-        gate_driver_set_duty_cycle(&zeroDC);
     }
     return success;
 }
@@ -95,6 +95,7 @@ bool CalibrateInductance(void)
         const float num_cycles = CAL_L_LEN / 2;
         const float dI_by_dt = (I_high - I_low) / (PWM_PERIOD_S * num_cycles);
         const float L = CAL_V_INDUCTANCE / dI_by_dt;
+        gate_driver_set_duty_cycle(&zeroDC);
         if ((L <= MIN_PHASE_INDUCTANCE) || (L >= MAX_PHASE_INDUCTANCE))
         {
             add_error_flag(ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE);
@@ -105,7 +106,6 @@ bool CalibrateInductance(void)
             motor_set_phase_inductance(L);
             Controller_UpdateCurrentGains();
         }
-        gate_driver_set_duty_cycle(&zeroDC);
     }
     return success;
 }
