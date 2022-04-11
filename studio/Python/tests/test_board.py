@@ -281,9 +281,16 @@ class TestBoard(TMTestCase):
         Test re-calibration without reset
         """
         self.tm.reset()
-        time.sleep(2)
+        time.sleep(3)
         self.check_state(0)
         self.try_calibrate()
+        time.sleep(0.5)
+        self.tm.position_control()
+        self.tm.set_pos_setpoint(0)
+        time.sleep(1.5)
+        self.tm.set_pos_setpoint(50000)
+        time.sleep(1.5)
+        self.tm.idle()
         time.sleep(0.5)
         self.try_calibrate(force=True)
         self.check_state(0)
