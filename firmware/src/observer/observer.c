@@ -29,8 +29,9 @@ static ObserverConfig config = {
 		.ki = 0.0f,
 };
 
-void Observer_Init(void)
+void observer_init(void)
 {
+	observer_reset();
     observer_set_bw(config.track_bw);
 	// We keep local copies of a few key variables from
 	// the encoder, because it is faster than calling
@@ -38,6 +39,13 @@ void Observer_Init(void)
 	state.encoder_type = encoder_get_type();
 	state.encoder_ticks = encoder_get_ticks();
 	state.encoder_half_ticks = state.encoder_ticks/2;
+}
+
+void observer_reset(void)
+{
+	state.pos_sector = 0;
+	state.pos_estimate_wrapped = 0;
+	state.vel_estimate = 0;
 }
 
 PAC5XXX_RAMFUNC void observer_update_estimates(void)

@@ -2,17 +2,17 @@
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
 //  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
-//  * 
-//  * This program is free software: you can redistribute it and/or modify  
-//  * it under the terms of the GNU General Public License as published by  
+//  *
+//  * This program is free software: you can redistribute it and/or modify
+//  * it under the terms of the GNU General Public License as published by
 //  * the Free Software Foundation, version 3.
 //  *
-//  * This program is distributed in the hope that it will be useful, but 
-//  * WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  * This program is distributed in the hope that it will be useful, but
+//  * WITHOUT ANY WARRANTY; without even the implied warranty of
+//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  * General Public License for more details.
 //  *
-//  * You should have received a copy of the GNU General Public License 
+//  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef COMMON_H
@@ -55,36 +55,36 @@
 #include "config.h"
 
 #ifndef PAC5XXX_OK
-#define PAC5XXX_OK      0
+#define PAC5XXX_OK 0
 #endif
 
 #ifndef PAC5XXX_ERROR
-#define PAC5XXX_ERROR   1
+#define PAC5XXX_ERROR 1
 #endif
 
-#define PI       (3.141592f)
-#define TWOPI    (6.283185f)
+#define PI (3.141592f)
+#define TWOPI (6.283185f)
 #define INVTWOPI (0.159155f)
-#define EPSILON  (2.718281f)
+#define EPSILON (2.718281f)
 
-#define PWM_PERIOD_S           (1.0f / PWM_FREQ_HZ)
+#define PWM_PERIOD_S (1.0f / PWM_FREQ_HZ)
 
-#define READ_UINT16(address)   (*((uint16_t *) address))
-#define READ_UINT32(address)   (*((uint32_t *) address))
+#define READ_UINT16(address) (*((uint16_t *)address))
+#define READ_UINT32(address) (*((uint32_t *)address))
 
-#define ERROR_FLAG_MAX_SIZE    (5u)
+#define ERROR_FLAG_MAX_SIZE (5u)
 
-#define ENCODER_TICKS          (8192)
-#define ENCODER_TICKS_FLOAT    (8192.f)
+#define ENCODER_TICKS (8192)
+#define ENCODER_TICKS_FLOAT (8192.f)
 
-#define HALL_SECTORS           (6)
-#define HALL_SECTOR_ANGLE      (TWOPI / HALL_SECTORS)
+#define HALL_SECTORS (6)
+#define HALL_SECTOR_ANGLE (TWOPI / HALL_SECTORS)
 #define CAL_DIR_LEN_PER_SECTOR (CAL_DIR_LEN / HALL_SECTORS)
 
 #if defined BOARD_REV_R32 || defined BOARD_REV_R33
 #define BOARD_REV_R3
 #define CAN_PE23
-#elif defined BOARD_REV_M1 
+#elif defined BOARD_REV_M1
 #define CAN_PF67
 #endif
 
@@ -92,8 +92,8 @@ static const float one_by_sqrt3 = 0.57735026919f;
 static const float two_by_sqrt3 = 1.15470053838f;
 static const float threehalfpi = 4.7123889f;
 static const float pi = PI;
-static const float halfpi = PI*0.5f;
-static const float quarterpi = PI*0.25f;
+static const float halfpi = PI * 0.5f;
+static const float quarterpi = PI * 0.25f;
 static const int32_t timer_freq_hz = ACLK_FREQ_HZ / (pow(2, TXCTL_PS_DIV));
 static const float twopi_by_enc_ticks = TWOPI / ENCODER_TICKS;
 static const float twopi_by_hall_sectors = TWOPI / HALL_SECTORS;
@@ -105,19 +105,21 @@ struct FloatTriplet
 	float C;
 };
 
-typedef enum {
+typedef enum
+{
 	ERROR_NO_ERROR = 0,
 	ERROR_INVALID_STATE = 1,
 	ERROR_CONTROL_BLOCK_REENTERED = 2,
 	ERROR_VBUS_UNDERVOLTAGE = 3,
 	ERROR_OVERCURRENT = 4,
-    ERROR_PWM_LIMIT_EXCEEDED = 5,
+	ERROR_PWM_LIMIT_EXCEEDED = 5,
 	ERROR_PHASE_RESISTANCE_OUT_OF_RANGE = 6,
-    ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE = 7,
-    ERROR_INVALID_POLE_PAIRS = 8,
-    ERROR_ENCODER_READING_UNSTABLE = 9,
+	ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE = 7,
+	ERROR_INVALID_POLE_PAIRS = 8,
+	ERROR_ENCODER_READING_UNSTABLE = 9,
 	ERROR_PLANNER_INVALID_INPUT = 10,
-	ERROR_PLANNER_VCRUISE_OVER_LIMIT = 11
+	ERROR_PLANNER_VCRUISE_OVER_LIMIT = 11,
+	ERROR_HALL_SENSOR_CALIBRATION_FAILED = 12
 } Error;
 
 #endif // #ifndef COMMON_H
