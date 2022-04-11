@@ -40,7 +40,9 @@ typedef struct
 	float ki;
 } ObserverConfig;
 
-void Observer_Init(void);
+void observer_init(void);
+void observer_reset(void);
+
 PAC5XXX_RAMFUNC void observer_update_estimates(void);
 PAC5XXX_RAMFUNC float observer_get_pos_estimate(void);
 PAC5XXX_RAMFUNC float observer_get_diff(float target);
