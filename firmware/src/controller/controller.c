@@ -37,6 +37,7 @@ static ControllerState state = {
 
     .state = STATE_IDLE,
     .mode = CTRL_CURRENT,
+    .is_calibrating = false,
 
     .I_phase_meas = {0.0f, 0.0f, 0.0f},
     .modulation_values = {0.0f, 0.0f, 0.0f},
@@ -88,6 +89,7 @@ void Controller_ControlLoop(void)
 
         if (state.state == STATE_CALIBRATE)
         {
+            state.is_calibrating = true;
             reset_calibration();
             if (ENCODER_MA7XX == encoder_get_type())
             {
@@ -97,6 +99,7 @@ void Controller_ControlLoop(void)
             {
                 (void)((CalibrateResistance() && CalibrateInductance()) && calibrate_hall_sequence());
             }
+            state.is_calibrating = false;
             Controller_SetState(STATE_IDLE);
         }
         else if (state.state == STATE_CL_CONTROL)
@@ -243,7 +246,7 @@ PAC5XXX_RAMFUNC ControlState Controller_GetState(void)
 
 PAC5XXX_RAMFUNC void Controller_SetState(ControlState new_state)
 {
-    if ((new_state != state.state) && (STATE_CALIBRATE != state.state))
+    if ((new_state != state.state) && (false == state.is_calibrating))
     {
         if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE) && (!error_flags_exist()) && motor_is_calibrated())
         {
