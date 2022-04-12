@@ -275,3 +275,83 @@ Example
 .. code-block:: shell
 
     .X
+
+.y
+==
+
+Get position P gain value
+
+Example
+
+.. code-block:: shell
+
+    .y
+    10
+
+.Y
+==
+
+Set position P gain value
+
+Example
+
+.. code-block:: shell
+
+    .Y10
+
+.f
+==
+
+Get velocity P gain value
+
+Example
+
+.. code-block:: shell
+
+    .f
+    10
+
+.F
+==
+
+Set velocity P gain value
+
+Example
+
+.. code-block:: shell
+
+    .F10
+
+.g
+==
+
+Get velocity I gain value
+
+Example
+
+.. code-block:: shell
+
+    .g
+    10
+
+.G
+==
+
+Set velocity I gain value
+
+Example
+
+.. code-block:: shell
+
+    .G10
+
+.J
+==
+
+Set UART baud rate
+
+Example
+
+.. code-block:: shell
+
+    .+57600

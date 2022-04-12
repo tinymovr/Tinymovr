@@ -414,55 +414,60 @@ void uart_interrupt_enable(UART_TYPE uart)
 //==============================================================================
 void uart_init(UART_TYPE uart, uint32_t baudrate)
 {
-    PAC55XX_UART_TYPEDEF *uart_ptr;
-
-    switch (uart)
+    if (baudrate >= 9600 && baudrate <= 1000000)
     {
-        case UARTA:
-            uart_ptr = PAC55XX_UARTA;
-            PAC55XX_SCC->CCSCTL.USAMODE = USART_MODE_UART;      // UART mode
-            break;
+        uart_interrupt_disable(uart);
 
-        case UARTB:
-            uart_ptr = PAC55XX_UARTB;
-            PAC55XX_SCC->CCSCTL.USBMODE = USART_MODE_UART;      // UART mode
-            break;
+        PAC55XX_UART_TYPEDEF *uart_ptr;
 
-        case UARTC:
-            uart_ptr = PAC55XX_UARTC;
-            PAC55XX_SCC->CCSCTL.USCMODE = USART_MODE_UART;      // UART mode
-            break;
+        switch (uart)
+        {
+            case UARTA:
+                uart_ptr = PAC55XX_UARTA;
+                PAC55XX_SCC->CCSCTL.USAMODE = USART_MODE_UART;      // UART mode
+                break;
 
-        case UARTD:
-            uart_ptr = PAC55XX_UARTD;
-            PAC55XX_SCC->CCSCTL.USDMODE = USART_MODE_UART;      // UART mode
-            break;
+            case UARTB:
+                uart_ptr = PAC55XX_UARTB;
+                PAC55XX_SCC->CCSCTL.USBMODE = USART_MODE_UART;      // UART mode
+                break;
 
-        default:
-            uart_ptr = PAC55XX_UARTD;
-            break;
+            case UARTC:
+                uart_ptr = PAC55XX_UARTC;
+                PAC55XX_SCC->CCSCTL.USCMODE = USART_MODE_UART;      // UART mode
+                break;
+
+            case UARTD:
+                uart_ptr = PAC55XX_UARTD;
+                PAC55XX_SCC->CCSCTL.USDMODE = USART_MODE_UART;      // UART mode
+                break;
+
+            default:
+                uart_ptr = PAC55XX_UARTD;
+                break;
+        }
+
+        pac5xxx_uart_config_LCR2(uart_ptr,
+                                UARTLCR_WL_BPC_8,
+                                UART_STOP_BITS_1,
+                                UART_PEN_DISABLE,
+                                UART_PARITY_FORCE_STICK_1,
+                                UART_BRKCTL_DISABLE);
+
+        pac5xxx_uart_config_divisor_latch2(uart_ptr, DF_UART_PCLK/16/baudrate);     // 115kbps = PCLK / (16///DLR)
+
+        //rx FIFO set
+        uart_ptr->FCR.FIFOEN = 1;
+        uart_ptr->FCR.RXFIFORST = 1;
+        pac5xxx_uart_rx_fifo_threshold2(uart_ptr, UARTFCR_TL_8B);
+        pac5xxx_uart_tx_fifo_threshold2(uart_ptr, UARTFCR_TL_8B);
+
+        pac5xxx_uart_int_enable_RDAI2(uart_ptr, UART_INT_ENABLE);
+        // pac5xxx_uart_int_enable_THREI2(uart_ptr, UART_INT_ENABLE);
+
+        uart_io_config(uart);
+        uart_interrupt_enable(uart);
     }
-
-    pac5xxx_uart_config_LCR2(uart_ptr,
-                             UARTLCR_WL_BPC_8,
-                             UART_STOP_BITS_1,
-                             UART_PEN_DISABLE,
-                             UART_PARITY_FORCE_STICK_1,
-                             UART_BRKCTL_DISABLE);
-
-    pac5xxx_uart_config_divisor_latch2(uart_ptr, DF_UART_PCLK/16/baudrate);     // 115kbps = PCLK / (16///DLR)
-
-    //rx FIFO set
-    uart_ptr->FCR.FIFOEN = 1;
-    uart_ptr->FCR.RXFIFORST = 1;
-    pac5xxx_uart_rx_fifo_threshold2(uart_ptr, UARTFCR_TL_8B);
-    pac5xxx_uart_tx_fifo_threshold2(uart_ptr, UARTFCR_TL_8B);
-
-    pac5xxx_uart_int_enable_RDAI2(uart_ptr, UART_INT_ENABLE);
-    // pac5xxx_uart_int_enable_THREI2(uart_ptr, UART_INT_ENABLE);
-
-    uart_io_config(uart);
-    uart_interrupt_enable(uart);
 }
 
 //==============================================================================

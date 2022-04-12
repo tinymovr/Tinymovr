@@ -100,6 +100,10 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
         	planner_move_to_vlimit((float)data);
 		break;
 
+        case 'J': // Set UART baud rate
+            uart_init(UART_ENUM, data);
+		break;
+
         default:
             // No action
         break;
@@ -144,7 +148,7 @@ int32_t UART_ReadAddr(uint8_t addr)
             ret_val = (int32_t)(controller_get_Iq_setpoint_user_frame() * UART_I_SCALING_FACTOR);
         break;
 
-        case 'G': // velocity integrator setpoint
+        case 'g': // velocity integrator setpoint
             ret_val = (int32_t)(Controller_GetVelIntegratorGain() * UART_VEL_INT_SCALING_FACTOR);
         break;
 
@@ -168,7 +172,7 @@ int32_t UART_ReadAddr(uint8_t addr)
             ret_val = motor_is_gimbal();
         break;
 
-        case 'Y': // 
+        case 'y': // 
             ret_val = Controller_GetPosGain();
         break;
 
