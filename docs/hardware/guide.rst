@@ -12,7 +12,7 @@ Requirements
 2. A means to talk CAN Bus, such as CANine or a Canable-compatible adapter.
 3. A mechanical rig that ensures firm connection between the Tinymovr PCB and the brushless motor. Designs that can be 3D printed are available.
 
-Note that the Tinymovr Dev Kit includes all of the above in a ready to use kit.
+Note that the Tinymovr Servo Kit includes all of the above in a ready to use kit.
 
 
 Supported Motor Types
@@ -102,7 +102,7 @@ The connection can be achieved in two ways. Either by soldering the motor leads 
 Connecting Data
 ###############
 
-Connect the CAN bus header to one of the two DF-13 sockets on the board. It is not important which one you choose. If this is a terminal node in the CAN network, you may need to use a termination resistor, as follows:
+Connect the CAN bus header to one of the two CAN sockets on the board. It is not important which one you choose. If this is a terminal node in the CAN network, you may need to use a termination resistor, as follows:
 
 * Tinymovr R3.x: flip ONLY the DIP switch labelled "CAN 120R" to on to enable the 120Ω termination resistor. 
 
@@ -120,7 +120,7 @@ Connecting Power
 
 * Tinymovr R5.x can be powered from a 12-38V (3S-9S) power source.
 
-Upon successful power-up, the onboard LED should light up.
+With the power source off/disconnected, connect the power leads observing correct polarity. Turn on/connect the power source. Upon successful power-up, the onboard LED should light up.
 
 .. note::
    Each Tinymovr board has a capacitance of around 500μF/160. Such capacitance can introduce significant inrush current upon power-on, especially if several boards are connected to the same power supply. To prevent damage to components from overcurrent, the use of an inrush current limiter or a current-limited power supply is advised.

@@ -5,13 +5,13 @@ From Zero to Spin
 Preparation
 ###########
 
-If you are using a Tinymovr Dev Kit, please ensure you have completed :ref:`connecting-data` and :ref:`connecting-power`.
+If you are using a Tinymovr Servo Kit/Tinymovr Dev Kit, please ensure you have completed :ref:`connecting-data` and :ref:`connecting-power`.
 
 If you are using a Tinymovr board in your own setup, please go through :ref:`hardware-overview` and :ref:`hardware-setup`.
 
 If using Tinymovr on Windows with a CANtact-compatible CAN Bus adapter, such as CANine, you will need to install an .inf file to enable proper device naming. You can `download the inf file here <https://canable.io/utilities/windows-driver.zip>`_. Extract the archive, right click and select Install.
 
-If using CAN bus, ensure at least one termination resistor is enabled, either on the CANine adapter, or on one Tinymovr. To enable the termination resistor on CANine, you can take a look at the `CANine connectors diagram <https://canine.readthedocs.io/en/latest/canine.html#hardware-configuration>`_.
+If using CAN bus, you may need to enable at least one termination resistor, either on the CANine adapter, or on one Tinymovr. To enable the termination resistor on CANine, you can take a look at the `CANine connectors diagram <https://canine.readthedocs.io/en/latest/canine.html#hardware-configuration>`_.
 
 Before proceeding to the next steps, ensure your Tinymovr is powered up.
 
@@ -60,10 +60,10 @@ Checking Functionality and Calibrating
 
 IPython should display an array of device-related information.
 
-If you are using a Tinymovr Dev Kit, the motor and encoder should have been already calibrated. If you have your own setup, or if you experience problems with prior calibration, you'll need to go through the following brief calibration procedure.
+If using a Tinymovr Servo Kit/Tinymovr Dev Kit, the motor and encoder should have been already calibrated. If you have your own setup, or if you experience problems with prior calibration, you'll need to go through the following brief calibration procedure.
 
 .. note::
-   After issuing the command below, the motor will spin. Ensure the rotor is free of obstructions or loads.
+   After issuing the command below, the motor will spin. Ensure the rotor is free of obstructions or loads, and the motor is firmly fixed.
 
 .. code-block:: python
 
