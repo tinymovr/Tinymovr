@@ -1,11 +1,8 @@
-.. _hardware-setup-guide:
+.. _hardware-setup:
 
-********************
-Hardware Setup Guide
-********************
-
-.. note::
-   Images in the documentation may refer to slightly different hardware versions. Where incompatibilities among hardware versions do exist, this is noted in the image caption.
+**************
+Hardware Setup
+**************
 
 
 Requirements
@@ -29,12 +26,6 @@ Most three-phase pancake-style outrunners can be used with Tinymovr. While there
 Mechanical Setup
 ################
 
-Board dimensions
-****************
-
-.. image:: dimensions.png
-  :width: 800
-  :alt: Tinymovr dimensions
 
 Mounting motor and Tinymovr
 ***************************
@@ -54,7 +45,7 @@ A `3D printable encoder magnet jig <https://github.com/yconst/Tinymovr/blob/mast
 For a 3D printable motor mount design, check out the `Tinymovr alpha dev kit mount <https://github.com/yconst/Tinymovr/tree/master/hardware/motor-stand>`_ (suitable for 40xx motors).
 
 .. note::
-   For safety reasons, you should always ensure the motor & controller assembly are secured to a stable surface before operation. The motor rotor may experience high acceleration that may cause injury or damage if not secured properly.
+   For safety reasons, you should always ensure the motor & controller assembly are secured to a stable surface before operation. The motor rotor may experience high acceleration that may cause damage or injury if not secured properly.
 
 .. figure:: magnet_mount.jpg
   :width: 800
@@ -64,21 +55,30 @@ For a 3D printable motor mount design, check out the `Tinymovr alpha dev kit mou
 
   Left: Magnet mount directly on shaft. Right: Magnet mount using 3d-printed holder.
 
+
+Magnet on the rear side of the PCB
+
+TL;DR: It is possible to have the magnet on the rear dise of the PCB, i.e. opposite of the magnet sensor IC, but the gap needs to be reduced to account for the PCB thickness. 
+
+This has been verified by MPS in `this forum post <https://forum.monolithicpower.com/t/mounting-ma702-and-magnet-on-opposite-sides-of-pcb/1609>`_, quoted below:
+
+  [...] this type of arrangement is possible, what really matters in the end is that there is enough magnetic field reaching the sensor.
+  Of course the minimum distance is imposed by the thickness of the PCB, so it puts some constraints on the design, that you have to take into account when chosing the magnet (you can use our online simulation tool for that). But as long as the PCB is not acting as a magnetic shield (due to copper plane), then it is fine.
+
+
 Mounting Tips
 
-* Ensure the encoder magnet is firmly attached to the motor shaft, otherwise it may slip out of sync. Use adhesive to secure if necessary.
+* Ensure the encoder magnet is firmly attached to the motor shaft, otherwise it may slip out of sync. Use strong adhesive to secure.
 
 * Calibration needs to be performed without any loads on the motor. If the motor is coupled to a load, the encoder offset angle may not be determined correctly, leading to a sub-optimal setup.
 
 * Adjust your termination resistor DIP switch (if needed) before putting together your actuator, to avoid needing to disassemble it for adjustment later on. See also :ref:`connecting-data`.
 
+
 .. _electrical-setup:
 
 Electrical Setup
 ################
-
-.. warning::
-   Tinymovr Alpha (R3.2) users: Please see :ref:`alpha-erratum-1`.
 
 Electrical setup comprises three main parts: Motor connection, data connection and power connection. Below is a diagram with the electrical connection scheme.
 
@@ -102,7 +102,11 @@ The connection can be achieved in two ways. Either by soldering the motor leads 
 Connecting Data
 ###############
 
-Connect the CAN bus header to one of the two DF-13 sockets on the board. It is not important which one you choose. If this is a terminal node in the CAN network, flip ONLY the DIP switch labelled "CAN 120R" to on to enable the 120Ohm termination resistor. This is the switch closer to the edge of the Tinymovr board.
+Connect the CAN bus header to one of the two DF-13 sockets on the board. It is not important which one you choose. If this is a terminal node in the CAN network, you may need to use a termination resistor, as follows:
+
+* Tinymovr R3.x: flip ONLY the DIP switch labelled "CAN 120R" to on to enable the 120Ω termination resistor. 
+
+* Tinymovr R5.x: you will need to provide an external 120Ω termination resistor.
 
 In small setups with few nodes and short wires, it is better to enable just a single termination resistor, either on one Tinymovr board or on the CAN adapter. In setups with many nodes and long cables, you may need to enable termination resistors in both terminal nodes.
 
@@ -112,39 +116,13 @@ In small setups with few nodes and short wires, it is better to enable just a si
 Connecting Power
 ################
 
-Tinymovr can be powered from a 12-26V (3S-6S) power source. With the power supply off, connect the XT30 plug to the socket on the board and turn on the power supply. On Tinymovr boards equipped with a status LED, the LED should light up.
+* Tinymovr R3.x can be powered from a 12-26V (3S-6S) power source.
+
+* Tinymovr R5.x can be powered from a 12-38V (3S-9S) power source.
+
+Upon successful power-up, the onboard LED should light up.
 
 .. note::
-   Each Tinymovr board has a capacitance of around 500μF. Such capacitance can introduce significant inrush current upon power-on, especially if several boards are connected to the same power supply. To prevent damage to components from overcurrent, the use of an inrush current limiter or a current-limited power supply is advised.
+   Each Tinymovr board has a capacitance of around 500μF/160. Such capacitance can introduce significant inrush current upon power-on, especially if several boards are connected to the same power supply. To prevent damage to components from overcurrent, the use of an inrush current limiter or a current-limited power supply is advised.
 
-.. _alpha-erratum-1:
-
-Connector Diagram
-*****************
-
-.. image:: connectors.png
-  :width: 800
-  :alt: Tinymovr connectors and pinouts
-
-Tinymovr Alpha CAN Bus Connector Erratum
-****************************************
-
-The CANine v1 Adapter that comes with Tinymovr alpha has the DF-13 pins reversed and as such is not compatible with regular DF-13 cables. Alpha users are advised to use the alternative pin header on the board and the included DF-13 to 2.54mm pin converter cable to communicate with Tinymovr, as shown in the diagram below:
-
-.. image:: header.png
-  :width: 300
-  :alt: Tinymovr alpha pin header connection
-
-Note above that the red wire should stay disconnected and to the left side of the board as viewed from the USB port side.
-
-.. _alpha-erratum-2:
-
-Tinymovr Alpha USB Micro Connector Erratum
-******************************************
-
-The USB Micro connector used in the CANine v1 adapter is unfortunately not very robust. In order to ensure that there is a good contact between the board and the USB cable, please ensure the male connector of the cable is firmly seated in the female connector of the board.
-
-In addition, avoid exerting lateral forces to the connector (upwards or downwards) as they place stress on the soldered retaining flaps.
-
-The next adapter iterations (aka CANine) use a USB Type C connector and do not have this issue.
 

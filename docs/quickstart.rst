@@ -7,7 +7,7 @@ Preparation
 
 If you are using a Tinymovr Dev Kit, please ensure you have completed :ref:`connecting-data` and :ref:`connecting-power`.
 
-If you are using a Tinymovr board in your own setup, please go through the :ref:`hardware-setup-guide`.
+If you are using a Tinymovr board in your own setup, please go through :ref:`hardware-overview` and :ref:`hardware-setup`.
 
 If using Tinymovr on Windows with a CANtact-compatible CAN Bus adapter, such as CANine, you will need to install an .inf file to enable proper device naming. You can `download the inf file here <https://canable.io/utilities/windows-driver.zip>`_. Extract the archive, right click and select Install.
 
