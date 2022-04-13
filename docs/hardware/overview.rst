@@ -13,42 +13,18 @@ Tinymovr R5.x is the latest Tinymovr revision. It features increased connectivit
 Board Drawings
 ##############
 
-.. image:: dimensions.png
-  :width: 800
-  :alt: Tinymovr dimensions
+TBA
 
 Connectivity
 ############
 
-.. image:: connectors.png
-  :width: 800
-  :alt: Tinymovr connectors and pinouts
+TBA
 
 
-R3.3, R3.4, R3.5
+R3.x
 ****************
 
-R3.3 is the previous Tinymovr revision, with CAN and UART connectivity.
-
-Board Drawings
-##############
-
-.. image:: dimensions.png
-  :width: 800
-  :alt: Tinymovr dimensions
-
-Connectivity
-############
-
-.. image:: connectors.png
-  :width: 800
-  :alt: Tinymovr connectors and pinouts
-
-
-R3.2
-****
-
-R3.2 was the first Tinymovr revision to become publicly available, featuring CAN and UART connectivity.
+R3.x is the previous Tinymovr revision, with CAN and UART connectivity.
 
 Board Drawings
 ##############
