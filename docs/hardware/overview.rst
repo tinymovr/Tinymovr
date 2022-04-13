@@ -15,12 +15,14 @@ Board Dimensions
 
 .. image:: dimensions_r5.png
   :width: 800
-  :alt: Tinymovr dimensions
+  :alt: Tinymovr R5 dimensions
 
 Connectivity
 ############
 
-TBA
+.. image:: connectors_r5.png
+  :width: 800
+  :alt: Tinymovr R5 connectors and pinouts
 
 
 R3.x
@@ -33,11 +35,11 @@ Board Dimensions
 
 .. image:: dimensions.png
   :width: 800
-  :alt: Tinymovr dimensions
+  :alt: Tinymovr R3.x dimensions
 
 Connectivity
 ############
 
 .. image:: connectors.png
   :width: 800
-  :alt: Tinymovr connectors and pinouts
+  :alt: Tinymovr R3.x connectors and pinouts
