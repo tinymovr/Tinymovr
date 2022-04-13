@@ -11,6 +11,7 @@ Welcome to Tinymovr documentation!
    :caption: Contents:
 
    quickstart
+   hardware/overview
    hardware/guide
    studio/installation
    studio/usage
@@ -23,4 +24,5 @@ Welcome to Tinymovr documentation!
    troubleshooting
    control/theory
    develop/guide
+   hardware/errata
 
