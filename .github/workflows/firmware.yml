@@ -46,18 +46,18 @@ jobs:
 
     - name: Build Debug
       run: |
-        make debug BOARD_REV=${{ matrix.board-revision }}
+        make debug REV=${{ matrix.board-revision }}
         make clean
       working-directory: firmware
     
     - name: Build Upgrade Image
       run: |
-        make upgrade BOARD_REV=${{ matrix.board-revision }}
+        make upgrade REV=${{ matrix.board-revision }}
         make clean
       working-directory: firmware
 
     - name: Build Release
       run: |
-        make release BOARD_REV=${{ matrix.board-revision }}
+        make release REV=${{ matrix.board-revision }}
         make clean
       working-directory: firmware
