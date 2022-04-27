@@ -84,8 +84,10 @@
 #if defined BOARD_REV_R32 || defined BOARD_REV_R33
 #define BOARD_REV_R3
 #define CAN_PE23
-#elif defined BOARD_REV_M1
+#elif defined BOARD_REV_R5
 #define CAN_PF67
+#else
+#error "Board revision incorrect or not defined"
 #endif
 
 static const float one_by_sqrt3 = 0.57735026919f;

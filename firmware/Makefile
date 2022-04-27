@@ -48,6 +48,7 @@ BASEFLAGS += -Wlogical-op
 BASEFLAGS += -Waggregate-return
 BASEFLAGS += -Wshadow
 BASEFLAGS += -Wdouble-promotion
+BASEFLAGS += -DBOARD_REV_$(REV)
 BASEFLAGS += $(INCLUDEFLAGS)
 
 # Compiler flags (c and c++), inherit BASEFLAGS
@@ -115,7 +116,7 @@ release: OBJECTS += $(BUILDDIR)/bootloader.o
 release: upgrade
 
 # Binary target
-binary: $(HEX) $(BIN) $(ELF)
+binary: print_board_rev $(HEX) $(BIN) $(ELF)
 
 # Objcopy to HEX
 $(HEX): $(ELF)
@@ -146,3 +147,10 @@ $(BUILDDIR)/%.o: %.cpp
 .PHONY : clean
 clean :
 	- $(rmdir_cmd) "$(BUILDDIR)"
+
+# Print board revision
+.PHONY: print_board_rev
+print_board_rev:
+	@echo "===Building Tinymovr==="
+	@echo "Board revision is $(REV)"
+	@echo "======================="

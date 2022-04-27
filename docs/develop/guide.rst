@@ -16,17 +16,29 @@ For proper debugging capabilities you will need a Segger J-Link adapter. Unfortu
 
 With the board and J-Link adapter powered off, connect the J-Link to Tinymovr as shown below:
 
-Connection directly to J-Link adapter:
+Connection directly to J-Link adapter for R3.x:
 
-.. image:: jtag.png
+.. image:: jtag_r3x.png
   :width: 800
-  :alt: Tinymovr alpha pin header connection
+  :alt: Tinymovr R3.x pin header connection
 
-Connection with SWD adapter (e.g. isolator):
+Connection directly to J-Link adapter for R5:
 
-.. image:: swd.png
+.. image:: jtag_r5.png
   :width: 800
-  :alt: Tinymovr alpha pin header connection
+  :alt: Tinymovr R5 pin header connection
+
+Connection with SWD adapter (e.g. isolator) for R3.x:
+
+.. image:: swd_r3x.png
+  :width: 800
+  :alt: Tinymovr R5 pin header connection
+
+Connection with SWD adapter (e.g. isolator) for R5:
+
+.. image:: swd_r5.png
+  :width: 800
+  :alt: Tinymovr R5 pin header connection
 
 (diagrams made with `Wireviz <https://github.com/formatc1702/WireViz>`_)
 
@@ -79,7 +91,7 @@ In addition, if you are in Windows you will need to install GNU make. This is ra
 
     choco install make
 
-Once you have the J-Link adapter wired up and the software installed, you are ready to flash and debug the firmware. To try out a test build from within VSCode select Terminal -> Run Task... from the menu bar. Then select Clean and Build Project (Debug). You should end up with a ``build/`` directory inside ``firmware/`` and there you should see the files ``tinymovr_fw.elf`` and ``tinymovr_fw.hex``.
+Once you have the J-Link adapter wired up and the software installed, you are ready to flash and debug the firmware. To try out a test build from within VSCode select Terminal -> Run Task... from the menu bar. Then select Clean and Build Project (Debug), and select the board revision against which you are compiling (R32, R33 or R5). You should end up with a ``build/`` directory inside ``firmware/`` and there you should see the files ``tinymovr_fw.elf`` and ``tinymovr_fw.hex``.
 
 To flash the firmware, provided your J-Link adapter is connected and drivers properly installed, hit F5. After a while you should see a screen like below:
 
@@ -102,6 +114,8 @@ You will need the Qorvo-supplied Eclipse distribution, which is Windows-compatib
 Run the downloaded installer that will install Eclipse and the J-Link utility (ver. 6.31) for you.
 
 Once installation is complete, run Eclipse and import the Tinymovr project. Try building to verify everything is ok. You are now ready to flash and debug using Eclipse.
+
+Please note that for a successful build using Eclipse you will need to `#define` in `config.h` one of `BOARD_REV_R32`, `BOARD_REV_R33` or `BOARD_REV_R5` depending on your board revision.
 
 
 

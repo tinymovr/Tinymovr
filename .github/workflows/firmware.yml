@@ -5,13 +5,16 @@ on: [push]
 jobs:
   check-and-build-fw:
     runs-on: 'ubuntu-20.04'
+    strategy:
+      matrix:
+        board-revision: [R32, R33, R5]
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python 3.7
+    - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
-        python-version: 3.7
+        python-version: "3.10"
 
     - name: Install dependencies
       run: |
@@ -43,18 +46,18 @@ jobs:
 
     - name: Build Debug
       run: |
-        make debug
+        make debug REV=${{ matrix.board-revision }}
         make clean
       working-directory: firmware
     
     - name: Build Upgrade Image
       run: |
-        make upgrade
+        make upgrade REV=${{ matrix.board-revision }}
         make clean
       working-directory: firmware
 
     - name: Build Release
       run: |
-        make release
+        make release REV=${{ matrix.board-revision }}
         make clean
       working-directory: firmware
