@@ -32,7 +32,7 @@
 // --- Board Version
 // #define BOARD_REV_R32
 #define BOARD_REV_R33
-// #define BOARD_REV_M1
+// #define BOARD_REV_R5
 
 #define ACLK_FREQ_HZ                (300000000)
 #define HCLK_FREQ_HZ                (150000000)
