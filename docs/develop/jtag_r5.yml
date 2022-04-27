@@ -1,0 +1,23 @@
+connectors:
+  JLink:
+    type: IDC
+    subtype: male
+    pinlabels: [VTref, NC, nTRST, GND, TDI, GND, TMS, GND, TCK, GND, RTCK, GND, TDO, GND, nRESET, GND, DBGRQ, GND, 5V, GND]
+  Tinymovr:
+    type: JST-SH 4pin
+    subtype: male
+    pinlabels: [GND, DIO, SCLK, VTref]
+
+cables:
+  W1:
+    gauge: 0.25 mm2
+    length: 0.2
+    color_code: DIN
+    wirecount: 4
+    shield: false
+
+connections:
+  -
+    - JLink: [4,7,9,1]
+    - W1: [1,2,3,4]
+    - Tinymovr: [1,2,3,4]
