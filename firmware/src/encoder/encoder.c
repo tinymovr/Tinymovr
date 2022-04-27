@@ -10,14 +10,17 @@ static EncoderState state = { 0 };
 
 void encoder_init(void)
 {
+#ifdef BOARD_REV_R5
     if (ENCODER_MA7XX == config.encoder_type)
     {
+#endif
         ma7xx_init();
         state.current_encoder_type = ENCODER_MA7XX;
         state.get_angle_ptr = &ma7xx_get_angle_rectified;
         state.update_angle_ptr = &ma7xx_update_angle;
         state.reset_encoder_ptr = &ma7xx_clear_rec_table;
         state.ticks = ENCODER_TICKS;
+#ifdef BOARD_REV_R5
     }
     else if (ENCODER_HALL == config.encoder_type)
     {
@@ -28,6 +31,7 @@ void encoder_init(void)
         state.reset_encoder_ptr = &hall_clear_sector_map;
         state.ticks = HALL_SECTORS;
     }
+#endif
 }
 
 void encoder_reset(void)
@@ -55,13 +59,17 @@ PAC5XXX_RAMFUNC uint16_t encoder_get_ticks(void)
 
 PAC5XXX_RAMFUNC float encoder_ticks_to_eangle()
 {
+#ifdef BOARD_REV_R5
     // We need to derive this during call, because the motor pole pairs
     // may change after calibration, or after user input
     if (ENCODER_MA7XX == state.current_encoder_type)
     {
+#endif
         return twopi_by_enc_ticks * motor_get_pole_pairs();
+#ifdef BOARD_REV_R5
     }
     return  twopi_by_hall_sectors;
+#endif
 }
 
 EncoderType encoder_get_type(void)
@@ -71,14 +79,18 @@ EncoderType encoder_get_type(void)
 
 PAC5XXX_RAMFUNC void encoder_set_type(EncoderType enc_type)
 {
+#ifdef BOARD_REV_R5
     if (ENCODER_MA7XX == enc_type)
     {
+#endif
         config.encoder_type = ENCODER_MA7XX;
+#ifdef BOARD_REV_R5
     }
     else if (ENCODER_HALL == enc_type)
     {
         config.encoder_type = ENCODER_HALL;
     }
+#endif
 }
 
 EncoderConfig* encoder_get_config(void)

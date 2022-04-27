@@ -5,6 +5,9 @@ on: [push]
 jobs:
   check-and-build-fw:
     runs-on: 'ubuntu-20.04'
+    strategy:
+      matrix:
+        board-revision: [R32, R33, R5]
     steps:
     - uses: actions/checkout@v2
 
@@ -43,18 +46,18 @@ jobs:
 
     - name: Build Debug
       run: |
-        make debug
+        make debug BOARD_REV=${{ matrix.board-revision }}
         make clean
       working-directory: firmware
     
     - name: Build Upgrade Image
       run: |
-        make upgrade
+        make upgrade BOARD_REV=${{ matrix.board-revision }}
         make clean
       working-directory: firmware
 
     - name: Build Release
       run: |
-        make release
+        make release BOARD_REV=${{ matrix.board-revision }}
         make clean
       working-directory: firmware
