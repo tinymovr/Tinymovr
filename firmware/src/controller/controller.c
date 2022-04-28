@@ -90,6 +90,7 @@ void Controller_ControlLoop(void)
         if (state.state == STATE_CALIBRATE)
         {
             state.is_calibrating = true;
+            reset_calibration();
             if (ENCODER_MA7XX == encoder_get_type())
             {
                 (void)((CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && calibrate_offset_and_rectification());
@@ -245,7 +246,7 @@ PAC5XXX_RAMFUNC ControlState controller_get_state(void)
 
 PAC5XXX_RAMFUNC void controller_set_state(ControlState new_state)
 {
-    if ((new_state != state.state) && (state.is_calibrating == false))
+    if ((new_state != state.state) && (false == state.is_calibrating))
     {
         if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE) && (!error_flags_exist()) && motor_is_calibrated())
         {

@@ -6,7 +6,7 @@
         {
             "type": "shell",
             "label": "Build Project (Debug)",
-            "command": "make debug",
+            "command": "make debug REV=${input:board_revision}",
             "options": {
                 "cwd": "${workspaceFolder}/firmware"
             },
@@ -22,7 +22,7 @@
         {
             "type": "shell",
             "label": "Build Project (Release)",
-            "command": "make release",
+            "command": "make release REV=${input:board_revision}",
             "options": {
                 "cwd": "${workspaceFolder}/firmware"
             },
@@ -35,7 +35,7 @@
         {
             "type": "shell",
             "label": "Clean and Build Project (Debug)",
-            "command": "make clean; make debug",
+            "command": "make clean; make debug REV=${input:board_revision}",
             "options": {
                 "cwd": "${workspaceFolder}/firmware"
             },
@@ -48,7 +48,7 @@
         {
             "type": "shell",
             "label": "Clean and Build Project (Release)",
-            "command": "make clean; make release",
+            "command": "make clean; make release REV=${input:board_revision}",
             "options": {
                 "cwd": "${workspaceFolder}/firmware"
             },
@@ -61,7 +61,7 @@
         {
             "type": "shell",
             "label": "Clean and Build Project (Upgrade)",
-            "command": "make clean; make upgrade",
+            "command": "make clean; make upgrade REV=${input:board_revision}",
             "options": {
                 "cwd": "${workspaceFolder}/firmware"
             },
@@ -70,6 +70,19 @@
                 "base": "$gcc", 
                 "fileLocation": ["relative", "${workspaceFolder}/firmware"]
             }
-        },
+        }
+    ],
+    "inputs": [
+        {
+            "type": "pickString",
+            "id": "board_revision",
+            "description": "The board revision against which firmware is built",
+            "options": [
+                "R32",
+                "R33",
+                "R5"
+            ],
+            "default": "R5"
+        }
     ]
 }

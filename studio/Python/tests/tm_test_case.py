@@ -41,9 +41,9 @@ class TMTestCase(unittest.TestCase):
         cls.tm.reset()
         time.sleep(timeout)
 
-    def try_calibrate(self, *args, **kwargs):
+    def try_calibrate(self, force=False, *args, **kwargs):
         motor_config = self.tm.motor_config
-        if motor_config.flags == 0 or motor_config.flags == 2:
+        if True == force or (motor_config.flags == 0 or motor_config.flags == 2):
             self.tm.calibrate()
             self.wait_for_calibration(*args, **kwargs)
             motor_config = self.tm.motor_config

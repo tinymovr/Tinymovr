@@ -36,7 +36,7 @@ int main(void)
     nvm_load_config(); // This will TRY to deserialize and import config
     encoder_init();
     UART_Init();
-	Observer_Init();
+	observer_init();
 	ADC_Init();
 	GateDriver_Init();
     CAN_init();

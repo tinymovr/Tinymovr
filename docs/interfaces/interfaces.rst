@@ -16,7 +16,7 @@ By default, the CAN baud rate is set to 1Mbit/s. This is customizable both throu
 Addressing
 ##########
 
-The 11-bit identifier of the CAN frame is used for device and endpoint identification. The 5 least significant bits of the identifier are reserved for endpoints, and the 6 most significant bits for device identification. This suggests that the total number of addressable endpoints in a single device are 32, and the total number of addressable devices are 64. 
+The 11-bit identifier of the CAN frame is used for device and endpoint identification. The 6 least significant bits of the identifier are reserved for endpoints, and the 5 most significant bits for device identification. This suggests that the total number of addressable endpoints in a single device are 64, and the total number of addressable devices are 32. 
 
 API
 ###

@@ -33,7 +33,7 @@ static MA7xxState state = { 0 };
 #if defined(BOARD_REV_R3)
 #define PRIMARY_ENCODER_SSP_PORT SSPD
 #define PRIMARY_ENCODER_SSP_STRUCT PAC55XX_SSPD
-#elif defined(BOARD_REV_M1)
+#elif defined(BOARD_REV_R5)
 #define PRIMARY_ENCODER_SSP_PORT SSPC
 #define PRIMARY_ENCODER_SSP_STRUCT PAC55XX_SSPC
 #endif

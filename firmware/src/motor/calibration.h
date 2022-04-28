@@ -15,8 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SRC_MOTOR_CALIBRATION_H_
-#define SRC_MOTOR_CALIBRATION_H_
+#pragma once
 
 #include <src/common.h>
 #include <src/motor/motor.h>
@@ -26,5 +25,4 @@ bool CalibrateInductance(void);
 bool CalibrateDirectionAndPolePairs(void);
 bool calibrate_hall_sequence(void);
 bool calibrate_offset_and_rectification(void);
-
-#endif /* SRC_MOTOR_CALIBRATION_H_ */
+void reset_calibration(void);

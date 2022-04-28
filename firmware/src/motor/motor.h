@@ -15,8 +15,7 @@
 //  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef MOTOR_MOTOR_H_
-#define MOTOR_MOTOR_H_
+#pragma once
 
 #define MIN_PHASE_RESISTANCE (0.005f)
 #define MAX_PHASE_RESISTANCE (1.0f)
@@ -53,6 +52,8 @@ typedef struct
 	bool is_gimbal;
 } MotorConfig;
 
+void motor_reset_calibration(void);
+
 PAC5XXX_RAMFUNC uint8_t motor_get_pole_pairs(void);
 PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad);
 PAC5XXX_RAMFUNC void motor_set_pole_pairs(uint8_t pairs);
@@ -85,4 +86,3 @@ PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir);
 MotorConfig *motor_get_config(void);
 void motor_restore_config(MotorConfig *config_);
 
-#endif /* MOTOR_MOTOR_H_ */

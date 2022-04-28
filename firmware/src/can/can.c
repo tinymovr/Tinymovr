@@ -25,7 +25,7 @@
 
 #if defined(BOARD_REV_R3)
 #define CAN_BUS_PINS CAN_PE23
-#elif defined(BOARD_REV_M1)
+#elif defined(BOARD_REV_R5)
 #define CAN_BUS_PINS CAN_PF67
 #endif
 
@@ -35,7 +35,7 @@ static CANConfig config = {
 
 void CAN_init(void)
 {
-#if defined(BOARD_REV_M1)
+#if defined(BOARD_REV_R5)
     // Configure PD7 as GPIO output
     PAC55XX_GPIOD->MODE.P7 = IO_PUSH_PULL_OUTPUT; // GPIO configured as an output
     PAC55XX_SCC->PDMUXSEL.w &= 0xFFFFFF0F;        // Clear bits to select GPIO function

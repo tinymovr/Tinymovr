@@ -21,6 +21,7 @@
 
 typedef void (*bool_setter)(bool);
 typedef int16_t (*int16_getter)(void);
+typedef void (*void_func)(void);
 
 typedef enum {
 	ENCODER_MA7XX = 0,
@@ -31,6 +32,7 @@ typedef struct {
     EncoderType current_encoder_type;
     bool_setter update_angle_ptr;
     int16_getter get_angle_ptr;
+    void_func reset_encoder_ptr;
     uint16_t ticks;
 } EncoderState;
 
@@ -40,6 +42,8 @@ typedef struct
 } EncoderConfig;
 
 void encoder_init(void);
+void encoder_reset(void);
+
 PAC5XXX_RAMFUNC int16_t encoder_get_angle(void);
 PAC5XXX_RAMFUNC void encoder_update_angle(bool check_error);
 

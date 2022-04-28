@@ -36,6 +36,19 @@ static MotorConfig config = {
 	.phases_swapped = false,
 	.is_gimbal = false};
 
+void motor_reset_calibration()
+{
+	config.pole_pairs = 7;
+	config.phase_resistance = 0.1f;
+	config.phase_inductance = 1e-5f;
+	config.user_offset = 0.0f;
+	config.user_direction = 1;
+	config.resistance_calibrated = false;
+	config.inductance_calibrated = false;
+	config.poles_calibrated = false;
+	config.phases_swapped = false;
+}
+
 PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad)
 {
 	const float mpos_diff = our_fabsf(mpos_end - mpos_start);
@@ -65,13 +78,13 @@ PAC5XXX_RAMFUNC void motor_set_pole_pairs(uint8_t pairs)
 		config.pole_pairs = pairs;
 		config.poles_calibrated = true;
 	}
-	// TODO: else error
 }
 
 PAC5XXX_RAMFUNC float motor_get_phase_resistance(void)
 {
 	return config.phase_resistance;
 }
+
 PAC5XXX_RAMFUNC void motor_set_phase_resistance(float R)
 {
 	if ((R > MIN_PHASE_RESISTANCE) && ((R < MAX_PHASE_RESISTANCE) || motor_get_is_gimbal()))
@@ -89,6 +102,7 @@ PAC5XXX_RAMFUNC float motor_get_phase_inductance(void)
 {
 	return config.phase_inductance;
 }
+
 PAC5XXX_RAMFUNC void motor_set_phase_inductance(float L)
 {
 	if ((L > MIN_PHASE_INDUCTANCE) && ((L < MAX_PHASE_INDUCTANCE) || motor_get_is_gimbal()))
