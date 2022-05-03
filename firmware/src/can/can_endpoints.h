@@ -1,5 +1,5 @@
 /*
-* This file was automatically generated using csnake v0.3.4.
+* This file was automatically generated using csnake v0.3.5.
 *
 * This file should not be edited directly, any changes will be
 * overwritten next time the script is run.

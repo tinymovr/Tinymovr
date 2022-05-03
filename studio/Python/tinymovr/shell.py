@@ -1,12 +1,11 @@
 """Tinymovr Shell Utility
 
 Usage:
-    tinymovr [--ids=<ids>] [--bustype=<bustype>] [--chan=<chan>] [--bitrate=<bitrate>] [--no-version-check]
+    tinymovr [--bustype=<bustype>] [--chan=<chan>] [--bitrate=<bitrate>] [--no-version-check]
     tinymovr -h | --help
     tinymovr --version
 
 Options:
-    --ids=<ids>          CAN node IDs to search [default: 1-10]
     --bustype=<bustype>  CAN bus type to use [default: slcan].
     --chan=<chan>        CAN channel (i.e. device) to use [default: auto].
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
@@ -24,11 +23,13 @@ import pynumparser
 from tinymovr import UserWrapper, VersionError
 from tinymovr.iface import IFace
 from tinymovr.iface.can_bus import CANBus, guess_channel
+
 try:
     from tinymovr.plotter import plot
 except ImportError:
     import warnings
-    warnings.warn('matplotlib not found, please install to enable plotting')
+
+    warnings.warn("matplotlib not found, please install to enable plotting")
 from tinymovr.units import get_registry
 
 """
@@ -56,9 +57,6 @@ def spawn_shell():
 
     logger = configure_logging()
 
-    num_parser = pynumparser.NumberSequence(limits=(0, 16))
-    node_ids = num_parser(arguments["--ids"])
-    
     bustype: str = arguments["--bustype"]
     channel: str = arguments["--chan"]
     bitrate: int = int(arguments["--bitrate"])
@@ -67,20 +65,6 @@ def spawn_shell():
         channel = guess_channel(bustype_hint=bustype)
     can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
     iface: IFace = CANBus(can_bus)
-
-    tms: Dict = {}
-    for node_id in node_ids:
-        try:
-            tm: UserWrapper = UserWrapper(node_id=node_id, iface=iface, version_check=do_version_check)
-            tm_name: str = base_name + str(node_id)
-            logger.info("Connected to {}".format(tm_name))
-            tms[tm_name] = tm
-        except TimeoutError:
-            logger.info("Node {} timed out".format(node_id))
-        except IOError as e:
-            logger.error(str(e))
-        except VersionError as e:
-            logger.warning(str(e))
 
     if len(tms) == 0:
         logger.error("No Tinymovr instances detected. Exiting shell...")

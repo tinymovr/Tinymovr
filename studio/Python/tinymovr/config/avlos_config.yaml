@@ -5,8 +5,8 @@ generators:
   generator_c:
     enabled: true
     paths:
-      output_header: ../../../firmware/src/can/can_endpoints.h
-      output_impl: ../../../firmware/src/can/can_endpoints.c
+      output_header: ../../../../firmware/src/can/can_endpoints.h
+      output_impl: ../../../../firmware/src/can/can_endpoints.c
     c_header_includes:
     - src/common.h
     c_impl_includes:
@@ -21,5 +21,5 @@ generators:
   generator_rst:
     enabled: true
     paths:
-      output_file: ../../../docs/api/reference.rst
+      output_file: ../../../../docs/api/reference.rst
 

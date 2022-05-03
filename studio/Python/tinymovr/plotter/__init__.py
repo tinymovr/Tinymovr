@@ -1,1 +1,0 @@
-from tinymovr.plotter.plotter import plot
