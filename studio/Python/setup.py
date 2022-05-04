@@ -33,7 +33,10 @@ setup(
     ],
     extras_require={"plot": ["matplotlib"]},
     entry_points={
-        "console_scripts": ["tinymovr=tinymovr.shell:spawn_shell"],
+        "console_scripts": [
+            "tinymovr_cli=tinymovr.cli:spawn",
+            "tinymovr=tinymovr.gui:spawn",
+        ],
         "can.interface": [
             "insilico=tinymovr.bus:InSilico",
         ],

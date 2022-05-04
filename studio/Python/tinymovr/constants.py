@@ -1,16 +1,22 @@
-
 from enum import IntEnum
+
+
+app_name = "Tinymovr Studio"
+base_node_name = "tm"
+
 
 class ControlStates(IntEnum):
     Idle = 0
     Calibration = 1
     ClosedLoopControl = 2
 
+
 class ControlModes(IntEnum):
     CurrentControl = 0
     VelocityControl = 1
     PositionControl = 2
     TrajectoryControl = 3
+
 
 class ErrorIDs(IntEnum):
     InvalidState = 1
@@ -37,5 +43,5 @@ error_descriptions = {
     ErrorIDs.InvalidPolePairs: "Pole pairs calculation did not converge to a valid value",
     ErrorIDs.EncoderReadingOutOfRange: "The encoder angle reading is out of range",
     ErrorIDs.InvalidPlannerInput: "The trajectory planner received invalid input",
-    ErrorIDs.PlannerVCruiseOverLimit: "The computed trajectory planner cruise velocity is over the current velocity limit"
-}    
+    ErrorIDs.PlannerVCruiseOverLimit: "The computed trajectory planner cruise velocity is over the current velocity limit",
+}
