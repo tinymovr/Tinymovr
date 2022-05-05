@@ -1,12 +1,13 @@
 """Tinymovr CLI
 
 Usage:
-    tinymovr [--bus=<bus>] [--bitrate=<bitrate>]
+    tinymovr [--bus=<bus>] [--chan=<chan>] [--bitrate=<bitrate>]
     tinymovr -h | --help
     tinymovr --version
 
 Options:
     --bus=<bus>  One or more interfaces to use, first available is used [default: socketcan,slcan].
+    --chan=<chan>  The bus device "channel".
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
 
@@ -40,7 +41,13 @@ def spawn():
 
     logger = configure_logging()
 
-    bustype, channel = get_bus_config(arguments["--bus"].rsplit(sep=","))
+    buses = arguments["--bus"].rsplit(sep=",")
+    channel = arguments["--chan"]
+
+    if not channel:
+        bustype, channel = get_bus_config(buses)
+    else:
+        bustype = buses[0]
     bitrate = int(arguments["--bitrate"])
     bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
 
