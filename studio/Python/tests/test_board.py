@@ -97,28 +97,24 @@ class TestBoard(TMTestCase):
             self.tm.set_vel_setpoint(target)
             time.sleep(0.2)
             velocity_pairs.append((target, self.tm.encoder_estimates.velocity))
-            time.sleep(0.3)
 
         for i in range(R):
             target = (R - i) * 20000 * ticks / s
             self.tm.set_vel_setpoint(target)
             time.sleep(0.2)
             velocity_pairs.append((target, self.tm.encoder_estimates.velocity))
-            time.sleep(0.3)
 
         for i in range(R):
             target = -i * 20000 * ticks / s
             self.tm.set_vel_setpoint(target)
             time.sleep(0.2)
             velocity_pairs.append((target, self.tm.encoder_estimates.velocity))
-            time.sleep(0.3)
 
         for i in range(R):
             target = (i - R) * 20000 * ticks / s
             self.tm.set_vel_setpoint(target)
             time.sleep(0.2)
             velocity_pairs.append((target, self.tm.encoder_estimates.velocity))
-            time.sleep(0.3)
 
         for target, estimate in velocity_pairs:
             self.assertAlmostEqual(target, estimate, delta=30000 * ticks / s)
