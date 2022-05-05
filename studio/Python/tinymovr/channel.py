@@ -19,7 +19,7 @@ class ResponseError(Exception):
         self.kw = kw
 
 
-class CANBusChannel:
+class CANChannel:
     def __init__(self, node_id, bus):
         self.node_id = node_id
         self.bus = bus

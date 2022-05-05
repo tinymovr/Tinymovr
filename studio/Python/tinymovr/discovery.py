@@ -12,7 +12,7 @@ import time
 import threading
 import yaml
 import importlib.resources
-from tinymovr.channel import CANBusChannel, ResponseError
+from tinymovr.channel import CANChannel, ResponseError
 from tinymovr.tee import Tee
 from tinymovr.constants import HEARTBEAT_BASE
 from avlos.deserializer import deserialize
@@ -67,7 +67,7 @@ class Discovery:
                 elif node_id not in self.pending_nodes:
                     self.pending_nodes.add(node_id)
                     tee = Tee(self.bus, lambda msg: msg.arbitration_id == node_id)
-                    chan = CANBusChannel(node_id, tee)
+                    chan = CANChannel(node_id, tee)
                     try:
                         node = deserialize(self.dev_def)
                         node.set_channel(chan)
