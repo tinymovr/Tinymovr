@@ -20,8 +20,8 @@ def get_bus_config(suggested_types=None):
     try:
         config = configs[0]
         return config["interface"], config["channel"]
-    except IndexError:
-        raise can.CanInitializationError("No active interface found")
+    except IndexError as exc:
+        raise can.CanInitializationError("No active interface found") from exc
 
 
 def configure_logging():
