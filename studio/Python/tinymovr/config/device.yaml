@@ -15,6 +15,16 @@ remote_attributes:
     unit: degC
     c_getter: adc_get_mcu_temp
     description: The internal temperature of the PAC55xx MCU.
+  - name: cycles
+    remote_attributes:
+      - name: total
+        dtype: uint32
+        c_getter: Scheduler_GetTotalCycles
+        description: Total processor cycles in a single PWM cycle.
+      - name: busy
+        dtype: uint32
+        c_getter: Scheduler_GetBusyCycles
+        description: Busy processor cycles in a single PWM cycle.
   - name: controller
     remote_attributes:
       - name: state
@@ -118,6 +128,33 @@ remote_attributes:
         c_getter: motor_get_is_gimbal
         c_setter: motor_set_is_gimbal
         description: The type of the motor. Either high current or gimbal.
+      - name: offset
+        dtype: float
+        c_getter: motor_get_user_offset
+        c_setter: motor_set_user_offset
+        description: User-defined offset of the motor.
+      - name: direction
+        dtype: uint8
+        c_getter: motor_get_user_direction
+        c_setter: motor_set_user_direction
+        description: User-defined direction of the motor.
+      - name: phase_currents
+        remote_attributes:
+          - name: U
+            dtype: float
+            unit: ampere
+            c_getter: motor_get_IU
+            description: Measured current in phase U.
+          - name: V
+            dtype: float
+            unit: ampere
+            c_getter: motor_get_IV
+            description: Measured current in phase V.
+          - name: W
+            dtype: float
+            unit: ampere
+            c_getter: motor_get_IW
+            description: Measured current in phase W.
   - name: encoder
     remote_attributes:
       - name: position_estimate
@@ -125,10 +162,40 @@ remote_attributes:
         unit: ticks
         c_getter: observer_get_pos_estimate
         description: The filtered encoder position estimate.
+      - name: type
+        #values: [INTERNAL, HALL]
+        dtype: uint8
+        c_getter: encoder_get_type
+        c_setter: encoder_set_type
+        description: The encoder type. Either INTERNAL or HALL.
       - name: bandwidth
         dtype: float
         unit: rad/s
         c_getter: observer_get_bw
         c_setter: observer_set_bw
         description: The encoder observer bandwidth.
-
+  - name: traj_planner
+    remote_attributes:
+      - name: max_accel
+        dtype: float
+        unit: ticks/s
+        c_getter: planner_get_max_accel
+        c_setter: planner_set_max_accel
+        description: The trajectory planner max acceleration.
+      - name: max_decel
+        dtype: float
+        unit: ticks/second/second
+        c_getter: planner_get_max_decel
+        c_setter: planner_set_max_decel
+        description: The trajectory planner max deceleration.
+      - name: max_vel
+        dtype: float
+        unit: ticks/second
+        c_getter: planner_get_max_vel
+        c_setter: planner_set_max_vel
+        description: The trajectory planner max cruise velocity.
+      - name: pos_setpoint
+        dtype: float
+        unit: ticks
+        c_setter: planner_move_to_vlimit
+        description: The position setpoint of the trajectory planner.
