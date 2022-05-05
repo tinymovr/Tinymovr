@@ -56,7 +56,6 @@ class Discovery:
         correct tee, as such will not disrupt other receivers.
         """
         while True:
-            print("ssss")
             self.logger.debug("Discovery iteration...")
             now = time.time()
             msg = self.tee.recv()
@@ -70,7 +69,7 @@ class Discovery:
                     chan = CANChannel(node_id, tee)
                     try:
                         node = deserialize(self.dev_def)
-                        node.set_channel(chan)
+                        node._channel = chan
                         self.active_nodes[node_id] = node
                         self.update_stamps[node_id] = now
                         self.appeared_cb(node, node_id)

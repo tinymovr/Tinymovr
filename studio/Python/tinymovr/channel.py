@@ -9,8 +9,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 """
 
 import can
+from functools import cached_property
 from tinymovr.constants import CAN_EP_BITS, CAN_EP_SIZE, CAN_EP_MASK
-
+from tinymovr.codec import MultibyteCodec
 
 class ResponseError(Exception):
     def __init__(self, kw, *args, **kwargs):
@@ -61,6 +62,10 @@ class CANChannel:
             is_remote_frame=rtr,
             data=payload,
         )
+
+    @cached_property
+    def serializer(self):
+        return MultibyteCodec()
 
 
 def extract_node_message_id(arbitration_id):
