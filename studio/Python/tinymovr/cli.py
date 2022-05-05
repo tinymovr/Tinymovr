@@ -6,7 +6,7 @@ Usage:
     tinymovr --version
 
 Options:
-    --bus=<bus>  CAN bus to use [default: auto].
+    --bus=<bus>  One or more interfaces to use, first available is used [default: socketcan,slcan].
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
 
@@ -40,7 +40,7 @@ def spawn():
 
     logger = configure_logging()
 
-    bustype, channel = get_bus_config(arguments["--bus"])
+    bustype, channel = get_bus_config(arguments["--bus"].rsplit(sep=","))
     bitrate = int(arguments["--bitrate"])
     bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
 

@@ -1,12 +1,21 @@
+"""
+Copyright 2022 Ioannis Chatzikonstantinou (Tinymovr)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
 import time
 import threading
 import yaml
 import importlib.resources
 from tinymovr.channel import CANBusChannel, ResponseError
 from tinymovr.tee import Tee
+from tinymovr.constants import HEARTBEAT_BASE
 from avlos.deserializer import deserialize
-
-HEARTBEAT_BASE = 0x700
 
 
 class Discovery:
@@ -47,6 +56,8 @@ class Discovery:
         correct tee, as such will not disrupt other receivers.
         """
         while True:
+            print("ssss")
+            self.logger.debug("Discovery iteration...")
             now = time.time()
             msg = self.tee.recv()
             while msg:
