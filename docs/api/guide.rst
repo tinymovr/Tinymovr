@@ -19,9 +19,9 @@ Here below is an example using the API from Python scripts and controlling hardw
 
     import can
     from tinymovr import Tinymovr
-    from tinymovr.iface.can import CAN
+    from tinymovr.iface.can_bus import CAN
 
-    bus = can.Bus(bustype="cantact", channel="COM1", bitrate=1000000)
+    bus = can.Bus(bustype="slcan", channel="your_com_port", bitrate=1000000)
     iface = CAN(bus)
     tm = Tinymovr(node_id=1, iface=iface)
 
