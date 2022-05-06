@@ -1,5 +1,5 @@
 /*
-* This file was automatically generated using csnake v0.3.5.
+* This file was automatically generated using csnake v0.3.4.
 *
 * This file should not be edited directly, any changes will be
 * overwritten next time the script is run.
@@ -28,7 +28,7 @@ typedef enum
     AVLOS_CMD_READ = 1
 } Avlos_Command;
 
-uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len, uint8_t cmd);
+static uint32_t avlos_proto_hash = 3354184238;
 
 /*
 * avlos_tm_uid
@@ -281,36 +281,6 @@ uint8_t avlos_tm_motor_offset(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comm
 uint8_t avlos_tm_motor_direction(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_motor_phase_currents_U
-*
-* Measured current in phase U.
-*
-* @param buffer
-* @param buffer_len
-*/
-uint8_t avlos_tm_motor_phase_currents_U(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
-
-/*
-* avlos_tm_motor_phase_currents_V
-*
-* Measured current in phase V.
-*
-* @param buffer
-* @param buffer_len
-*/
-uint8_t avlos_tm_motor_phase_currents_V(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
-
-/*
-* avlos_tm_motor_phase_currents_W
-*
-* Measured current in phase W.
-*
-* @param buffer
-* @param buffer_len
-*/
-uint8_t avlos_tm_motor_phase_currents_W(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
-
-/*
 * avlos_tm_encoder_position_estimate
 *
 * The filtered encoder position estimate.
@@ -380,4 +350,4 @@ uint8_t avlos_tm_traj_planner_max_vel(uint8_t * buffer, uint8_t * buffer_len, Av
 */
 uint8_t avlos_tm_traj_planner_pos_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
-static uint8_t (*avlos_endpoints[36])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_get_hash, &avlos_tm_uid, &avlos_tm_Vbus, &avlos_tm_temp, &avlos_tm_cycles_total, &avlos_tm_cycles_busy, &avlos_tm_controller_state, &avlos_tm_controller_mode, &avlos_tm_controller_pos_setpoint, &avlos_tm_controller_vel_setpoint, &avlos_tm_controller_Iq_setpoint, &avlos_tm_controller_Iq_estimate, &avlos_tm_controller_pos_p_gain, &avlos_tm_controller_vel_p_gain, &avlos_tm_controller_vel_i_gain, &avlos_tm_controller_Iq_p_gain, &avlos_tm_controller_vel_integrator_gain, &avlos_tm_controller_vel_integrator_deadband, &avlos_tm_comms_can_rate, &avlos_tm_comms_can_id, &avlos_tm_motor_R, &avlos_tm_motor_L, &avlos_tm_motor_pole_pairs, &avlos_tm_motor_type, &avlos_tm_motor_offset, &avlos_tm_motor_direction, &avlos_tm_motor_phase_currents_U, &avlos_tm_motor_phase_currents_V, &avlos_tm_motor_phase_currents_W, &avlos_tm_encoder_position_estimate, &avlos_tm_encoder_type, &avlos_tm_encoder_bandwidth, &avlos_tm_traj_planner_max_accel, &avlos_tm_traj_planner_max_decel, &avlos_tm_traj_planner_max_vel, &avlos_tm_traj_planner_pos_setpoint};
+static uint8_t (*avlos_endpoints[32])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_tm_uid, &avlos_tm_Vbus, &avlos_tm_temp, &avlos_tm_cycles_total, &avlos_tm_cycles_busy, &avlos_tm_controller_state, &avlos_tm_controller_mode, &avlos_tm_controller_pos_setpoint, &avlos_tm_controller_vel_setpoint, &avlos_tm_controller_Iq_setpoint, &avlos_tm_controller_Iq_estimate, &avlos_tm_controller_pos_p_gain, &avlos_tm_controller_vel_p_gain, &avlos_tm_controller_vel_i_gain, &avlos_tm_controller_Iq_p_gain, &avlos_tm_controller_vel_integrator_gain, &avlos_tm_controller_vel_integrator_deadband, &avlos_tm_comms_can_rate, &avlos_tm_comms_can_id, &avlos_tm_motor_R, &avlos_tm_motor_L, &avlos_tm_motor_pole_pairs, &avlos_tm_motor_type, &avlos_tm_motor_offset, &avlos_tm_motor_direction, &avlos_tm_encoder_position_estimate, &avlos_tm_encoder_type, &avlos_tm_encoder_bandwidth, &avlos_tm_traj_planner_max_accel, &avlos_tm_traj_planner_max_decel, &avlos_tm_traj_planner_max_vel, &avlos_tm_traj_planner_pos_setpoint};

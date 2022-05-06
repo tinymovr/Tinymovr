@@ -1,5 +1,5 @@
 /*
-* This file was automatically generated using csnake v0.3.5.
+* This file was automatically generated using csnake v0.3.4.
 *
 * This file should not be edited directly, any changes will be
 * overwritten next time the script is run.
@@ -20,8 +20,6 @@
 #include "src/controller/controller.h"
 #include "src/nvm/nvm.h"
 #include "can_endpoints.h"
-
-uint8_t avlos_get_hash(uint8_t * buffer, uint8_t * buffer_len, uint8_t cmd) { const uint32_t v = 0x503e4a86; memcpy(buffer, &v, sizeof(v)); return AVLOS_RET_READ; }
 
 uint8_t avlos_tm_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
@@ -413,42 +411,6 @@ uint8_t avlos_tm_motor_direction(uint8_t * buffer, uint8_t * buffer_len, Avlos_C
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t avlos_tm_motor_phase_currents_U(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
-{
-    float v;
-    if (AVLOS_CMD_READ == cmd) {
-        v = motor_get_IU();
-        *buffer_len = sizeof(v);
-        memcpy(buffer, &v, sizeof(v));
-        return AVLOS_RET_READ;
-    }
-    return AVLOS_RET_NOACTION;
-}
-
-uint8_t avlos_tm_motor_phase_currents_V(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
-{
-    float v;
-    if (AVLOS_CMD_READ == cmd) {
-        v = motor_get_IV();
-        *buffer_len = sizeof(v);
-        memcpy(buffer, &v, sizeof(v));
-        return AVLOS_RET_READ;
-    }
-    return AVLOS_RET_NOACTION;
-}
-
-uint8_t avlos_tm_motor_phase_currents_W(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
-{
-    float v;
-    if (AVLOS_CMD_READ == cmd) {
-        v = motor_get_IW();
-        *buffer_len = sizeof(v);
-        memcpy(buffer, &v, sizeof(v));
-        return AVLOS_RET_READ;
-    }
-    return AVLOS_RET_NOACTION;
-}
-
 uint8_t avlos_tm_encoder_position_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     float v;
@@ -549,13 +511,7 @@ uint8_t avlos_tm_traj_planner_max_vel(uint8_t * buffer, uint8_t * buffer_len, Av
 uint8_t avlos_tm_traj_planner_pos_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     float v;
-    if (AVLOS_CMD_READ == cmd) {
-        v = None();
-        *buffer_len = sizeof(v);
-        memcpy(buffer, &v, sizeof(v));
-        return AVLOS_RET_READ;
-    }
-    else if (AVLOS_CMD_WRITE == cmd) {
+    if (AVLOS_CMD_WRITE == cmd) {
         memcpy(&v, buffer, sizeof(v));
         planner_move_to_vlimit(v);
         return AVLOS_RET_WRITE;

@@ -258,40 +258,10 @@ tm.motor.direction
 User-defined direction of the motor.
 
 
-tm.motor.phase_currents.U
--------------------------
-
-- Endpoint ID: 26
-- Data Type: float
-- Unit: ampere
-
-Measured current in phase U.
-
-
-tm.motor.phase_currents.V
--------------------------
-
-- Endpoint ID: 27
-- Data Type: float
-- Unit: ampere
-
-Measured current in phase V.
-
-
-tm.motor.phase_currents.W
--------------------------
-
-- Endpoint ID: 28
-- Data Type: float
-- Unit: ampere
-
-Measured current in phase W.
-
-
 tm.encoder.position_estimate
 ----------------------------
 
-- Endpoint ID: 29
+- Endpoint ID: 26
 - Data Type: float
 - Unit: tick
 
@@ -301,7 +271,7 @@ The filtered encoder position estimate.
 tm.encoder.type
 ---------------
 
-- Endpoint ID: 30
+- Endpoint ID: 27
 - Data Type: uint8
 - Unit: Not defined
 
@@ -311,7 +281,7 @@ The encoder type. Either INTERNAL or HALL.
 tm.encoder.bandwidth
 --------------------
 
-- Endpoint ID: 31
+- Endpoint ID: 28
 - Data Type: float
 - Unit: radian / second
 
@@ -321,7 +291,7 @@ The encoder observer bandwidth.
 tm.traj_planner.max_accel
 -------------------------
 
-- Endpoint ID: 32
+- Endpoint ID: 29
 - Data Type: float
 - Unit: tick / second
 
@@ -331,7 +301,7 @@ The trajectory planner max acceleration.
 tm.traj_planner.max_decel
 -------------------------
 
-- Endpoint ID: 33
+- Endpoint ID: 30
 - Data Type: float
 - Unit: tick / second ** 2
 
@@ -341,7 +311,7 @@ The trajectory planner max deceleration.
 tm.traj_planner.max_vel
 -----------------------
 
-- Endpoint ID: 34
+- Endpoint ID: 31
 - Data Type: float
 - Unit: tick / second
 
@@ -351,7 +321,7 @@ The trajectory planner max cruise velocity.
 tm.traj_planner.pos_setpoint
 ----------------------------
 
-- Endpoint ID: 35
+- Endpoint ID: 32
 - Data Type: float
 - Unit: tick
 
