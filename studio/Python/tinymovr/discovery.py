@@ -12,10 +12,15 @@ import time
 import threading
 import yaml
 import importlib.resources
+from studio.Python.tinymovr.codec.codec import DataType
 from tinymovr.channel import CANChannel, ResponseError
 from tinymovr.tee import Tee
 from tinymovr.constants import HEARTBEAT_BASE
 from avlos.deserializer import deserialize
+
+
+class ProtocolVersionError(Exception):
+    pass
 
 
 class Discovery:
@@ -68,7 +73,14 @@ class Discovery:
                     tee = Tee(self.bus, lambda msg: msg.arbitration_id == node_id)
                     chan = CANChannel(node_id, tee)
                     try:
+                        device_hash_uint32, *_ = chan.serializer.deserialize(
+                            msg.data[:4], DataType.UINT32
+                        )
                         node = deserialize(self.dev_def)
+                        if node.hash_uint32 != device_hash_uint32:
+                            raise ProtocolVersionError(
+                                "Incompatible protocol versions (hash mismatch)"
+                            )
                         node._channel = chan
                         self.active_nodes[node_id] = node
                         self.update_stamps[node_id] = now
