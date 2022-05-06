@@ -31,7 +31,13 @@
 
 static CANConfig config = {
     .id = 1,
-    .kbaud_rate = CAN_BAUD_1000KHz};
+    .kbaud_rate = CAN_BAUD_1000KHz,
+    .heartbeat_period = 1000};
+
+static CANState state ={0};
+
+// TODO: Ya.. could be better
+extern volatile uint32_t msTicks;
 
 void CAN_init(void)
 {
@@ -159,4 +165,14 @@ CANConfig *CAN_get_config(void)
 void CAN_restore_config(CANConfig *config_)
 {
     config = *config_;
+}
+
+void CAN_task(void) {
+    // Transmit heartbeat
+    const uint32_t msg_diff = msTicks - state.last_msg_ms;
+    if (msg_diff >= config.heartbeat_period && PAC55XX_CAN->SR.TBS != 0)
+    {
+        state.last_msg_ms = msTicks;
+        can_transmit(4, 0x700 | config.id, &avlos_proto_hash);
+    }
 }

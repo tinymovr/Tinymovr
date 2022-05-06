@@ -19,11 +19,18 @@
 
 #define CAN_EP_SIZE 11
 
-typedef struct
+typedef struct 
 {
     uint8_t id;
     uint8_t kbaud_rate;
+    uint16_t heartbeat_period;
 } CANConfig;
+
+typedef struct 
+{
+    uint8_t faults;
+    uint32_t last_msg_ms;
+} CANState;
 
 void CAN_init(void);
 uint16_t CAN_get_kbit_rate(void);
@@ -34,3 +41,5 @@ void CAN_process_interrupt(void);
 
 CANConfig *CAN_get_config(void);
 void CAN_restore_config(CANConfig *config_);
+
+void CAN_task(void);

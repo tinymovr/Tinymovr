@@ -81,6 +81,9 @@ void system_init(void)
 
     // Configure error handling
     SCB->CCR |= 0x10;
+
+    /* Initialize Systick per 1ms */
+    SysTick_Config(150000); // TODO: Use var
 }
 
 void system_reset(void)
