@@ -138,23 +138,23 @@ remote_attributes:
         c_getter: motor_get_user_direction
         c_setter: motor_set_user_direction
         description: User-defined direction of the motor.
-      - name: phase_currents
-        remote_attributes:
-          - name: U
-            dtype: float
-            unit: ampere
-            c_getter: motor_get_IU
-            description: Measured current in phase U.
-          - name: V
-            dtype: float
-            unit: ampere
-            c_getter: motor_get_IV
-            description: Measured current in phase V.
-          - name: W
-            dtype: float
-            unit: ampere
-            c_getter: motor_get_IW
-            description: Measured current in phase W.
+      # - name: phase_currents
+      #   remote_attributes:
+      #     - name: U
+      #       dtype: float
+      #       unit: ampere
+      #       c_getter: motor_get_IU
+      #       description: Measured current in phase U.
+      #     - name: V
+      #       dtype: float
+      #       unit: ampere
+      #       c_getter: motor_get_IV
+      #       description: Measured current in phase V.
+      #     - name: W
+      #       dtype: float
+      #       unit: ampere
+      #       c_getter: motor_get_IW
+      #       description: Measured current in phase W.
   - name: encoder
     remote_attributes:
       - name: position_estimate
