@@ -12,10 +12,14 @@ For this method you will need a USB to UART adapter or similar device to connect
 
 .. warning::
    The UART port on Tinymovr is NOT 5V tolerant. Applying 5V voltage will immediately damage the onboard PAC5527 controller. Please use only 3.3V for UART communication.
-   
+
+.. image:: connectors_r5.png
+  :width: 800
+  :alt: Tinymovr R5 connectors and pinouts
+
 .. image:: connectors.png
    :width: 800
-   :alt: Tinymovr connectors and pinouts
+   :alt: Tinymovr R3.x connectors and pinouts
 
 Qorvo provides an application to interface with the bootloader environment using UART and enable firmware upgrades. It is available through the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_ as an archive named "PAC55xx ActiveFlashLight Bootloader". Please download and extract the archive and follow these steps:
 
