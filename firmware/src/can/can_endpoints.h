@@ -1,19 +1,6 @@
-/*
-* This file was automatically generated using csnake v0.3.4.
-*
-* This file should not be edited directly, any changes will be
-* overwritten next time the script is run.
-*
-* Source code for csnake is available at:
-* https://gitlab.com/andrejr/csnake
-*
-* csnake is also available on PyPI, at :
-* https://pypi.org/project/csnake
-*/
 
 #pragma once
-
-#include "src/common.h"
+#include <src/common.h>
 
 typedef enum
 {
@@ -28,326 +15,325 @@ typedef enum
     AVLOS_CMD_READ = 1
 } Avlos_Command;
 
-static uint32_t avlos_proto_hash = 3354184238;
+extern uint32_t avlos_proto_hash;
+extern uint8_t (*avlos_endpoints[32])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_uid
+* uid_0
 *
 * The unique device ID, unique to each PAC55xx chip produced.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t uid_0(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_Vbus
+* Vbus_1
 *
 * The bus voltage.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_Vbus(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t Vbus_1(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_temp
+* temp_2
 *
 * The internal temperature of the PAC55xx MCU.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_temp(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t temp_2(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_cycles_total
+* total_3
 *
 * Total processor cycles in a single PWM cycle.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_cycles_total(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t total_3(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_cycles_busy
+* busy_4
 *
 * Busy processor cycles in a single PWM cycle.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_cycles_busy(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t busy_4(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_controller_state
+* state_5
 *
 * The state of the controller.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_controller_state(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t state_5(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_controller_mode
+* mode_6
 *
 * The control mode of the controller.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_controller_mode(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t mode_6(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_controller_pos_setpoint
+* pos_setpoint_7
 *
 * The position setpoint.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_controller_pos_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t pos_setpoint_7(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_controller_vel_setpoint
+* vel_setpoint_8
 *
 * The velocity setpoint.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_controller_vel_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t vel_setpoint_8(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_controller_Iq_setpoint
+* Iq_setpoint_9
 *
 * The Iq setpoint.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_controller_Iq_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t Iq_setpoint_9(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_controller_Iq_estimate
+* Iq_estimate_10
 *
 * The Iq estimate.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_controller_Iq_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t Iq_estimate_10(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_controller_pos_p_gain
+* pos_p_gain_11
 *
 * The proportional gain of the position controller.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_controller_pos_p_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t pos_p_gain_11(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_controller_vel_p_gain
+* vel_p_gain_12
 *
 * The proportional gain of the velocity controller.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_controller_vel_p_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t vel_p_gain_12(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_controller_vel_i_gain
+* vel_i_gain_13
 *
 * The integral gain of the velocity controller.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_controller_vel_i_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t vel_i_gain_13(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_controller_Iq_p_gain
+* Iq_p_gain_14
 *
 * The current controller proportional gain.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_controller_Iq_p_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t Iq_p_gain_14(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_controller_vel_integrator_gain
+* gain_15
 *
 * The gain of the velocity integrator.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_controller_vel_integrator_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t gain_15(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_controller_vel_integrator_deadband
+* deadband_16
 *
 * The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_controller_vel_integrator_deadband(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t deadband_16(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_comms_can_rate
+* rate_17
 *
 * The baud rate of the CAN interface.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_comms_can_rate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t rate_17(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_comms_can_id
+* id_18
 *
 * The ID of the CAN interface.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_comms_can_id(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t id_18(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_motor_R
+* R_19
 *
 * The motor Resistance value.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_motor_R(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t R_19(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_motor_L
+* L_20
 *
 * The motor Inductance value.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_motor_L(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t L_20(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_motor_pole_pairs
+* pole_pairs_21
 *
 * The motor pole pair count.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_motor_pole_pairs(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t pole_pairs_21(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_motor_type
+* type_22
 *
 * The type of the motor. Either high current or gimbal.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_motor_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t type_22(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_motor_offset
+* offset_23
 *
 * User-defined offset of the motor.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_motor_offset(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t offset_23(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_motor_direction
+* direction_24
 *
 * User-defined direction of the motor.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_motor_direction(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t direction_24(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_encoder_position_estimate
+* position_estimate_25
 *
 * The filtered encoder position estimate.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_encoder_position_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t position_estimate_25(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_encoder_type
+* type_26
 *
 * The encoder type. Either INTERNAL or HALL.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_encoder_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t type_26(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_encoder_bandwidth
+* bandwidth_27
 *
 * The encoder observer bandwidth.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_encoder_bandwidth(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t bandwidth_27(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_traj_planner_max_accel
+* max_accel_28
 *
 * The trajectory planner max acceleration.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_traj_planner_max_accel(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t max_accel_28(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_traj_planner_max_decel
+* max_decel_29
 *
 * The trajectory planner max deceleration.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_traj_planner_max_decel(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t max_decel_29(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_traj_planner_max_vel
+* max_vel_30
 *
 * The trajectory planner max cruise velocity.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_traj_planner_max_vel(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t max_vel_30(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_tm_traj_planner_pos_setpoint
+* pos_setpoint_31
 *
 * The position setpoint of the trajectory planner.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_tm_traj_planner_pos_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
-
-static uint8_t (*avlos_endpoints[32])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_tm_uid, &avlos_tm_Vbus, &avlos_tm_temp, &avlos_tm_cycles_total, &avlos_tm_cycles_busy, &avlos_tm_controller_state, &avlos_tm_controller_mode, &avlos_tm_controller_pos_setpoint, &avlos_tm_controller_vel_setpoint, &avlos_tm_controller_Iq_setpoint, &avlos_tm_controller_Iq_estimate, &avlos_tm_controller_pos_p_gain, &avlos_tm_controller_vel_p_gain, &avlos_tm_controller_vel_i_gain, &avlos_tm_controller_Iq_p_gain, &avlos_tm_controller_vel_integrator_gain, &avlos_tm_controller_vel_integrator_deadband, &avlos_tm_comms_can_rate, &avlos_tm_comms_can_id, &avlos_tm_motor_R, &avlos_tm_motor_L, &avlos_tm_motor_pole_pairs, &avlos_tm_motor_type, &avlos_tm_motor_offset, &avlos_tm_motor_direction, &avlos_tm_encoder_position_estimate, &avlos_tm_encoder_type, &avlos_tm_encoder_bandwidth, &avlos_tm_traj_planner_max_accel, &avlos_tm_traj_planner_max_decel, &avlos_tm_traj_planner_max_vel, &avlos_tm_traj_planner_pos_setpoint};
+uint8_t pos_setpoint_31(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
