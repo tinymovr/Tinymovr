@@ -8,9 +8,10 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+import time
 import can
 from functools import cached_property
-from tinymovr.constants import CAN_EP_BITS, CAN_EP_SIZE, CAN_EP_MASK
+from tinymovr.constants import CAN_EP_SIZE, CAN_EP_MASK
 from tinymovr.codec import MultibyteCodec
 
 class ResponseError(Exception):
@@ -31,26 +32,38 @@ class CANChannel:
 
     def recv(self, ep_id, timeout=0.1):
         frame_id = self.make_arbitration_id(ep_id)
-        frame = self.bus.recv(timeout=timeout)
-        if frame:
-            if frame.arbitration_id == frame_id:
-                return frame.data
-            else:
-                error_data = extract_node_message_id(frame_id)
-                error_data += extract_node_message_id(frame.arbitration_id)
-                raise IOError(
-                    "Received id mismatch. Expected: Node: {}, Endpoint:{}; Got: Node: {}, Endpoint:{}".format(
-                        *[hex(v) for v in error_data]
-                    )
-                )
+        frame = self.recv_frame(timeout=timeout)
+        if frame.arbitration_id == frame_id:
+            return frame.data
         else:
-            raise TimeoutError()
+            error_data = extract_node_message_id(frame_id)
+            error_data += extract_node_message_id(frame.arbitration_id)
+            raise IOError(
+                "Received id mismatch. Expected: Node: {}, Endpoint:{}; Got: Node: {}, Endpoint:{}".format(
+                    *[hex(v) for v in error_data]
+                )
+            )
+
+    def recv_frame(self, timeout=0.1, sleep_interval=0.01):
+        total_interval = 0
+        while total_interval < timeout:
+            try:
+                frame = self.bus.recv(0)
+                if frame:
+                    return frame
+            except TimeoutError:
+                pass
+            finally:
+                time.sleep(sleep_interval)
+                total_interval += sleep_interval
+        raise ResponseError(self.node_id)
+
 
     def make_arbitration_id(self, endpoint_id):
         """
         Generates a CAN id from node and endpoint ids
         """
-        return (self.node_id << CAN_EP_BITS) | endpoint_id
+        return (self.node_id << CAN_EP_SIZE) | endpoint_id
 
     def create_frame(self, endpoint_id, rtr=False, payload=None):
         """

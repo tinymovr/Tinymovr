@@ -14,7 +14,6 @@ from enum import IntEnum
 
 app_name = "Tinymovr Studio"
 base_node_name = "tm"
-CAN_EP_BITS = 6
 HEARTBEAT_BASE = 0x700
 CAN_EP_SIZE = 6
 CAN_EP_MASK = int(math.pow(2, CAN_EP_SIZE) - 1)

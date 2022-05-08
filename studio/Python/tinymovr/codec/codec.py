@@ -1,21 +1,6 @@
 from typing import Dict, List
 import struct
-from enum import Enum
-
-
-class DataType(Enum):
-    VOID = 0
-    BOOL = 1
-    UINT8 = 2
-    INT8 = 3
-    UINT16 = 4
-    INT16 = 5
-    UINT32 = 6
-    INT32 = 7
-    UINT64 = 8
-    INT64 = 9
-    FLOAT = 10
-    DOUBLE = 11
+from avlos.datatypes import DataType
 
 
 class Codec:
@@ -64,17 +49,6 @@ codecs: Dict[DataType, StructCodec] = {
     DataType.INT32: StructCodec("<i", int),
     DataType.UINT32: StructCodec("<I", int),
     DataType.FLOAT: StructCodec("<f", float),
-}
-
-sizes: Dict[DataType, int] = {
-    DataType.BOOL: 1,
-    DataType.INT8: 1,
-    DataType.UINT8: 1,
-    DataType.INT16: 2,
-    DataType.UINT16: 2,
-    DataType.INT32: 4,
-    DataType.UINT32: 4,
-    DataType.FLOAT: 4,
 }
 
 

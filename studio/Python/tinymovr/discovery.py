@@ -12,10 +12,10 @@ import time
 import threading
 import yaml
 import importlib.resources
-from studio.Python.tinymovr.codec.codec import DataType
+from tinymovr.codec import DataType
 from tinymovr.channel import CANChannel, ResponseError
 from tinymovr.tee import Tee
-from tinymovr.constants import HEARTBEAT_BASE
+from tinymovr.constants import HEARTBEAT_BASE, CAN_EP_SIZE
 from avlos.deserializer import deserialize
 
 
@@ -70,7 +70,7 @@ class Discovery:
                     self.update_stamps[node_id] = now
                 elif node_id not in self.pending_nodes:
                     self.pending_nodes.add(node_id)
-                    tee = Tee(self.bus, lambda msg: msg.arbitration_id == node_id)
+                    tee = Tee(self.bus, lambda msg: msg.arbitration_id >> CAN_EP_SIZE & 0xFF == node_id)
                     chan = CANChannel(node_id, tee)
                     try:
                         device_hash_uint32, *_ = chan.serializer.deserialize(

@@ -32,14 +32,14 @@ class Tee:
         self.queue = []
         self.tees.append(self)
 
-    def recv(self):
+    def recv(self, *args, **kwargs):
         """
         Tries to receive a message from the bus object and if successful,
         tests reception of each tee instance in the global index.
         """
         self.lock.acquire()
         response = None
-        frame = self.bus.recv(1)
+        frame = self.bus.recv(*args, **kwargs)
         if frame:
             for tee in self.tees:
                 if tee.filter_cb(frame):
