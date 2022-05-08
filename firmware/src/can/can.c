@@ -36,8 +36,9 @@ static CANConfig config = {
 
 static CANState state ={0};
 
-// TODO: Ya.. could be better
 extern volatile uint32_t msTicks;
+extern uint32_t avlos_proto_hash;
+extern uint8_t (*avlos_endpoints[32])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 void CAN_init(void)
 {
@@ -173,6 +174,8 @@ void CAN_task(void) {
     if (msg_diff >= config.heartbeat_period && PAC55XX_CAN->SR.TBS != 0)
     {
         state.last_msg_ms = msTicks;
-        can_transmit(4, 0x700 | config.id, &avlos_proto_hash);
+        uint8_t buf[4];
+        *(uint32_t *)buf = avlos_proto_hash;
+        can_transmit(4, 0x700 | config.id, buf);
     }
 }

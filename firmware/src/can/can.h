@@ -17,7 +17,7 @@
 
 #pragma once
 
-#define CAN_EP_SIZE 11
+#define CAN_EP_SIZE 6
 
 typedef struct 
 {
