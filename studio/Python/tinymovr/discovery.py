@@ -63,7 +63,7 @@ class Discovery:
         while True:
             self.logger.debug("Discovery iteration...")
             now = time.time()
-            msg = self.tee.recv()
+            msg = self.tee.recv(0)
             while msg:
                 node_id = msg.arbitration_id & 0x3F
                 if node_id in self.active_nodes:
@@ -79,7 +79,7 @@ class Discovery:
                         node = deserialize(self.dev_def)
                         if node.hash_uint32 != device_hash_uint32:
                             raise ProtocolVersionError(
-                                "Incompatible protocol versions (hash mismatch)"
+                                "Incompatible protocol versions (hash mismatch).\nPlease try upgrading firmware & studio to the same version."
                             )
                         node._channel = chan
                         self.active_nodes[node_id] = node
@@ -88,7 +88,7 @@ class Discovery:
                     except ResponseError as e:
                         self.logger.error(e)
                     self.pending_nodes.remove(node_id)
-                msg = self.tee.recv()
+                msg = self.tee.recv(0)
 
             # for_removal = set()
             # for node_id, stamp in self.update_stamps.items():
