@@ -47,15 +47,11 @@ class CANChannel:
     def recv_frame(self, timeout=0.1, sleep_interval=0.01):
         total_interval = 0
         while total_interval < timeout:
-            try:
-                frame = self.bus.recv(0)
-                if frame:
-                    return frame
-            except TimeoutError:
-                pass
-            finally:
-                time.sleep(sleep_interval)
-                total_interval += sleep_interval
+            frame = self.bus.recv(0)
+            if frame:
+                return frame
+            time.sleep(sleep_interval)
+            total_interval += sleep_interval
         raise ResponseError(self.node_id)
 
 
