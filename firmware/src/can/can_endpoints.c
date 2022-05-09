@@ -12,7 +12,7 @@
 
 
 uint8_t (*avlos_endpoints[32])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&uid_0, &Vbus_1, &temp_2, &total_3, &busy_4, &state_5, &mode_6, &pos_setpoint_7, &vel_setpoint_8, &Iq_setpoint_9, &Iq_estimate_10, &pos_p_gain_11, &vel_p_gain_12, &vel_i_gain_13, &Iq_p_gain_14, &gain_15, &deadband_16, &rate_17, &id_18, &R_19, &L_20, &pole_pairs_21, &type_22, &offset_23, &direction_24, &position_estimate_25, &type_26, &bandwidth_27, &max_accel_28, &max_decel_29, &max_vel_30, &pos_setpoint_31 };
-uint32_t avlos_proto_hash = 3354184238;
+uint32_t avlos_proto_hash = 1974723864;
 
 uint8_t uid_0(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
