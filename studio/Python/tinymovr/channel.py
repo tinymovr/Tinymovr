@@ -14,6 +14,7 @@ from functools import cached_property
 from tinymovr.constants import CAN_EP_SIZE, CAN_EP_MASK
 from tinymovr.codec import MultibyteCodec
 
+
 class ResponseError(Exception):
     def __init__(self, kw, *args, **kwargs):
         msg = "Node {} did not respond".format(kw)
@@ -32,7 +33,7 @@ class CANChannel:
 
     def recv(self, ep_id, timeout=0.1):
         frame_id = self.make_arbitration_id(ep_id)
-        frame = self.recv_frame(timeout=timeout)
+        frame = self._recv_frame(timeout=timeout)
         if frame.arbitration_id == frame_id:
             return frame.data
         else:
@@ -44,20 +45,15 @@ class CANChannel:
                 )
             )
 
-    def recv_frame(self, timeout=0.1, sleep_interval=0.01):
+    def _recv_frame(self, timeout=0.1, sleep_interval=0.01):
         total_interval = 0
         while total_interval < timeout:
-            try:
-                frame = self.bus.recv(0)
-                if frame:
-                    return frame
-            except TimeoutError:
-                pass
-            finally:
-                time.sleep(sleep_interval)
-                total_interval += sleep_interval
+            frame = self.bus.recv(0)
+            if frame:
+                return frame
+            time.sleep(sleep_interval)
+            total_interval += sleep_interval
         raise ResponseError(self.node_id)
-
 
     def make_arbitration_id(self, endpoint_id):
         """
