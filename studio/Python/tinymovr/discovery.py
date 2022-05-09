@@ -70,7 +70,10 @@ class Discovery:
                     self.update_stamps[node_id] = now
                 elif node_id not in self.pending_nodes:
                     self.pending_nodes.add(node_id)
-                    tee = Tee(self.bus, lambda msg: msg.arbitration_id >> CAN_EP_SIZE & 0xFF == node_id)
+                    tee = Tee(
+                        self.bus,
+                        lambda msg: msg.arbitration_id >> CAN_EP_SIZE & 0xFF == node_id,
+                    )
                     chan = CANChannel(node_id, tee)
                     try:
                         device_hash_uint32, *_ = chan.serializer.deserialize(
