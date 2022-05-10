@@ -1,5 +1,6 @@
 
 name: tm
+version: 0.9.0
 remote_attributes:
   - name: uid
     dtype: uint32
