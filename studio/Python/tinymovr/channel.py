@@ -67,7 +67,7 @@ class CANChannel:
         """
         return can.Message(
             arbitration_id=self.make_arbitration_id(endpoint_id),
-            is_extended_id=False,
+            is_extended_id=True,
             is_remote_frame=rtr,
             data=payload,
         )
