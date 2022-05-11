@@ -91,15 +91,27 @@ In addition, if you are in Windows you will need to install GNU make. This is ra
 
     choco install make
 
-Once you have the J-Link adapter wired up and the software installed, you are ready to flash and debug the firmware. To try out a test build from within VSCode select Terminal -> Run Task... from the menu bar. Then select Clean and Build Project (Debug), and select the board revision against which you are compiling (R32, R33 or R5). You should end up with a ``build/`` directory inside ``firmware/`` and there you should see the files ``tinymovr_fw.elf`` and ``tinymovr_fw.hex``.
+Once you have the J-Link adapter wired up and the software installed, you are ready to flash and debug the firmware. To try out a test build from within VSCode select ``Terminal -> Run Task...`` from the menu bar, and select ``Clean and Build Project (Debug)``.
 
-To flash the firmware, provided your J-Link adapter is connected and drivers properly installed, hit F5. After a while you should see a screen like below:
+.. image:: tasks_list.PNG
+  :width: 800
+  :alt: Task selector
+
+Tinymovr implements board revision selection using an input menu with a few predefined choices.
+
+.. image:: revision_list.PNG
+  :width: 800
+  :alt: Board revision selector
+
+Select the board revision against which you are compiling (R32, R33 or R5) from the list. The build process will start, it usually takes a few tenths of seconds max. After it finishes, you should end up with a ``build/`` directory inside ``firmware/`` and there you should see the files ``tinymovr_fw.elf``, ``tinymovr_fw.hex`` and ``tinymovr_fw.bin``.
+
+To flash the firmware, provided your J-Link adapter is connected and drivers properly installed, hit F5. After a while the debug session should start and you should see a screen like below:
 
 .. image:: Capture.PNG
   :width: 800
   :alt: Tinymovr firmware debug session using VSCode
 
-Congrats! You are now fully set to develop!
+Congrats! You are now fully set to start developing for Tinymovr!
 
 
 .. _setting-up-eclipse:
@@ -115,7 +127,7 @@ Run the downloaded installer that will install Eclipse and the J-Link utility (v
 
 Once installation is complete, run Eclipse and import the Tinymovr project. Try building to verify everything is ok. You are now ready to flash and debug using Eclipse.
 
-Please note that for a successful build using Eclipse you will need to `#define` in `config.h` one of `BOARD_REV_R32`, `BOARD_REV_R33` or `BOARD_REV_R5` depending on your board revision.
+Please note that for a successful build using Eclipse you will need to ``#define`` in ``config.h`` one of ``BOARD_REV_R32``, ``BOARD_REV_R33`` or ``BOARD_REV_R5`` depending on your board revision.
 
 
 
