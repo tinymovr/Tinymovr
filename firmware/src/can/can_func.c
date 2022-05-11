@@ -18,7 +18,9 @@ uint8_t tx_data[8] = {0,1,2,3,4,5,6,7};
 uint8_t rx_data[8];
 
 uint8_t data_length;
-uint16_t rx_id;
+uint32_t rx_id;
+bool rtr;
+uint8_t can_cmd_id;
 uint32_t buffer;
 
 void can_io_config(void)
@@ -150,7 +152,39 @@ void can_baud(CAN_BAUD_TYPE baud)
     }
 }
 
-void can_transmit(uint8_t dataLen, uint16_t id, const uint8_t * data)
+void can_process_standard(void)
+{
+    buffer = PAC55XX_CAN->RXBUF; //  read RX buffer, RX buffer bit order same as TX buffer
+
+    data_length = buffer & 0x0F;
+    rx_id = ((buffer & 0xE00000) >> 21) | ((buffer & 0xFF00) >> 5);
+
+    can_cmd_id = rx_id & 0x3F;
+    rtr = ((buffer >> 6) & 0x1) == 0x1;
+    rx_data[0] = buffer >> 24; // data0
+    if (data_length > 1u)
+    {
+        buffer = PAC55XX_CAN->RXBUF; // buffer contains data1..data4
+        rx_data[1] = buffer;
+        rx_data[2] = buffer >> 8;
+        rx_data[3] = buffer >> 16;
+        rx_data[4] = buffer >> 24;
+        if (data_length > 5u)
+        {
+            buffer = PAC55XX_CAN->RXBUF; //  buffer contains data7..data5
+            rx_data[5] = buffer;
+            rx_data[6] = buffer >> 8;
+            rx_data[7] = buffer >> 16;
+        }
+    }
+}
+
+void can_process_extended(void)
+{
+    
+}
+
+void can_transmit_standard(uint8_t dataLen, uint16_t id, const uint8_t * data)
 {
     while (PAC55XX_CAN->SR.TBS == 0) {};           // wait for TX buffer free
     PAC55XX_CAN->TXBUF = (dataLen << 0)    |       // DLC - Data Length Code
@@ -176,6 +210,11 @@ void can_transmit(uint8_t dataLen, uint16_t id, const uint8_t * data)
     }
 	
     PAC55XX_CAN->CMR.TR = 1;	// Request transmit
+}
+
+void can_transmit_extended(uint8_t dataLen, uint32_t id, const uint8_t * data)
+{
+    
 }
 
 uint16_t CAN_BaudTypeToInt(CAN_BAUD_TYPE type)

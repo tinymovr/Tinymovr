@@ -14,6 +14,7 @@
 #ifndef CAN_FUNC_H
 #define CAN_FUNC_H
 
+#include <stdbool.h>
 #include "pac5xxx.h"
 #include "pac5xxx_gpio.h"
 #include "pac5xxx_can.h"
@@ -67,12 +68,17 @@ extern uint8_t tx_data[8];
 extern uint8_t rx_data[8];
 
 extern uint8_t data_length;
-extern uint16_t rx_id;
+extern uint32_t rx_id;
+extern bool rtr;
+extern uint8_t can_cmd_id;
 extern uint32_t buffer;
 
 void can_baud(CAN_BAUD_TYPE baud);
 void can_io_config(void);
-void can_transmit(uint8_t dataLen, uint16_t id, const uint8_t * data);
+void can_process_standard(void);
+void can_process_extended(void);
+void can_transmit_standard(uint8_t dataLen, uint16_t id, const uint8_t * data);
+void can_transmit_extended(uint8_t dataLen, uint32_t id, const uint8_t * data);
 
 uint16_t CAN_BaudTypeToInt(CAN_BAUD_TYPE type);
 CAN_BAUD_TYPE CAN_IntToBaudType(uint16_t baud);

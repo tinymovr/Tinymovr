@@ -120,40 +120,18 @@ void CAN_set_ID(uint8_t id)
 
 void CAN_process_interrupt(void)
 {
-    buffer = PAC55XX_CAN->RXBUF; //  read RX buffer, RX buffer bit order same as TX buffer
-
-    data_length = buffer & 0x0F;
-    rx_id = ((buffer & 0xE00000) >> 21) | ((buffer & 0xFF00) >> 5);
-
-    uint8_t command_id = rx_id & 0x3F;
-    bool rtr = ((buffer >> 6) & 0x1) == 0x1;
-    rx_data[0] = buffer >> 24; // data0
-    if (data_length > 1u)
-    {
-        buffer = PAC55XX_CAN->RXBUF; // buffer contains data1..data4
-        rx_data[1] = buffer;
-        rx_data[2] = buffer >> 8;
-        rx_data[3] = buffer >> 16;
-        rx_data[4] = buffer >> 24;
-        if (data_length > 5u)
-        {
-            buffer = PAC55XX_CAN->RXBUF; //  buffer contains data7..data5
-            rx_data[5] = buffer;
-            rx_data[6] = buffer >> 8;
-            rx_data[7] = buffer >> 16;
-        }
-    }
+    can_process_standard();
 
     // Process message
-    if (sizeof(avlos_endpoints) / sizeof(avlos_endpoints[0]) > command_id)
+    if (sizeof(avlos_endpoints) / sizeof(avlos_endpoints[0]) > can_cmd_id)
     {
-        uint8_t (*callback)(uint8_t buffer[], uint8_t * buffer_length, Avlos_Command cmd) = avlos_endpoints[command_id];
+        uint8_t (*callback)(uint8_t buffer[], uint8_t * buffer_length, Avlos_Command cmd) = avlos_endpoints[can_cmd_id];
         uint8_t can_msg_buffer[8];
         memcpy(can_msg_buffer, &rx_data, data_length);
         uint8_t response_type = callback(can_msg_buffer, &data_length, (uint8_t)rtr);
         if (AVLOS_RET_READ == response_type)
         {
-            can_transmit(data_length, (config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);
+            can_transmit_standard(data_length, (config.id << CAN_EP_SIZE) | can_cmd_id, can_msg_buffer);
         }
     }
 }
@@ -176,6 +154,6 @@ void CAN_task(void) {
         state.last_msg_ms = msTicks;
         uint8_t buf[4];
         *(uint32_t *)buf = avlos_proto_hash;
-        can_transmit(4, 0x700 | config.id, buf);
+        can_transmit_standard(4, 0x700 | config.id, buf);
     }
 }
