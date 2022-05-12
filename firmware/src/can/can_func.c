@@ -181,7 +181,32 @@ void can_process_standard(void)
 
 void can_process_extended(void)
 {
-    
+    buffer = PAC55XX_CAN->RXBUF; //  read RX buffer, RX buffer bit order same as TX buffer
+
+    data_length = buffer & 0x0F;
+    rtr = ((buffer >> 6) & 0x1) == 0x1;
+    rx_id = ((buffer & 0xFF000000) >> 24) | (buffer & 0x00FF0000) >> 8 | (buffer & 0x0000FF00) << 8;
+
+    buffer = PAC55XX_CAN->RXBUF;
+
+    rx_id |= (buffer & 0xFF) >> 3;
+
+    rx_data[0] = buffer & 0xFF; // data0
+    rx_data[1] = (buffer >> 8) & 0xFF; // data1
+    rx_data[2] = (buffer >> 16) & 0xFF; // data2
+    if (data_length > 3u)
+    {
+        buffer = PAC55XX_CAN->RXBUF; // buffer contains data3..data6
+        rx_data[3] = buffer;
+        rx_data[4] = buffer >> 8;
+        rx_data[5] = buffer >> 16;
+        rx_data[6] = buffer >> 24;
+        if (data_length > 7u)
+        {
+            buffer = PAC55XX_CAN->RXBUF; //  buffer contains data7
+            rx_data[7] = buffer;
+        }
+    }
 }
 
 void can_transmit_standard(uint8_t dataLen, uint16_t id, const uint8_t * data)
