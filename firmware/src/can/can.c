@@ -1,4 +1,3 @@
-
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
 //  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
@@ -120,7 +119,7 @@ void CAN_set_ID(uint8_t id)
 
 void CAN_process_interrupt(void)
 {
-    can_process_standard();
+    can_process_extended();
 
     // Process message
     if (sizeof(avlos_endpoints) / sizeof(avlos_endpoints[0]) > can_cmd_id)
@@ -131,7 +130,7 @@ void CAN_process_interrupt(void)
         uint8_t response_type = callback(can_msg_buffer, &data_length, (uint8_t)rtr);
         if (AVLOS_RET_READ == response_type)
         {
-            can_transmit_standard(data_length, (config.id << CAN_EP_SIZE) | can_cmd_id, can_msg_buffer);
+            can_transmit_extended(data_length, (config.id << CAN_EP_SIZE) | can_cmd_id, can_msg_buffer);
         }
     }
 }

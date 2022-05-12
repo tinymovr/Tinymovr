@@ -1,3 +1,4 @@
+// Except where otherwise noted, this file is:
 //=============================================================================
 // Copyright (C) 2018-2019, Qorvo, Inc.
 //
@@ -22,6 +23,22 @@ uint32_t rx_id;
 bool rtr;
 uint8_t can_cmd_id;
 uint32_t buffer;
+
+//  * The function "can_io_config" is part of the Tinymovr-Firmware distribution
+//  * (https://github.com/yconst/tinymovr-firmware).
+//  * Copyright (c) 2022 Ioannis Chatzikonstantinou.
+//  *
+//  * This program is free software: you can redistribute it and/or modify
+//  * it under the terms of the GNU General Public License as published by
+//  * the Free Software Foundation, version 3.
+//  *
+//  * This program is distributed in the hope that it will be useful, but
+//  * WITHOUT ANY WARRANTY; without even the implied warranty of
+//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//  * General Public License for more details.
+//  *
+//  * You should have received a copy of the GNU General Public License
+//  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 void can_io_config(void)
 {
@@ -179,13 +196,29 @@ void can_process_standard(void)
     }
 }
 
+//  * The function "can_process_extended" is part of the Tinymovr-Firmware distribution
+//  * (https://github.com/yconst/tinymovr-firmware).
+//  * Copyright (c) 2022 Ioannis Chatzikonstantinou.
+//  *
+//  * This program is free software: you can redistribute it and/or modify
+//  * it under the terms of the GNU General Public License as published by
+//  * the Free Software Foundation, version 3.
+//  *
+//  * This program is distributed in the hope that it will be useful, but
+//  * WITHOUT ANY WARRANTY; without even the implied warranty of
+//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//  * General Public License for more details.
+//  *
+//  * You should have received a copy of the GNU General Public License
+//  * along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 void can_process_extended(void)
 {
     buffer = PAC55XX_CAN->RXBUF; //  read RX buffer, RX buffer bit order same as TX buffer
 
     data_length = buffer & 0x0F;
     rtr = ((buffer >> 6) & 0x1) == 0x1;
-    rx_id = ((buffer & 0xFF000000) >> 24) | (buffer & 0x00FF0000) >> 8 | (buffer & 0x0000FF00) << 8;
+    rx_id = ((buffer & 0xFF000000) >> (24-5)) | (buffer & 0x00FF0000) >> (8-5) | (buffer & 0x0000FF00) << (8+5);
 
     buffer = PAC55XX_CAN->RXBUF;
 
@@ -212,21 +245,21 @@ void can_process_extended(void)
 void can_transmit_standard(uint8_t dataLen, uint16_t id, const uint8_t * data)
 {
     while (PAC55XX_CAN->SR.TBS == 0) {};           // wait for TX buffer free
-    PAC55XX_CAN->TXBUF = (dataLen << 0)    |       // DLC - Data Length Code
-                         (0u << 6)         |       // RTR = 0 Data Frame
-                         (0u << 7)         |       // FF - Format Frame; 0=Std Frame
-                         ((id>>3) << 8)    |       // ID 10:3
-                         ((id&0x07u) << 21) |      // ID 2:0
+    PAC55XX_CAN->TXBUF = (dataLen << 0)         |  // DLC - Data Length Code
+                         (0u << 6)              |  // RTR = 0 Data Frame
+                         (0u << 7)              |  // FF - Format Frame; 0=Std Frame
+                         ((id>>3 & 0xFF) << 8)  |  // ID 10:3
+                         ((id&0x07u) << 21)     |  // ID 2:0
                          (data[0] << 24);          // Data 0
 
-    if(dataLen > 1u)
+    if (dataLen > 1u)
     {
         PAC55XX_CAN->TXBUF = (data[1] << 0)  |      // Data 1
                              (data[2] << 8)  |		// Data 2
                              (data[3] << 16) |      // Data 3
                              (data[4] << 24);       // Data 4
     }
-    if(dataLen > 5u)
+    if (dataLen > 5u)
     {
     PAC55XX_CAN->TXBUF = (data[5] << 0)   |    // Data 5
                          (data[6] << 8)   |    // Data 6
@@ -237,9 +270,50 @@ void can_transmit_standard(uint8_t dataLen, uint16_t id, const uint8_t * data)
     PAC55XX_CAN->CMR.TR = 1;	// Request transmit
 }
 
+//  * The function "can_transmit_extended" is part of the Tinymovr-Firmware distribution
+//  * (https://github.com/yconst/tinymovr-firmware).
+//  * Copyright (c) 2022 Ioannis Chatzikonstantinou.
+//  *
+//  * This program is free software: you can redistribute it and/or modify
+//  * it under the terms of the GNU General Public License as published by
+//  * the Free Software Foundation, version 3.
+//  *
+//  * This program is distributed in the hope that it will be useful, but
+//  * WITHOUT ANY WARRANTY; without even the implied warranty of
+//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//  * General Public License for more details.
+//  *
+//  * You should have received a copy of the GNU General Public License
+//  * along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 void can_transmit_extended(uint8_t dataLen, uint32_t id, const uint8_t * data)
 {
-    
+    while (PAC55XX_CAN->SR.TBS == 0) {};             // wait for TX buffer free
+    PAC55XX_CAN->TXBUF = (dataLen << 0)            | // DLC - Data Length Code
+                         (0u << 6)                 | // RTR = 0 Data Frame
+                         (1u << 7)                 | // FF - Format Frame; 1=Ext Frame
+                         ((id&0x1FE00000u) << 8)   |
+                         ((id&0x001FE000u) << 16)  |
+                         ((id&0x00001FE0u) << 24);
+
+    PAC55XX_CAN->TXBUF = (id & 0x1F << 3)       |
+                         (data[0] << 8)         |
+                         (data[1] << 16)        |
+                         (data[2] << 24);
+
+    if (dataLen > 3u)
+    {
+        PAC55XX_CAN->TXBUF = (data[3] << 0)  |      // Data 3
+                             (data[4] << 8)  |		// Data 4
+                             (data[5] << 16) |      // Data 5
+                             (data[6] << 24);       // Data 6
+    }
+    if (dataLen > 7u)
+    {
+        PAC55XX_CAN->TXBUF = (data[7] << 0);        // Data 7
+    }
+
+    PAC55XX_CAN->CMR.TR = 1;	// Request transmit
 }
 
 uint16_t CAN_BaudTypeToInt(CAN_BAUD_TYPE type)
