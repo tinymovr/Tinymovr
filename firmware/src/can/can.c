@@ -78,7 +78,8 @@ void CAN_init(void)
 
     // Filter bit7:0 => ID10:3
     // Filter bit15:13 => ID2:0
-    PAC55XX_CAN->AMR = 0xFFFFFF87;
+    // PAC55XX_CAN->AMR = 0xFFFFFF87;
+    PAC55XX_CAN->AMR = 0xFFFFFFFF;
     PAC55XX_CAN->ACR = config.id << (CAN_EP_SIZE - 3);
 
     // PAC55XX_CAN->IMR.TIM = 1;		// Transmit Interrupt
@@ -109,9 +110,8 @@ void CAN_set_ID(uint8_t id)
 {
     pac5xxx_can_reset_mode_set(1); // CAN in reset mode, in order to configure CAN module
     config.id = id;
-    // Filter bit7:0 => ID10:3
-    // Filter bit15:13 => ID2:0
-    PAC55XX_CAN->AMR = 0xFFFFFF87;
+    // PAC55XX_CAN->AMR = 0xFFFFFF87;
+    PAC55XX_CAN->AMR = 0xFFFFFFFF;
     PAC55XX_CAN->ACR = config.id << (CAN_EP_SIZE - 3);
     pac5xxx_can_reset_mode_set(0); // CAN reset mode inactive
     delay_us(100);
