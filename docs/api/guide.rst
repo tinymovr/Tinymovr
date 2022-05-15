@@ -774,10 +774,8 @@ Return Values
 Member            Description          Data Type  Data Offset Default Unit
 ---------------   -------------------  ---------  ----------- ----------------
 ``flags``         Calibrated, Gimbal   uint8      0
-``R``             Phase Resistance     uint16     1           milliohm
-``pole_pairs``    Motor Pole Pairs     uint8      3
-``L``             Phase Inductance     uint16     4           microhenry
-``I_cal``         Calibration Current  uint16     6           milliamp
+``pole_pairs``    Motor Pole Pairs     uint8      1
+``I_cal``         Calibration Current  float      2           ampere
 ===============   ===================  =========  =========== ================
 
 Example
@@ -786,7 +784,7 @@ Example
 .. code-block:: python
 
     >>>tmx.motor_config
-    {"flags": 1, "R": 200, "pole_pairs": 11, "L": 100, "I_cal": 5000}
+    {"flags": 1, "pole_pairs": 11, "I_cal": 5.0}
 
 
 set_motor_config
@@ -795,7 +793,7 @@ set_motor_config
 | **endpoint**: ``0x1F``
 | **type**: Write-only
 
-Sets motor properties.
+Sets motor config (flags, pole pairs, calibration current).
 
 Arguments
 ---------
@@ -804,9 +802,8 @@ Arguments
 Member            Description          Data Type  Data Offset Default Unit
 ---------------   -------------------  ---------  ----------- ----------------
 ``flags``         Gimbal               uint8      0
-``R``             Phase Resistance     uint16     1           milliohm
-``L``             Phase Inductance     uint16     3           microhenry
-``I_cal``         Calibration Current  uint16     5           milliamp
+``pole_pairs``    Motor Pole Pairs     uint8      1
+``I_cal``         Calibration Current  float      2           ampere
 ===============   ===================  =========  =========== ================
 
 Example
@@ -815,12 +812,12 @@ Example
 High-current motor:
 .. code-block:: python
 
-    >>>tmx.set_motor_config(0, 200, 100, 5000)
+    >>>tmx.set_motor_config(0, 14, 5000)
 
 Gimbal motor:
 .. code-block:: python
 
-    >>>tmx.set_motor_config(1, 10000, 2000, 500)
+    >>>tmx.set_motor_config(1, 14, 500)
 
 timings
 *******
