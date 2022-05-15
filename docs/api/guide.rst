@@ -812,12 +812,12 @@ Example
 High-current motor:
 .. code-block:: python
 
-    >>>tmx.set_motor_config(0, 14, 5000)
+    >>>tmx.set_motor_config(0, 14, 5)
 
 Gimbal motor:
 .. code-block:: python
 
-    >>>tmx.set_motor_config(1, 14, 500)
+    >>>tmx.set_motor_config(1, 14, 0.5)
 
 timings
 *******

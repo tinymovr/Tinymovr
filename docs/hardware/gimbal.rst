@@ -25,40 +25,49 @@ Enabling Gimbal Mode
    
    * Using arbitrary resistance and inductance settings can damage your motor and board.
 
-To enable gimbal mode, set the motor config as follows:
+To enable gimbal mode, set the motor configuration as follows:
 
 .. code-block:: python
 
-    >>>tm1.set_motor_config(1, motor_resistance, motor_inductance, I_cal)
+    >>>tm1.set_motor_config(1, pole_pairs, calibration_current)
 
-Please note that by default the motor_resistance field is in Milliohms, the motor_inductance field is in Microhenries, and the calibration current ``I_cal`` in Milliamps.
+    >>>tm1.set_motor_RL(motor_resistance, motor_inductance)
+
+Please note that by default the motor_resistance field is in Ohms, the motor_inductance field is in Henries, and the calibration current in Amps. The pole pairs need not be the correct number, as it will be discovered during calibration. You can leave it at the default 7.
 
 Example
 
 .. code-block:: python
     
-    >>>tmx.set_motor_config(1, 5000, 2000, 500)
+    >>>tmx.set_motor_config(1, 7, 0.5)
 
-This specifies a motor with 5Ohms resistance, 2Millihenries inductance and 0.5Amps calibration current.
+     >>>tmx.set_motor_RL(5, 0.002)
+
+This specifies a motor with 5 Ohms resistance, 2 Millihenries inductance and 0.5Amps calibration current.
 Alternatuvely, using the units interface:
 
 .. code-block:: python
     
-    >>>tmx.set_motor_config(1, 0.005 * Ohm, 0.002 * Henry, 0.5 * Amps)
+    >>>tmx.set_motor_config(1, 7, 0.5 * Amps)
+
+    >>>tmx.set_motor_config(5 * Ohm, 0.002 * Henry)
 
 Control that the settings are correct:
 
 .. code-block:: python
     
     >>>tmx.motor_config
-    {"flags": 2, "R": 5000, "pole_pairs": 11, "L": 2000, "I_cal": 500}
+    {"flags": 2, "pole_pairs": 7, "I_cal": 0.5}
 
-You can now calibrate the motor. Calibration will bypass resistance and inductance measurement, and will only calculate pole pairs, offset and direction. After calibration you should see a value of '3' in the 'flags' field of motor_config:
+    >>>tmx.motor_RL
+    {"R": 5, "L": 0.002}
+
+You can now calibrate the motor. Calibration will bypass resistance and inductance measurement, and will only calculate pole pairs, offset and direction. After calibration you should see the correct number of pole pairs, and a value of `3` in the `flags` field of motor_config:
 
 .. code-block:: python
     
     >>>tmx.motor_config
-    {"flags": 3, "R": 5000, "pole_pairs": 11, "L": 2000, "I_cal": 500}
+    {"flags": 3, "pole_pairs": 11, "I_cal": 0.5}
 
 Controlling the Motor
 ---------------------
