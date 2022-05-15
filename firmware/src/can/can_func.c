@@ -22,7 +22,6 @@ uint8_t data_length;
 uint32_t rx_id;
 bool rtr;
 uint8_t can_cmd_id;
-uint32_t buffer;
 
 //  * The function "can_io_config" is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
@@ -171,7 +170,7 @@ void can_baud(CAN_BAUD_TYPE baud)
 
 void can_process_standard(void)
 {
-    buffer = PAC55XX_CAN->RXBUF; //  read RX buffer, RX buffer bit order same as TX buffer
+    uint32_t buffer = PAC55XX_CAN->RXBUF; //  read RX buffer, RX buffer bit order same as TX buffer
 
     data_length = buffer & 0x0F;
     rx_id = ((buffer & 0xE00000) >> 21) | ((buffer & 0xFF00) >> 5);
@@ -214,30 +213,31 @@ void can_process_standard(void)
 
 void can_process_extended(void)
 {
-    buffer = PAC55XX_CAN->RXBUF; //  read RX buffer, RX buffer bit order same as TX buffer
+    uint32_t buffer = PAC55XX_CAN->RXBUF; //  read RX buffer, RX buffer bit order same as TX buffer
 
     data_length = buffer & 0x0F;
     rtr = ((buffer >> 6) & 0x1) == 0x1;
-    rx_id = ((buffer & 0xFF000000) >> (24-5)) | (buffer & 0x00FF0000) >> (8-5) | (buffer & 0x0000FF00) << (8+5);
-
+    rx_id = ((buffer & 0xFF000000) >> 19) | ((buffer & 0x00FF0000) >> 3) | ((buffer & 0x0000FF00) << 13);
+    
     buffer = PAC55XX_CAN->RXBUF;
 
     rx_id |= (buffer & 0xFF) >> 3;
+    can_cmd_id = rx_id & 0x3F;
 
-    rx_data[0] = buffer & 0xFF; // data0
-    rx_data[1] = (buffer >> 8) & 0xFF; // data1
-    rx_data[2] = (buffer >> 16) & 0xFF; // data2
+    rx_data[0] = (buffer >> 8) & 0xFF; // data0
+    rx_data[1] = (buffer >> 16) & 0xFF; // data1
+    rx_data[2] = (buffer >> 24) & 0xFF; // data2
     if (data_length > 3u)
     {
         buffer = PAC55XX_CAN->RXBUF; // buffer contains data3..data6
-        rx_data[3] = buffer;
-        rx_data[4] = buffer >> 8;
-        rx_data[5] = buffer >> 16;
-        rx_data[6] = buffer >> 24;
+        rx_data[3] = buffer & 0xFF;
+        rx_data[4] = (buffer >> 8) & 0xFF;
+        rx_data[5] = (buffer >> 16) & 0xFF;
+        rx_data[6] = (buffer >> 24) & 0xFF;
         if (data_length > 7u)
         {
             buffer = PAC55XX_CAN->RXBUF; //  buffer contains data7
-            rx_data[7] = buffer;
+            rx_data[7] = buffer & 0xFF;
         }
     }
 }
@@ -288,29 +288,29 @@ void can_transmit_standard(uint8_t dataLen, uint16_t id, const uint8_t * data)
 
 void can_transmit_extended(uint8_t dataLen, uint32_t id, const uint8_t * data)
 {
-    while (PAC55XX_CAN->SR.TBS == 0) {};             // wait for TX buffer free
-    PAC55XX_CAN->TXBUF = (dataLen << 0)            | // DLC - Data Length Code
-                         (0u << 6)                 | // RTR = 0 Data Frame
-                         (1u << 7)                 | // FF - Format Frame; 1=Ext Frame
-                         ((id&0x1FE00000u) << 8)   |
-                         ((id&0x001FE000u) << 16)  |
-                         ((id&0x00001FE0u) << 24);
+    while (PAC55XX_CAN->SR.TBS == 0) {};                 // wait for TX buffer free
+    PAC55XX_CAN->TXBUF = (dataLen << 0)                | // DLC - Data Length Code
+                         (0u << 6)                     | // RTR = 0 Data Frame
+                         (1u << 7)                     | // FF - Format Frame; 1=Ext Frame
+                         ((id&0x1FE00000u) >> (21-8))  |
+                         ((id&0x001FE000u) << (16-13)) |
+                         ((id&0x00001FE0u) << (24-5));
 
-    PAC55XX_CAN->TXBUF = (id & 0x1F << 3)       |
-                         (data[0] << 8)         |
-                         (data[1] << 16)        |
-                         (data[2] << 24);
+    PAC55XX_CAN->TXBUF = ((id & 0x1F) << 3)            |
+                         ((data[0] & 0xFF) << 8)       |
+                         ((data[1] & 0xFF) << 16)      |
+                         ((data[2] & 0xFF) << 24);
 
     if (dataLen > 3u)
     {
-        PAC55XX_CAN->TXBUF = (data[3] << 0)  |      // Data 3
-                             (data[4] << 8)  |		// Data 4
-                             (data[5] << 16) |      // Data 5
-                             (data[6] << 24);       // Data 6
+        PAC55XX_CAN->TXBUF = ((data[3] & 0xFF) << 0)   |      // Data 3
+                             ((data[4] & 0xFF) << 8)   |		// Data 4
+                             ((data[5] & 0xFF) << 16)  |      // Data 5
+                             ((data[6] & 0xFF) << 24);       // Data 6
     }
     if (dataLen > 7u)
     {
-        PAC55XX_CAN->TXBUF = (data[7] << 0);        // Data 7
+        PAC55XX_CAN->TXBUF = ((data[7] & 0xFF) << 0);        // Data 7
     }
 
     PAC55XX_CAN->CMR.TR = 1;	// Request transmit

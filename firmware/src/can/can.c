@@ -153,6 +153,6 @@ void CAN_task(void) {
         state.last_msg_ms = msTicks;
         uint8_t buf[4];
         *(uint32_t *)buf = avlos_proto_hash;
-        can_transmit_standard(4, 0x700 | config.id, buf);
+        can_transmit_extended(4, 0x700 | config.id, buf);
     }
 }

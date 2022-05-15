@@ -71,7 +71,6 @@ extern uint8_t data_length;
 extern uint32_t rx_id;
 extern bool rtr;
 extern uint8_t can_cmd_id;
-extern uint32_t buffer;
 
 void can_baud(CAN_BAUD_TYPE baud);
 void can_io_config(void);
