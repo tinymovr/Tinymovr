@@ -5,90 +5,90 @@ remote_attributes:
   - name: uid
     dtype: uint32
     c_getter: system_get_uid
-    description: The unique device ID, unique to each PAC55xx chip produced.
+    summary: The unique device ID, unique to each PAC55xx chip produced.
   - name: Vbus
     dtype: float
     unit: volt
     c_getter: adc_get_Vbus
-    description: The bus voltage.
+    summary: The bus voltage.
   - name: temp
     dtype: float
     unit: degC
     c_getter: adc_get_mcu_temp
-    description: The internal temperature of the PAC55xx MCU.
+    summary: The internal temperature of the PAC55xx MCU.
   - name: cycles
     remote_attributes:
       - name: total
         dtype: uint32
         c_getter: Scheduler_GetTotalCycles
-        description: Total processor cycles in a single PWM cycle.
+        summary: Total processor cycles in a single PWM cycle.
       - name: busy
         dtype: uint32
         c_getter: Scheduler_GetBusyCycles
-        description: Busy processor cycles in a single PWM cycle.
+        summary: Busy processor cycles in a single PWM cycle.
   - name: controller
     remote_attributes:
       - name: state
         dtype: uint8
         c_getter: controller_get_state
         c_setter: controller_set_state
-        description: The state of the controller.
+        summary: The state of the controller.
       - name: mode
         dtype: uint8
         c_getter: controller_get_mode
         c_setter: controller_set_mode
-        description: The control mode of the controller.
+        summary: The control mode of the controller.
       - name: pos_setpoint
         dtype: float
         c_getter: controller_get_pos_setpoint_user_frame
         c_setter: controller_set_pos_setpoint_user_frame
-        description: The position setpoint.
+        summary: The position setpoint.
       - name: vel_setpoint
         dtype: float
         c_getter: controller_get_vel_setpoint_user_frame
         c_setter: controller_set_vel_setpoint_user_frame
-        description: The velocity setpoint.
+        summary: The velocity setpoint.
       - name: Iq_setpoint
         dtype: float
         c_getter: controller_get_Iq_setpoint_user_frame
         c_setter: controller_set_Iq_setpoint_user_frame
-        description: The Iq setpoint.
+        summary: The Iq setpoint.
       - name: Iq_estimate
         dtype: float
         c_getter: controller_get_Iq_estimate_user_frame
-        description: The Iq estimate.
+        summary: The Iq estimate.
       - name: pos_p_gain
         dtype: float
         c_getter: controller_get_pos_gain
         c_setter: controller_set_pos_gain
-        description: The proportional gain of the position controller.
+        summary: The proportional gain of the position controller.
       - name: vel_p_gain
         dtype: float
         c_getter: controller_get_vel_gain
         c_setter: controller_set_vel_gain
-        description: The proportional gain of the velocity controller.
+        summary: The proportional gain of the velocity controller.
       - name: vel_i_gain
         dtype: float
         c_getter: controller_get_vel_integrator_gain
         c_setter: controller_set_vel_integrator_gain
-        description: The integral gain of the velocity controller.
+        summary: The integral gain of the velocity controller.
       - name: Iq_p_gain
         dtype: float
         c_getter: controller_get_Iq_gain
-        description: The current controller proportional gain.
+        summary: The current controller proportional gain.
       - name: vel_integrator
         remote_attributes:
           - name: gain
             dtype: float
             c_getter: controller_get_vel_integrator_gain
             c_setter: controller_set_vel_integrator_gain
-            description: The gain of the velocity integrator.
+            summary: The gain of the velocity integrator.
           - name: deadband
             dtype: float
             c_getter: controller_get_vel_integrator_deadband
             c_setter: controller_set_vel_integrator_deadband
             rst_target: integrator-deadband
-            description: The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
+            summary: The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
   - name: comms
     remote_attributes:
     - name: can
@@ -98,12 +98,12 @@ remote_attributes:
         c_getter: CAN_get_kbit_rate
         c_setter: CAN_set_kbit_rate
         rst_target: api-can-rate
-        description: The baud rate of the CAN interface.
+        summary: The baud rate of the CAN interface.
       - name: id
         dtype: uint32
         c_getter: CAN_get_ID
         c_setter: CAN_set_ID
-        description: The ID of the CAN interface.
+        summary: The ID of the CAN interface.
   - name: motor
     remote_attributes:
       - name: R
@@ -111,70 +111,70 @@ remote_attributes:
         unit: ohm
         c_getter: motor_get_phase_resistance
         c_setter: motor_set_phase_resistance
-        description: The motor Resistance value.
+        summary: The motor Resistance value.
       - name: L
         dtype: float
         unit: henry
         c_getter: motor_get_phase_inductance
         c_setter: motor_set_phase_inductance
-        description: The motor Inductance value.
+        summary: The motor Inductance value.
       - name: pole_pairs
         dtype: uint8
         c_getter: motor_get_pole_pairs
         c_setter: motor_set_pole_pairs
-        description: The motor pole pair count.
+        summary: The motor pole pair count.
       - name: type
         #values: [HIGH_CURRENT, GIMBAL]
         dtype: uint8
         c_getter: motor_get_is_gimbal
         c_setter: motor_set_is_gimbal
-        description: The type of the motor. Either high current or gimbal.
+        summary: The type of the motor. Either high current or gimbal.
       - name: offset
         dtype: float
         c_getter: motor_get_user_offset
         c_setter: motor_set_user_offset
-        description: User-defined offset of the motor.
+        summary: User-defined offset of the motor.
       - name: direction
         dtype: uint8
         c_getter: motor_get_user_direction
         c_setter: motor_set_user_direction
-        description: User-defined direction of the motor.
+        summary: User-defined direction of the motor.
       # - name: phase_currents
       #   remote_attributes:
       #     - name: U
       #       dtype: float
       #       unit: ampere
       #       c_getter: motor_get_IU
-      #       description: Measured current in phase U.
+      #       summary: Measured current in phase U.
       #     - name: V
       #       dtype: float
       #       unit: ampere
       #       c_getter: motor_get_IV
-      #       description: Measured current in phase V.
+      #       summary: Measured current in phase V.
       #     - name: W
       #       dtype: float
       #       unit: ampere
       #       c_getter: motor_get_IW
-      #       description: Measured current in phase W.
+      #       summary: Measured current in phase W.
   - name: encoder
     remote_attributes:
       - name: position_estimate
         dtype: float
         unit: ticks
         c_getter: observer_get_pos_estimate
-        description: The filtered encoder position estimate.
+        summary: The filtered encoder position estimate.
       - name: type
         #values: [INTERNAL, HALL]
         dtype: uint8
         c_getter: encoder_get_type
         c_setter: encoder_set_type
-        description: The encoder type. Either INTERNAL or HALL.
+        summary: The encoder type. Either INTERNAL or HALL.
       - name: bandwidth
         dtype: float
         unit: rad/s
         c_getter: observer_get_bw
         c_setter: observer_set_bw
-        description: The encoder observer bandwidth.
+        summary: The encoder observer bandwidth.
   - name: traj_planner
     remote_attributes:
       - name: max_accel
@@ -182,21 +182,21 @@ remote_attributes:
         unit: ticks/s
         c_getter: planner_get_max_accel
         c_setter: planner_set_max_accel
-        description: The trajectory planner max acceleration.
+        summary: The trajectory planner max acceleration.
       - name: max_decel
         dtype: float
         unit: ticks/second/second
         c_getter: planner_get_max_decel
         c_setter: planner_set_max_decel
-        description: The trajectory planner max deceleration.
+        summary: The trajectory planner max deceleration.
       - name: max_vel
         dtype: float
         unit: ticks/second
         c_getter: planner_get_max_vel
         c_setter: planner_set_max_vel
-        description: The trajectory planner max cruise velocity.
+        summary: The trajectory planner max cruise velocity.
       - name: pos_setpoint
         dtype: float
         unit: ticks
         c_setter: planner_move_to_vlimit
-        description: The position setpoint of the trajectory planner.
+        summary: The position setpoint of the trajectory planner.
