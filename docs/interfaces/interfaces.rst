@@ -201,6 +201,22 @@ Example
 
     .I1000
 
+.W
+==
+
+Get/set current (Iq) limit (mA).
+
+Example
+
+.. code-block:: shell
+
+    .W
+    10000
+
+.. code-block:: shell
+
+    .W15000
+
 .G
 ==
 
