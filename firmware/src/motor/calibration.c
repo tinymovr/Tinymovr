@@ -33,9 +33,9 @@ static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 bool CalibrateResistance(void)
 {
     bool success = true;
-    float I_cal = motor_get_I_cal();
     if (!motor_is_gimbal())
     {
+        float I_cal = motor_get_I_cal();
         float V_setpoint = 0.0f;
         struct FloatTriplet I_phase_meas = {0.0f};
         struct FloatTriplet modulation_values = {0.0f};
