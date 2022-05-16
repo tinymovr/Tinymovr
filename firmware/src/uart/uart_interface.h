@@ -15,20 +15,6 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-//
-// Commands
-// b - read vbus voltage *
-// P - read/write position setpoint
-// p - read position meas
-// V - read/write velocity setpoint
-// v - read velocity meas
-// I - read/write current setpoint **
-// i - read current meas **
-// Q - read/write current tolerance **
-//
-// * scaled by UART_V_SCALING_FACTOR
-// ** scaled by UART_I_SCALING_FACTOR
-
 
 #ifndef UART_UART_INTERFACE_H_
 #define UART_UART_INTERFACE_H_
