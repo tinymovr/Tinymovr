@@ -16,6 +16,11 @@ remote_attributes:
     unit: degC
     c_getter: adc_get_mcu_temp
     summary: The internal temperature of the PAC55xx MCU.
+  - name: reset
+    summary: Reset the device.
+    c_caller: system_reset
+    dtype: void
+    arguments: []
   - name: cycles
     remote_attributes:
       - name: total

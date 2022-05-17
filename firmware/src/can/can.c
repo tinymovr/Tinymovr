@@ -36,8 +36,6 @@ static CANConfig config = {
 static CANState state ={0};
 
 extern volatile uint32_t msTicks;
-extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[32])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 void CAN_init(void)
 {
