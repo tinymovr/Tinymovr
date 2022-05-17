@@ -86,6 +86,12 @@ PAC5XXX_RAMFUNC void controller_set_state(ControlState new_state);
 PAC5XXX_RAMFUNC ControlMode controller_get_mode(void);
 PAC5XXX_RAMFUNC void controller_set_mode(ControlMode mode);
 
+inline void controller_calibrate(void) {controller_set_state(STATE_CALIBRATE);}
+inline void controller_idle(void) {controller_set_state(STATE_IDLE);}
+inline void controller_position_mode(void) {controller_set_mode(CTRL_POSITION);controller_set_state(STATE_CL_CONTROL);}
+inline void controller_velocity_mode(void) {controller_set_mode(CTRL_VELOCITY);controller_set_state(STATE_CL_CONTROL);}
+inline void controller_current_mode(void) {controller_set_mode(CTRL_CURRENT);controller_set_state(STATE_CL_CONTROL);}
+
 PAC5XXX_RAMFUNC float controller_get_pos_setpoint_user_frame(void);
 PAC5XXX_RAMFUNC void controller_set_pos_setpoint_user_frame(float value);
 PAC5XXX_RAMFUNC float controller_get_vel_setpoint_user_frame(void);
