@@ -13,6 +13,10 @@
             "servertype": "jlink",
             "device": "PAC55XX",
             "interface": "swd",
+            "serverArgs": [
+                // Add any arguments to pass to the JLink GDB server here
+                // "-speed 2000"
+            ],
             "runToEntryPoint": "main",
             "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
             "preLaunchTask": "Build Project (Debug)",

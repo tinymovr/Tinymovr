@@ -17,8 +17,8 @@
 #include <src/can/can_endpoints.h>
 
 
-uint8_t (*avlos_endpoints[33])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&uid_0, &Vbus_1, &temp_2, &reset_3, &total_4, &busy_5, &state_6, &mode_7, &pos_setpoint_8, &vel_setpoint_9, &Iq_setpoint_10, &Iq_estimate_11, &pos_p_gain_12, &vel_p_gain_13, &vel_i_gain_14, &Iq_p_gain_15, &gain_16, &deadband_17, &rate_18, &id_19, &R_20, &L_21, &pole_pairs_22, &type_23, &offset_24, &direction_25, &position_estimate_26, &type_27, &bandwidth_28, &max_accel_29, &max_decel_30, &max_vel_31, &pos_setpoint_32 };
-uint32_t avlos_proto_hash = 3907629374;
+uint8_t (*avlos_endpoints[35])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&uid_0, &Vbus_1, &temp_2, &save_config_3, &erase_config_4, &reset_5, &total_6, &busy_7, &state_8, &mode_9, &pos_setpoint_10, &vel_setpoint_11, &Iq_setpoint_12, &Iq_estimate_13, &pos_p_gain_14, &vel_p_gain_15, &vel_i_gain_16, &Iq_p_gain_17, &gain_18, &deadband_19, &rate_20, &id_21, &R_22, &L_23, &pole_pairs_24, &type_25, &offset_26, &direction_27, &position_estimate_28, &type_29, &bandwidth_30, &max_accel_31, &max_decel_32, &max_vel_33, &pos_setpoint_34 };
+uint32_t avlos_proto_hash = 3073919892;
 
 uint8_t uid_0(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
@@ -56,14 +56,28 @@ uint8_t temp_2(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t reset_3(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t save_config_3(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    nvm_save_config();
+
+    return AVLOS_RET_CALL;
+}
+
+uint8_t erase_config_4(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    nvm_erase();
+
+    return AVLOS_RET_CALL;
+}
+
+uint8_t reset_5(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     system_reset();
 
     return AVLOS_RET_CALL;
 }
 
-uint8_t total_4(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t total_6(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         uint32_t v;
@@ -75,7 +89,7 @@ uint8_t total_4(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t busy_5(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t busy_7(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         uint32_t v;
@@ -87,7 +101,7 @@ uint8_t busy_5(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t state_6(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t state_8(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         uint8_t v;
@@ -105,7 +119,7 @@ uint8_t state_6(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t mode_7(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t mode_9(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         uint8_t v;
@@ -123,7 +137,7 @@ uint8_t mode_7(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t pos_setpoint_8(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t pos_setpoint_10(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -141,7 +155,7 @@ uint8_t pos_setpoint_8(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t vel_setpoint_9(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t vel_setpoint_11(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -159,7 +173,7 @@ uint8_t vel_setpoint_9(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t Iq_setpoint_10(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t Iq_setpoint_12(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -177,7 +191,7 @@ uint8_t Iq_setpoint_10(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t Iq_estimate_11(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t Iq_estimate_13(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -189,7 +203,7 @@ uint8_t Iq_estimate_11(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t pos_p_gain_12(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t pos_p_gain_14(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -207,7 +221,7 @@ uint8_t pos_p_gain_12(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t vel_p_gain_13(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t vel_p_gain_15(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -225,7 +239,7 @@ uint8_t vel_p_gain_13(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t vel_i_gain_14(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t vel_i_gain_16(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -243,7 +257,7 @@ uint8_t vel_i_gain_14(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t Iq_p_gain_15(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t Iq_p_gain_17(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -255,7 +269,7 @@ uint8_t Iq_p_gain_15(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t gain_16(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t gain_18(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -273,7 +287,7 @@ uint8_t gain_16(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t deadband_17(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t deadband_19(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -291,7 +305,7 @@ uint8_t deadband_17(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t rate_18(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t rate_20(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         uint32_t v;
@@ -309,7 +323,7 @@ uint8_t rate_18(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t id_19(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t id_21(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         uint32_t v;
@@ -327,7 +341,7 @@ uint8_t id_19(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t R_20(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t R_22(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -345,7 +359,7 @@ uint8_t R_20(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t L_21(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t L_23(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -363,7 +377,7 @@ uint8_t L_21(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t pole_pairs_22(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t pole_pairs_24(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         uint8_t v;
@@ -381,7 +395,7 @@ uint8_t pole_pairs_22(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t type_23(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t type_25(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         uint8_t v;
@@ -399,7 +413,7 @@ uint8_t type_23(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t offset_24(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t offset_26(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -417,7 +431,7 @@ uint8_t offset_24(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t direction_25(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t direction_27(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         uint8_t v;
@@ -435,7 +449,7 @@ uint8_t direction_25(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t position_estimate_26(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t position_estimate_28(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -447,7 +461,7 @@ uint8_t position_estimate_26(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comma
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t type_27(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t type_29(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         uint8_t v;
@@ -465,7 +479,7 @@ uint8_t type_27(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t bandwidth_28(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t bandwidth_30(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -483,7 +497,7 @@ uint8_t bandwidth_28(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t max_accel_29(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t max_accel_31(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -501,7 +515,7 @@ uint8_t max_accel_29(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t max_decel_30(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t max_decel_32(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -519,7 +533,7 @@ uint8_t max_decel_30(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t max_vel_31(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t max_vel_33(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
@@ -537,7 +551,7 @@ uint8_t max_vel_31(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t pos_setpoint_32(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t pos_setpoint_34(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_WRITE == cmd) {
         float v;

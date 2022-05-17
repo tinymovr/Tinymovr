@@ -16,6 +16,16 @@ remote_attributes:
     unit: degC
     c_getter: adc_get_mcu_temp
     summary: The internal temperature of the PAC55xx MCU.
+  - name: save_config
+    summary: Save configuration to non-volatile memory.
+    c_caller: nvm_save_config
+    dtype: void
+    arguments: []
+  - name: erase_config
+    summary: Erase the config stored in non-volatile memory and reset the device.
+    c_caller: nvm_erase
+    dtype: void
+    arguments: []
   - name: reset
     summary: Reset the device.
     c_caller: system_reset
@@ -45,21 +55,25 @@ remote_attributes:
         summary: The control mode of the controller.
       - name: pos_setpoint
         dtype: float
+        unit: tick
         c_getter: controller_get_pos_setpoint_user_frame
         c_setter: controller_set_pos_setpoint_user_frame
         summary: The position setpoint.
       - name: vel_setpoint
         dtype: float
+        unit: tick/sec
         c_getter: controller_get_vel_setpoint_user_frame
         c_setter: controller_set_vel_setpoint_user_frame
         summary: The velocity setpoint.
       - name: Iq_setpoint
         dtype: float
+        unit: ampere
         c_getter: controller_get_Iq_setpoint_user_frame
         c_setter: controller_set_Iq_setpoint_user_frame
         summary: The Iq setpoint.
       - name: Iq_estimate
         dtype: float
+        unit: ampere
         c_getter: controller_get_Iq_estimate_user_frame
         summary: The Iq estimate.
       - name: pos_p_gain

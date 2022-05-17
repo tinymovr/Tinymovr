@@ -10,7 +10,7 @@ uid
 
 ID: 0
 Type: uint32
-Units: 
+
 
 The unique device ID, unique to each PAC55xx chip produced.
 
@@ -20,7 +20,7 @@ Vbus
 
 ID: 1
 Type: float
-
+Units: volt
 
 The bus voltage.
 
@@ -30,15 +30,35 @@ temp
 
 ID: 2
 Type: float
-
+Units: degree_Celsius
 
 The internal temperature of the PAC55xx MCU.
+
+
+save_config() -> void
+-------------------------------------------------------------------
+
+ID: 3
+Return Type: void
+
+
+Save configuration to non-volatile memory.
+
+
+erase_config() -> void
+-------------------------------------------------------------------
+
+ID: 4
+Return Type: void
+
+
+Erase the config stored in non-volatile memory and reset the device.
 
 
 reset() -> void
 -------------------------------------------------------------------
 
-ID: 3
+ID: 5
 Return Type: void
 
 
@@ -48,9 +68,9 @@ Reset the device.
 total
 -------------------------------------------------------------------
 
-ID: 4
+ID: 6
 Type: uint32
-Units: 
+
 
 Total processor cycles in a single PWM cycle.
 
@@ -58,9 +78,9 @@ Total processor cycles in a single PWM cycle.
 busy
 -------------------------------------------------------------------
 
-ID: 5
+ID: 7
 Type: uint32
-Units: 
+
 
 Busy processor cycles in a single PWM cycle.
 
@@ -68,9 +88,9 @@ Busy processor cycles in a single PWM cycle.
 state
 -------------------------------------------------------------------
 
-ID: 6
+ID: 8
 Type: uint8
-Units: 
+
 
 The state of the controller.
 
@@ -78,9 +98,9 @@ The state of the controller.
 mode
 -------------------------------------------------------------------
 
-ID: 7
+ID: 9
 Type: uint8
-Units: 
+
 
 The control mode of the controller.
 
@@ -88,9 +108,9 @@ The control mode of the controller.
 pos_setpoint
 -------------------------------------------------------------------
 
-ID: 8
+ID: 10
 Type: float
-Units: 
+Units: tick
 
 The position setpoint.
 
@@ -98,9 +118,9 @@ The position setpoint.
 vel_setpoint
 -------------------------------------------------------------------
 
-ID: 9
+ID: 11
 Type: float
-Units: 
+Units: tick / second
 
 The velocity setpoint.
 
@@ -108,9 +128,9 @@ The velocity setpoint.
 Iq_setpoint
 -------------------------------------------------------------------
 
-ID: 10
+ID: 12
 Type: float
-Units: 
+Units: ampere
 
 The Iq setpoint.
 
@@ -118,9 +138,9 @@ The Iq setpoint.
 Iq_estimate
 -------------------------------------------------------------------
 
-ID: 11
+ID: 13
 Type: float
-Units: 
+Units: ampere
 
 The Iq estimate.
 
@@ -128,9 +148,9 @@ The Iq estimate.
 pos_p_gain
 -------------------------------------------------------------------
 
-ID: 12
+ID: 14
 Type: float
-Units: 
+
 
 The proportional gain of the position controller.
 
@@ -138,9 +158,9 @@ The proportional gain of the position controller.
 vel_p_gain
 -------------------------------------------------------------------
 
-ID: 13
+ID: 15
 Type: float
-Units: 
+
 
 The proportional gain of the velocity controller.
 
@@ -148,9 +168,9 @@ The proportional gain of the velocity controller.
 vel_i_gain
 -------------------------------------------------------------------
 
-ID: 14
+ID: 16
 Type: float
-Units: 
+
 
 The integral gain of the velocity controller.
 
@@ -158,9 +178,9 @@ The integral gain of the velocity controller.
 Iq_p_gain
 -------------------------------------------------------------------
 
-ID: 15
+ID: 17
 Type: float
-Units: 
+
 
 The current controller proportional gain.
 
@@ -168,9 +188,9 @@ The current controller proportional gain.
 gain
 -------------------------------------------------------------------
 
-ID: 16
+ID: 18
 Type: float
-Units: 
+
 
 The gain of the velocity integrator.
 
@@ -178,9 +198,9 @@ The gain of the velocity integrator.
 deadband
 -------------------------------------------------------------------
 
-ID: 17
+ID: 19
 Type: float
-Units: 
+
 
 The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
 
@@ -188,9 +208,9 @@ The deadband of the velocity integrator. A region around the position setpoint w
 rate
 -------------------------------------------------------------------
 
-ID: 18
+ID: 20
 Type: uint32
-Units: 
+
 
 The baud rate of the CAN interface.
 
@@ -198,9 +218,9 @@ The baud rate of the CAN interface.
 id
 -------------------------------------------------------------------
 
-ID: 19
+ID: 21
 Type: uint32
-Units: 
+
 
 The ID of the CAN interface.
 
@@ -208,9 +228,9 @@ The ID of the CAN interface.
 R
 -------------------------------------------------------------------
 
-ID: 20
+ID: 22
 Type: float
-
+Units: ohm
 
 The motor Resistance value.
 
@@ -218,9 +238,9 @@ The motor Resistance value.
 L
 -------------------------------------------------------------------
 
-ID: 21
+ID: 23
 Type: float
-
+Units: henry
 
 The motor Inductance value.
 
@@ -228,9 +248,9 @@ The motor Inductance value.
 pole_pairs
 -------------------------------------------------------------------
 
-ID: 22
+ID: 24
 Type: uint8
-Units: 
+
 
 The motor pole pair count.
 
@@ -238,9 +258,9 @@ The motor pole pair count.
 type
 -------------------------------------------------------------------
 
-ID: 23
+ID: 25
 Type: uint8
-Units: 
+
 
 The type of the motor. Either high current or gimbal.
 
@@ -248,9 +268,9 @@ The type of the motor. Either high current or gimbal.
 offset
 -------------------------------------------------------------------
 
-ID: 24
+ID: 26
 Type: float
-Units: 
+
 
 User-defined offset of the motor.
 
@@ -258,9 +278,9 @@ User-defined offset of the motor.
 direction
 -------------------------------------------------------------------
 
-ID: 25
+ID: 27
 Type: uint8
-Units: 
+
 
 User-defined direction of the motor.
 
@@ -268,9 +288,9 @@ User-defined direction of the motor.
 position_estimate
 -------------------------------------------------------------------
 
-ID: 26
+ID: 28
 Type: float
-
+Units: tick
 
 The filtered encoder position estimate.
 
@@ -278,9 +298,9 @@ The filtered encoder position estimate.
 type
 -------------------------------------------------------------------
 
-ID: 27
+ID: 29
 Type: uint8
-Units: 
+
 
 The encoder type. Either INTERNAL or HALL.
 
@@ -288,9 +308,9 @@ The encoder type. Either INTERNAL or HALL.
 bandwidth
 -------------------------------------------------------------------
 
-ID: 28
+ID: 30
 Type: float
-
+Units: radian / second
 
 The encoder observer bandwidth.
 
@@ -298,9 +318,9 @@ The encoder observer bandwidth.
 max_accel
 -------------------------------------------------------------------
 
-ID: 29
+ID: 31
 Type: float
-
+Units: tick / second
 
 The trajectory planner max acceleration.
 
@@ -308,9 +328,9 @@ The trajectory planner max acceleration.
 max_decel
 -------------------------------------------------------------------
 
-ID: 30
+ID: 32
 Type: float
-
+Units: tick / second ** 2
 
 The trajectory planner max deceleration.
 
@@ -318,9 +338,9 @@ The trajectory planner max deceleration.
 max_vel
 -------------------------------------------------------------------
 
-ID: 31
+ID: 33
 Type: float
-
+Units: tick / second
 
 The trajectory planner max cruise velocity.
 
@@ -328,9 +348,9 @@ The trajectory planner max cruise velocity.
 pos_setpoint
 -------------------------------------------------------------------
 
-ID: 32
+ID: 34
 Type: float
-
+Units: tick
 
 The position setpoint of the trajectory planner.
 
