@@ -108,6 +108,31 @@ remote_attributes:
             c_setter: controller_set_vel_integrator_deadband
             rst_target: integrator-deadband
             summary: The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
+      - name: calibrate
+        summary: Calibrate the device.
+        c_caller: controller_calibrate
+        dtype: void
+        arguments: []
+      - name: idle
+        summary: Set idle mode, disabling the driver.
+        c_caller: controller_idle
+        dtype: void
+        arguments: []
+      - name: position_mode
+        summary: Set position control mode.
+        c_caller: controller_position_mode
+        dtype: void
+        arguments: []
+      - name: velocity_mode
+        summary: Set velocity control mode.
+        c_caller: controller_velocity_mode
+        dtype: void
+        arguments: []
+      - name: current_mode
+        summary: Set current control mode.
+        c_caller: controller_current_mode
+        dtype: void
+        arguments: []
   - name: comms
     remote_attributes:
     - name: can

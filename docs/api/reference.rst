@@ -205,10 +205,60 @@ Type: float
 The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
 
 
-rate
+calibrate() -> void
 -------------------------------------------------------------------
 
 ID: 20
+Return Type: void
+
+
+Calibrate the device.
+
+
+idle() -> void
+-------------------------------------------------------------------
+
+ID: 21
+Return Type: void
+
+
+Set idle mode, disabling the driver.
+
+
+position_mode() -> void
+-------------------------------------------------------------------
+
+ID: 22
+Return Type: void
+
+
+Set position control mode.
+
+
+velocity_mode() -> void
+-------------------------------------------------------------------
+
+ID: 23
+Return Type: void
+
+
+Set velocity control mode.
+
+
+current_mode() -> void
+-------------------------------------------------------------------
+
+ID: 24
+Return Type: void
+
+
+Set current control mode.
+
+
+rate
+-------------------------------------------------------------------
+
+ID: 25
 Type: uint32
 
 
@@ -218,7 +268,7 @@ The baud rate of the CAN interface.
 id
 -------------------------------------------------------------------
 
-ID: 21
+ID: 26
 Type: uint32
 
 
@@ -228,7 +278,7 @@ The ID of the CAN interface.
 R
 -------------------------------------------------------------------
 
-ID: 22
+ID: 27
 Type: float
 Units: ohm
 
@@ -238,7 +288,7 @@ The motor Resistance value.
 L
 -------------------------------------------------------------------
 
-ID: 23
+ID: 28
 Type: float
 Units: henry
 
@@ -248,7 +298,7 @@ The motor Inductance value.
 pole_pairs
 -------------------------------------------------------------------
 
-ID: 24
+ID: 29
 Type: uint8
 
 
@@ -258,7 +308,7 @@ The motor pole pair count.
 type
 -------------------------------------------------------------------
 
-ID: 25
+ID: 30
 Type: uint8
 
 
@@ -268,7 +318,7 @@ The type of the motor. Either high current or gimbal.
 offset
 -------------------------------------------------------------------
 
-ID: 26
+ID: 31
 Type: float
 
 
@@ -278,7 +328,7 @@ User-defined offset of the motor.
 direction
 -------------------------------------------------------------------
 
-ID: 27
+ID: 32
 Type: uint8
 
 
@@ -288,7 +338,7 @@ User-defined direction of the motor.
 position_estimate
 -------------------------------------------------------------------
 
-ID: 28
+ID: 33
 Type: float
 Units: tick
 
@@ -298,7 +348,7 @@ The filtered encoder position estimate.
 type
 -------------------------------------------------------------------
 
-ID: 29
+ID: 34
 Type: uint8
 
 
@@ -308,7 +358,7 @@ The encoder type. Either INTERNAL or HALL.
 bandwidth
 -------------------------------------------------------------------
 
-ID: 30
+ID: 35
 Type: float
 Units: radian / second
 
@@ -318,7 +368,7 @@ The encoder observer bandwidth.
 max_accel
 -------------------------------------------------------------------
 
-ID: 31
+ID: 36
 Type: float
 Units: tick / second
 
@@ -328,7 +378,7 @@ The trajectory planner max acceleration.
 max_decel
 -------------------------------------------------------------------
 
-ID: 32
+ID: 37
 Type: float
 Units: tick / second ** 2
 
@@ -338,7 +388,7 @@ The trajectory planner max deceleration.
 max_vel
 -------------------------------------------------------------------
 
-ID: 33
+ID: 38
 Type: float
 Units: tick / second
 
@@ -348,7 +398,7 @@ The trajectory planner max cruise velocity.
 pos_setpoint
 -------------------------------------------------------------------
 
-ID: 34
+ID: 39
 Type: float
 Units: tick
 
