@@ -29,36 +29,49 @@ To enable gimbal mode, set the motor config as follows:
 
 .. code-block:: python
 
-    >>>tm1.set_motor_config(1, motor_resistance, motor_inductance, I_cal)
-
-Please note that by default the motor_resistance field is in Milliohms, the motor_inductance field is in Microhenries, and the calibration current ``I_cal`` in Milliamps.
+    >>>tm1.motor.type = 1 # gimbal type
+    >>>tm1.motor.R = {motor_resistance}
+    >>>tm1.motor.L = {motor_inductance}
+    >>>tm1.motor.I_cal = {calibration_current}
 
 Example
 
 .. code-block:: python
-    
-    >>>tmx.set_motor_config(1, 5000, 2000, 500)
+
+    >>>tm1.motor.type = 1
+    >>>tm1.motor.R = 5
+    >>>tm1.motor.L = 2e-3
+    >>>tm1.motor.I_cal = 0.5
 
 This specifies a motor with 5Ohms resistance, 2Millihenries inductance and 0.5Amps calibration current.
 Alternatuvely, using the units interface:
 
 .. code-block:: python
-    
-    >>>tmx.set_motor_config(1, 0.005 * Ohm, 0.002 * Henry, 0.5 * Amps)
+
+    >>>tm1.motor.type = 1
+    >>>tm1.motor.R = 5 * Ohm
+    >>>tm1.motor.L = 2e-3 * Henry
+    >>>tm1.motor.I_cal = 0.5 * Amps
 
 Control that the settings are correct:
 
 .. code-block:: python
     
-    >>>tmx.motor_config
-    {"flags": 2, "R": 5000, "pole_pairs": 11, "L": 2000, "I_cal": 500}
+    >>>tm1.motor.
 
-You can now calibrate the motor. Calibration will bypass resistance and inductance measurement, and will only calculate pole pairs, offset and direction. After calibration you should see a value of '3' in the 'flags' field of motor_config:
+You can now calibrate the motor:
 
 .. code-block:: python
     
-    >>>tmx.motor_config
-    {"flags": 3, "R": 5000, "pole_pairs": 11, "L": 2000, "I_cal": 500}
+    >>>tm1.controller.calibrate()
+
+Because the motor is set as gimbal, calibration will bypass resistance and inductance measurement, and will only calculate pole pairs, offset and direction. After calibration `tmx.motor.calibrated` should return true:
+
+.. code-block:: python
+    
+    >>>tm1.motor.calibrated
+    True
+
 
 Controlling the Motor
 ---------------------

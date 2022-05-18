@@ -31,11 +31,11 @@ The above code block will instantiate a Tinymovr with CAN bus id of 1 and calibr
 
 .. code-block:: python
 
-    tm.position_control()
-    tm.set_pos_setpoint(0)
+    tm.controller.position_mode()
+    tm.controller.pos_setpoint = 0
 
-    tm.velocity_control()
-    tm.set_vel_setpoint(80000)
+    tm.controller.velocity_mode()
+    tm.controller.vel_setpoint = 80000
 
 Error Codes
 ###########
