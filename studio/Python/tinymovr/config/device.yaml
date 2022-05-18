@@ -239,8 +239,17 @@ remote_attributes:
         c_getter: planner_get_max_vel
         c_setter: planner_set_max_vel
         summary: The trajectory planner max cruise velocity.
-      - name: pos_setpoint
-        dtype: float
-        unit: ticks
-        c_setter: planner_move_to_vlimit
-        summary: The position setpoint of the trajectory planner.
+      - name: move_to
+        summary: Move to target position respecting velocity and acceleration limits.
+        c_caller: planner_move_to_vlimit
+        dtype: void
+        arguments:
+          - name: pos_setpoint
+            dtype: float
+      - name: move_to_tlimit
+        summary: Move to target position respecting time limits for each sector.
+        c_caller: planner_move_to_tlimit
+        dtype: void
+        arguments:
+          - name: pos_setpoint
+            dtype: float

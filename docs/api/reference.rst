@@ -65,7 +65,7 @@ Return Type: void
 Reset the device.
 
 
-total
+cycles.total
 -------------------------------------------------------------------
 
 ID: 6
@@ -75,7 +75,7 @@ Type: uint32
 Total processor cycles in a single PWM cycle.
 
 
-busy
+cycles.busy
 -------------------------------------------------------------------
 
 ID: 7
@@ -85,7 +85,7 @@ Type: uint32
 Busy processor cycles in a single PWM cycle.
 
 
-state
+controller.state
 -------------------------------------------------------------------
 
 ID: 8
@@ -95,7 +95,7 @@ Type: uint8
 The state of the controller.
 
 
-mode
+controller.mode
 -------------------------------------------------------------------
 
 ID: 9
@@ -105,7 +105,7 @@ Type: uint8
 The control mode of the controller.
 
 
-pos_setpoint
+controller.pos_setpoint
 -------------------------------------------------------------------
 
 ID: 10
@@ -115,7 +115,7 @@ Units: tick
 The position setpoint.
 
 
-vel_setpoint
+controller.vel_setpoint
 -------------------------------------------------------------------
 
 ID: 11
@@ -125,7 +125,7 @@ Units: tick / second
 The velocity setpoint.
 
 
-Iq_setpoint
+controller.Iq_setpoint
 -------------------------------------------------------------------
 
 ID: 12
@@ -135,7 +135,7 @@ Units: ampere
 The Iq setpoint.
 
 
-Iq_estimate
+controller.Iq_estimate
 -------------------------------------------------------------------
 
 ID: 13
@@ -145,7 +145,7 @@ Units: ampere
 The Iq estimate.
 
 
-pos_p_gain
+controller.pos_p_gain
 -------------------------------------------------------------------
 
 ID: 14
@@ -155,7 +155,7 @@ Type: float
 The proportional gain of the position controller.
 
 
-vel_p_gain
+controller.vel_p_gain
 -------------------------------------------------------------------
 
 ID: 15
@@ -165,7 +165,7 @@ Type: float
 The proportional gain of the velocity controller.
 
 
-vel_i_gain
+controller.vel_i_gain
 -------------------------------------------------------------------
 
 ID: 16
@@ -175,7 +175,7 @@ Type: float
 The integral gain of the velocity controller.
 
 
-Iq_p_gain
+controller.Iq_p_gain
 -------------------------------------------------------------------
 
 ID: 17
@@ -185,7 +185,7 @@ Type: float
 The current controller proportional gain.
 
 
-gain
+controller.vel_integrator.gain
 -------------------------------------------------------------------
 
 ID: 18
@@ -195,7 +195,7 @@ Type: float
 The gain of the velocity integrator.
 
 
-deadband
+controller.vel_integrator.deadband
 -------------------------------------------------------------------
 
 ID: 19
@@ -255,7 +255,7 @@ Return Type: void
 Set current control mode.
 
 
-rate
+comms.can.rate
 -------------------------------------------------------------------
 
 ID: 25
@@ -265,7 +265,7 @@ Type: uint32
 The baud rate of the CAN interface.
 
 
-id
+comms.can.id
 -------------------------------------------------------------------
 
 ID: 26
@@ -275,7 +275,7 @@ Type: uint32
 The ID of the CAN interface.
 
 
-R
+motor.R
 -------------------------------------------------------------------
 
 ID: 27
@@ -285,7 +285,7 @@ Units: ohm
 The motor Resistance value.
 
 
-L
+motor.L
 -------------------------------------------------------------------
 
 ID: 28
@@ -295,7 +295,7 @@ Units: henry
 The motor Inductance value.
 
 
-pole_pairs
+motor.pole_pairs
 -------------------------------------------------------------------
 
 ID: 29
@@ -305,7 +305,7 @@ Type: uint8
 The motor pole pair count.
 
 
-type
+motor.type
 -------------------------------------------------------------------
 
 ID: 30
@@ -315,7 +315,7 @@ Type: uint8
 The type of the motor. Either high current or gimbal.
 
 
-offset
+motor.offset
 -------------------------------------------------------------------
 
 ID: 31
@@ -325,7 +325,7 @@ Type: float
 User-defined offset of the motor.
 
 
-direction
+motor.direction
 -------------------------------------------------------------------
 
 ID: 32
@@ -335,7 +335,7 @@ Type: uint8
 User-defined direction of the motor.
 
 
-position_estimate
+encoder.position_estimate
 -------------------------------------------------------------------
 
 ID: 33
@@ -345,7 +345,7 @@ Units: tick
 The filtered encoder position estimate.
 
 
-type
+encoder.type
 -------------------------------------------------------------------
 
 ID: 34
@@ -355,7 +355,7 @@ Type: uint8
 The encoder type. Either INTERNAL or HALL.
 
 
-bandwidth
+encoder.bandwidth
 -------------------------------------------------------------------
 
 ID: 35
@@ -365,7 +365,7 @@ Units: radian / second
 The encoder observer bandwidth.
 
 
-max_accel
+traj_planner.max_accel
 -------------------------------------------------------------------
 
 ID: 36
@@ -375,7 +375,7 @@ Units: tick / second
 The trajectory planner max acceleration.
 
 
-max_decel
+traj_planner.max_decel
 -------------------------------------------------------------------
 
 ID: 37
@@ -385,7 +385,7 @@ Units: tick / second ** 2
 The trajectory planner max deceleration.
 
 
-max_vel
+traj_planner.max_vel
 -------------------------------------------------------------------
 
 ID: 38
@@ -395,13 +395,23 @@ Units: tick / second
 The trajectory planner max cruise velocity.
 
 
-pos_setpoint
+move_to(pos_setpoint) -> void
 -------------------------------------------------------------------
 
 ID: 39
-Type: float
-Units: tick
+Return Type: void
 
-The position setpoint of the trajectory planner.
+
+Move to target position respecting velocity and acceleration limits.
+
+
+move_to_tlimit(pos_setpoint) -> void
+-------------------------------------------------------------------
+
+ID: 40
+Return Type: void
+
+
+Move to target position respecting time limits for each sector.
 
 
