@@ -20,7 +20,19 @@ Supported Motor Types
 
 Most three-phase pancake-style outrunners can be used with Tinymovr. While there is a lot of variation between motors of even the same size and external appearance, as a general rule-of-thumb motors ranging from 40mm outer diameter to 110mm should work fine with Tinymovr.
 
-(image)
+Additional details:
+
+Tinymovr expects a motor with sinusoidal back-EMF. Most brushless outrunners have inusoidal back-EMF. If uncertain and you have access to an oscilloscope, you can hook up the motor phases to the scope channels and check out the back-EMF for yourself. Ideally, you would expect something like below:
+
+.. figure:: backemf.png
+  :width: 800
+  :align: center
+  :alt: Sinusoidal back-EMF on the scope
+  :figclass: align-center
+
+  Sinusoidal back-EMF on the scope
+
+Motors with trapezoidal back-EMF can also be controlled, but control will be sub-optimal. The trapezoidal back-EMF will appear as residual in the dq frame, as a result it will be much harder for the current controller to regulate phase currents. The tangible result is that the motor may exhibit increased noise and vibration while running.
 
 
 Mechanical Setup
@@ -58,7 +70,7 @@ For a 3D printable motor mount design, check out the `Tinymovr alpha dev kit mou
 
 Magnet on the rear side of the PCB
 
-TL;DR: It is possible to have the magnet on the rear dise of the PCB, i.e. opposite of the magnet sensor IC, but the gap needs to be reduced to account for the PCB thickness. 
+TL;DR: It is possible to have the magnet on the rear side of the PCB, i.e. opposite of the magnet sensor IC, but the gap needs to be reduced to account for the PCB thickness. 
 
 This has been verified by MPS in `this forum post <https://forum.monolithicpower.com/t/mounting-ma702-and-magnet-on-opposite-sides-of-pcb/1609>`_, quoted below:
 
@@ -90,12 +102,9 @@ Electrical setup comprises three main parts: Motor connection, data connection a
 Connecting Motor
 ################
 
-Connect the three motor phases to the three terminals on Tinymovr. The order of connection is not important, motor direction will be determined during motor/encoder calibration.
+Connect the three motor phases to the three terminals on Tinymovr. The order of connection is not important, and motor direction will be determined during motor/encoder calibration.
 
-The connection can be achieved in two ways. Either by soldering the motor leads directly on the terminals, or by securing the leads with a 2mm lug.
-
-.. note::
-   If using a lug connection, ensure that the screw and nut are not rotating against the PCB surface, as this may remove parts of the soldermask or even conductive copper layer.
+For Tinymovr R3.x, the motor leads can be connected by soldering on the PCB. For Tinymovr R5, the leads can be connected by soldering on the PCB, or you can solder a screw terminal block and secure the motor leads on the block.
 
 .. _connecting-data:
 
@@ -123,6 +132,4 @@ Connecting Power
 With the power source off/disconnected, connect the power leads observing correct polarity. Turn on/connect the power source. Upon successful power-up, the onboard LED should light up.
 
 .. note::
-   Each Tinymovr board has a capacitance of around 500μF/160. Such capacitance can introduce significant inrush current upon power-on, especially if several boards are connected to the same power supply. To prevent damage to components from overcurrent, the use of an inrush current limiter or a current-limited power supply is advised.
-
-
+   Each Tinymovr board has a capacitance of around 500μF (R3.x) / 160μF (R5). Such capacitance can introduce significant inrush current upon power-on, especially if several boards are connected to the same power supply. To prevent damage to components from overcurrent, the use of an inrush current limiter or a current-limited power supply is advised.

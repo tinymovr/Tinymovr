@@ -67,4 +67,4 @@ Time-limited trajectories are useful for synchronizing the acceleration, cruise 
     tm2.traj_planner.move_to_tlimit(5000)
     tm3.traj_planner.move_to_tlimit(200000)
 
-This will generate three trajectories that will start and end at the same time (with 1-2 milliseconds delay, due to sequential transmission of commands). 
+This will generate one trajectory for each controller, which will start and end simultaneously. 
