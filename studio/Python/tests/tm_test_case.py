@@ -42,24 +42,22 @@ class TMTestCase(unittest.TestCase):
         time.sleep(timeout)
 
     def try_calibrate(self, force=False, *args, **kwargs):
-        motor_config = self.tm.motor_config
-        if True == force or (motor_config.flags == 0 or motor_config.flags == 2):
+        if True == force or self.tm.motor.calibrated:
             self.tm.calibrate()
             self.wait_for_calibration(*args, **kwargs)
-            motor_config = self.tm.motor_config
-            self.assertTrue(motor_config.flags == 1 or motor_config.flags == 3)
+            self.assertTrue(self.tm.motor.calibrated)
 
     def wait_for_calibration(self, check_interval=0.05):
         for _ in range(1000):
-            if self.tm.state.state == 0:
+            if self.tm.controller.state == 0:
                 break
             time.sleep(check_interval)
-        self.assertEqual(self.tm.state.state, 0)
+        self.assertEqual(self.tm.controller.state, 0)
 
     def check_state(self, target_state, target_error=None):
-        state = self.tm.state
-        if target_error and state.errors:
-            self.assertIn(target_error, state.errors)
+        errors = self.tm.errors
+        if target_error and errors:
+            self.assertGreater(errors & target_error.bitmask, 0)
         else:
-            self.assertFalse(state.errors)
-        self.assertEqual(state.state, target_state)
+            self.assertEqual(errors, 0)
+        self.assertEqual(self.tm.controller.state, target_state)
