@@ -71,6 +71,18 @@ remote_attributes:
         c_getter: controller_get_Iq_setpoint_user_frame
         c_setter: controller_set_Iq_setpoint_user_frame
         summary: The Iq setpoint.
+      - name: vel_limit
+        dtype: float
+        unit: tick/sec
+        c_getter: controller_get_vel_limit
+        c_setter: controller_set_vel_limit
+        summary: The velocity limit.
+      - name: Iq_limit
+        dtype: float
+        unit: ampere
+        c_getter: controller_get_Iq_limit
+        c_setter: controller_set_Iq_limit
+        summary: The Iq limit.
       - name: Iq_estimate
         dtype: float
         unit: ampere

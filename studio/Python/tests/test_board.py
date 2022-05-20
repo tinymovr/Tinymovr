@@ -27,7 +27,7 @@ class TestBoard(TMTestCase):
         """
         pos_estimates = []
         for _ in range(500):
-            pos_estimates.append(self.tm.encoder_estimates.position)
+            pos_estimates.append(self.tm.encoder.pos_estimate)
             time.sleep(0.001)
         # apparently the statistics lib works with quantities only
         self.assertLess(st.pstdev(pos_estimates) * ticks, 5 * ticks)
@@ -36,24 +36,30 @@ class TestBoard(TMTestCase):
         """
         Test rejection of invalid values for limits and gains
         """
-        limits = self.tm.limits
-        self.tm.set_limits(-10, -10)  # invalid, should not be set
-        self.assertEqual(limits, self.tm.limits)
+        self.tm.controller.vel_limit = -10  # invalid, should not be set
+        self.assertGreater(self.tm.controller.vel_limit, 0)
+        self.tm.controller.Iq_limit = -10  # invalid, should not be set
+        self.assertGreater(self.tm.controller.Iq_limit, 0)
 
-        gains = self.tm.gains
-        self.tm.set_gains(-10, -10)  # invalid, should not be set
-        self.assertEqual(gains, self.tm.gains)
+        self.tm.controller.vel_gain = -10  # invalid, should not be set
+        self.assertGreater(self.tm.controller.vel_gain, 0)
+        self.tm.controller.pos_gain = -10  # invalid, should not be set
+        self.assertGreater(self.tm.controller.pos_gain, 0)
 
-        init_params = self.tm.vel_integrator_params
-        self.tm.set_vel_integrator_params(-10, 200)  # invalid, should not be set
-        self.assertEqual(init_params, self.tm.vel_integrator_params)
+        self.tm.controller.vel_integrator.gain = -10  # invalid, should not be set
+        self.assertGreater(self.tm.controller.vel_integrator.gain, 0)
+        self.tm.controller.vel_integrator.deadband = -10  # invalid, should not be set
+        self.assertGreater(self.tm.controller.vel_integrator.deadband, 0)
 
-        # Zero vel integrator values should be allowed
-        self.tm.set_vel_integrator_params(0, 0)  # valid, should be set
-        self.assertEqual(self.tm.vel_integrator_params.gain, 0)
+        self.tm.controller.vel_integrator.gain = 0  # valid, should be set
+        self.assertEqual(self.tm.controller.vel_integrator.gain, 0)
+        self.tm.controller.vel_integrator.deadband = 0  # valid, should be set
+        self.assertEqual(self.tm.controller.vel_integrator.deadband, 0)
 
         # Bring it back
-        self.tm.set_vel_integrator_params(**init_params)
+        self.tm.reset()
+
+        time.sleep(1)
 
     def test_c_calibrate(self):
         """
@@ -68,16 +74,16 @@ class TestBoard(TMTestCase):
         """
         self.check_state(0)
         self.try_calibrate()
-        self.tm.position_control()
+        self.tm.controller.position_mode()
         self.check_state(2)
 
         for i in range(10):
-            self.tm.set_pos_setpoint(i * 1000 * ticks)
+            self.tm.controller.pos_setpoint = i * 1000 * ticks
             time.sleep(0.2)
             self.assertAlmostEqual(
-                i * 1000 * ticks, self.tm.encoder_estimates.position, delta=1000 * ticks
+                i * 1000 * ticks, self.tm.encoder.pos_estimate, delta=1000 * ticks
             )
-            time.sleep(0.4)
+            time.sleep(0.2)
 
     def test_e_velocity_control(self):
         """
@@ -85,7 +91,7 @@ class TestBoard(TMTestCase):
         """
         self.check_state(0)
         self.try_calibrate()
-        self.tm.velocity_control()
+        self.tm.controller.velocity_mode()
         self.check_state(2)
 
         R = 14
@@ -94,27 +100,27 @@ class TestBoard(TMTestCase):
 
         for i in range(R):
             target = i * 20000 * ticks / s
-            self.tm.set_vel_setpoint(target)
+            self.tm.controller.vel_setpoint = target
             time.sleep(0.2)
-            velocity_pairs.append((target, self.tm.encoder_estimates.velocity))
+            velocity_pairs.append((target, self.tm.encoder.vel_estimate))
 
         for i in range(R):
             target = (R - i) * 20000 * ticks / s
-            self.tm.set_vel_setpoint(target)
+            self.tm.controller.vel_setpoint = target
             time.sleep(0.2)
-            velocity_pairs.append((target, self.tm.encoder_estimates.velocity))
+            velocity_pairs.append((target, self.tm.encoder.vel_estimate))
 
         for i in range(R):
             target = -i * 20000 * ticks / s
-            self.tm.set_vel_setpoint(target)
+            self.tm.controller.vel_setpoint = target
             time.sleep(0.2)
-            velocity_pairs.append((target, self.tm.encoder_estimates.velocity))
+            velocity_pairs.append((target, self.tm.encoder.vel_estimate))
 
         for i in range(R):
             target = (i - R) * 20000 * ticks / s
-            self.tm.set_vel_setpoint(target)
+            self.tm.controller.vel_setpoint = target
             time.sleep(0.2)
-            velocity_pairs.append((target, self.tm.encoder_estimates.velocity))
+            velocity_pairs.append((target, self.tm.encoder.vel_estimate))
 
         for target, estimate in velocity_pairs:
             self.assertAlmostEqual(target, estimate, delta=30000 * ticks / s)
@@ -125,13 +131,16 @@ class TestBoard(TMTestCase):
         """
         self.check_state(0)
         self.try_calibrate()
-        self.tm.position_control()
+        self.tm.controller.position_mode()
         self.check_state(2)
 
         for _ in range(10):
             new_pos = random.uniform(-24000, 24000)
-            self.tm.set_pos_setpoint(new_pos * ticks)
+            self.tm.controller.pos_setpoint = new_pos * ticks
             time.sleep(0.5)
+            self.assertAlmostEqual(
+                self.tm.encoder.pos_estimate, self.tm.controller.pos_setpoint
+            )
 
     def test_g_limits(self):
         """
@@ -139,43 +148,41 @@ class TestBoard(TMTestCase):
         """
         self.check_state(0)
         self.try_calibrate()
-        self.tm.velocity_control()
+        self.tm.controller.velocity_mode()
         self.check_state(2)
 
-        self.tm.set_limits(30000, 0.8)
-        new_limits = self.tm.limits
+        self.tm.controller.vel_limit = 30000
+        self.tm.controller.Iq_limit = 0.8
         self.assertAlmostEqual(
-            new_limits.velocity, 30000 * ticks / s, delta=1 * ticks / s
+            self.tm.controller.vel_limit, 30000 * ticks / s, delta=1 * ticks / s
         )
-        self.assertAlmostEqual(new_limits.current, 0.8 * A, delta=0.01 * A)
+        self.assertAlmostEqual(self.tm.controller.Iq_limit, 0.8 * A, delta=0.01 * A)
 
-        self.tm.set_vel_setpoint(400000 * ticks / s)
+        self.tm.controller.vel_setpoint = 400000 * ticks / s
         time.sleep(0.5)
         self.assertAlmostEqual(
             30000 * ticks / s,
-            self.tm.encoder_estimates.velocity,
+            self.tm.encoder.vel_estimate,
             delta=5000 * ticks / s,
         )
-        self.tm.set_vel_setpoint(-400000 * ticks / s)
+        self.tm.controller.vel_setpoint = -400000 * ticks / s
         time.sleep(0.5)
         self.assertAlmostEqual(
             -30000 * ticks / s,
-            self.tm.encoder_estimates.velocity,
+            self.tm.encoder.vel_estimate,
             delta=5000 * ticks / s,
         )
 
-        self.tm.set_vel_setpoint(0)
-
+        self.tm.controller.vel_setpoint = 0
         time.sleep(0.5)
 
     def test_h_timings(self):
         """
         Test DWT busy/total cycle timings
         """
-        tim = self.tm.timings
-        self.assertGreater(tim.total, 0)
-        self.assertGreater(tim.busy, 0)
-        self.assertLess(tim.busy, 3000)
+        self.assertGreater(tm1.cycles.total, 0)
+        self.assertGreater(tm1.cycles.busy, 0)
+        self.assertLess(tm1.cycles.busy, 3000)
 
     def test_i_states(self):
         """
@@ -190,38 +197,38 @@ class TestBoard(TMTestCase):
         # Test if idle command works (it should be ignored because we're calibrating)
         self.tm.idle()
         time.sleep(0.5)
-        self.assertEqual(self.tm.state.state, 1)
+        self.assertEqual(self.tm.controller.state, 1)
         # Same for closed loop control command
-        self.tm.position_control()
+        self.tm.controller.position_mode()
         time.sleep(0.5)
-        self.assertEqual(self.tm.state.state, 1)
+        self.assertEqual(self.tm.controller.state, 1)
         # Wait for calibration to finish
         self.wait_for_calibration()
         # Now state transitions should work
-        self.assertEqual(self.tm.state.state, 0)
-        self.tm.position_control()
+        self.assertEqual(self.tm.controller.state, 0)
+        self.tm.controller.position_mode()
         time.sleep(0.5)
-        self.assertEqual(self.tm.state.state, 2)
-        self.tm.idle()
+        self.assertEqual(self.tm.controller.state, 2)
+        self.tm.controller.idle_mode()
 
     def test_j_gimbal_mode(self):
         """
         Test gimbal mode
         """
         self.check_state(0)
-        self.tm.set_motor_config(
-            flags=1, pole_pairs=1, I_cal=5.0
-        )  # fw will ignore pole pair value of 1
-        self.tm.set_motor_RL(R=0.2, L=20 * 1e-5)
+        self.tm.motor.is_gimbal = True
+        self.tm.motor.I_cal = 5.0
+        self.tm.motor.R = 0.2
+        self.tm.motor.L = 20 * 1e-5
         self.try_calibrate()
-        self.tm.position_control()
+        self.tm.controller.position_mode()
         self.check_state(2)
 
         for i in range(10):
-            self.tm.set_pos_setpoint(i * 1000 * ticks)
+            self.tm.controller.pos_setpoint = i * 1000 * ticks
             time.sleep(0.2)
             self.assertAlmostEqual(
-                i * 1000 * ticks, self.tm.encoder_estimates.position, delta=1000 * ticks
+                i * 1000 * ticks, self.tm.encoder.pos_estimate, delta=1000 * ticks
             )
             time.sleep(0.4)
 
@@ -231,46 +238,47 @@ class TestBoard(TMTestCase):
         """
         self.check_state(0)
         self.try_calibrate()
-        self.tm.position_control()
+        self.tm.controller.position_mode()
         self.check_state(2)
 
-        self.assertEqual(self.tm.offset_dir.offset, 0)
-        self.assertEqual(self.tm.offset_dir.direction, 1)
+        self.assertEqual(self.tm.motor.offset, 0)
+        self.assertEqual(self.tm.motor.direction, 1)
 
-        offset = self.tm.encoder_estimates.position
-        self.tm.set_offset_dir(offset, 1)
-        self.assertAlmostEqual(self.tm.encoder_estimates.position, 0, delta=100)
+        offset = self.tm.encoder.pos_estimate
+        self.tm.motor.offset = offset
+        self.assertAlmostEqual(self.tm.encoder.pos_estimate, 0, delta=100)
 
-        self.tm.set_offset_dir(offset, -1)
-        self.assertAlmostEqual(self.tm.encoder_estimates.position, 0, delta=100)
+        self.tm.motor.direction = -1
+        self.assertAlmostEqual(self.tm.encoder.pos_estimate, 0, delta=100)
 
-        self.tm.set_pos_setpoint(offset)
+        self.tm.controller.pos_setpoint = offset
         time.sleep(0.5)
-        self.tm.set_offset_dir(0, 1)
-        self.assertAlmostEqual(self.tm.encoder_estimates.position, 0, delta=100)
+        self.tm.motor.offset = 0
+        self.tm.motor.direction = -1
+        self.assertAlmostEqual(self.tm.controller.pos_setpoint, 0, delta=100)
 
-    def test_l_read_write_endpoints(self):
-        """
-        Test read-write endpoints
-        """
-        self.check_state(0)
-        self.try_calibrate()
-        self.tm.position_control()
-        self.check_state(2)
+    # def test_l_read_write_endpoints(self):
+    #     """
+    #     Test read-write endpoints
+    #     """
+    #     self.check_state(0)
+    #     self.try_calibrate()
+    #     self.tm.position_control()
+    #     self.check_state(2)
 
-        self.tm.position_control()
-        self.tm.set_pos_setpoint(0)
+    #     self.tm.position_control()
+    #     self.tm.set_pos_setpoint(0)
 
-        time.sleep(2)
+    #     time.sleep(2)
 
-        self.tm.velocity_control()
+    #     self.tm.velocity_control()
 
-        for k in range(10):
-            values = self.tm.get_set_pos_vel(0, 20000)
-            time.sleep(1)
-            self.assertAlmostEqual(
-                20000 * k * ticks, values.position, delta=2000 * (k + 1) * ticks
-            )
+    #     for k in range(10):
+    #         values = self.tm.get_set_pos_vel(0, 20000)
+    #         time.sleep(1)
+    #         self.assertAlmostEqual(
+    #             20000 * k * ticks, values.position, delta=2000 * (k + 1) * ticks
+    #         )
 
     def test_m_recalibrate(self):
         """
@@ -281,21 +289,21 @@ class TestBoard(TMTestCase):
         self.check_state(0)
         self.try_calibrate()
         time.sleep(0.5)
-        self.tm.position_control()
-        self.tm.set_pos_setpoint(0)
+        self.tm.controller.position_mode()
+        self.tm.controller.pos_setpoint = 0
         time.sleep(1.5)
-        self.tm.set_pos_setpoint(50000)
+        self.tm.controller.pos_setpoint = 50000
         time.sleep(1.5)
-        self.tm.idle()
+        self.tm.controller.idle_mode()
         time.sleep(0.5)
         self.try_calibrate(force=True)
         self.check_state(0)
-        self.tm.position_control()
+        self.tm.controller.position_mode()
         pos_estimates = []
         for k in range(50):
-            pos_estimates.append(self.tm.encoder_estimates.position)
+            pos_estimates.append(self.tm.encoder.pos_estimate)
             time.sleep(0.05)
-        self.tm.idle()
+        self.tm.controller.idle_mode()
         self.assertLess(st.pstdev(pos_estimates) * ticks, 100 * ticks)
 
 
