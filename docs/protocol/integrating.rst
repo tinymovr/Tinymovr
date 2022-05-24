@@ -1,14 +1,15 @@
-API
-+++
+Integrating Tinymovr
+++++++++++++++++++++
 
-Overview
-########
+Tinymovr can be integrated into your projects in the form of a Python library. Using the library, you can generate and manipulate one or more Python objects that represent Tinymovr controllers, with the full device tree, as exposed in the Studio GUI and CLI. The communication protocol defined by Avlos and used by Tinymovr comprises a series of read/write endpoints. The endpoints are defined taking into account the capabilities and constraints of the CAN bus, the main communication bus used by Tinymovr, however they are not strictly constrained to CAN, and can be used with other comm channels as well.
 
-This document outlines the main API used to interface with Tinymovr. This API comprises a series of read/write endpoints. The endpoints are defined taking into account the capabilities and constraints of the CAN bus, the main communication bus used by Tinymovr. 
+The Tinymovr Library allows full hardware control from within Python scripts, using a high-level interface to hardware. For use with embedded devices, the Tinymovr C++ Library is proposed as an alternative.
 
-The Tinymovr API allows full hardware control from within Python scripts, using a high-level interface to hardware. At the same time, it is possible to interface directly with the CAN bus endpoints, for instance in an embedded application. In both cases, the :ref:`api-reference` provides all the necessary information.
+It is of course possible to interface directly with Tinymovr using the protocol endpoints by generating the message frames yourself. However, this is generally advised against, as the libraries offer robustness and functionality that is not trivial to implement from scratch.
 
-Tinymovr API is part of Tinymovr Studio. For help installing Studio, please take a look at :ref:`studio-installation`.
+The Tinymovr Python library is part of Tinymovr Studio. For help installing Studio, please take a look at :ref:`studio-installation`.
+
+For the full Tinymovr protocol reference, take a look at the :ref:`api-reference`
 
 Use with Python
 ###############
@@ -17,13 +18,10 @@ Here below is an example using the API from Python scripts and controlling hardw
 
 .. code-block:: python
 
-    import can
-    from tinymovr import Tinymovr
-    from tinymovr.iface.can import CAN
+    from tinymovr.config import get_bus_config, create_device
 
-    bus = can.Bus(bustype="cantact", channel="COM1", bitrate=1000000)
-    iface = CAN(bus)
-    tm = Tinymovr(node_id=1, iface=iface)
+    bus = get_bus_config("socketcan")
+    tm = create_device(node_id=1, bus=bus)
 
     tm.calibrate()
 
@@ -32,7 +30,7 @@ The above code block will instantiate a Tinymovr with CAN bus id of 1 and calibr
 .. code-block:: python
 
     tm.controller.position_mode()
-    tm.controller.pos_setpoint = 0
+    tm.controller.pos_setpoint = 10000
 
     tm.controller.velocity_mode()
     tm.controller.vel_setpoint = 80000
@@ -91,3 +89,5 @@ The pole pair detection algorithm did not converge near an integer number during
 *******************************
 
 Encoder reading variation is over maximum allowed threshold. This is usually the casse if the magnet is misaligned, too far away from the encoder IC, or missing.
+
+
