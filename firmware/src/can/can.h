@@ -17,8 +17,6 @@
 
 #pragma once
 
-#define CAN_EP_SIZE 6
-
 typedef struct 
 {
     uint8_t id;

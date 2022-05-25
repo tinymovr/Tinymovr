@@ -21,7 +21,8 @@ uint8_t rx_data[8];
 uint8_t data_length;
 uint32_t rx_id;
 bool rtr;
-uint8_t can_cmd_id;
+uint32_t can_ep_id;
+uint32_t can_seq_id;
 
 //  * The function "can_io_config" is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
@@ -175,7 +176,7 @@ void can_process_standard(void)
     data_length = buffer & 0x0F;
     rx_id = ((buffer & 0xE00000) >> 21) | ((buffer & 0xFF00) >> 5);
 
-    can_cmd_id = rx_id & 0x3F;
+    can_ep_id = rx_id & 0x3F;
     rtr = ((buffer >> 6) & 0x1) == 0x1;
     rx_data[0] = buffer >> 24; // data0
     if (data_length > 1u)
@@ -222,7 +223,8 @@ void can_process_extended(void)
     buffer = PAC55XX_CAN->RXBUF;
 
     rx_id |= (buffer & 0xFF) >> 3;
-    can_cmd_id = rx_id & 0x3F;
+    
+    ids_from_arbitration(rx_id, &can_ep_id, &can_seq_id);
 
     rx_data[0] = (buffer >> 8) & 0xFF; // data0
     rx_data[1] = (buffer >> 16) & 0xFF; // data1
@@ -408,4 +410,15 @@ CAN_BAUD_TYPE CAN_IntToBaudType(uint16_t baud)
         break;
     }
     return ret;
+}
+
+void ids_from_arbitration(uint32_t arb_id, uint32_t* ep_id, uint32_t* seq_id)
+{
+    *ep_id = arb_id & CAN_EP_MASK;
+    *seq_id = (arb_id & CAN_SEQ_MASK) >> CAN_EP_SIZE;
+}
+
+void arbitration_from_ids(uint32_t* arb_id, uint32_t ep_id, uint32_t seq_id, uint32_t node_id)
+{
+    *arb_id = (ep_id & CAN_EP_MASK) | ((seq_id << CAN_EP_SIZE) & CAN_SEQ_MASK) | ((node_id << (CAN_EP_SIZE + CAN_SEQ_SIZE)) & CAN_DEV_MASK);
 }

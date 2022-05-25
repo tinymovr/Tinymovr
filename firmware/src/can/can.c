@@ -119,16 +119,15 @@ void CAN_process_interrupt(void)
 {
     can_process_extended();
 
-    // Process message
-    if (sizeof(avlos_endpoints) / sizeof(avlos_endpoints[0]) > can_cmd_id)
+    if (sizeof(avlos_endpoints) / sizeof(avlos_endpoints[0]) > can_ep_id)
     {
-        uint8_t (*callback)(uint8_t buffer[], uint8_t * buffer_length, Avlos_Command cmd) = avlos_endpoints[can_cmd_id];
+        uint8_t (*callback)(uint8_t buffer[], uint8_t * buffer_length, Avlos_Command cmd) = avlos_endpoints[can_ep_id];
         uint8_t can_msg_buffer[8];
         memcpy(can_msg_buffer, &rx_data, data_length);
         uint8_t response_type = callback(can_msg_buffer, &data_length, (uint8_t)rtr);
         if (AVLOS_RET_READ == response_type)
         {
-            can_transmit_extended(data_length, (config.id << CAN_EP_SIZE) | can_cmd_id, can_msg_buffer);
+            can_transmit_extended(data_length, rx_id, can_msg_buffer);
         }
     }
 }
