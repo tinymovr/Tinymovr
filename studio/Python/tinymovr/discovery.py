@@ -15,7 +15,7 @@ import importlib.resources
 from tinymovr.channel import CANChannel, ResponseError
 from tinymovr.tee import Tee
 from tinymovr.constants import HEARTBEAT_BASE, CAN_EP_SIZE
-from tinymovr.config import create_device, ProtocolVersionError
+from tinymovr.config import create_device_with_hash_msg, ProtocolVersionError
 
 
 class ProtocolVersionError(Exception):
@@ -73,7 +73,7 @@ class Discovery:
                 elif node_id not in self.pending_nodes:
                     self.pending_nodes.add(node_id)
                     try:
-                        node = create_device(msg, self.bus)
+                        node = create_device_with_hash_msg(msg, self.bus)
                         self.active_nodes[node_id] = node
                         self.update_stamps[node_id] = now
                         self.appeared_cb(node, node_id)

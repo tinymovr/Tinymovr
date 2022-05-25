@@ -63,14 +63,14 @@ def create_device(node_id, bus):
     # is a hash mismatch, we raise an exception, otherwise
     # we return the device node as is.
     node._channel = chan
-    if node.hash_uint32 != node.hash: # hash_uint32 is local, hash is remote
+    if node.hash_uint32 != node.protocol_hash: # hash_uint32 is local, proto_hash is remote
         raise ProtocolVersionError(
             "Incompatible protocol versions (hash mismatch).\nPlease try upgrading firmware & studio to the same version."
         )
     return node
 
 
-def create_device_hash_msg(heartbeat_msg, bus):
+def create_device_with_hash_msg(heartbeat_msg, bus):
     """
     Create a device, the hash msg will be used
     to decode the actual hash value
@@ -89,6 +89,7 @@ def create_device_hash_msg(heartbeat_msg, bus):
         raise ProtocolVersionError(
             "Incompatible protocol versions (hash mismatch).\nPlease try upgrading firmware & studio to the same version."
         )
+    node._channel = chan
     return node
 
 

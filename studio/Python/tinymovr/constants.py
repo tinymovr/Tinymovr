@@ -15,8 +15,13 @@ from enum import IntEnum
 app_name = "Tinymovr Studio"
 base_node_name = "tm"
 HEARTBEAT_BASE = 0x700
+
 CAN_EP_SIZE = 6
-CAN_EP_MASK = int(math.pow(2, CAN_EP_SIZE) - 1)
+CAN_EP_MASK = 1 << CAN_EP_SIZE - 1
+CAN_SEQ_SIZE = 6
+CAN_SEQ_MASK = (1 << CAN_SEQ_SIZE - 1) << CAN_EP_SIZE
+CAN_DEV_SIZE = 6
+CAN_DEV_MASK = (1 << CAN_DEV_SIZE - 1) << (CAN_EP_SIZE + CAN_SEQ_SIZE)
 
 
 class ControlStates(IntEnum):
