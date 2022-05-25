@@ -2,6 +2,10 @@
 name: tm
 version: 0.9.0
 remote_attributes:
+  - name: protocol_hash
+    dtype: uint32
+    c_getter: _avlos_get_proto_hash
+    summary: The Avlos protocol hash.
   - name: uid
     dtype: uint32
     c_getter: system_get_uid
@@ -103,6 +107,11 @@ remote_attributes:
         c_getter: controller_get_vel_integrator_gain
         c_setter: controller_set_vel_integrator_gain
         summary: The integral gain of the velocity controller.
+      - name: I_bw
+        dtype: float
+        c_getter: controller_get_I_bw
+        c_setter: controller_set_I_bw
+        summary: The current controller bandwidth.
       - name: Iq_p_gain
         dtype: float
         c_getter: controller_get_Iq_gain

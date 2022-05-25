@@ -23,5 +23,5 @@ generators:
   generator_rst:
     enabled: true
     paths:
-      output_file: ../../../../docs/api/reference.rst
+      output_file: ../../../../docs/protocol/reference.rst
 
