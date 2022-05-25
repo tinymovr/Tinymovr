@@ -12,11 +12,10 @@ import time
 import threading
 import yaml
 import importlib.resources
-from tinymovr.codec import DataType
 from tinymovr.channel import CANChannel, ResponseError
 from tinymovr.tee import Tee
 from tinymovr.constants import HEARTBEAT_BASE, CAN_EP_SIZE
-from avlos.deserializer import deserialize
+from tinymovr.config import create_device, ProtocolVersionError
 
 
 class ProtocolVersionError(Exception):
@@ -39,6 +38,7 @@ class Discovery:
         self.active_nodes = {}
         self.update_stamps = {}
         self.pending_nodes = set()
+        self.incompatible_nodes = set()
 
         self.tee = Tee(
             bus, lambda msg: HEARTBEAT_BASE == msg.arbitration_id & HEARTBEAT_BASE
@@ -66,30 +66,22 @@ class Discovery:
             msg = self.tee.recv(0)
             while msg:
                 node_id = msg.arbitration_id & 0x3F
-                if node_id in self.active_nodes:
+                if node_id in self.incompatible_nodes:
+                    pass
+                elif node_id in self.active_nodes:
                     self.update_stamps[node_id] = now
                 elif node_id not in self.pending_nodes:
                     self.pending_nodes.add(node_id)
-                    tee = Tee(
-                        self.bus,
-                        lambda msg: msg.arbitration_id >> CAN_EP_SIZE & 0xFF == node_id,
-                    )
-                    chan = CANChannel(node_id, tee)
                     try:
-                        device_hash_uint32, *_ = chan.serializer.deserialize(
-                            msg.data[:4], DataType.UINT32
-                        )
-                        node = deserialize(self.dev_def)
-                        if node.hash_uint32 != device_hash_uint32:
-                            raise ProtocolVersionError(
-                                "Incompatible protocol versions (hash mismatch).\nPlease try upgrading firmware & studio to the same version."
-                            )
-                        node._channel = chan
+                        node = create_device(msg, self.bus)
                         self.active_nodes[node_id] = node
                         self.update_stamps[node_id] = now
                         self.appeared_cb(node, node_id)
                     except ResponseError as e:
                         self.logger.error(e)
+                    except ProtocolVersionError as e:
+                        self.logger.error(e)
+                        self.incompatible_nodes.add(node_id)
                     self.pending_nodes.remove(node_id)
                 msg = self.tee.recv(0)
 

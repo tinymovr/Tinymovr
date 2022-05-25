@@ -2,34 +2,27 @@
 This unit test suite tests functionality
 of Tinymovr boards.
 """
-import random
+import yaml
 import time
 import can
 
-import tinymovr
-from tinymovr import Tinymovr
-from tinymovr.iface import IFace
-from tinymovr.iface.can_bus import CANBus, guess_channel
-from tinymovr.units import get_registry
+from tinymovr.config import get_bus_config, create_device
 
 import unittest
-
-bustype = "slcan"
 
 
 class TMTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        channel = guess_channel(bustype_hint=bustype)
-        cls.can_bus: can.Bus = can.Bus(
+        bustype, channel = get_bus_config(["socketcan"])
+        cls.can_bus = can.Bus(
             bustype=bustype, channel=channel, bitrate=1000000
         )
-        iface: IFace = CANBus(cls.can_bus)
-        cls.tm = Tinymovr(node_id=1, iface=iface)
+        cls.tm = create_device(node_id=1, bus=cls.can_bus)
         cls.reset_and_wait()
 
     def tearDown(self):
-        self.tm.idle()
+        self.tm.controller.idle_mode()
 
     @classmethod
     def tearDownClass(cls):
