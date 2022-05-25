@@ -26,11 +26,13 @@ class TestTrajPlanner(TMTestCase):
 
         time.sleep(1)
 
+        self.tm.traj_planner.max_vel = 100000
+
         for _ in range(20):
-            self.tm.plan_v_limit(random.randrange(-200000, 200000), 100000)
+            self.tm.traj_planner.move_to(random.randrange(-200000, 200000))
             time.sleep(0.6)
         
-        self.tm.plan_v_limit(self.tm.setpoints.position, 100000)
+        self.tm.traj_planner.move_to(self.tm.controller.pos_setpoint)
         time.sleep(4)
 
     def test_traj_planner_alt(self):
@@ -44,13 +46,15 @@ class TestTrajPlanner(TMTestCase):
 
         time.sleep(1)
 
-        self.tm.set_max_plan_acc_dec(50000, 50000)
+        self.tm.traj_planner.max_vel = 100000
+        self.tm.traj_planner.max_accel = 50000
+        self.tm.traj_planner.max_decel = 50000
 
         for _ in range(20):
-            self.tm.plan_v_limit(random.randrange(-200000, 200000), 180000)
+            self.tm.traj_planner.move_to(random.randrange(-200000, 200000))
             time.sleep(0.6)
         
-        self.tm.plan_v_limit(self.tm.setpoints.position, 100000)
+        self.tm.traj_planner.move_to(self.tm.controller.pos_setpoint)
         time.sleep(4)
 
 if __name__ == '__main__':
