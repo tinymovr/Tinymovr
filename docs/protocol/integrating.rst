@@ -23,7 +23,7 @@ Here below is an example using the API from Python scripts and controlling hardw
 
     from tinymovr.config import get_bus_config, create_device
 
-    bus = get_bus_config("socketcan")
+    bus = get_bus_config(["socketcan"])
     tm = create_device(node_id=1, bus=bus)
 
     tm.calibrate()
