@@ -9,11 +9,11 @@ static struct PlannerConfig config = {
 	.max_decel = ENCODER_TICKS_FLOAT,
 	.max_vel = 50000.0f};
 
-bool planner_move_to_tlimit(float p_target, float deltat_tot, float deltat_acc, float deltat_dec)
+bool planner_move_to_tlimit(float p_target)
 {
 	bool response = false;
 	MotionPlan motion_plan = {0};
-	if (!error_flags_exist() && planner_prepare_plan_tlimit(p_target, deltat_tot, deltat_acc, deltat_dec, &motion_plan))
+	if (!error_flags_exist() && planner_prepare_plan_tlimit(p_target, config.deltat_tot, config.deltat_acc, config.deltat_dec, &motion_plan))
 	{
 		controller_set_motion_plan(motion_plan);
 		controller_set_mode(CTRL_TRAJECTORY);
@@ -37,7 +37,6 @@ bool planner_move_to_vlimit(float p_target)
 
 bool planner_prepare_plan_tlimit(float p_target, float deltat_tot, float deltat_acc, float deltat_dec, MotionPlan *plan)
 {
-	bool response = false;
 	float p_0 = controller_get_pos_setpoint_user_frame();
 	float S = p_target - p_0;
 	float v_0 = controller_get_vel_setpoint_user_frame();
@@ -46,49 +45,47 @@ bool planner_prepare_plan_tlimit(float p_target, float deltat_tot, float deltat_
 	if (deltat_tot < 0 || deltat_acc < 0 || deltat_dec < 0 || deltat_cruise < 0.0f)
 	{
 		add_error_flag(ERROR_PLANNER_INVALID_INPUT);
+		return false;
 	}
-	else if (our_fabsf(v_cruise) > Controller_GetVelLimit())
+	else if (our_fabsf(v_cruise) > controller_get_vel_limit())
 	{
 		add_error_flag(ERROR_PLANNER_VCRUISE_OVER_LIMIT);
+		return false;
 	}
-	else if (S != 0.0f)
+	else if (S == 0.0f)
 	{
-		response = true;
+		return false;
 	}
-	if (response == true)
-	{
-		float acc = (v_cruise - v_0) / deltat_acc;
-		float dec = v_cruise / deltat_dec;
-		// Assign everything
-		plan->p_0 = p_0;
-		plan->p_target = p_target;
-		plan->deltat_acc = deltat_acc;
-		plan->t_acc_cruise = deltat_acc;
-		plan->deltat_cruise = deltat_cruise;
-		plan->t_cruise_dec = deltat_acc + deltat_cruise;
-		plan->deltat_dec = deltat_dec;
-		plan->t_end = deltat_acc + deltat_cruise + deltat_dec;
-		plan->v_0 = v_0;
-		plan->v_cruise = v_cruise;
-		// plan->v_target = 0;
-		plan->acc = acc;
-		plan->dec = dec;
-		plan->p_acc_cruise = plan->p_0 + v_0 * deltat_acc + 0.5f * acc * deltat_acc * deltat_acc;
-		plan->p_cruise_dec = plan->p_acc_cruise + v_cruise * deltat_cruise;
-	}
-	return response;
+	float acc = (v_cruise - v_0) / deltat_acc;
+	float dec = v_cruise / deltat_dec;
+	// Assign everything
+	plan->p_0 = p_0;
+	plan->p_target = p_target;
+	plan->deltat_acc = deltat_acc;
+	plan->t_acc_cruise = deltat_acc;
+	plan->deltat_cruise = deltat_cruise;
+	plan->t_cruise_dec = deltat_acc + deltat_cruise;
+	plan->deltat_dec = deltat_dec;
+	plan->t_end = deltat_acc + deltat_cruise + deltat_dec;
+	plan->v_0 = v_0;
+	plan->v_cruise = v_cruise;
+	// plan->v_target = 0;
+	plan->acc = acc;
+	plan->dec = dec;
+	plan->p_acc_cruise = plan->p_0 + v_0 * deltat_acc + 0.5f * acc * deltat_acc * deltat_acc;
+	plan->p_cruise_dec = plan->p_acc_cruise + v_cruise * deltat_cruise;
+	return true;
 }
 
 bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float d_max, MotionPlan *plan)
 {
-	bool response = false;
 	const float p_0 = controller_get_pos_setpoint_user_frame();
 	const float S = p_target - p_0;
 	const float v_0 = controller_get_vel_setpoint_user_frame();
 	const float sign = S >= 0 ? 1.0f : -1.0f;
 	if (S == 0.0f)
 	{
-		response = false;
+		return false;
 	}
 	// Case 1. Distance to v=0 > desired distance. Full stop trajectory.
 	if (v_0 * v_0 > our_fabsf(2 * d_max * S))
@@ -108,7 +105,7 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 		plan->p_target = p_target_fullstop;
 		plan->p_acc_cruise = p_0;
 		plan->p_cruise_dec = p_0;
-		response = true;
+		return true;
 	}
 	//	// Case 2. |v_0| > |v_max|. Drop to v_max immediately
 	//	// TODO: Here wa actually drop to v_0. We should normally
@@ -152,7 +149,7 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 		// plan->v_target = 0;
 		plan->p_acc_cruise = p_acc_cruise;
 		plan->p_cruise_dec = p_acc_cruise;
-		response = true;
+		return true;
 	}
 	// Case 4. Trapezoidal profile
 	else
@@ -185,31 +182,29 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 		// plan->v_target = 0;
 		plan->p_acc_cruise = p_acc_cruise;
 		plan->p_cruise_dec = p_cruise_dec;
-		response = true;
+		return true;
 	}
-	return response;
+	return false;
 }
 
 bool planner_set_max_accel(float max_accel)
 {
-	bool response = false;
 	if (max_accel > 0)
 	{
 		config.max_accel = max_accel;
-		response = true;
+		return true;
 	}
-	return response;
+	return false;
 }
 
 bool planner_set_max_decel(float max_decel)
 {
-	bool response = false;
 	if (max_decel > 0)
 	{
 		config.max_decel = max_decel;
-		response = true;
+		return true;
 	}
-	return response;
+	return false;
 }
 
 float planner_get_max_accel(void)
@@ -224,18 +219,62 @@ float planner_get_max_decel(void)
 
 bool planner_set_max_vel(float max_vel)
 {
-	bool response = false;
 	if (max_vel > 0)
 	{
 		config.max_vel = max_vel;
-		response = true;
+		return true;
 	}
-	return response;
+	return false;
 }
 
 float planner_get_max_vel(void)
 {
 	return config.max_vel;
+}
+
+float planner_get_deltat_acc(void)
+{
+	return config.deltat_acc;
+}
+
+bool planner_set_deltat_acc(float deltat_acc)
+{
+	if (deltat_acc > 0)
+	{
+		config.deltat_acc = deltat_acc;
+		return true;
+	}
+	return false;
+}
+
+float planner_get_deltat_tot(void)
+{
+	return config.deltat_tot;
+}
+
+bool planner_set_deltat_tot(float deltat_tot)
+{
+	if (deltat_tot > 0)
+	{
+		config.deltat_tot = deltat_tot;
+		return true;
+	}
+	return false;
+}
+
+float planner_get_deltat_dec(void)
+{
+	return config.deltat_dec;
+}
+
+bool planner_set_deltat_dec(float deltat_dec)
+{
+	if (deltat_dec > 0)
+	{
+		config.deltat_dec = deltat_dec;
+		return true;
+	}
+	return false;
 }
 
 PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan)
