@@ -116,17 +116,17 @@ void controller_set_vel_integrator_gain(float gain);
 float controller_get_vel_integrator_deadband(void);
 void controller_set_vel_integrator_deadband(float gain);
 float controller_get_Iq_gain(void);
-float Controller_GetIqBandwidth(void);
-void Controller_SetIqBandwidth(float bw);
+float controller_get_I_bw(void);
+void controller_set_I_bw(float bw);
 
-float Controller_GetVelLimit(void);
-void Controller_SetVelLimit(float limit);
-float Controller_GetIqLimit(void);
-void Controller_SetIqLimit(float limit);
+float controller_get_vel_limit(void);
+void controller_set_vel_limit(float limit);
+float controller_get_Iq_limit(void);
+void controller_set_Iq_limit(float limit);
 
 void controller_set_motion_plan(MotionPlan mp);
 
-PAC5XXX_RAMFUNC void Controller_UpdateCurrentGains(void);
+PAC5XXX_RAMFUNC void controller_update_I_gains(void);
 
 ControllerConfig *Controller_GetConfig(void);
 void Controller_RestoreConfig(ControllerConfig *config_);

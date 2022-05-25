@@ -104,7 +104,7 @@ bool CalibrateInductance(void)
         else
         {
             motor_set_phase_inductance(L);
-            Controller_UpdateCurrentGains();
+            controller_update_I_gains();
         }
     }
     return success;

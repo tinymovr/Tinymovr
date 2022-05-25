@@ -412,26 +412,26 @@ float controller_get_Iq_gain(void)
     return config.I_gain;
 }
 
-float Controller_GetIqBandwidth(void)
+float controller_get_I_bw(void)
 {
     return config.I_bw;
 }
 
-void Controller_SetIqBandwidth(float bw)
+void controller_set_I_bw(float bw)
 {
     if (bw > 0.0f)
     {
         config.I_bw = bw;
-        Controller_UpdateCurrentGains();
+        controller_update_I_gains();
     }
 }
 
-float Controller_GetVelLimit(void)
+float controller_get_vel_limit(void)
 {
     return config.vel_limit;
 }
 
-void Controller_SetVelLimit(float limit)
+void controller_set_vel_limit(float limit)
 {
     if (limit > 0.0f)
     {
@@ -439,12 +439,12 @@ void Controller_SetVelLimit(float limit)
     }
 }
 
-float Controller_GetIqLimit(void)
+float controller_get_Iq_limit(void)
 {
     return config.I_limit;
 }
 
-void Controller_SetIqLimit(float limit)
+void controller_set_Iq_limit(float limit)
 {
     if (limit > 0.0f)
     {
@@ -476,7 +476,7 @@ static inline bool Controller_LimitVelocity(float min_limit, float max_limit, fl
     return our_clamp(I, Imin, Imax);
 }
 
-PAC5XXX_RAMFUNC void Controller_UpdateCurrentGains(void)
+PAC5XXX_RAMFUNC void controller_update_I_gains(void)
 {
     config.I_gain = config.I_bw * motor_get_phase_inductance();
     float plant_pole = motor_get_phase_resistance() / motor_get_phase_inductance();

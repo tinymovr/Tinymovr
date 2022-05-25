@@ -93,7 +93,7 @@ PAC5XXX_RAMFUNC void motor_set_phase_resistance(float R)
 		config.resistance_calibrated = true;
 		if (config.resistance_calibrated && config.inductance_calibrated)
 		{
-			Controller_UpdateCurrentGains();
+			controller_update_I_gains();
 		}
 	}
 }
@@ -111,7 +111,7 @@ PAC5XXX_RAMFUNC void motor_set_phase_inductance(float L)
 		config.inductance_calibrated = true;
 		if (config.resistance_calibrated && config.inductance_calibrated)
 		{
-			Controller_UpdateCurrentGains();
+			controller_update_I_gains();
 		}
 	}
 }
@@ -130,7 +130,7 @@ PAC5XXX_RAMFUNC void motor_set_phase_R_and_L(float R, float L)
 	}
 	if (config.resistance_calibrated && config.inductance_calibrated)
 	{
-		Controller_UpdateCurrentGains();
+		controller_update_I_gains();
 	}
 }
 
