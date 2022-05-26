@@ -20,10 +20,6 @@ from tinymovr.constants import HEARTBEAT_BASE, CAN_EP_SIZE
 from tinymovr.config import create_device_with_hash_msg, ProtocolVersionError
 
 
-class ProtocolVersionError(Exception):
-    pass
-
-
 class Discovery:
     """
     Discover Tinymovr instances on the CAN bus using the periodically
@@ -43,7 +39,9 @@ class Discovery:
         self.incompatible_nodes = set()
 
         self.tee = Tee(
-            bus, lambda msg: HEARTBEAT_BASE == msg.arbitration_id & HEARTBEAT_BASE
+            bus,
+            lambda msg: HEARTBEAT_BASE == msg.arbitration_id & HEARTBEAT_BASE,
+            self.logger,
         )
 
         def_path_str = str(

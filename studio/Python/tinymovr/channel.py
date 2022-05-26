@@ -13,7 +13,13 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 import time
 import can
 from functools import cached_property
-from tinymovr.constants import CAN_DEV_MASK, CAN_EP_SIZE, CAN_EP_MASK, CAN_SEQ_SIZE, CAN_SEQ_MASK
+from tinymovr.constants import (
+    CAN_DEV_MASK,
+    CAN_EP_SIZE,
+    CAN_EP_MASK,
+    CAN_SEQ_SIZE,
+    CAN_SEQ_MASK,
+)
 from tinymovr.codec import MultibyteCodec
 
 
@@ -43,11 +49,12 @@ class CANChannel:
             s_ep_id, _, s_node_id = ids_from_arbitration(frame.arbitration_id)
             raise IOError(
                 "Received id mismatch. Expected: Node: {}, Endpoint:{}; Got: Node: {}, Endpoint:{}".format(
-                    e_node_id, e_ep_id, s_node_id, s_ep_id 
+                    e_node_id, e_ep_id, s_node_id, s_ep_id
                 )
             )
 
     def _recv_frame(self, timeout=0.1, sleep_interval=0.01):
+        # TODO: Move logic to Tee
         total_interval = 0
         while total_interval < timeout:
             frame = self.bus.recv(0)
@@ -74,6 +81,10 @@ class CANChannel:
 
 
 def ids_from_arbitration(arbitration_id):
+    """
+    Generate endpoint, message sequence and node ids
+    from a CAN arbitration id
+    """
     node_id = (arbitration_id & CAN_DEV_MASK) >> (CAN_EP_SIZE + CAN_SEQ_SIZE)
     seq_id = (arbitration_id & CAN_SEQ_MASK) >> CAN_EP_SIZE
     ep_id = arbitration_id & CAN_EP_MASK
@@ -81,8 +92,12 @@ def ids_from_arbitration(arbitration_id):
 
 
 def arbitration_from_ids(ep_id, seq_id, node_id):
+    """
+    Generate a CAN arbitration id from endpoint,
+    message sequence and node ids
+    """
     return (
-        ep_id & CAN_EP_MASK | 
-        ((seq_id << CAN_EP_SIZE) & CAN_SEQ_MASK) |
-        ((node_id << (CAN_EP_SIZE + CAN_SEQ_SIZE)) & CAN_DEV_MASK)
+        ep_id & CAN_EP_MASK
+        | ((seq_id << CAN_EP_SIZE) & CAN_SEQ_MASK)
+        | ((node_id << (CAN_EP_SIZE + CAN_SEQ_SIZE)) & CAN_DEV_MASK)
     )
