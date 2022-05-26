@@ -1,7 +1,20 @@
-'''
-This unit test suite tests functionality
-of Tinymovr trajectory planner.
-'''
+"""
+TinymovrTrajectory Planner Tests
+Copyright Ioannis Chatzikonstantinou 2020-2022
+
+Tests the functionality of the Tinymovr trajectory planner.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>.
+"""
+
 import random
 import time
 import statistics as st
@@ -14,11 +27,10 @@ from tests import TMTestCase
 
 
 class TestTrajPlanner(TMTestCase):
-
     def test_traj_planner(self):
-        '''
+        """
         Test trajectory planner
-        '''
+        """
         self.check_state(0)
         self.try_calibrate()
         self.tm.position_control()
@@ -31,14 +43,14 @@ class TestTrajPlanner(TMTestCase):
         for _ in range(20):
             self.tm.traj_planner.move_to(random.randrange(-200000, 200000))
             time.sleep(0.6)
-        
+
         self.tm.traj_planner.move_to(self.tm.controller.pos_setpoint)
         time.sleep(4)
 
     def test_traj_planner_alt(self):
-        '''
+        """
         Test trajectory planner with alternate acceleration and velocity limits
-        '''
+        """
         self.check_state(0)
         self.try_calibrate()
         self.tm.position_control()
@@ -53,9 +65,10 @@ class TestTrajPlanner(TMTestCase):
         for _ in range(20):
             self.tm.traj_planner.move_to(random.randrange(-200000, 200000))
             time.sleep(0.6)
-        
+
         self.tm.traj_planner.move_to(self.tm.controller.pos_setpoint)
         time.sleep(4)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main(failfast=True)

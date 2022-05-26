@@ -1,8 +1,20 @@
 """
-This unit test suite tests functionality
-of Tinymovr boards.
+Tinymovr Base Test Class
+Copyright Ioannis Chatzikonstantinou 2020-2022
+
+Implements convenience functionality.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>.
 """
-import yaml
+
 import time
 import can
 
@@ -15,9 +27,7 @@ class TMTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         bustype, channel = get_bus_config(["socketcan"])
-        cls.can_bus = can.Bus(
-            bustype=bustype, channel=channel, bitrate=1000000
-        )
+        cls.can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=1000000)
         cls.tm = create_device(node_id=1, bus=cls.can_bus)
         cls.reset_and_wait()
 

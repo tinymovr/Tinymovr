@@ -1,13 +1,23 @@
 """
-This unit test suite tests functionality of the
-Tinymovr Studio using a simulated Tinymovr
-device, which is suitable for unit testing.
+Tinymovr Simulation Tests
+Copyright Ioannis Chatzikonstantinou 2020-2022
+
+Tests functionality of the Tinymovr Studio using a simulated Tinymovr device.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>.
 """
-import random
+
 import time
 import can
 
-import tinymovr
 from tinymovr import Tinymovr, VersionError
 from tinymovr.constants import ErrorIDs
 from tinymovr.iface import IFace
@@ -50,12 +60,16 @@ class TestSimulation(unittest.TestCase):
     def test_version_mismatch(self):
         can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
         original_version = can_bus.min_studio_version
-        can_bus.min_studio_version = ["0", "255", "255"] # some impossibly large version
+        can_bus.min_studio_version = [
+            "0",
+            "255",
+            "255",
+        ]  # some impossibly large version
         iface: IFace = CANBus(can_bus)
         with self.assertRaises(VersionError):
             Tinymovr(node_id=1, iface=iface)
         # need to restore because the bus is singleton
-        can_bus.min_studio_version = original_version 
+        can_bus.min_studio_version = original_version
 
     def test_get_error_idle(self):
         """
@@ -130,8 +144,8 @@ class TestSimulation(unittest.TestCase):
         self.tm.calibrate()
         self.tm.current_control()
         vals = self.tm.get_set_pos_vel_Iq(0, 500 * ticks / s, 0.001 * A)
-        self.assertAlmostEqual(vals.position, 0, delta= 1 * ticks)
-        self.assertAlmostEqual(vals.velocity_ff, 0, delta= 10 * ticks)
+        self.assertAlmostEqual(vals.position, 0, delta=1 * ticks)
+        self.assertAlmostEqual(vals.velocity_ff, 0, delta=10 * ticks)
         time.sleep(0.5)
         vals = self.tm.get_set_pos_vel_Iq(0, 0, 0)
         self.assertLess(abs(vals.position.magnitude), 500)
