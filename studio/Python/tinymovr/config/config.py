@@ -24,15 +24,18 @@ from tinymovr.constants import CAN_EP_SIZE
 
 dev_def = None
 
-def_path_str = str(
-    importlib.resources.files("tinymovr").joinpath("config/device.yaml")
-)
+def_path_str = str(importlib.resources.files("tinymovr").joinpath("config/device.yaml"))
 with open(def_path_str) as dev_def_raw:
     dev_def = yaml.safe_load(dev_def_raw)
 
 
 class ProtocolVersionError(Exception):
-    pass
+    def __init__(self, *args, **kwargs):
+        msg = (
+            "Incompatible protocol versions (hash mismatch)."
+            "Please try upgrading firmware & studio to the same version."
+        )
+        super().__init__(msg, *args, **kwargs)
 
 
 def get_bus_config(suggested_types=None):
@@ -53,10 +56,7 @@ def create_device(node_id, bus):
     Create a device with the defined ID and bus.
     The hash value will be retrieved from the remote.
     """
-    tee = Tee(
-        bus,
-        lambda msg: msg.arbitration_id >> CAN_EP_SIZE & 0xFF == node_id,
-    )
+    tee = Tee(bus, lambda msg: msg.arbitration_id >> CAN_EP_SIZE & 0xFF == node_id)
     chan = CANChannel(node_id, tee)
     node = deserialize(dev_def)
 
@@ -66,10 +66,10 @@ def create_device(node_id, bus):
     # is a hash mismatch, we raise an exception, otherwise
     # we return the device node as is.
     node._channel = chan
-    if node.hash_uint32 != node.protocol_hash: # hash_uint32 is local, proto_hash is remote
-        raise ProtocolVersionError(
-            "Incompatible protocol versions (hash mismatch).\nPlease try upgrading firmware & studio to the same version."
-        )
+    if (
+        node.hash_uint32 != node.protocol_hash
+    ):  # hash_uint32 is local, proto_hash is remote
+        raise ProtocolVersionError()
     return node
 
 
@@ -79,19 +79,12 @@ def create_device_with_hash_msg(heartbeat_msg, bus):
     to decode the actual hash value
     """
     node_id = heartbeat_msg.arbitration_id & 0x3F
-    tee = Tee(
-        bus,
-        lambda msg: msg.arbitration_id >> CAN_EP_SIZE & 0xFF == node_id,
-    )
+    tee = Tee(bus, lambda msg: msg.arbitration_id >> CAN_EP_SIZE & 0xFF == node_id)
     chan = CANChannel(node_id, tee)
     node = deserialize(dev_def)
-    hash, *_ = chan.serializer.deserialize(
-            heartbeat_msg.data[:4], DataType.UINT32
-        )
-    if node.hash_uint32 != hash: # hash_uint32 is local, hash is remote
-        raise ProtocolVersionError(
-            "Incompatible protocol versions (hash mismatch).\nPlease try upgrading firmware & studio to the same version."
-        )
+    hash, *_ = chan.serializer.deserialize(heartbeat_msg.data[:4], DataType.UINT32)
+    if node.hash_uint32 != hash:  # hash_uint32 is local, hash is remote
+        raise ProtocolVersionError()
     node._channel = chan
     return node
 
