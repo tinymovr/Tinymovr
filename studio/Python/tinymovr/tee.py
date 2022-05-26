@@ -1,4 +1,9 @@
 """
+Tinymovr Tee Module
+Copyright Ioannis Chatzikonstantinou 2020-2022
+
+Implements a Tee class to distribute incoming traffic according to rules
+
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
 Foundation, either version 3 of the License, or (at your option) any later
@@ -15,7 +20,7 @@ from threading import Lock
 
 class Tee:
     """
-    Filter and distribute incoming messages based on the boolean result
+    Sistribute incoming messages based on the boolean result
     of a filter callback.
 
     python-can does not allow filtering messages per recipient therefore

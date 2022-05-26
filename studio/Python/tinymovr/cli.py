@@ -22,6 +22,11 @@ from tinymovr.constants import app_name, base_node_name
 from tinymovr.config import get_bus_config, configure_logging
 
 """
+Tinymovr CLI Module
+Copyright Ioannis Chatzikonstantinou 2020-2022
+
+The Tinymovr Studio IPython-based command line interface
+
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
 Foundation, either version 3 of the License, or (at your option) any later

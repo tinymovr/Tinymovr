@@ -1,5 +1,5 @@
 """
-Tinymovr Codecs Class
+Tinymovr Codecs Module
 Copyright Ioannis Chatzikonstantinou 2020-2022
 
 Implements codecs for various datatypes.
