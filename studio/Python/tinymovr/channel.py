@@ -80,6 +80,7 @@ class CANChannel:
         return MultibyteCodec()
 
 
+# TODO: Implement unit test for these functions
 def ids_from_arbitration(arbitration_id):
     """
     Generate endpoint, message sequence and node ids

@@ -39,9 +39,7 @@ class Discovery:
         self.incompatible_nodes = set()
 
         self.tee = Tee(
-            bus,
-            lambda msg: HEARTBEAT_BASE == msg.arbitration_id & HEARTBEAT_BASE,
-            self.logger,
+            bus, lambda msg: HEARTBEAT_BASE == msg.arbitration_id & HEARTBEAT_BASE
         )
 
         def_path_str = str(
