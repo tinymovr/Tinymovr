@@ -25,23 +25,11 @@
 #include <src/encoder/encoder.h>
 #include <src/encoder/ma7xx.h>
 #include <src/observer/observer.h>
+#include <src/scheduler/scheduler.h>
 
 volatile uint32_t msTicks = 0;
 
-struct SchedulerState
-{
-	bool adc_interrupt;
-	bool can_interrupt;
-	bool uart_message_interrupt;
-	bool busy;
-
-    uint32_t busy_cycles;
-    uint32_t total_cycles;
-    uint32_t busy_loop_start;
-    uint32_t total_loop_start;
-};
-
-struct SchedulerState state = {0};
+SchedulerState state = {0};
 
 void WaitForControlLoopInterrupt(void)
 {
@@ -59,7 +47,7 @@ void WaitForControlLoopInterrupt(void)
 		{
 			// Handle UART
 			state.uart_message_interrupt = false;
-			UART_ProcessMessage();
+			UART_process_message();
 		}
 		else
 		{
@@ -78,9 +66,10 @@ void WaitForControlLoopInterrupt(void)
 	{
 		ma7xx_send_angle_cmd();
 	}
-	ADC_UpdateMeasurements();
-	encoder_update_angle(true);
-	observer_update_estimates();
+	ADC_update();
+	system_update();
+	encoder_update(true);
+	observer_update();
 	// At this point control is returned to main loop.
 }
 

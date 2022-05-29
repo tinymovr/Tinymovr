@@ -20,7 +20,18 @@
 
 #include "src/common.h"
 
+typedef struct {
+    float Vbus;
+    uint8_t errors;
+} SystemState;
+
+typedef struct {
+    float Vbus_tau;
+    float Vbus_D;
+} SystemConfig;
+
 void system_init(void);
+PAC5XXX_RAMFUNC void system_update(void);
 void system_reset(void);
 
 PAC5XXX_RAMFUNC inline uint32_t system_get_uid(void)

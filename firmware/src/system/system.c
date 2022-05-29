@@ -23,6 +23,11 @@
 
 uint8_t error_flags[ERROR_FLAG_MAX_SIZE] = {0};
 uint8_t error_count = 0;
+SystemState state = {0};
+
+SystemConfig config = {
+    .Vbus_tau = 0.001f
+};
 
 void system_init(void)
 {
@@ -82,14 +87,24 @@ void system_init(void)
     // Configure error handling
     SCB->CCR |= 0x10;
 
+    // Arbitrary value to avoid division by zero
+    state.Vbus = 12.0f;
+
+    // Derive VBus D value for given tau value
+    config.Vbus_D = 1.0f - powf(EPSILON, -1.0f / (config.Vbus_tau * PWM_FREQ_HZ));
+
     /* Initialize Systick per 1ms */
     SysTick_Config(150000); // TODO: Use var
 }
 
-void system_reset(void)
+PAC5XXX_RAMFUNC void system_update(void)
 {
-    pac5xxx_tile_register_write(ADDR_WATCHDOG,
-                                pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
+    state.Vbus += config.Vbus_D * (((float)PAC55XX_ADC->DTSERES4.VAL) * VBUS_SCALING_FACTOR - state.Vbus);
+    if (state.Vbus < VBUS_LOW_THRESHOLD)
+    {
+        state.errors |= SYST_ERROR_VBUS_UNDERVOLTAGE;
+        return false;
+    }
 }
 
 PAC5XXX_RAMFUNC bool error_flags_exist(void)
