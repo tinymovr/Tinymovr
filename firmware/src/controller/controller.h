@@ -21,6 +21,11 @@
 #include <src/common.h>
 #include <src/controller/trajectory_planner.h>
 
+typedef enum {
+    CTRLR_ERROR_NONE = 0,
+    CTRLR_ERROR_CURRENT_LIMIT_EXCEEDED = (1 << 0)
+} ControllerError;
+
 typedef enum
 {
     STATE_IDLE = 0,
@@ -41,6 +46,7 @@ typedef struct
     // TODO: State.state is very confusing, name appropriately
     ControlState state;
     ControlMode mode;
+    uint8_t errors;
     bool is_calibrating;
 
     struct FloatTriplet I_phase_meas;
@@ -127,6 +133,8 @@ void controller_set_Iq_limit(float limit);
 void controller_set_motion_plan(MotionPlan mp);
 
 PAC5XXX_RAMFUNC void controller_update_I_gains(void);
+
+PAC5XXX_RAMFUNC uint8_t controller_get_errors(void);
 
 ControllerConfig *Controller_GetConfig(void);
 void Controller_RestoreConfig(ControllerConfig *config_);

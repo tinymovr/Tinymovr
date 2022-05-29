@@ -5,8 +5,8 @@
 #include <src/encoder/hall.h>
 #include <src/encoder/encoder.h>
 
-static EncoderConfig config = { 0 };
-static EncoderState state = { 0 };
+static EncoderConfig config = {0};
+static EncoderState state = {0};
 
 void encoder_init(void)
 {
@@ -16,6 +16,7 @@ void encoder_init(void)
 #endif
         ma7xx_init();
         state.current_encoder_type = ENCODER_MA7XX;
+        state.get_error_ptr = &ma7xx_get_errors;
         state.get_angle_ptr = &ma7xx_get_angle_rectified;
         state.update_angle_ptr = &ma7xx_update_angle;
         state.reset_encoder_ptr = &ma7xx_clear_rec_table;
@@ -26,6 +27,7 @@ void encoder_init(void)
     {
         hall_init();
         state.current_encoder_type = ENCODER_HALL;
+        state.get_error_ptr = &hall_get_errors;
         state.get_angle_ptr = &hall_get_angle;
         state.update_angle_ptr = &hall_update_angle;
         state.reset_encoder_ptr = &hall_clear_sector_map;
@@ -44,7 +46,7 @@ PAC5XXX_RAMFUNC int16_t encoder_get_angle(void)
     return state.get_angle_ptr();
 }
 
-PAC5XXX_RAMFUNC void encoder_update_angle(bool check_error)
+PAC5XXX_RAMFUNC void encoder_update(bool check_error)
 {
     if (state.update_angle_ptr)
     {
@@ -91,6 +93,11 @@ PAC5XXX_RAMFUNC void encoder_set_type(EncoderType enc_type)
         config.encoder_type = ENCODER_HALL;
     }
 #endif
+}
+
+PAC5XXX_RAMFUNC uint8_t encoder_get_errors(void)
+{
+    return state.get_error_ptr();
 }
 
 EncoderConfig* encoder_get_config(void)

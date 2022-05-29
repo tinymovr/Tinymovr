@@ -31,6 +31,11 @@ typedef struct
     uint8_t sector;
 } HAllState;
 
+typedef enum {
+    HALL_ERROR_NONE     = 0,
+    HALL_ERROR_CALIBRATION_FAILED = 1 << 0
+} HallError;
+
 void hall_init(void);
 PAC5XXX_RAMFUNC int16_t hall_get_angle(void);
 PAC5XXX_RAMFUNC void hall_update_angle(bool check_error);

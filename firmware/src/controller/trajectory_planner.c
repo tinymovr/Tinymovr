@@ -4,16 +4,19 @@
 #include <src/utils/utils.h>
 #include <src/controller/trajectory_planner.h>
 
-static struct PlannerConfig config = {
+static PlannerConfig config = {
 	.max_accel = ENCODER_TICKS_FLOAT,
 	.max_decel = ENCODER_TICKS_FLOAT,
-	.max_vel = 50000.0f};
+	.max_vel = 50000.0f
+};
+
+static PlannerState state = {0};
 
 bool planner_move_to_tlimit(float p_target)
 {
 	bool response = false;
 	MotionPlan motion_plan = {0};
-	if (!error_flags_exist() && planner_prepare_plan_tlimit(p_target, config.deltat_tot, config.deltat_acc, config.deltat_dec, &motion_plan))
+	if (!errors_exist() && planner_prepare_plan_tlimit(p_target, config.deltat_tot, config.deltat_acc, config.deltat_dec, &motion_plan))
 	{
 		controller_set_motion_plan(motion_plan);
 		controller_set_mode(CTRL_TRAJECTORY);
@@ -44,12 +47,12 @@ bool planner_prepare_plan_tlimit(float p_target, float deltat_tot, float deltat_
 	float v_cruise = (S - 0.5f * deltat_acc * v_0) / (0.5f * deltat_acc + deltat_cruise + 0.5f * deltat_dec);
 	if (deltat_tot < 0 || deltat_acc < 0 || deltat_dec < 0 || deltat_cruise < 0.0f)
 	{
-		add_error_flag(ERROR_PLANNER_INVALID_INPUT);
+		state.errors |= PLNR_ERROR_INVALID_INPUT;
 		return false;
 	}
 	else if (our_fabsf(v_cruise) > controller_get_vel_limit())
 	{
-		add_error_flag(ERROR_PLANNER_VCRUISE_OVER_LIMIT);
+		state.errors |= PLNR_ERROR_VCRUISE_OVER_LIMIT;
 		return false;
 	}
 	else if (S == 0.0f)
@@ -275,6 +278,11 @@ bool planner_set_deltat_dec(float deltat_dec)
 		return true;
 	}
 	return false;
+}
+
+PAC5XXX_RAMFUNC uint8_t planner_get_errors(void)
+{
+	return state.errors;
 }
 
 PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan)

@@ -82,7 +82,7 @@ void ADC_IRQHandler(void)
 	// to the ADC triggering the next
 	if (true == gate_driver_is_enabled() && true == state.busy)
 	{
-		add_error_flag(ERROR_CONTROL_BLOCK_REENTERED);
+		state.errors |= SCHED_ERROR_CONTROL_BLOCK_REENTERED;
 		// We do not change the control state here, to
 		// avoid any concurrency issues
 	}
@@ -121,4 +121,9 @@ uint32_t Scheduler_GetTotalCycles(void)
 uint32_t Scheduler_GetBusyCycles(void)
 {
     return state.busy_cycles;
+}
+
+PAC5XXX_RAMFUNC uint8_t scheduler_get_errors(void)
+{
+	return state.errors;
 }

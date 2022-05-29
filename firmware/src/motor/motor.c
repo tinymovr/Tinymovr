@@ -36,6 +36,8 @@ static MotorConfig config = {
 	.phases_swapped = false,
 	.is_gimbal = false};
 
+static MotorState state = {0};
+
 void motor_reset_calibration()
 {
 	config.pole_pairs = 7;
@@ -193,6 +195,11 @@ PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir)
 	{
 		config.user_direction = dir;
 	}
+}
+
+PAC5XXX_RAMFUNC uint8_t motor_get_errors(void)
+{
+	return state.errors;
 }
 
 MotorConfig *motor_get_config(void)
