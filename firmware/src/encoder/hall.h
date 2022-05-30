@@ -27,6 +27,7 @@ typedef struct
 
 typedef struct
 {
+    uint8_t errors;
 	uint16_t angle;
     uint8_t sector;
 } HAllState;
@@ -37,8 +38,10 @@ typedef enum {
 } HallError;
 
 void hall_init(void);
+
+PAC5XXX_RAMFUNC uint8_t hall_get_errors(void);
 PAC5XXX_RAMFUNC int16_t hall_get_angle(void);
-PAC5XXX_RAMFUNC void hall_update_angle(bool check_error);
+PAC5XXX_RAMFUNC void hall_update(bool check_error);
 PAC5XXX_RAMFUNC uint8_t hall_get_sector(void);
 
 void hall_clear_sector_map(void);

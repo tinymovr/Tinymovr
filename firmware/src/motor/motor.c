@@ -202,6 +202,11 @@ PAC5XXX_RAMFUNC uint8_t motor_get_errors(void)
 	return state.errors;
 }
 
+PAC5XXX_RAMFUNC uint8_t *motor_get_error_ptr(void)
+{
+	return &(state.errors);
+}
+
 MotorConfig *motor_get_config(void)
 {
 	return &config;

@@ -19,11 +19,13 @@
 #include <src/utils/utils.h>
 #include <src/rtt/SEGGER_RTT.h>
 #include <src/controller/controller.h>
+#include <src/encoder/encoder.h>
+#include <src/motor/motor.h>
 #include <src/system/system.h>
 
-SystemState state = {0};
+static SystemState state = {0};
 
-SystemConfig config = {
+static SystemConfig config = {
     .Vbus_tau = 0.001f
 };
 
@@ -101,7 +103,6 @@ PAC5XXX_RAMFUNC void system_update(void)
     if (state.Vbus < VBUS_LOW_THRESHOLD)
     {
         state.errors |= SYST_ERROR_VBUS_UNDERVOLTAGE;
-        return false;
     }
 }
 

@@ -18,7 +18,7 @@ void encoder_init(void)
         state.current_encoder_type = ENCODER_MA7XX;
         state.get_error_ptr = &ma7xx_get_errors;
         state.get_angle_ptr = &ma7xx_get_angle_rectified;
-        state.update_angle_ptr = &ma7xx_update_angle;
+        state.update_angle_ptr = &ma7xx_update;
         state.reset_encoder_ptr = &ma7xx_clear_rec_table;
         state.ticks = ENCODER_TICKS;
 #ifdef BOARD_REV_R5
@@ -29,7 +29,7 @@ void encoder_init(void)
         state.current_encoder_type = ENCODER_HALL;
         state.get_error_ptr = &hall_get_errors;
         state.get_angle_ptr = &hall_get_angle;
-        state.update_angle_ptr = &hall_update_angle;
+        state.update_angle_ptr = &hall_update;
         state.reset_encoder_ptr = &hall_clear_sector_map;
         state.ticks = HALL_SECTORS;
     }

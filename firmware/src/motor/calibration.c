@@ -32,7 +32,6 @@ static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 
 bool CalibrateResistance(void)
 {
-    bool success = true;
     float I_cal = motor_get_I_cal();
     if (!motor_get_is_gimbal())
     {
@@ -52,20 +51,20 @@ bool CalibrateResistance(void)
         gate_driver_set_duty_cycle(&zeroDC);
         if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
         {
-            add_error_flag(ERROR_PHASE_RESISTANCE_OUT_OF_RANGE);
-            success = false;
+            uint8_t *error_ptr = motor_get_error_ptr();
+            *error_ptr |= MOTOR_ERROR_PHASE_RESISTANCE_OUT_OF_RANGE;
+            return false;
         }
         else
         {
             motor_set_phase_resistance(R);
         }
     }
-    return success;
+    return true;
 }
 
 bool CalibrateInductance(void)
 {
-    bool success = true;
     if (!motor_get_is_gimbal())
     {
         float V_setpoint = 0.0f;
@@ -98,8 +97,9 @@ bool CalibrateInductance(void)
         gate_driver_set_duty_cycle(&zeroDC);
         if ((L <= MIN_PHASE_INDUCTANCE) || (L >= MAX_PHASE_INDUCTANCE))
         {
-            add_error_flag(ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE);
-            success = false;
+            uint8_t *error_ptr = motor_get_error_ptr();
+            *error_ptr |= MOTOR_ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE;
+            return false;
         }
         else
         {
@@ -107,7 +107,7 @@ bool CalibrateInductance(void)
             controller_update_I_gains();
         }
     }
-    return success;
+    return true;
 }
 
 bool CalibrateDirectionAndPolePairs(void)
@@ -136,11 +136,12 @@ bool CalibrateDirectionAndPolePairs(void)
     {
         set_epos_and_wait(epos_target, I_setpoint);
     }
-    // Try to calibrate
+    // Find pole pairs
     if (!motor_find_pole_pairs(ENCODER_TICKS, epos_start, observer_get_pos_estimate(), epos_target))
     {
-        add_error_flag(ERROR_INVALID_POLE_PAIRS);
-        success = false;
+        uint8_t *error_ptr = motor_get_error_ptr();
+        *error_ptr |= MOTOR_ERROR_INVALID_POLE_PAIRS;
+        return false;
     }
     else
     {
@@ -165,7 +166,6 @@ bool calibrate_hall_sequence(void)
     uint8_t *sector_map = hall_get_sector_map_ptr();
     // We'll just do a single electrical cycle
     const float I_setpoint = motor_get_I_cal();
-    bool success = true;
     // Stay a bit at starting epos
     for (uint32_t i = 0; i < CAL_STAY_LEN; i++)
     {
@@ -182,14 +182,14 @@ bool calibrate_hall_sequence(void)
             set_epos_and_wait(HALL_SECTOR_ANGLE * (j + (float)i / CAL_DIR_LEN_PER_SECTOR), I_setpoint);
         }
     }
-    // TODO: Assert all expected sectors covered
+    // TODO: Assert all expected sectors covered, else set error
     // Move back to start epos
     for (uint32_t i = 0; i < CAL_DIR_LEN; i++)
     {
         set_epos_and_wait(TWOPI * (1.0f - ((float)i / CAL_DIR_LEN)), I_setpoint);
     }
     hall_set_sector_map_calibrated();
-    return success;
+    return true;
 }
 
 bool calibrate_offset_and_rectification(void)

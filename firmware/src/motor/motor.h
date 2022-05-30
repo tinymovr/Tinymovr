@@ -89,6 +89,7 @@ PAC5XXX_RAMFUNC int8_t motor_get_user_direction(void);
 PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir);
 
 PAC5XXX_RAMFUNC uint8_t motor_get_errors(void);
+PAC5XXX_RAMFUNC uint8_t *motor_get_error_ptr(void);
 
 MotorConfig *motor_get_config(void);
 void motor_restore_config(MotorConfig *config_);
