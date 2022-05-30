@@ -21,8 +21,11 @@
 #include <src/controller/controller.h>
 #include <src/system/system.h>
 
-uint8_t error_flags[ERROR_FLAG_MAX_SIZE] = {0};
-uint8_t error_count = 0;
+SystemState state = {0};
+
+SystemConfig config = {
+    .Vbus_tau = 0.001f
+};
 
 void system_init(void)
 {
@@ -82,8 +85,24 @@ void system_init(void)
     // Configure error handling
     SCB->CCR |= 0x10;
 
+    // Arbitrary value to avoid division by zero
+    state.Vbus = 12.0f;
+
+    // Derive VBus D value for given tau value
+    config.Vbus_D = 1.0f - powf(EPSILON, -1.0f / (config.Vbus_tau * PWM_FREQ_HZ));
+
     /* Initialize Systick per 1ms */
     SysTick_Config(150000); // TODO: Use var
+}
+
+PAC5XXX_RAMFUNC void system_update(void)
+{
+    state.Vbus += config.Vbus_D * (((float)PAC55XX_ADC->DTSERES4.VAL) * VBUS_SCALING_FACTOR - state.Vbus);
+    if (state.Vbus < VBUS_LOW_THRESHOLD)
+    {
+        state.errors |= SYST_ERROR_VBUS_UNDERVOLTAGE;
+        return false;
+    }
 }
 
 void system_reset(void)
@@ -92,48 +111,23 @@ void system_reset(void)
                                 pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
 }
 
-PAC5XXX_RAMFUNC bool error_flags_exist(void)
+PAC5XXX_RAMFUNC float system_get_Vbus(void)
 {
-    return error_count > 0u;
+    return state.Vbus;
 }
 
-PAC5XXX_RAMFUNC uint8_t *get_error_flags(void)
+PAC5XXX_RAMFUNC uint8_t system_get_errors(void)
 {
-    return error_flags;
+    return state.errors;
 }
 
-PAC5XXX_RAMFUNC void add_error_flag(uint8_t flag)
+PAC5XXX_RAMFUNC bool errors_exist(void)
 {
-    bool add = flag > 0u;
-    uint8_t i = 0u;
-    while ((add == true) && (i < ERROR_FLAG_MAX_SIZE))
-    {
-        if (error_flags[i++] == flag)
-        {
-            add = false;
-        }
-    }
-    if (add)
-    {
-        error_flags[error_count] |= flag;
-        error_count++;
-        if (error_count >= ERROR_FLAG_MAX_SIZE)
-        {
-            error_count = 0;
-        }
-    }
-}
-
-PAC5XXX_RAMFUNC bool health_check(void)
-{
-    const float VBus = adc_get_Vbus();
-    bool success = true;
-    if (VBus < VBUS_LOW_THRESHOLD)
-    {
-        add_error_flag(ERROR_VBUS_UNDERVOLTAGE);
-        success = false;
-    }
-    return success;
+    return (controller_get_errors() | 
+            encoder_get_errors() | 
+            motor_get_errors() | 
+            planner_get_errors() | 
+            system_get_errors());
 }
 
 void printUsageErrorMsg(uint32_t CFSRValue)

@@ -28,17 +28,18 @@ typedef struct
 typedef struct
 {
 	int16_t angle;
+    uint8_t error;
 } MA7xxState;
 
 typedef enum {
-    ENCODER_ERR_NO_ERROR        = 0x0000,
-    ENCODER_ERR_UNSTABLE        = 0x0001
-} EncoderError;
+    MA7XX_ERROR_NONE     = 0,
+    MA7XX_ERROR_UNSTABLE = 1 << 0
+} MA7xxError;
 
 // MA702 commands
 typedef enum {
-    MA_CMD_NOP              = 0x0000,
-    MA_CMD_ANGLE            = 0x0000
+    MA_CMD_NOP   = 0x0000,
+    MA_CMD_ANGLE = 0x0000
 } MA702Command;
 
 void ma7xx_init(void);

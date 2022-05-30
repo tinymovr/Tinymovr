@@ -24,7 +24,7 @@ import can
 from avlos.deserializer import deserialize
 from tinymovr.codec import DataType
 from tinymovr.tee import Tee
-from tinymovr.channel import CANChannel
+from tinymovr.channel import CANChannel, ids_from_arbitration
 from tinymovr.constants import CAN_EP_SIZE
 
 dev_def = None
@@ -61,7 +61,7 @@ def create_device(node_id, bus):
     Create a device with the defined ID and bus.
     The hash value will be retrieved from the remote.
     """
-    tee = Tee(bus, lambda msg: msg.arbitration_id >> CAN_EP_SIZE & 0xFF == node_id)
+    tee = Tee(bus, lambda msg: ids_from_arbitration(msg.arbitration_id)[2] == node_id)
     chan = CANChannel(node_id, tee)
     node = deserialize(dev_def)
 
@@ -84,7 +84,7 @@ def create_device_with_hash_msg(heartbeat_msg, bus):
     to decode the actual hash value
     """
     node_id = heartbeat_msg.arbitration_id & 0x3F
-    tee = Tee(bus, lambda msg: msg.arbitration_id >> CAN_EP_SIZE & 0xFF == node_id)
+    tee = Tee(bus, lambda msg: ids_from_arbitration(msg.arbitration_id)[2] == node_id)
     chan = CANChannel(node_id, tee)
     node = deserialize(dev_def)
     hash, *_ = chan.serializer.deserialize(heartbeat_msg.data[:4], DataType.UINT32)

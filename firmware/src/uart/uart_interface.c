@@ -111,7 +111,7 @@ int32_t UART_ReadAddr(uint8_t addr)
     switch (addr)
     {
     case 'b': // vbus value
-        ret_val = (int32_t)(adc_get_Vbus() * UART_V_SCALING_FACTOR);
+        ret_val = (int32_t)(system_get_Vbus() * UART_V_SCALING_FACTOR);
         break;
 
     case 'e': // controller error
@@ -208,7 +208,7 @@ int32_t UART_ReadAddr(uint8_t addr)
     return ret_val;
 }
 
-void UART_ProcessMessage(void)
+void UART_process_message(void)
 {
     int8_t addr = uart_rx_msg[1];
     int8_t len = ((int8_t)uart_rx_msg_len) - 3;

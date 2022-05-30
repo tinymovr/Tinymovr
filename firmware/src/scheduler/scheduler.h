@@ -15,12 +15,30 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SRC_SCHEDULER_SCHEDULER_H_
-#define SRC_SCHEDULER_SCHEDULER_H_
+#pragma once
+
+typedef enum {
+    SCHED_ERROR_NONE = 0,
+    SCHED_ERROR_CONTROL_BLOCK_REENTERED = 1 << 0
+} SchedulerError;
+
+typedef struct 
+{
+	bool adc_interrupt;
+	bool can_interrupt;
+	bool uart_message_interrupt;
+	bool busy;
+
+    uint8_t errors;
+    uint32_t busy_cycles;
+    uint32_t total_cycles;
+    uint32_t busy_loop_start;
+    uint32_t total_loop_start;
+} SchedulerState;
 
 void WaitForControlLoopInterrupt(void);
 
 uint32_t Scheduler_GetTotalCycles(void);
 uint32_t Scheduler_GetBusyCycles(void);
 
-#endif /* SRC_SCHEDULER_SCHEDULER_H_ */
+PAC5XXX_RAMFUNC uint8_t scheduler_get_errors(void);

@@ -72,8 +72,6 @@ typedef enum
 
 struct ADCState
 {
-    float vbus_val;
-    float vbus_D;
     int16_t temp;
     struct FloatTriplet I_phase_meas;
     struct FloatTriplet I_phase_offset;
@@ -84,13 +82,11 @@ struct ADCConfig
     float Iphase_limit;
     float I_filter_k;
     float I_phase_offset_tau;
-    float VBus_tau;
 };
 
 void ADC_Init(void);
-PAC5XXX_RAMFUNC float adc_get_Vbus(void);
 PAC5XXX_RAMFUNC int16_t adc_get_mcu_temp(void);
 PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc);
-PAC5XXX_RAMFUNC void ADC_UpdateMeasurements(void);
+PAC5XXX_RAMFUNC void ADC_update(void);
 
 #endif /* ADC_ADC_H_ */

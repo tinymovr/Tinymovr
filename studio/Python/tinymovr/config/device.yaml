@@ -13,13 +13,17 @@ remote_attributes:
   - name: Vbus
     dtype: float
     unit: volt
-    c_getter: adc_get_Vbus
+    c_getter: system_get_Vbus
     summary: The bus voltage.
   - name: temp
     dtype: float
     unit: degC
     c_getter: adc_get_mcu_temp
     summary: The internal temperature of the PAC55xx MCU.
+  - name: errors
+    dtype: uint8
+    c_getter: system_get_errors
+    summary: Any system errors, as a bitmask
   - name: save_config
     summary: Save configuration to non-volatile memory.
     c_caller: nvm_save_config
@@ -57,78 +61,81 @@ remote_attributes:
         c_getter: controller_get_mode
         c_setter: controller_set_mode
         summary: The control mode of the controller.
-      - name: pos_setpoint
-        dtype: float
-        unit: tick
-        c_getter: controller_get_pos_setpoint_user_frame
-        c_setter: controller_set_pos_setpoint_user_frame
-        summary: The position setpoint.
-      - name: vel_setpoint
-        dtype: float
-        unit: tick/sec
-        c_getter: controller_get_vel_setpoint_user_frame
-        c_setter: controller_set_vel_setpoint_user_frame
-        summary: The velocity setpoint.
-      - name: Iq_setpoint
-        dtype: float
-        unit: ampere
-        c_getter: controller_get_Iq_setpoint_user_frame
-        c_setter: controller_set_Iq_setpoint_user_frame
-        summary: The Iq setpoint.
-      - name: vel_limit
-        dtype: float
-        unit: tick/sec
-        c_getter: controller_get_vel_limit
-        c_setter: controller_set_vel_limit
-        summary: The velocity limit.
-      - name: Iq_limit
-        dtype: float
-        unit: ampere
-        c_getter: controller_get_Iq_limit
-        c_setter: controller_set_Iq_limit
-        summary: The Iq limit.
-      - name: Iq_estimate
-        dtype: float
-        unit: ampere
-        c_getter: controller_get_Iq_estimate_user_frame
-        summary: The Iq estimate.
-      - name: pos_p_gain
-        dtype: float
-        c_getter: controller_get_pos_gain
-        c_setter: controller_set_pos_gain
-        summary: The proportional gain of the position controller.
-      - name: vel_p_gain
-        dtype: float
-        c_getter: controller_get_vel_gain
-        c_setter: controller_set_vel_gain
-        summary: The proportional gain of the velocity controller.
-      - name: vel_i_gain
-        dtype: float
-        c_getter: controller_get_vel_integrator_gain
-        c_setter: controller_set_vel_integrator_gain
-        summary: The integral gain of the velocity controller.
-      - name: I_bw
-        dtype: float
-        c_getter: controller_get_I_bw
-        c_setter: controller_set_I_bw
-        summary: The current controller bandwidth.
-      - name: Iq_p_gain
-        dtype: float
-        c_getter: controller_get_Iq_gain
-        summary: The current controller proportional gain.
-      - name: vel_integrator
+      - name: errors
+        dtype: uint8
+        c_getter: controller_get_errors
+        summary: Any controller errors, as a bitmask
+      - name: position
         remote_attributes:
-          - name: gain
+          - name: setpoint
+            dtype: float
+            unit: tick
+            c_getter: controller_get_pos_setpoint_user_frame
+            c_setter: controller_set_pos_setpoint_user_frame
+            summary: The position setpoint.
+          - name: p_gain
+            dtype: float
+            c_getter: controller_get_pos_gain
+            c_setter: controller_set_pos_gain
+            summary: The proportional gain of the position controller.
+      - name: velocity
+        remote_attributes:
+          - name: setpoint
+            dtype: float
+            unit: tick/sec
+            c_getter: controller_get_vel_setpoint_user_frame
+            c_setter: controller_set_vel_setpoint_user_frame
+            summary: The velocity setpoint.
+          - name: limit
+            dtype: float
+            unit: tick/sec
+            c_getter: controller_get_vel_limit
+            c_setter: controller_set_vel_limit
+            summary: The velocity limit.
+          - name: p_gain
+            dtype: float
+            c_getter: controller_get_vel_gain
+            c_setter: controller_set_vel_gain
+            summary: The proportional gain of the velocity controller.
+          - name: i_gain
             dtype: float
             c_getter: controller_get_vel_integrator_gain
             c_setter: controller_set_vel_integrator_gain
-            summary: The gain of the velocity integrator.
+            summary: The integral gain of the velocity controller.
           - name: deadband
             dtype: float
             c_getter: controller_get_vel_integrator_deadband
             c_setter: controller_set_vel_integrator_deadband
             rst_target: integrator-deadband
             summary: The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
+      - name: current
+        remote_attributes:
+          - name: Iq_setpoint
+            dtype: float
+            unit: ampere
+            c_getter: controller_get_Iq_setpoint_user_frame
+            c_setter: controller_set_Iq_setpoint_user_frame
+            summary: The Iq setpoint.
+          - name: Iq_limit
+            dtype: float
+            unit: ampere
+            c_getter: controller_get_Iq_limit
+            c_setter: controller_set_Iq_limit
+            summary: The Iq limit.
+          - name: Iq_estimate
+            dtype: float
+            unit: ampere
+            c_getter: controller_get_Iq_estimate_user_frame
+            summary: The Iq estimate.
+          - name: bandwidth
+            dtype: float
+            c_getter: controller_get_I_bw
+            c_setter: controller_set_I_bw
+            summary: The current controller bandwidth.
+          - name: Iq_p_gain
+            dtype: float
+            c_getter: controller_get_Iq_gain
+            summary: The current controller proportional gain.
       - name: calibrate
         summary: Calibrate the device.
         c_caller: controller_calibrate
@@ -204,6 +211,10 @@ remote_attributes:
         c_getter: motor_get_user_direction
         c_setter: motor_set_user_direction
         summary: User-defined direction of the motor.
+      - name: errors
+        dtype: uint8
+        c_getter: motor_get_errors
+        summary: Any motor/calibration errors, as a bitmask
       # - name: phase_currents
       #   remote_attributes:
       #     - name: U
@@ -240,6 +251,10 @@ remote_attributes:
         c_getter: observer_get_bw
         c_setter: observer_set_bw
         summary: The encoder observer bandwidth.
+      - name: errors
+        dtype: uint8
+        c_getter: encoder_get_errors
+        summary: Any encoder errors, as a bitmask
   - name: traj_planner
     remote_attributes:
       - name: max_accel
@@ -274,3 +289,7 @@ remote_attributes:
         arguments:
           - name: pos_setpoint
             dtype: float
+      - name: errors
+        dtype: uint8
+        c_getter: planner_get_errors
+        summary: Any errors in the trajectory planner, as a bitmask

@@ -66,18 +66,11 @@ static struct ADCState adc;
 static struct ADCConfig config = {
     .Iphase_limit = 40.0f,
     .I_filter_k = 0.6f,
-    .I_phase_offset_tau = 0.2f,
-    .VBus_tau = 0.001f,
+    .I_phase_offset_tau = 0.2f
 };
 
 void ADC_Init(void)
 {
-    // Arbitrary value to avoid division by zero
-    adc.vbus_val = 12.0f;
-
-    // Derive VBus D value for given tau value
-    adc.vbus_D = 1.0f - powf(EPSILON, -1.0f / (config.VBus_tau * PWM_FREQ_HZ));
-
     // --- Begin CAFE2 Initialization
 
     // Write all CAFE registers
@@ -231,11 +224,6 @@ void ADC_DTSE_Init(void)
     pac5xxx_dtse_seq_config(18, ADC0, 0, ADC_IRQ0_EN, SEQ_END); // Get result at DTSERES18, Interrupt
 }
 
-PAC5XXX_RAMFUNC float adc_get_Vbus(void)
-{
-    return adc.vbus_val;
-}
-
 PAC5XXX_RAMFUNC int16_t adc_get_mcu_temp(void)
 {
     return adc.temp;
@@ -256,7 +244,7 @@ PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc)
     }
 }
 
-PAC5XXX_RAMFUNC void ADC_UpdateMeasurements(void)
+PAC5XXX_RAMFUNC void ADC_update(void)
 {
     // TODO: Try doing below transformations in integer domain
     const float I_phase_offset_k = PWM_PERIOD_S / config.I_phase_offset_tau;
@@ -278,6 +266,4 @@ PAC5XXX_RAMFUNC void ADC_UpdateMeasurements(void)
     const int32_t FTTEMP = 27; // READ_UINT16(0x0010041E);
     const int32_t temp_val = (int32_t)(PAC55XX_ADC->DTSERES2.VAL);
     adc.temp = ((((FTTEMP + 273) * ((temp_val * 100) + 12288)) / (((int16_t)TTEMPS * 100) + 12288)) - 273);
-
-    adc.vbus_val += adc.vbus_D * (((float)PAC55XX_ADC->DTSERES4.VAL) * VBUS_SCALING_FACTOR - adc.vbus_val);
 }

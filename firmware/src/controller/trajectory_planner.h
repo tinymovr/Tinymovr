@@ -20,14 +20,24 @@
 
 #include "src/common.h"
 
-struct PlannerConfig {
+typedef enum {
+    PLNR_ERROR_NONE = 0,
+    PLNR_ERROR_INVALID_INPUT = (1 << 0),
+    PLNR_ERROR_VCRUISE_OVER_LIMIT = (1 << 1)
+} PlannerError;
+
+typedef struct {
 	float max_accel;
 	float max_decel;
 	float max_vel;
     float deltat_acc;
     float deltat_tot;
     float deltat_dec;
-};
+} PlannerConfig;
+
+typedef struct {
+	uint8_t errors;
+} PlannerState;
 
 typedef struct
 {
@@ -68,6 +78,9 @@ float planner_get_deltat_tot(void);
 bool planner_set_deltat_tot(float deltat_tot);
 float planner_get_deltat_dec(void);
 bool planner_set_deltat_dec(float deltat_dec);
+
+PAC5XXX_RAMFUNC uint8_t planner_get_errors(void);
+
 PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan);
 
 #endif /* CONTROLLER_TRAJECTORY_PLANNER_H_ */

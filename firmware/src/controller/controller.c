@@ -37,6 +37,7 @@ static ControllerState state = {
 
     .state = STATE_IDLE,
     .mode = CTRL_CURRENT,
+    .errors = CTRLR_ERROR_NONE,
     .is_calibrating = false,
 
     .I_phase_meas = {0.0f, 0.0f, 0.0f},
@@ -75,14 +76,13 @@ void Controller_ControlLoop(void)
 {
     while (true)
     {
-        health_check();
         const float Iq = controller_get_Iq_estimate();
         if ((Iq > (config.I_limit * I_TRIP_MARGIN)) ||
             (Iq < -(config.I_limit * I_TRIP_MARGIN)))
         {
-            add_error_flag(ERROR_OVERCURRENT);
+            state.errors |= CTRLR_ERROR_CURRENT_LIMIT_EXCEEDED;
         }
-        if (error_flags_exist() && (state.state != STATE_IDLE))
+        if (errors_exist() && (state.state != STATE_IDLE))
         {
             controller_set_state(STATE_IDLE);
         }
@@ -176,7 +176,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     const float e_phase = observer_get_epos();
     const float c_I = fast_cos(e_phase);
     const float s_I = fast_sin(e_phase);
-    const float VBus = adc_get_Vbus();
+    const float VBus = system_get_Vbus();
 
     float Vd;
     float Vq;
@@ -482,4 +482,9 @@ PAC5XXX_RAMFUNC void controller_update_I_gains(void)
     float plant_pole = motor_get_phase_resistance() / motor_get_phase_inductance();
     config.Iq_integrator_gain = plant_pole * config.I_gain;
     config.Id_integrator_gain = config.Iq_integrator_gain;
+}
+
+PAC5XXX_RAMFUNC uint8_t controller_get_errors(void)
+{
+    return state.errors;
 }

@@ -43,7 +43,7 @@ bool CalibrateResistance(void)
         {
             ADC_GetPhaseCurrents(&I_phase_meas);
             V_setpoint += CAL_V_GAIN * (I_cal - I_phase_meas.A);
-            const float pwm_setpoint = V_setpoint / adc_get_Vbus();
+            const float pwm_setpoint = V_setpoint / system_get_Vbus();
             SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
             gate_driver_set_duty_cycle(&modulation_values);
             WaitForControlLoopInterrupt();
@@ -87,7 +87,7 @@ bool CalibrateInductance(void)
                 I_low += I_phase_meas.A;
                 V_setpoint = CAL_V_INDUCTANCE;
             }
-            const float pwm_setpoint = V_setpoint / adc_get_Vbus();
+            const float pwm_setpoint = V_setpoint / system_get_Vbus();
             SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
             gate_driver_set_duty_cycle(&modulation_values);
             WaitForControlLoopInterrupt();
@@ -275,7 +275,7 @@ void reset_calibration(void)
 static inline void set_epos_and_wait(float angle, float I_setpoint)
 {
     struct FloatTriplet modulation_values = {0.0f};
-    float pwm_setpoint = (I_setpoint * motor_get_phase_resistance()) / adc_get_Vbus();
+    float pwm_setpoint = (I_setpoint * motor_get_phase_resistance()) / system_get_Vbus();
     our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
     SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),
         &modulation_values.A, &modulation_values.B, &modulation_values.C);

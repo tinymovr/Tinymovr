@@ -27,10 +27,10 @@
 
 typedef enum
 {
-	MOTOR_ERR_NO_ERROR = 0x0000,
-	MOTOR_ERR_PHASE_RESISTANCE_OUT_OF_RANGE = 0x0001,
-	MOTOR_ERR_PHASE_INDUCTANCE_OUT_OF_RANGE = 0x0002,
-	MOTOR_ERR_INVALID_POLE_PAIRS = 0x0004
+	MOTOR_ERROR_NO_ERROR = 0,
+	MOTOR_ERROR_PHASE_RESISTANCE_OUT_OF_RANGE = 1 << 0,
+	MOTOR_ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE = 1 << 1,
+	MOTOR_ERROR_INVALID_POLE_PAIRS = 1 << 2
 } MotorError;
 
 typedef struct
@@ -51,6 +51,11 @@ typedef struct
 	bool phases_swapped;
 	bool is_gimbal;
 } MotorConfig;
+
+typedef struct
+{
+	uint8_t errors;
+} MotorState;
 
 void motor_reset_calibration(void);
 
@@ -82,6 +87,8 @@ PAC5XXX_RAMFUNC void motor_set_user_offset(float offset);
 
 PAC5XXX_RAMFUNC int8_t motor_get_user_direction(void);
 PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir);
+
+PAC5XXX_RAMFUNC uint8_t motor_get_errors(void);
 
 MotorConfig *motor_get_config(void);
 void motor_restore_config(MotorConfig *config_);

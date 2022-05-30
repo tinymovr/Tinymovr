@@ -20,7 +20,24 @@
 
 #include "src/common.h"
 
+typedef enum {
+    SYST_ERROR_NONE = 0,
+    SYST_ERROR_VBUS_UNDERVOLTAGE = (1 << 0),
+    SYST_ERROR_DRIVER_FAULT = (1 << 1)
+} SystemErrors;
+
+typedef struct {
+    float Vbus;
+    uint8_t errors;
+} SystemState;
+
+typedef struct {
+    float Vbus_tau;
+    float Vbus_D;
+} SystemConfig;
+
 void system_init(void);
+PAC5XXX_RAMFUNC void system_update(void);
 void system_reset(void);
 
 PAC5XXX_RAMFUNC inline uint32_t system_get_uid(void)
@@ -28,9 +45,8 @@ PAC5XXX_RAMFUNC inline uint32_t system_get_uid(void)
     return PAC55XX_INFO1->UNIQUEID[0] ^ PAC55XX_INFO1->UNIQUEID[1] ^ PAC55XX_INFO1->UNIQUEID[2];
 }
 
-PAC5XXX_RAMFUNC bool error_flags_exist(void);
-PAC5XXX_RAMFUNC uint8_t *get_error_flags(void);
-PAC5XXX_RAMFUNC void add_error_flag(uint8_t error);
-PAC5XXX_RAMFUNC bool health_check(void);
+PAC5XXX_RAMFUNC float system_get_Vbus(void);
+PAC5XXX_RAMFUNC uint8_t system_get_errors(void);
+PAC5XXX_RAMFUNC bool errors_exist(void);
 
 #endif /* SYSTEM_SYSTEM_H_ */

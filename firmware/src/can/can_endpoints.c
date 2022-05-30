@@ -53,7 +53,7 @@ uint8_t avlos_Vbus(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
     if (AVLOS_CMD_READ == cmd) {
         float v;
-        v = adc_get_Vbus();
+        v = system_get_Vbus();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
