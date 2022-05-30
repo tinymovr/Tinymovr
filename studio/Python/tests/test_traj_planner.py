@@ -1,5 +1,5 @@
 """
-TinymovrTrajectory Planner Tests
+Tinymovr Trajectory Planner Tests
 Copyright Ioannis Chatzikonstantinou 2020-2022
 
 Tests the functionality of the Tinymovr trajectory planner.
