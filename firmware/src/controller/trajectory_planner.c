@@ -29,7 +29,7 @@ bool planner_move_to_vlimit(float p_target)
 {
 	bool response = false;
 	MotionPlan motion_plan = {0};
-	if (!error_flags_exist() && planner_prepare_plan_vlimit(p_target, config.max_vel, config.max_accel, config.max_decel, &motion_plan))
+	if (!errors_exist() && planner_prepare_plan_vlimit(p_target, config.max_vel, config.max_accel, config.max_decel, &motion_plan))
 	{
 		controller_set_motion_plan(motion_plan);
 		controller_set_mode(CTRL_TRAJECTORY);
