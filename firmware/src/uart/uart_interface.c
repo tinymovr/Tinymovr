@@ -116,8 +116,7 @@ int32_t UART_ReadAddr(uint8_t addr)
 
     case 'e': // controller error
     {
-        uint8_t *error_flags = get_error_flags();
-        memcpy(&ret_val, error_flags, sizeof(uint32_t));
+        // pass
     }
     break;
 
