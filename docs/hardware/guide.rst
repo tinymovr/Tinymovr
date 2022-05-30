@@ -22,15 +22,7 @@ Most three-phase pancake-style outrunners can be used with Tinymovr. While there
 
 Additional details:
 
-Tinymovr expects a motor with sinusoidal back-EMF. Most brushless outrunners have inusoidal back-EMF. If uncertain and you have access to an oscilloscope, you can hook up the motor phases to the scope channels and check out the back-EMF for yourself. Ideally, you would expect something like below:
-
-.. figure:: backemf.png
-  :width: 800
-  :align: center
-  :alt: Sinusoidal back-EMF on the scope
-  :figclass: align-center
-
-  Sinusoidal back-EMF on the scope
+Tinymovr expects a motor with sinusoidal back-EMF. Most brushless outrunners have inusoidal back-EMF. If uncertain and you have access to an oscilloscope, you can hook up the motor phases to the scope channels and check out the back-EMF for yourself. 
 
 Motors with trapezoidal back-EMF can also be controlled, but control will be sub-optimal. The trapezoidal back-EMF will appear as residual in the dq frame, as a result it will be much harder for the current controller to regulate phase currents. The tangible result is that the motor may exhibit increased noise and vibration while running.
 
