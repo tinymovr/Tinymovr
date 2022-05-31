@@ -189,9 +189,9 @@ class TestBoard(TMTestCase):
         """
         Test DWT busy/total cycle timings
         """
-        self.assertGreater(tm1.cycles.total, 0)
-        self.assertGreater(tm1.cycles.busy, 0)
-        self.assertLess(tm1.cycles.busy, 3000)
+        self.assertGreater(self.tm.cycles.total, 0)
+        self.assertGreater(self.tm.cycles.busy, 0)
+        self.assertLess(self.tm.cycles.busy, 3000)
 
     def test_i_states(self):
         """
