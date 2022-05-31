@@ -93,13 +93,13 @@ In addition, if you are in Windows you will need to install GNU make. This is ra
 
 Once you have the J-Link adapter wired up and the software installed, you are ready to flash and debug the firmware. To try out a test build from within VSCode select ``Terminal -> Run Task...`` from the menu bar, and select ``Clean and Build Project (Debug)``.
 
-.. image:: tasks_list.PNG
+.. image:: tasks_list.png
   :width: 800
   :alt: Task selector
 
 Tinymovr implements board revision selection using an input menu with a few predefined choices.
 
-.. image:: revision_list.PNG
+.. image:: revision_list.png
   :width: 800
   :alt: Board revision selector
 
@@ -107,7 +107,7 @@ Select the board revision against which you are compiling (R32, R33 or R5) from 
 
 To flash the firmware, provided your J-Link adapter is connected and drivers properly installed, hit F5. After a while the debug session should start and you should see a screen like below:
 
-.. image:: Capture.PNG
+.. image:: Capture.png
   :width: 800
   :alt: Tinymovr firmware debug session using VSCode
 
