@@ -27,6 +27,7 @@ setup(
         "ipython",
         "python-can>=4.0.0.dev0",
         "pyserial",
+        "pyyaml",
         "docopt",
         "flatten-dict",
         "pint",
