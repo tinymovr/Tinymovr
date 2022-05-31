@@ -19,9 +19,6 @@ import random
 import time
 import statistics as st
 
-import tinymovr
-from tinymovr import Tinymovr
-
 import unittest
 from tests import TMTestCase
 

@@ -18,10 +18,6 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 import random
 import time
 import statistics as st
-
-import tinymovr
-from tinymovr import Tinymovr
-from tinymovr.constants import ErrorIDs
 from tinymovr.units import get_registry
 
 import unittest
