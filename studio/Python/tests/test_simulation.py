@@ -15,127 +15,26 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import time
+from tinymovr.channel import ResponseError
+from tinymovr.config import create_device
 import can
-from tinymovr.config import get_bus_config, create_device
+from unittest.mock import patch, MagicMock
 import unittest
 
-ureg = get_registry()
-A = ureg.ampere
-ticks = ureg.ticks
-s = ureg.second
 
 class TestSimulation(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        bustype, channel = get_bus_config(["socketcan"])
-        cls.can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=1000000)
-        cls.tm = create_device(node_id=1, bus=cls.can_bus)
-        cls.reset_and_wait()
-
-    def setUp(self):
-        self.tm.reset()
-
-    def test_get_device_info(self):
+    @patch("can.Bus")
+    def test_response_error(self, can_bus):
         """
-        Test getting of device info
+        Test response error
         """
-        info = self.tm.device_info
-        self.assertGreaterEqual(info.fw_major, 0)
-        self.assertGreaterEqual(info.fw_minor, 7)
-
-    def test_version_mismatch(self):
-        can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
-        original_version = can_bus.min_studio_version
-        can_bus.min_studio_version = [
-            "0",
-            "255",
-            "255",
-        ]  # some impossibly large version
-        iface: IFace = CANBus(can_bus)
-        with self.assertRaises(VersionError):
-            Tinymovr(node_id=1, iface=iface)
-        # need to restore because the bus is singleton
-        can_bus.min_studio_version = original_version
-
-    def test_get_error_idle(self):
-        """
-        Test successful getting of correct error codes
-        in various scenarios
-        """
-        self.assertFalse(self.tm.state.errors)
-
-    def test_get_error_nocalib(self):
-        """
-        Test successful getting of correct error codes
-        in various scenarios
-        """
-        self.tm.position_control()
-        self.assertIn(ErrorIDs.InvalidState, self.tm.state.errors)
-
-    def test_get_error_calib(self):
-        """
-        Test successful getting of correct error codes
-        in various scenarios
-        """
-        self.tm.calibrate()  # no need to wait cause it's simulation
-        self.tm.position_control()
-        self.assertFalse(self.tm.state.errors)
-
-    def test_get_encoder_estimates(self):
-        estimates = self.tm.encoder_estimates
-        self.assertEqual(estimates.position, 0)
-        self.assertEqual(estimates.velocity, 0)
-
-    def test_set_current_control(self):
-        self.tm.calibrate()
-        self.tm.current_control()
-        self.tm.set_cur_setpoint(0.5 * A)
-        self.assertEqual(self.tm.Iq.estimate, 0.5 * A)
-        time.sleep(0.5)
-        self.tm.set_cur_setpoint(-0.5 * A)
-        self.assertEqual(self.tm.Iq.estimate, -0.5 * A)
-        time.sleep(0.5)
-        self.assertLess(abs(self.tm.encoder_estimates.velocity), 500 * ticks / s)
-
-    def test_set_current_control_nounits(self):
-        self.tm.calibrate()
-        self.tm.current_control()
-        self.tm.set_cur_setpoint(0.5)
-        self.assertEqual(self.tm.Iq.estimate.magnitude, 0.5)
-        time.sleep(0.5)
-        self.tm.set_cur_setpoint(-0.5)
-        self.assertEqual(self.tm.Iq.estimate.magnitude, -0.5)
-        time.sleep(0.5)
-        self.assertLess(abs(self.tm.encoder_estimates.velocity.magnitude), 500)
-
-    def test_set_vel_control(self):
-        self.tm.calibrate()
-        self.tm.current_control()
-        self.tm.set_vel_setpoint(1000 * ticks / s)
-        time.sleep(0.5)
-        self.tm.set_vel_setpoint(-1000 * ticks / s)
-        time.sleep(0.5)
-        self.assertLess(abs(self.tm.encoder_estimates.position), 500 * ticks)
-
-    def test_set_vel_control_nounits(self):
-        self.tm.calibrate()
-        self.tm.current_control()
-        self.tm.set_vel_setpoint(1000)
-        time.sleep(0.5)
-        self.tm.set_vel_setpoint(-1000)
-        time.sleep(0.5)
-        self.assertLess(abs(self.tm.encoder_estimates.position.magnitude), 500)
-
-    def test_get_set_pos_vel(self):
-        self.tm.calibrate()
-        self.tm.current_control()
-        vals = self.tm.get_set_pos_vel_Iq(0, 500 * ticks / s, 0.001 * A)
-        self.assertAlmostEqual(vals.position, 0, delta=1 * ticks)
-        self.assertAlmostEqual(vals.velocity_ff, 0, delta=10 * ticks)
-        time.sleep(0.5)
-        vals = self.tm.get_set_pos_vel_Iq(0, 0, 0)
-        self.assertLess(abs(vals.position.magnitude), 500)
+        can_bus.send = MagicMock()
+        can_bus.recv = MagicMock()
+        # can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=1000000)
+        with self.assertRaises(ResponseError):
+            tm = create_device(node_id=1, bus=can_bus)
+        assert can_bus.send.called
+        assert can_bus.recv.called
 
 
 if __name__ == "__main__":
