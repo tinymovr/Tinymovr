@@ -17,13 +17,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 import time
 import can
-
-from tinymovr import Tinymovr, VersionError
-from tinymovr.constants import ErrorIDs
-from tinymovr.iface import IFace
-from tinymovr.iface.can_bus import CANBus
-from tinymovr.units import get_registry
-
+from tinymovr.config import get_bus_config, create_device
 import unittest
 
 ureg = get_registry()
@@ -31,20 +25,13 @@ A = ureg.ampere
 ticks = ureg.ticks
 s = ureg.second
 
-bustype = "insilico"
-channel = "test"
-
-
-def get_tm() -> Tinymovr:
-    can_bus: can.Bus = can.Bus(bustype=bustype, channel=channel)
-    iface: IFace = CANBus(can_bus)
-    return Tinymovr(node_id=1, iface=iface)
-
-
 class TestSimulation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tm: Tinymovr = get_tm()
+        bustype, channel = get_bus_config(["socketcan"])
+        cls.can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=1000000)
+        cls.tm = create_device(node_id=1, bus=cls.can_bus)
+        cls.reset_and_wait()
 
     def setUp(self):
         self.tm.reset()
