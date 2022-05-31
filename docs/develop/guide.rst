@@ -107,7 +107,7 @@ Select the board revision against which you are compiling (R32, R33 or R5) from 
 
 To flash the firmware, provided your J-Link adapter is connected and drivers properly installed, hit F5. After a while the debug session should start and you should see a screen like below:
 
-.. image:: Capture.png
+.. image:: Capture.PNG
   :width: 800
   :alt: Tinymovr firmware debug session using VSCode
 
