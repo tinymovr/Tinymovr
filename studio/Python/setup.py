@@ -26,6 +26,7 @@ setup(
     install_requires=[
         "ipython",
         "python-can>=4.0.0.dev0",
+        "avlos @ git+ssh://git@github.com/tinymovr/avlos.git",
         "pyserial",
         "pyyaml",
         "docopt",
