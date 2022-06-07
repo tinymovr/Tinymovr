@@ -74,13 +74,13 @@ void CAN_init(void)
     PAC55XX_CAN->BTR0.SJW = 1; // Synchronization jump width
     PAC55XX_CAN->BTR1.SAM = 0; // Bus is sampled once
 
-    // Filter bit7:0 => ID10:3
-    // Filter bit15:13 => ID2:0
     // PAC55XX_CAN->AMR = 0xFFFFFF87;
-    PAC55XX_CAN->AMR = 0xFFFFFFFF;
-    PAC55XX_CAN->ACR = config.id << (CAN_EP_SIZE - 3);
+    // PAC55XX_CAN->AMR = 0xFFFFFFFF;
+    // 11111111111111110000111100000000
+    PAC55XX_CAN->AMR = 0xFFFF0F00;
+    PAC55XX_CAN->ACR = config.id & 0xFF; // for now we only use 8 bit identifier
 
-    // PAC55XX_CAN->IMR.TIM = 1;		// Transmit Interrupt
+    // PAC55XX_CAN->IMR.TIM = 1; // Transmit Interrupt
     PAC55XX_CAN->IMR.RIM = 1; // Receive Interrupt
     NVIC_SetPriority(CAN_IRQn, 3);
     NVIC_EnableIRQ(CAN_IRQn);
@@ -108,9 +108,7 @@ void CAN_set_ID(uint8_t id)
 {
     pac5xxx_can_reset_mode_set(1); // CAN in reset mode, in order to configure CAN module
     config.id = id;
-    // PAC55XX_CAN->AMR = 0xFFFFFF87;
-    PAC55XX_CAN->AMR = 0xFFFFFFFF;
-    PAC55XX_CAN->ACR = config.id << (CAN_EP_SIZE - 3);
+    PAC55XX_CAN->ACR = config.id & 0xFF; // for now we only use 8 bit identifier
     pac5xxx_can_reset_mode_set(0); // CAN reset mode inactive
     delay_us(100);
 }
