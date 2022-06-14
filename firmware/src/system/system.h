@@ -20,12 +20,6 @@
 
 #include "src/common.h"
 
-typedef enum {
-    SYST_ERROR_NONE = 0,
-    SYST_ERROR_VBUS_UNDERVOLTAGE = (1 << 0),
-    SYST_ERROR_DRIVER_FAULT = (1 << 1)
-} SystemErrors;
-
 typedef struct {
     float Vbus;
     uint8_t errors;

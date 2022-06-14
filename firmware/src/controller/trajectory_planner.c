@@ -1,6 +1,7 @@
 
 #include <src/system/system.h>
 #include <src/controller/controller.h>
+#include <src/can/can_endpoints.h>
 #include <src/utils/utils.h>
 #include <src/controller/trajectory_planner.h>
 
@@ -47,12 +48,12 @@ bool planner_prepare_plan_tlimit(float p_target, float deltat_tot, float deltat_
 	float v_cruise = (S - 0.5f * deltat_acc * v_0) / (0.5f * deltat_acc + deltat_cruise + 0.5f * deltat_dec);
 	if (deltat_tot < 0 || deltat_acc < 0 || deltat_dec < 0 || deltat_cruise < 0.0f)
 	{
-		state.errors |= PLNR_ERROR_INVALID_INPUT;
+		state.errors |= TRAJ_PLANNER_ERRORS_INVALID_INPUT;
 		return false;
 	}
 	else if (our_fabsf(v_cruise) > controller_get_vel_limit())
 	{
-		state.errors |= PLNR_ERROR_VCRUISE_OVER_LIMIT;
+		state.errors |= TRAJ_PLANNER_ERRORS_VCRUISE_OVER_LIMIT;
 		return false;
 	}
 	else if (S == 0.0f)

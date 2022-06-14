@@ -23,6 +23,41 @@ typedef enum
     AVLOS_CMD_READ = 1
 } Avlos_Command;
 
+typedef enum
+{
+    ERRORS_NONE = 0,
+    ERRORS_UNDERVOLTAGE = (1 << 0), 
+    ERRORS_DRIVER_FAULT = (1 << 1)
+} errors_flags;
+
+typedef enum
+{
+    CONTROLLER_ERRORS_NONE = 0,
+    CONTROLLER_ERRORS_CURRENT_LIMIT_EXCEEDED = (1 << 0)
+} controller_errors_flags;
+
+typedef enum
+{
+    MOTOR_ERRORS_NONE = 0,
+    MOTOR_ERRORS_PHASE_RESISTANCE_OUT_OF_RANGE = (1 << 0), 
+    MOTOR_ERRORS_PHASE_INDUCTANCE_OUT_OF_RANGE = (1 << 1), 
+    MOTOR_ERRORS_INVALID_POLE_PAIRS = (1 << 2)
+} motor_errors_flags;
+
+typedef enum
+{
+    ENCODER_ERRORS_NONE = 0,
+    ENCODER_ERRORS_CALIBRATION_FAILED = (1 << 0), 
+    ENCODER_ERRORS_READING_UNSTABLE = (1 << 1)
+} encoder_errors_flags;
+
+typedef enum
+{
+    TRAJ_PLANNER_ERRORS_NONE = 0,
+    TRAJ_PLANNER_ERRORS_INVALID_INPUT = (1 << 0), 
+    TRAJ_PLANNER_ERRORS_VCRUISE_OVER_LIMIT = (1 << 1)
+} traj_planner_errors_flags;
+
 extern uint32_t avlos_proto_hash;
 extern uint8_t (*avlos_endpoints[49])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);

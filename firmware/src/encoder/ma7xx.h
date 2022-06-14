@@ -32,11 +32,6 @@ typedef struct
     uint8_t error;
 } MA7xxState;
 
-typedef enum {
-    MA7XX_ERROR_NONE     = 0,
-    MA7XX_ERROR_UNSTABLE = 1 << 0
-} MA7xxError;
-
 // MA702 commands
 typedef enum {
     MA_CMD_NOP   = 0x0000,

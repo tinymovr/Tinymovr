@@ -25,14 +25,6 @@
 
 #include "src/common.h"
 
-typedef enum
-{
-	MOTOR_ERROR_NO_ERROR = 0,
-	MOTOR_ERROR_PHASE_RESISTANCE_OUT_OF_RANGE = 1 << 0,
-	MOTOR_ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE = 1 << 1,
-	MOTOR_ERROR_INVALID_POLE_PAIRS = 1 << 2
-} MotorError;
-
 typedef struct
 {
 	uint8_t pole_pairs;

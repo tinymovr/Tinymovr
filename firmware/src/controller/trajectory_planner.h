@@ -20,12 +20,6 @@
 
 #include "src/common.h"
 
-typedef enum {
-    PLNR_ERROR_NONE = 0,
-    PLNR_ERROR_INVALID_INPUT = (1 << 0),
-    PLNR_ERROR_VCRUISE_OVER_LIMIT = (1 << 1)
-} PlannerError;
-
 typedef struct {
 	float max_accel;
 	float max_decel;

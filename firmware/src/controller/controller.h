@@ -21,11 +21,6 @@
 #include <src/common.h>
 #include <src/controller/trajectory_planner.h>
 
-typedef enum {
-    CTRLR_ERROR_NONE = 0,
-    CTRLR_ERROR_CURRENT_LIMIT_EXCEEDED = (1 << 0)
-} ControllerError;
-
 typedef enum
 {
     STATE_IDLE = 0,

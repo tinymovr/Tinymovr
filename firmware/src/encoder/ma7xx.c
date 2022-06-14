@@ -82,7 +82,7 @@ PAC5XXX_RAMFUNC void ma7xx_update(bool check_error)
 		     ((delta > MAX_ALLOWED_DELTA_ADD) || (delta < MIN_ALLOWED_DELTA_ADD)) &&
 		     ((delta > MAX_ALLOWED_DELTA_SUB) || (delta < MIN_ALLOWED_DELTA_SUB)) )
 		{
-            state.errors |= MA7XX_ERROR_UNSTABLE;
+            state.errors |= ENCODER_ERRORS_READING_UNSTABLE;
 		}
     }
     state.angle = angle;

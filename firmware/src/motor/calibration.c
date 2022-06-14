@@ -23,6 +23,7 @@
 #include <src/encoder/ma7xx.h>
 #include <src/encoder/hall.h>
 #include <src/controller/controller.h>
+#include <src/can/can_endpoints.h>
 #include <src/system/system.h>
 #include <src/motor/calibration.h>
 
@@ -52,7 +53,7 @@ bool CalibrateResistance(void)
         if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
         {
             uint8_t *error_ptr = motor_get_error_ptr();
-            *error_ptr |= MOTOR_ERROR_PHASE_RESISTANCE_OUT_OF_RANGE;
+            *error_ptr |= MOTOR_ERRORS_PHASE_RESISTANCE_OUT_OF_RANGE;
             return false;
         }
         else
@@ -98,7 +99,7 @@ bool CalibrateInductance(void)
         if ((L <= MIN_PHASE_INDUCTANCE) || (L >= MAX_PHASE_INDUCTANCE))
         {
             uint8_t *error_ptr = motor_get_error_ptr();
-            *error_ptr |= MOTOR_ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE;
+            *error_ptr |= MOTOR_ERRORS_PHASE_INDUCTANCE_OUT_OF_RANGE;
             return false;
         }
         else
@@ -140,7 +141,7 @@ bool CalibrateDirectionAndPolePairs(void)
     if (!motor_find_pole_pairs(ENCODER_TICKS, epos_start, observer_get_pos_estimate(), epos_target))
     {
         uint8_t *error_ptr = motor_get_error_ptr();
-        *error_ptr |= MOTOR_ERROR_INVALID_POLE_PAIRS;
+        *error_ptr |= MOTOR_ERRORS_INVALID_POLE_PAIRS;
         return false;
     }
     else

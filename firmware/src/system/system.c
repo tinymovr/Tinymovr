@@ -21,6 +21,7 @@
 #include <src/controller/controller.h>
 #include <src/encoder/encoder.h>
 #include <src/motor/motor.h>
+#include <src/system/can_endpoints.h>
 #include <src/system/system.h>
 
 static SystemState state = {0};
@@ -35,8 +36,8 @@ void system_init(void)
     // Set Flash Lock to allow write access to MEMCTL register for configuring clocks
     PAC55XX_MEMCTL->FLASHLOCK = FLASH_LOCK_ALLOW_WRITE_MEMCTL;
 
-    // Turn on Flache Cache
-    PAC55XX_MEMCTL->MEMCTL.CACHEDIS = 0; // Enable Flash CACHE
+    // Turn on Flash Cache
+    PAC55XX_MEMCTL->MEMCTL.CACHEDIS = 0;
 
     // Always make sure MCLK is set to use ROSC CLK when making changes to FRCLK, SCLK, or HCLK
     PAC55XX_MEMCTL->MEMCTL.MCLKSEL = MEMCTL_MCLK_ROSCCLK; // MCLK = ROSCCLK
@@ -102,7 +103,7 @@ PAC5XXX_RAMFUNC void system_update(void)
     state.Vbus += config.Vbus_D * (((float)PAC55XX_ADC->DTSERES4.VAL) * VBUS_SCALING_FACTOR - state.Vbus);
     if (state.Vbus < VBUS_LOW_THRESHOLD)
     {
-        state.errors |= SYST_ERROR_VBUS_UNDERVOLTAGE;
+        state.errors |= ERRORS_UNDERVOLTAGE;
     }
 }
 

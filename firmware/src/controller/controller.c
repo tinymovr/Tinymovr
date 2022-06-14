@@ -24,6 +24,7 @@
 #include "src/utils/utils.h"
 #include <src/scheduler/scheduler.h>
 #include <src/motor/calibration.h>
+#include <src/can/can_endpoints.h>
 #include <src/controller/controller.h>
 
 PAC5XXX_RAMFUNC void CLControlStep(void);
@@ -80,7 +81,7 @@ void Controller_ControlLoop(void)
         if ((Iq > (config.I_limit * I_TRIP_MARGIN)) ||
             (Iq < -(config.I_limit * I_TRIP_MARGIN)))
         {
-            state.errors |= CTRLR_ERROR_CURRENT_LIMIT_EXCEEDED;
+            state.errors |= CONTROLLER_ERRORS_CURRENT_LIMIT_EXCEEDED;
         }
         if (errors_exist() && (state.state != STATE_IDLE))
         {
