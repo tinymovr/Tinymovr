@@ -21,7 +21,7 @@ remote_attributes:
     c_getter: adc_get_mcu_temp
     summary: The internal temperature of the PAC55xx MCU.
   - name: errors
-    dtype: uint8
+    flags: [UNDERVOLTAGE, DRIVER_FAULT]
     c_getter: system_get_errors
     summary: Any system errors, as a bitmask
   - name: save_config
@@ -62,7 +62,7 @@ remote_attributes:
         c_setter: controller_set_mode
         summary: The control mode of the controller.
       - name: errors
-        dtype: uint8
+        flags: [CURRENT_LIMIT_EXCEEDED]
         c_getter: controller_get_errors
         summary: Any controller errors, as a bitmask
       - name: position
@@ -212,7 +212,7 @@ remote_attributes:
         c_setter: motor_set_user_direction
         summary: User-defined direction of the motor.
       - name: errors
-        dtype: uint8
+        flags: [PHASE_RESISTANCE_OUT_OF_RANGE, PHASE_INDUCTANCE_OUT_OF_RANGE,INVALID_POLE_PAIRS]
         c_getter: motor_get_errors
         summary: Any motor/calibration errors, as a bitmask
       # - name: phase_currents
@@ -252,7 +252,7 @@ remote_attributes:
         c_setter: observer_set_bw
         summary: The encoder observer bandwidth.
       - name: errors
-        dtype: uint8
+        flags: [CALIBRATION_FAILED, READING_UNSTABLE]
         c_getter: encoder_get_errors
         summary: Any encoder errors, as a bitmask
   - name: traj_planner
@@ -290,6 +290,6 @@ remote_attributes:
           - name: pos_setpoint
             dtype: float
       - name: errors
-        dtype: uint8
+        flags: [INVALID_INPUT, VCRUISE_OVER_LIMIT]
         c_getter: planner_get_errors
         summary: Any errors in the trajectory planner, as a bitmask
