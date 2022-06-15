@@ -21,7 +21,7 @@
 #include <src/controller/controller.h>
 #include <src/encoder/encoder.h>
 #include <src/motor/motor.h>
-#include <src/system/can_endpoints.h>
+#include <src/can/can_endpoints.h>
 #include <src/system/system.h>
 
 static SystemState state = {0};

@@ -19,6 +19,7 @@
 #include <src/system/system.h>
 #include <src/ssp/ssp_func.h>
 #include <src/utils/utils.h>
+#include <src/can/can_endpoints.h>
 #include <src/encoder/ma7xx.h>
 
 static MA7xxConfig config = {0};
