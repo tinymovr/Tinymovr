@@ -38,7 +38,7 @@ static ControllerState state = {
 
     .state = STATE_IDLE,
     .mode = CTRL_CURRENT,
-    .errors = CTRLR_ERROR_NONE,
+    .errors = CONTROLLER_ERRORS_NONE,
     .is_calibrating = false,
 
     .I_phase_meas = {0.0f, 0.0f, 0.0f},
