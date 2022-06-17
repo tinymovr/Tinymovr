@@ -75,9 +75,9 @@ void CAN_init(void)
     PAC55XX_CAN->BTR1.SAM = 0; // Bus is sampled once
 
     // PAC55XX_CAN->AMR = 0xFFFFFF87;
-    // PAC55XX_CAN->AMR = 0xFFFFFFFF;
+    //PAC55XX_CAN->AMR = 0xFFFFFFFF;
     // 11111111111111110000111100000000
-    PAC55XX_CAN->AMR = 0xFFFF0F00;
+    PAC55XX_CAN->AMR = 0xFFFFFF00;
     PAC55XX_CAN->ACR = config.id & 0xFF; // for now we only use 8 bit identifier
 
     // PAC55XX_CAN->IMR.TIM = 1; // Transmit Interrupt

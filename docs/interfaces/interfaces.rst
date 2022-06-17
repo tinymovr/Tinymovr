@@ -16,7 +16,7 @@ By default, the CAN baud rate is set to 1Mbit/s. This is customizable both throu
 Addressing
 ##########
 
-Tinymovr uses extended CAN frames for communication. The 29-bit identifier of the extended CAN frame is used for device, endpoint and message sequence identification. The 12 least significant bits of the identifier are reserved for endpoint identification, the next 8 for message sequence identification, and the 9 most significant bits, for device identification. The total number of addressable endpoints in a single device are 4096, the number of addressable devices is 512, and a message sequence can include up to 256 messages. 
+Tinymovr uses extended CAN frames for communication. The 29-bit identifier of the extended CAN frame is used for device, endpoint and message sequence identification. The 12 least significant bits of the identifier are reserved for endpoint identification, the next 9 for message sequence identification, and the 8 most significant bits, for device identification. The total number of addressable endpoints in a single device are 4096, the number of addressable devices is 256, and a message sequence can include up to 512 messages. 
 
 Protocol
 ########
