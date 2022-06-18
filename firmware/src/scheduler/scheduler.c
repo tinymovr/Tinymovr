@@ -25,6 +25,7 @@
 #include <src/encoder/encoder.h>
 #include <src/encoder/ma7xx.h>
 #include <src/observer/observer.h>
+#include <src/can/can_endpoints.h>
 #include <src/scheduler/scheduler.h>
 
 volatile uint32_t msTicks = 0;
@@ -82,7 +83,7 @@ void ADC_IRQHandler(void)
 	// to the ADC triggering the next
 	if (true == gate_driver_is_enabled() && true == state.busy)
 	{
-		state.errors |= SCHED_ERROR_CONTROL_BLOCK_REENTERED;
+		state.errors |= SCHEDULER_ERRORS_CONTROL_BLOCK_REENTERED;
 		// We do not change the control state here, to
 		// avoid any concurrency issues
 	}

@@ -32,6 +32,12 @@ typedef enum
 
 typedef enum
 {
+    SCHEDULER_ERRORS_NONE = 0,
+    SCHEDULER_ERRORS_CONTROL_BLOCK_REENTERED = (1 << 0)
+} scheduler_errors_flags;
+
+typedef enum
+{
     CONTROLLER_ERRORS_NONE = 0,
     CONTROLLER_ERRORS_CURRENT_LIMIT_EXCEEDED = (1 << 0)
 } controller_errors_flags;
@@ -59,7 +65,7 @@ typedef enum
 } traj_planner_errors_flags;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[49])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[50])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -143,24 +149,34 @@ uint8_t avlos_erase_config(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command
 uint8_t avlos_reset(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_cycles_total
+* avlos_scheduler_total
 *
 * Total processor cycles in a single PWM cycle.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_cycles_total(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t avlos_scheduler_total(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_cycles_busy
+* avlos_scheduler_busy
 *
 * Busy processor cycles in a single PWM cycle.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_cycles_busy(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t avlos_scheduler_busy(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_scheduler_errors
+*
+* Any scheduler errors, as a bitmask
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_scheduler_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_controller_state

@@ -17,11 +17,6 @@
 
 #pragma once
 
-typedef enum {
-    SCHED_ERROR_NONE = 0,
-    SCHED_ERROR_CONTROL_BLOCK_REENTERED = 1 << 0
-} SchedulerError;
-
 typedef struct 
 {
 	bool adc_interrupt;

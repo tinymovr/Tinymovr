@@ -39,7 +39,7 @@ remote_attributes:
     c_caller: system_reset
     dtype: void
     arguments: []
-  - name: cycles
+  - name: scheduler
     remote_attributes:
       - name: total
         dtype: uint32
@@ -49,6 +49,10 @@ remote_attributes:
         dtype: uint32
         c_getter: Scheduler_GetBusyCycles
         summary: Busy processor cycles in a single PWM cycle.
+      - name: errors
+        flags: [CONTROL_BLOCK_REENTERED]
+        c_getter: controller_get_errors
+        summary: Any scheduler errors, as a bitmask
   - name: controller
     remote_attributes:
       - name: state
