@@ -1,9 +1,9 @@
-"""Tinymovr CLI
+"""Tinymovr Studio CLI
 
 Usage:
-    tinymovr [--bus=<bus>] [--chan=<chan>] [--bitrate=<bitrate>]
-    tinymovr -h | --help
-    tinymovr --version
+    tinymovr_cli [--bus=<bus>] [--chan=<chan>] [--bitrate=<bitrate>]
+    tinymovr_cli -h | --help
+    tinymovr_cli --version
 
 Options:
     --bus=<bus>  One or more interfaces to use, first available is used [default: socketcan,slcan].

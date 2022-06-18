@@ -25,6 +25,8 @@ setup(
     python_requires=">=3.6",
     install_requires=[
         "ipython",
+        "pyside2",
+        "pyqtgraph",
         "python-can>=4.0.0.dev0",
         "avlos @ git+ssh://git@github.com/tinymovr/avlos.git",
         "pyserial",
@@ -32,8 +34,7 @@ setup(
         "docopt",
         "flatten-dict",
         "pint",
-    ],
-    extras_require={"plot": ["matplotlib"]},
+    ]
     entry_points={
         "console_scripts": [
             "tinymovr_cli=tinymovr.cli:spawn",

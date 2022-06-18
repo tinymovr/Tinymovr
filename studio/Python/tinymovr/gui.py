@@ -1,23 +1,24 @@
-"""Tinymovr Studio
+"""Tinymovr Studio GUI
 
 Usage:
-    tinymovr [--bitrate=<bitrate>]
+    tinymovr [--bus=<bus>] [--chan=<chan>] [--bitrate=<bitrate>]
     tinymovr -h | --help
     tinymovr --version
 
 Options:
+    --bus=<bus>  One or more interfaces to use, first available is used [default: socketcan,slcan].
+    --chan=<chan>  The bus device "channel".
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
 
 import sys
 import time
-import threading
 import pkg_resources
-import struct
+import can
+import pint
 from docopt import docopt
-from queue import Queue
 from PySide2 import QtCore
-from PySide2.QtCore import QObject, QThread, Signal, Slot
+from PySide2.QtCore import QObject, Signal
 from PySide2.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -31,11 +32,9 @@ from PySide2.QtWidgets import (
     QTreeWidgetItem,
 )
 import pyqtgraph as pg
-from avlos import get_all
-from tinymovr.isotp_channel import LiteBus
 from tinymovr.discovery import Discovery
 from tinymovr.constants import app_name, base_node_name
-from tinymovr.config import configure_logging
+from tinymovr.config import configure_logging, get_bus_config
 from tinymovr.constants import app_name
 
 
@@ -118,8 +117,16 @@ class MainWindow(QMainWindow):
         pg.setConfigOptions(antialias=True)
         self.graphs_by_id = {}
 
+        buses = arguments["--bus"].rsplit(sep=",")
+        channel = arguments["--chan"]
+
+        if not channel:
+            bustype, channel = get_bus_config(buses)
+        else:
+            bustype = buses[0]
+
         self.thread = QtCore.QThread()
-        self.worker = Worker(bitrate, self.logger)
+        self.worker = Worker(bustype, channel, bitrate, self.logger)
         self.TreeItemCheckedSignal.connect(self.worker.update_checkstates)
         self.thread.started.connect(self.worker.run)
         self.worker.moveToThread(self.thread)
@@ -163,10 +170,10 @@ class MainWindow(QMainWindow):
     def parse_node(self, node, name, attribute_widgets_by_id):
         widget = QTreeWidgetItem([name, 0, ""])
         try:
-            # Let's assume it's a RemoteObject
-            for child_name, child in node.children.items():
+            # Let's assume it's a RemoteNode
+            for attr_name, attr in node.remote_attributes.items():
                 widget.addChild(
-                    self.parse_node(child, child_name, attribute_widgets_by_id)
+                    self.parse_node(attr, attr_name, attribute_widgets_by_id)
                 )
         except AttributeError:
             # Maybe a RemoteAttribute
@@ -174,7 +181,7 @@ class MainWindow(QMainWindow):
                 val = node.get_value()
                 widget.setText(1, format_value(val))
                 widget.setCheckState(0, QtCore.Qt.Unchecked)
-                attribute_widgets_by_id[node.id] = {"node": node, "widget": widget}
+                attribute_widgets_by_id[node.ep_id] = {"node": node, "widget": widget}
             except AttributeError:
                 # Must be a RemoteFunction then
                 widget.setText(2, "CALL")
@@ -211,7 +218,10 @@ class MainWindow(QMainWindow):
                     x.pop(0)
                     y.pop(0)
                 x.append(self.get_rel_time())
-                y.append(val)
+                try:
+                    y.append(val.magnitude)
+                except AttributeError:
+                    y.append(val)
                 data_line.setData(x, y)
 
 
@@ -220,10 +230,12 @@ class Worker(QObject):
     update_attrs = QtCore.Signal(dict)
     regen = QtCore.Signal(dict)
 
-    def __init__(self, bitrate, logger):
+    def __init__(self, bustype, channel, bitrate, logger):
         super().__init__()
         self.logger = logger
-        self.bus = LiteBus(bitrate)
+
+        self.bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
+
         self.dsc = Discovery(
             self.bus, self.node_appeared, self.node_disappeared, self.logger
         )
@@ -242,7 +254,7 @@ class Worker(QObject):
         self.running = False
 
     def get_values(self):
-        updated_attrs = {attr.id: attr.get_value() for attr in self.active_attrs}
+        updated_attrs = {attr.ep_id: attr.get_value() for attr in self.active_attrs}
         if len(updated_attrs) > 0:
             self.update_attrs.emit(updated_attrs)
 
