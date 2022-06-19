@@ -28,7 +28,6 @@
 #include <src/controller/controller.h>
 
 PAC5XXX_RAMFUNC void CLControlStep(void);
-PAC5XXX_RAMFUNC void IdleStep(void);
 PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
                                                             float vel_gain, float *I);
 
@@ -109,7 +108,7 @@ void Controller_ControlLoop(void)
         }
         else
         {
-            IdleStep();
+            // pass
         }
         WaitForControlLoopInterrupt();
     }
@@ -235,10 +234,6 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     gate_driver_set_duty_cycle(&state.modulation_values);
 }
 
-PAC5XXX_RAMFUNC void IdleStep(void)
-{
-    // pass
-}
 
 PAC5XXX_RAMFUNC ControlState controller_get_state(void)
 {
