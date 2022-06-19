@@ -11,13 +11,14 @@ Options:
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
 
+import os
 import sys
 import time
 import pkg_resources
 import can
 import pint
 from docopt import docopt
-from PySide2 import QtCore
+from PySide2 import QtCore, QtGui
 from PySide2.QtCore import QObject, Signal
 from PySide2.QtWidgets import (
     QApplication,
@@ -79,6 +80,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(app_name)
         self.tree_widget = QTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
+        self.tree_widget.doubleClicked.connect(self.double_click)
         headers = ["Attribute", "Value", "Set Value"]
         self.tree_widget.setHeaderLabels(headers)
 
@@ -119,7 +121,6 @@ class MainWindow(QMainWindow):
 
         buses = arguments["--bus"].rsplit(sep=",")
         channel = arguments["--chan"]
-
         if not channel:
             bustype, channel = get_bus_config(buses)
         else:
@@ -148,10 +149,10 @@ class MainWindow(QMainWindow):
         graph_widget = pg.PlotWidget(title=attr.full_name)
         pi = graph_widget.getPlotItem()
         if attr.unit:
-            pi.setLabel(axis='left', text=attr.name, units=f"{attr.unit}")
+            pi.setLabel(axis="left", text=attr.name, units=f"{attr.unit}")
         else:
-            pi.setLabel(axis='left', text=attr.name)
-        pi.setLabel(axis='bottom', text='samples')
+            pi.setLabel(axis="left", text=attr.name)
+        pi.setLabel(axis="bottom", text="samples")
         x = []
         y = []
         data_line = graph_widget.plot(x, y)
@@ -190,7 +191,8 @@ class MainWindow(QMainWindow):
                 attribute_widgets_by_id[node.ep_id] = {"node": node, "widget": widget}
             except AttributeError:
                 # Must be a RemoteFunction then
-                widget.setText(2, "CALL")
+                widget._tm_node = node
+                widget.setIcon(2, load_icon("call.png"))
         return widget
 
     @QtCore.Slot()
@@ -229,6 +231,13 @@ class MainWindow(QMainWindow):
                 except AttributeError:
                     y.append(val)
                 data_line.setData(x, y)
+
+    @QtCore.Slot()
+    def double_click(self, event):
+        print(event.row())
+        widget = self.childAt(event.pos())
+        if widget is not None and widget.objectName():
+            print("dblclick:", widget.objectName())
 
 
 class Worker(QObject):
@@ -287,6 +296,17 @@ def format_value(value):
     if isinstance(value, float):
         return "{0:.6g}".format(value)
     return str(value)
+
+
+def load_icon(fname_icon):
+    path_this_dir = os.path.dirname(os.path.abspath(__file__))
+    path_icons = os.path.join(path_this_dir, "..", "resources", "icons")
+    path_icon = os.path.join(path_icons, fname_icon)
+    pixmap = QtGui.QPixmap(path_icon)
+    icon = QtGui.QIcon()
+    icon.addPixmap(pixmap, QtGui.QIcon.Normal)
+    icon.addPixmap(pixmap, QtGui.QIcon.Disabled)
+    return icon
 
 
 def spawn():
