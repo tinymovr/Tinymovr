@@ -145,7 +145,13 @@ class MainWindow(QMainWindow):
         return time.time() - self.start_time
 
     def make_graph(self, attr):
-        graph_widget = pg.PlotWidget(title=attr.name)
+        graph_widget = pg.PlotWidget(title=attr.full_name)
+        pi = graph_widget.getPlotItem()
+        try:
+            pi.setLabel(axis='left', text=attr.name, units=f"{attr.unit}")
+        except AttributeError:
+            pi.setLabel(axis='left', text=attr.name)
+        pi.setLabel(axis='bottom', text='samples')
         x = []
         y = []
         data_line = graph_widget.plot(x, y)
