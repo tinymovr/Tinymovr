@@ -147,9 +147,9 @@ class MainWindow(QMainWindow):
     def make_graph(self, attr):
         graph_widget = pg.PlotWidget(title=attr.full_name)
         pi = graph_widget.getPlotItem()
-        try:
+        if attr.unit:
             pi.setLabel(axis='left', text=attr.name, units=f"{attr.unit}")
-        except AttributeError:
+        else:
             pi.setLabel(axis='left', text=attr.name)
         pi.setLabel(axis='bottom', text='samples')
         x = []
