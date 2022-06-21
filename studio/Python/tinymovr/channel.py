@@ -18,6 +18,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 import time
 import can
 from functools import cached_property
+from avlos.channel import BaseChannel
 from tinymovr.constants import (
     CAN_DEV_MASK,
     CAN_EP_SIZE,
@@ -35,7 +36,7 @@ class ResponseError(Exception):
         self.kw = kw
 
 
-class CANChannel:
+class CANChannel(BaseChannel):
     def __init__(self, node_id, bus):
         self.node_id = node_id
         self.bus = bus
