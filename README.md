@@ -2,24 +2,15 @@
 ![Studio Lint Test](https://github.com/yconst/tinymovr/workflows/Tinymovr%20Studio%20Lint%2FTest/badge.svg)
 ![Docs Build](https://github.com/yconst/tinymovr/workflows/Tinymovr%20Docs%20Build/badge.svg)
 
-## Tinymovr Motor Controller
+[Tinymovr is an affordable motor controller](https://tinymovr.com) for precise control of 3-phase brushless motors. Tinymovr works with up to 38V input voltage, drives motors up to 40A continuous phase current, integrates an absolute angle encoder (MPS MA702) and features rich connectivity.
 
-This is the main repository for Tinymovr Motor Controller.
-
-Tinymovr is an affordable motor controller for precise control of 3-phase brushless motors. Tinymovr is highly integrated incorporating an advanced MCU (Qorvo PAC5527), compact power stage, integrated absolute angle encoder (MPS MA702) and CAN and UART connectivity. 
-
-### Note
-
-The master branch of this repository represents the state of art of development, and it may contain bugs.
-For a stable version, especially if you are starting with the project, please consider [installing Tinymovr Studio from PyPI](https://tinymovr.readthedocs.io/en/latest/studio/installation.html)
+This repository holds the open source firmware, client library, hardware designs and documentation source.
 
 ### Documentation
 
-For Tinymovr documentation, please visit the [Tinymovr docs at Readthedocs](https://tinymovr.readthedocs.io).
+[Documentation is available at Readthedocs.](https://tinymovr.readthedocs.io)
 
 ### Repository Structure
-
-The repository is organized as follows:
 
 [firmware](./firmware/): Firmware for the PAC5527 MCU in Tinymovr
 
@@ -31,9 +22,11 @@ The repository is organized as follows:
 
 ### External Links
 
-[Project Page](https://hackaday.io/project/168650-tinymovr-motor-controller)
+[Website](https://tinymovr.com)
 
-[Blog](https://hackaday.io/project/168650/logs)
+[Blog](https://tinymovr.com/blogs/news)
+
+[Project page on Hackaday](https://hackaday.io/project/168650-tinymovr-motor-controller)
 
 [BLDC-Design-Help Repository](https://github.com/ThotAlion/BLDC-design-help), with lots of useful information and Tinymovr benchmarks
 
