@@ -201,17 +201,18 @@ class MainWindow(QMainWindow):
         enabled = item.checkState(0) == QtCore.Qt.Checked
         try:
             attr = item._tm_attribute
-            attr_id = attr.ep_id
-            self.TreeItemCheckedSignal.emit({"attr": attr, "enabled": enabled})
-            if enabled and attr_id not in self.graphs_by_id:
-                graph = self.make_graph(attr)
-                self.graphs_by_id[attr_id] = graph
-                self.right_layout.addWidget(graph["widget"])
-            elif not enabled and attr_id in self.graphs_by_id:
-                self.graphs_by_id[attr_id]["widget"].deleteLater()
-                del self.graphs_by_id[attr_id]
         except AttributeError:
-            pass
+            return
+        attr_id = attr.ep_id
+        self.TreeItemCheckedSignal.emit({"attr": attr, "enabled": enabled})
+        if enabled and attr_id not in self.graphs_by_id:
+            graph = self.make_graph(attr)
+            self.graphs_by_id[attr_id] = graph
+            self.right_layout.addWidget(graph["widget"])
+        elif not enabled and attr_id in self.graphs_by_id:
+            self.graphs_by_id[attr_id]["widget"].deleteLater()
+            del self.graphs_by_id[attr_id]
+        
 
     @QtCore.Slot()
     def update_attrs(self, data):
