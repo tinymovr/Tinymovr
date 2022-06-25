@@ -152,7 +152,7 @@ class MainWindow(QMainWindow):
             pi.setLabel(axis="left", text=attr.name, units=f"{attr.unit}")
         else:
             pi.setLabel(axis="left", text=attr.name)
-        pi.setLabel(axis="bottom", text="samples")
+        pi.setLabel(axis="bottom", text="time", units="sec")
         x = []
         y = []
         data_line = graph_widget.plot(x, y)
