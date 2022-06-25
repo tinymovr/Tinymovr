@@ -28,7 +28,7 @@ setup(
         "pyside2",
         "pyqtgraph",
         "python-can>=4.0.0.dev0",
-        "avlos @ git+ssh://git@github.com/tinymovr/avlos.git",
+        "avlos @ git+https://github.com/tinymovr/avlos.git",
         "pyserial",
         "pyyaml",
         "docopt",
