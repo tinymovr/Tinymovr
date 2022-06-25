@@ -80,7 +80,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(app_name)
         self.tree_widget = QTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
-        self.tree_widget.doubleClicked.connect(self.double_click)
+        self.tree_widget.itemDoubleClicked.connect(self.double_click)
         headers = ["Attribute", "Value", "Set Value"]
         self.tree_widget.setHeaderLabels(headers)
 
@@ -233,12 +233,12 @@ class MainWindow(QMainWindow):
                 data_line.setData(x, y)
 
     @QtCore.Slot()
-    def double_click(self, event):
-        print(event.row())
-        widget = self.childAt(event.pos())
-        if widget is not None and widget.objectName():
-            print("dblclick:", widget.objectName())
-
+    def double_click(self, item, column):
+        if 2 == column:
+            try:
+                item._tm_function()
+            except AttributeError:
+                pass
 
 class Worker(QObject):
 
