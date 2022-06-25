@@ -188,28 +188,30 @@ class MainWindow(QMainWindow):
                 val = node.get_value()
                 widget.setText(1, format_value(val))
                 widget.setCheckState(0, QtCore.Qt.Unchecked)
+                widget._tm_attribute = node
                 attribute_widgets_by_id[node.ep_id] = {"node": node, "widget": widget}
             except AttributeError:
                 # Must be a RemoteFunction then
-                widget._tm_node = node
+                widget._tm_function = node
                 widget.setIcon(2, load_icon("call.png"))
         return widget
 
     @QtCore.Slot()
     def item_changed(self, item):
         enabled = item.checkState(0) == QtCore.Qt.Checked
-        for attr_id, data in self.attribute_widgets_by_id.items():
-            if item == data["widget"]:
-                attr = data["node"]
-                self.TreeItemCheckedSignal.emit({"attr": attr, "enabled": enabled})
-                if enabled and attr_id not in self.graphs_by_id:
-                    graph = self.make_graph(attr)
-                    self.graphs_by_id[attr_id] = graph
-                    self.right_layout.addWidget(graph["widget"])
-                elif not enabled and attr_id in self.graphs_by_id:
-                    self.graphs_by_id[attr_id]["widget"].deleteLater()
-                    del self.graphs_by_id[attr_id]
-                break
+        try:
+            attr = item._tm_attribute
+            attr_id = attr.ep_id
+            self.TreeItemCheckedSignal.emit({"attr": attr, "enabled": enabled})
+            if enabled and attr_id not in self.graphs_by_id:
+                graph = self.make_graph(attr)
+                self.graphs_by_id[attr_id] = graph
+                self.right_layout.addWidget(graph["widget"])
+            elif not enabled and attr_id in self.graphs_by_id:
+                self.graphs_by_id[attr_id]["widget"].deleteLater()
+                del self.graphs_by_id[attr_id]
+        except AttributeError:
+            pass
 
     @QtCore.Slot()
     def update_attrs(self, data):
@@ -239,6 +241,7 @@ class MainWindow(QMainWindow):
                 item._tm_function()
             except AttributeError:
                 pass
+                
 
 class Worker(QObject):
 
