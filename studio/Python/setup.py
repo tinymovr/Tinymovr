@@ -34,7 +34,7 @@ setup(
         "docopt",
         "flatten-dict",
         "pint",
-    ]
+    ],
     entry_points={
         "console_scripts": [
             "tinymovr_cli=tinymovr.cli:spawn",
