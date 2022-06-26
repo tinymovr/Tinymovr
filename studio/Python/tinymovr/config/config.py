@@ -50,8 +50,7 @@ def get_bus_config(suggested_types=None):
     """
     configs = can.interface.detect_available_configs(suggested_types)
     try:
-        config = configs[0]
-        return config["interface"], config["channel"]
+        return configs[0]
     except IndexError as exc:
         raise can.CanInitializationError("No active interface found") from exc
 

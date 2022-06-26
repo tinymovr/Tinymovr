@@ -50,13 +50,18 @@ def spawn():
 
     buses = arguments["--bus"].rsplit(sep=",")
     channel = arguments["--chan"]
+    bitrate = int(arguments["--bitrate"])
 
     if not channel:
-        bustype, channel = get_bus_config(buses)
+        params = get_bus_config(buses)
+        params["bitrate"] = bitrate
     else:
-        bustype = buses[0]
-    bitrate = int(arguments["--bitrate"])
-    bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
+        params = {
+            "bustype": buses[0],
+            "channel": channel,
+            "bitrate": bitrate
+        }
+    bus = can.Bus(**params)
 
     tms = {}
     user_ns = {}
