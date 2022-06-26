@@ -83,7 +83,7 @@ def create_device_with_hash_msg(heartbeat_msg, bus):
     to decode the actual hash value
     """
     node_id = heartbeat_msg.arbitration_id & 0x3F
-    tee = Tee(bus, lambda msg: ids_from_arbitration(msg.arbitration_id)[2] == node_id)
+    tee = Tee(bus, lambda msg: msg.is_remote_frame == False and ids_from_arbitration(msg.arbitration_id)[2] == node_id)
     chan = CANChannel(node_id, tee)
     node = deserialize(dev_def)
     hash, *_ = chan.serializer.deserialize(heartbeat_msg.data[:4], DataType.UINT32)
