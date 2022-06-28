@@ -81,7 +81,7 @@ class MainWindow(QMainWindow):
         self.tree_widget = QTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
         self.tree_widget.itemDoubleClicked.connect(self.double_click)
-        headers = ["Attribute", "Value", "Set Value"]
+        headers = ["Attribute", "Value"]
         self.tree_widget.setHeaderLabels(headers)
 
         self.status_label = QLabel()
@@ -176,6 +176,7 @@ class MainWindow(QMainWindow):
 
     def parse_node(self, node, name, attribute_widgets_by_id):
         widget = QTreeWidgetItem([name, 0, ""])
+        widget._orig_flags = widget.flags()
         try:
             # Let's assume it's a RemoteNode
             for attr_name, attr in node.remote_attributes.items():
@@ -189,15 +190,24 @@ class MainWindow(QMainWindow):
                 widget.setText(1, format_value(val))
                 widget.setCheckState(0, QtCore.Qt.Unchecked)
                 widget._tm_attribute = node
+                widget._editing = False
                 attribute_widgets_by_id[node.ep_id] = {"node": node, "widget": widget}
             except AttributeError:
                 # Must be a RemoteFunction then
                 widget._tm_function = node
-                widget.setIcon(2, load_icon("call.png"))
+                widget.setIcon(1, load_icon("call.png"))
         return widget
 
     @QtCore.Slot()
     def item_changed(self, item):
+        if item._editing:
+            # Value changed
+            val = item.text(1)
+            item._tm_attribute.set_value(float(val))
+            item.setText(1, format_value(item._tm_attribute.get_value()))
+
+        item._editing = False
+        # Checkbox changed
         enabled = item.checkState(0) == QtCore.Qt.Checked
         try:
             attr = item._tm_attribute
@@ -212,7 +222,6 @@ class MainWindow(QMainWindow):
         elif not enabled and attr_id in self.graphs_by_id:
             self.graphs_by_id[attr_id]["widget"].deleteLater()
             del self.graphs_by_id[attr_id]
-        
 
     @QtCore.Slot()
     def update_attrs(self, data):
@@ -237,12 +246,22 @@ class MainWindow(QMainWindow):
 
     @QtCore.Slot()
     def double_click(self, item, column):
-        if 2 == column:
-            try:
-                item._tm_function()
-            except AttributeError:
-                pass
-                
+        if 1 == column:
+            if (
+                hasattr(item, "_tm_attribute") and
+                hasattr(item._tm_attribute, "c_setter")
+                and None != item._tm_attribute.c_setter
+            ):
+                item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+                item._editing = True
+            else:
+                try:
+                    item._tm_function()
+                except AttributeError:
+                    pass
+        elif int(item._orig_flags) != int(item.flags()):
+            item.setFlags(item._orig_flags)
+
 
 class Worker(QObject):
 
@@ -296,7 +315,9 @@ class Worker(QObject):
             self.active_attrs.remove(attr)
 
 
-def format_value(value):
+def format_value(value, include_unit=True):
+    if not include_unit and isinstance(value, pint.Quantity):
+        return str(value.magnitude)
     if isinstance(value, float):
         return "{0:.6g}".format(value)
     return str(value)
