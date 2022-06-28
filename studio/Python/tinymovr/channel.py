@@ -16,6 +16,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import time
+from threading import Lock
 import can
 from functools import cached_property
 from avlos.channel import BaseChannel
@@ -40,14 +41,21 @@ class CANChannel(BaseChannel):
     def __init__(self, node_id, bus):
         self.node_id = node_id
         self.bus = bus
+        self.lock = Lock()
 
     def send(self, data, ep_id):
+        self.lock.acquire()
         rtr = False if data and len(data) else True
         self.bus.send(self.create_frame(ep_id, rtr, data))
+        self.lock.release()
 
     def recv(self, ep_id, timeout=0.1):
+        self.lock.acquire()
         frame_id = arbitration_from_ids(ep_id, 0, self.node_id)
-        frame = self._recv_frame(timeout=timeout)
+        try:
+            frame = self._recv_frame(timeout=timeout)
+        finally:
+            self.lock.release()
         if frame.arbitration_id == frame_id:
             return frame.data
         else:
