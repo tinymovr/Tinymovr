@@ -14,7 +14,7 @@ def format_value(value, include_unit=True):
 
 def load_icon(fname_icon):
     path_this_dir = os.path.dirname(os.path.abspath(__file__))
-    path_icons = os.path.join(path_this_dir, "..", "resources", "icons")
+    path_icons = os.path.join(path_this_dir, "..", "..", "resources", "icons")
     path_icon = os.path.join(path_icons, fname_icon)
     pixmap = QtGui.QPixmap(path_icon)
     icon = QtGui.QIcon()

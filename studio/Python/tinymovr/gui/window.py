@@ -164,14 +164,18 @@ class MainWindow(QMainWindow):
     def item_changed(self, item):
         if item._editing:
             # Value changed
+            item._editing = False
             val = item.text(1)
             try:
                 item._tm_attribute.set_value(get_registry()(val))
             except pint.PintError:
-                item._tm_attribute.set_value(float(val))
+                try:
+                    item._tm_attribute.set_value(float(val))
+                except ValueError:
+                    # Show pop up dialog
+                    pass
             item.setText(1, format_value(item._tm_attribute.get_value()))
 
-        item._editing = False
         # Checkbox changed
         enabled = item.checkState(0) == QtCore.Qt.Checked
         try:
