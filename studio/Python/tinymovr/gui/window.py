@@ -1,4 +1,5 @@
 import time
+import pint
 from PySide2 import QtCore
 from PySide2.QtCore import Signal
 from PySide2.QtWidgets import (
@@ -15,6 +16,7 @@ from PySide2.QtWidgets import (
 import pyqtgraph as pg
 from tinymovr.constants import app_name
 from tinymovr.config import get_bus_config, configure_logging
+from tinymovr.units import get_registry
 from tinymovr.gui import Worker, format_value, load_icon
 
 class MainWindow(QMainWindow):
@@ -163,7 +165,10 @@ class MainWindow(QMainWindow):
         if item._editing:
             # Value changed
             val = item.text(1)
-            item._tm_attribute.set_value(float(val))
+            try:
+                item._tm_attribute.set_value(get_registry()(val))
+            except pint.PintError:
+                item._tm_attribute.set_value(float(val))
             item.setText(1, format_value(item._tm_attribute.get_value()))
 
         item._editing = False
