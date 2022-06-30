@@ -1,6 +1,6 @@
 
 name: tm
-version: 0.9.0
+version: 1.0.1
 remote_attributes:
   - name: protocol_hash
     dtype: uint32
@@ -243,6 +243,11 @@ remote_attributes:
         unit: ticks
         c_getter: observer_get_pos_estimate
         summary: The filtered encoder position estimate.
+      - name: velocity_estimate
+        dtype: float
+        unit: ticks/second
+        c_getter: observer_get_vel_estimate
+        summary: The filtered encoder velocity estimate.
       - name: type
         #values: [INTERNAL, HALL]
         dtype: uint8
