@@ -16,6 +16,7 @@ Welcome to Tinymovr documentation!
    studio/installation
    studio/usage
    planner/planner
+   encoders/encoders
    api/guide
    interfaces/interfaces
    upgrade/upgrade
