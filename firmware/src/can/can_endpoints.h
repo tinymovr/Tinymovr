@@ -65,7 +65,7 @@ typedef enum
 } traj_planner_errors_flags;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[50])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[51])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -477,6 +477,16 @@ uint8_t avlos_motor_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command
 * @param buffer_len
 */
 uint8_t avlos_encoder_position_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_encoder_velocity_estimate
+*
+* The filtered encoder velocity estimate.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_encoder_velocity_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_encoder_type

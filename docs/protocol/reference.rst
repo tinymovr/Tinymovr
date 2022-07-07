@@ -421,10 +421,20 @@ Units: tick
 The filtered encoder position estimate.
 
 
-encoder.type
+encoder.velocity_estimate
 -------------------------------------------------------------------
 
 ID: 41
+Type: float
+Units: tick / second
+
+The filtered encoder velocity estimate.
+
+
+encoder.type
+-------------------------------------------------------------------
+
+ID: 42
 Type: uint8
 
 
@@ -434,7 +444,7 @@ The encoder type. Either INTERNAL or HALL.
 encoder.bandwidth
 -------------------------------------------------------------------
 
-ID: 42
+ID: 43
 Type: float
 Units: radian / second
 
@@ -444,7 +454,7 @@ The encoder observer bandwidth.
 encoder.errors
 -------------------------------------------------------------------
 
-ID: 43
+ID: 44
 Type: uint8
 
 
@@ -454,7 +464,7 @@ Any encoder errors, as a bitmask
 traj_planner.max_accel
 -------------------------------------------------------------------
 
-ID: 44
+ID: 45
 Type: float
 Units: tick / second
 
@@ -464,7 +474,7 @@ The trajectory planner max acceleration.
 traj_planner.max_decel
 -------------------------------------------------------------------
 
-ID: 45
+ID: 46
 Type: float
 Units: tick / second ** 2
 
@@ -474,7 +484,7 @@ The trajectory planner max deceleration.
 traj_planner.max_vel
 -------------------------------------------------------------------
 
-ID: 46
+ID: 47
 Type: float
 Units: tick / second
 
@@ -484,7 +494,7 @@ The trajectory planner max cruise velocity.
 move_to(pos_setpoint) -> void
 -------------------------------------------------------------------
 
-ID: 47
+ID: 48
 Return Type: void
 
 
@@ -494,7 +504,7 @@ Move to target position respecting velocity and acceleration limits.
 move_to_tlimit(pos_setpoint) -> void
 -------------------------------------------------------------------
 
-ID: 48
+ID: 49
 Return Type: void
 
 
@@ -504,7 +514,7 @@ Move to target position respecting time limits for each sector.
 traj_planner.errors
 -------------------------------------------------------------------
 
-ID: 49
+ID: 50
 Type: uint8
 
 
