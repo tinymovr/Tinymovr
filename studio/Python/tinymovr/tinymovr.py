@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import time
 from copy import copy
 import pkg_resources
 from packaging import version
@@ -21,16 +22,17 @@ import json
 from tinymovr.iface import IFace
 from tinymovr.presenter import presenter_map, strip_end
 from tinymovr.constants import ControlStates, ControlModes
-from pint import Quantity as _Q
+from pint import PintError, Quantity as _Q
 
 
 min_fw_version = "0.8.13"
 
 
 class VersionError(Exception):
-    
     def __init__(self, kw, found, required, *args, **kwargs):
-        msg = "Node {} version incompatible (found: {}, required: {})".format(kw, found, required)
+        msg = "Node {} version incompatible (found: {}, required: {})".format(
+            kw, found, required
+        )
         super().__init__(msg, *args, **kwargs)
         self.kw = kw
         self.found = found
@@ -51,24 +53,32 @@ class Tinymovr:
         if version_check:
             # Check FW version
             if version.parse(self.fw_version) < version.parse(min_fw_version):
-                raise VersionError(kw="fw", found=self.fw_version, required=min_fw_version)
+                raise VersionError(
+                    kw="fw", found=self.fw_version, required=min_fw_version
+                )
             # Check studio version
             msv = self.min_studio_version
-            msv_str = ".".join([str(msv.fw_major), str(msv.fw_minor), str(msv.fw_patch)])
+            msv_str = ".".join(
+                [str(msv.fw_major), str(msv.fw_minor), str(msv.fw_patch)]
+            )
             studio_version_string = pkg_resources.require("tinymovr")[0].version
             if version.parse(studio_version_string) < version.parse(msv_str):
-                raise VersionError(kw="studio", found=studio_version_string, required=msv_str)
+                raise VersionError(
+                    kw="studio", found=studio_version_string, required=msv_str
+                )
 
     def __getattr__(self, attr: str):
-        
+
         if attr in self.eps:
             d = self.eps[attr]
             ep_type = d["type"]
 
-            if 'w' in ep_type:
+            if "w" in ep_type:
                 # This is a write or read-write endpoint
                 def wrapper(*args, **kwargs):
-                    assert len(args) == 0 or len(kwargs) == 0, "Either positional or keyword arguments are supported, not both"
+                    assert (
+                        len(args) == 0 or len(kwargs) == 0
+                    ), "Either positional or keyword arguments are supported, not both"
                     if len(kwargs) > 0:
                         assert "labels" in d
                         inputs = [
@@ -91,16 +101,20 @@ class Tinymovr:
                     if len(inputs) > 0:
                         payload = self.codec.serialize(inputs, *d["types"])
                     self.iface.send(self.node_id, d["ep_id"], payload=payload)
-                    if 'r' in ep_type:
-                        return self.present_response(attr, d, self.iface.receive(self.node_id, d["ep_id"]))
+                    if "r" in ep_type:
+                        return self.present_response(
+                            attr, d, self.iface.receive(self.node_id, d["ep_id"])
+                        )
 
                 return wrapper
 
             elif ep_type == "r":
                 # This is a read-type endpoint
                 self.iface.send(self.node_id, d["ep_id"])
-                return self.present_response(attr, d, self.iface.receive(self.node_id, d["ep_id"]))
-                
+                return self.present_response(
+                    attr, d, self.iface.receive(self.node_id, d["ep_id"])
+                )
+
     def present_response(self, attr, ep, response):
         data = self.codec.deserialize(response, *ep["types"])
         if attr in presenter_map:
@@ -127,11 +141,12 @@ class Tinymovr:
         Export the board config to a file
         """
         config_map = {}
-        for k, v in self.iface.get_ep_map().items():
-            if v["type"] == "r" and "ser_map" in v:
+        for ep_name, ep in self.iface.get_ep_map().items():
+            if ep["type"] == "r" and "ser_map" in ep:
                 # Node can be serialized (saved)
-                vals = getattr(self, k)
-                config_map.update(self._data_from_arguments(vals, v["ser_map"]))
+                config_map.update(
+                    self._data_from_arguments(getattr(self, ep_name), ep["ser_map"])
+                )
         with open(file_path, "w") as f:
             json.dump(config_map, f)
 
@@ -141,15 +156,17 @@ class Tinymovr:
         """
         with open(file_path, "r") as f:
             data = json.load(f)
-        for k, v in self.iface.get_ep_map().items():
-            if v["type"] == "w" and "ser_map" in v:
+        for ep_name, ep in self.iface.get_ep_map().items():
+            if ep["type"] == "w" and "ser_map" in ep:
                 # Node has saved data and can be deserialized (restored)
-                kwargs = self._arguments_from_data(v["ser_map"], data)
+                kwargs = self._arguments_from_data(ep["ser_map"], data)
                 if len(kwargs):
-                    f = getattr(self, k)
+                    f = getattr(self, ep_name)
                     f(**kwargs)
+                    time.sleep(1) #safer to sleep cause setting is async
 
-    def _data_from_arguments(self, args, ep_map):
+    # "ser_map": {"can": ("id", "baud_rate")}
+    def _data_from_arguments(self, values, ep_map):
         """
         Generate a nested dictionary from a dictionary of values,
         following the template in ep_map
@@ -157,9 +174,9 @@ class Tinymovr:
         data = {}
         for key, value in ep_map.items():
             if isinstance(value, dict):
-                data[key] = self._data_from_arguments(args, value)
+                data[key] = self._data_from_arguments(values, value)
             elif isinstance(value, tuple):
-                data[key] = {k: getattr(args, k) for k in value}
+                data[key] = {k: str(getattr(values, k)) for k in value}
             else:
                 raise TypeError("Map is not a dictionary or tuple")
         return data
@@ -177,7 +194,10 @@ class Tinymovr:
         elif isinstance(ep_map, tuple) and isinstance(ep_data, dict):
             for key in ep_map:
                 if key in ep_data:
-                    kwargs[key] = ep_data[key]
+                    try:
+                        kwargs[key] = _Q(ep_data[key])
+                    except PintError:
+                        kwargs[key] = float(ep_data[key])
         else:
             raise TypeError("Mismatch in passed arguments")
         return kwargs
