@@ -22,7 +22,7 @@ import json
 from tinymovr.iface import IFace
 from tinymovr.presenter import presenter_map, strip_end
 from tinymovr.constants import ControlStates, ControlModes
-from pint import PintError, Quantity as _Q
+from pint import Quantity as _Q
 
 
 min_fw_version = "0.8.13"
