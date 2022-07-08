@@ -144,6 +144,7 @@ class Tinymovr:
         for ep_name, ep in self.iface.get_ep_map().items():
             if ep["type"] == "r" and "ser_map" in ep:
                 # Node can be serialized (saved)
+                print("Exporting {}...".format(ep_name))
                 config_map.update(
                     self._data_from_arguments(getattr(self, ep_name), ep["ser_map"])
                 )
@@ -162,8 +163,9 @@ class Tinymovr:
                 kwargs = self._arguments_from_data(ep["ser_map"], data)
                 if len(kwargs):
                     f = getattr(self, ep_name)
+                    print("Restoring {}...".format(ep_name))
                     f(**kwargs)
-                    time.sleep(1) #safer to sleep cause setting is async
+                    time.sleep(0.001) #safer to sleep cause setting is async
 
     # "ser_map": {"can": ("id", "baud_rate")}
     def _data_from_arguments(self, values, ep_map):
