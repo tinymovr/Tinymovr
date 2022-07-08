@@ -176,7 +176,13 @@ class Tinymovr:
             if isinstance(value, dict):
                 data[key] = self._data_from_arguments(values, value)
             elif isinstance(value, tuple):
-                data[key] = {k: str(getattr(values, k)) for k in value}
+                content = {}
+                for k in value:
+                    try:
+                        content[k] = getattr(values, k).magnitude
+                    except AttributeError:
+                        content[k] = getattr(values, k)
+                data[key] = content
             else:
                 raise TypeError("Map is not a dictionary or tuple")
         return data
@@ -194,10 +200,7 @@ class Tinymovr:
         elif isinstance(ep_map, tuple) and isinstance(ep_data, dict):
             for key in ep_map:
                 if key in ep_data:
-                    try:
-                        kwargs[key] = _Q(ep_data[key])
-                    except PintError:
-                        kwargs[key] = float(ep_data[key])
+                    kwargs[key] = ep_data[key]
         else:
             raise TypeError("Mismatch in passed arguments")
         return kwargs
