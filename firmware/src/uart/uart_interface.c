@@ -76,7 +76,7 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
         break;
 
     case 'W': // Set Iq Limit
-        Controller_SetIqLimit((float)data * ONE_OVER_UART_IQ_LIMIT_SCALING_FACTOR);
+        controller_set_Iq_limit((float)data * ONE_OVER_UART_IQ_LIMIT_SCALING_FACTOR);
         break;
         
     case 'U': // CAN Baud Rate
@@ -153,19 +153,15 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
     case 'H': // phase resistance
-        ret_val = motor_get_phase_resistance() * UART_R_SCALING_FACTOR;
+        ret_val = (int32_t)(motor_get_phase_resistance() * UART_R_SCALING_FACTOR);
         break;
 
-        case 'H': // phase resistance
-            ret_val = (int32_t)(motor_get_phase_resistance() * UART_R_SCALING_FACTOR);
+    case 'L': // phase inductance
+        ret_val = (int32_t)(motor_get_phase_inductance() * UART_L_SCALING_FACTOR);
         break;
 
-        case 'L': // phase inductance
-            ret_val = (int32_t)(motor_get_phase_inductance() * UART_L_SCALING_FACTOR);
-        break;
-
-        case 'W': // Get Iq Limit
-            ret_val = (int32_t)(Controller_GetIqLimit() * UART_IQ_LIMIT_SCALING_FACTOR);
+    case 'W': // Get Iq Limit
+        ret_val = (int32_t)(controller_get_Iq_limit() * UART_IQ_LIMIT_SCALING_FACTOR);
         break;
 
     case 'C': // CAN ID

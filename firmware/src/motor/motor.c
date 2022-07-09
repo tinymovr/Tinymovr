@@ -46,7 +46,7 @@ void motor_reset_calibration()
 	// not a gimbal, otherwise they will not
 	// be recalibrated and will stay at default
 	// values!
-	if (!motor_is_gimbal())
+	if (!motor_get_is_gimbal())
 	{
 		config.phase_resistance = 0.1f;
 		config.phase_inductance = 1e-5f;
