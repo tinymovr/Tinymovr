@@ -18,8 +18,8 @@
 #pragma once
 
 // Firmware Version
-#define VERSION_MAJOR (0u)
-#define VERSION_MINOR (9u)
+#define VERSION_MAJOR (1u)
+#define VERSION_MINOR (0u)
 #define VERSION_PATCH (0u)
 
 /// TINYMOVR CONFIGURATION OPTIONS ///
