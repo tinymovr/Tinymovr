@@ -22,11 +22,6 @@
 #define VERSION_MINOR (9u)
 #define VERSION_PATCH (0u)
 
-// Required Studio version
-#define STUDIO_MIN_VERSION_MAJOR (0u)
-#define STUDIO_MIN_VERSION_MINOR (9u)
-#define STUDIO_MIN_VERSION_PATCH (0u)
-
 /// TINYMOVR CONFIGURATION OPTIONS ///
 
 #define ACLK_FREQ_HZ                (300000000)
