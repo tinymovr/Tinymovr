@@ -44,19 +44,19 @@ Because the d and q quantities represent DC signals in the rotational frame, it 
 Thus the whole process is automated, and you don't need to worry about it.
 
 
-High Level Control loop
-#######################
+Control loop Overview
+#####################
 
-On top of the FOC loop, Tinymovr implements an embedded control loop with different modes and setpoints. Since it is embedded, it runs much faster at a 20kHz rate, than an external loop could do when communicating via the CAN bus.
+On top of the FOC loop, Tinymovr implements an embedded control loop. This control loop runs at a 20kHz rate.
+
+.. image:: control_loop.png
+  :width: 800
+  :alt: Tinymovr Control Loop
 
 Position mode
 *************
 
 This is the most versatile mode, it accepts a position setpoint, and additional velocity and current feedforward terms.
-
-.. image:: control_loop.png
-  :width: 800
-  :alt: Tinymovr dimensions
 
 You can send these 3 setpoints as a single CAN frame when using the `set_pos_setpoint` endpoint.
 

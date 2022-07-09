@@ -41,12 +41,20 @@ static MotorState state = {0};
 void motor_reset_calibration()
 {
 	config.pole_pairs = 7;
-	config.phase_resistance = 0.1f;
-	config.phase_inductance = 1e-5f;
+	// Important! We only reset resistance and 
+	// inductance measurements if the motor is
+	// not a gimbal, otherwise they will not
+	// be recalibrated and will stay at default
+	// values!
+	if (!motor_is_gimbal())
+	{
+		config.phase_resistance = 0.1f;
+		config.phase_inductance = 1e-5f;
+		config.resistance_calibrated = false;
+		config.inductance_calibrated = false;
+	}
 	config.user_offset = 0.0f;
 	config.user_direction = 1;
-	config.resistance_calibrated = false;
-	config.inductance_calibrated = false;
 	config.poles_calibrated = false;
 	config.phases_swapped = false;
 }

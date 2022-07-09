@@ -25,7 +25,7 @@ Enabling Gimbal Mode
    
    * Using arbitrary resistance and inductance settings can damage your motor and board.
 
-To enable gimbal mode, set the motor config as follows:
+To enable gimbal mode, set the motor configuration as follows:
 
 .. code-block:: python
 
@@ -43,7 +43,9 @@ Example
     >>>tm1.motor.L = 2e-3
     >>>tm1.motor.I_cal = 0.5
 
-This specifies a motor with 5Ohms resistance, 2Millihenries inductance and 0.5Amps calibration current.
+     >>>tmx.set_motor_RL(5, 0.002)
+
+This specifies a motor with 5 Ohms resistance, 2 Millihenries inductance and 0.5Amps calibration current.
 Alternatuvely, using the units interface:
 
 .. code-block:: python

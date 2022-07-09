@@ -29,6 +29,7 @@ bool nvm_save_config(void)
 	uint8_t data[sizeof(struct NVMStruct)];
 	s.motor_config = *motor_get_config();
 	s.hall_config = *hall_get_config();
+	s.ma7xx_config = *ma7xx_get_config();
 	s.encoder_config = *encoder_get_config();
 	s.observer_config = *Observer_GetConfig();
 	s.controller_config = *Controller_GetConfig();
@@ -56,6 +57,7 @@ bool nvm_load_config(void)
 	{
 		motor_restore_config(&s.motor_config);
 		hall_restore_config(&s.hall_config);
+		ma7xx_restore_config(&s.ma7xx_config);
 		encoder_restore_config(&s.encoder_config);
 		Observer_RestoreConfig(&s.observer_config);
 		Controller_RestoreConfig(&s.controller_config);

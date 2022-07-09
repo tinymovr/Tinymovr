@@ -36,6 +36,7 @@ bool CalibrateResistance(void)
     float I_cal = motor_get_I_cal();
     if (!motor_get_is_gimbal())
     {
+        float I_cal = motor_get_I_cal();
         float V_setpoint = 0.0f;
         struct FloatTriplet I_phase_meas = {0.0f};
         struct FloatTriplet modulation_values = {0.0f};

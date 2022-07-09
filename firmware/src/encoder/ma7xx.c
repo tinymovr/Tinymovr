@@ -104,3 +104,13 @@ int16_t *ma7xx_get_rec_table_ptr(void)
 {
     return config.rec_table;
 }
+
+MA7xxConfig* ma7xx_get_config(void)
+{
+    return &config;
+}
+
+void ma7xx_restore_config(MA7xxConfig* config_)
+{
+    config = *config_;
+}

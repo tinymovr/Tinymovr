@@ -224,6 +224,8 @@ class TestBoard(TMTestCase):
         """
         Test gimbal mode
         """
+        self.reset_and_wait()
+        # Ensure we're idle
         self.check_state(0)
         self.tm.motor.is_gimbal = True
         self.tm.motor.I_cal = 5.0
