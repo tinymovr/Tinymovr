@@ -19,6 +19,7 @@
 
 #include <src/motor/motor.h>
 #include <src/encoder/hall.h>
+#include <src/encoder/ma7xx.h>
 #include <src/encoder/encoder.h>
 #include <src/observer/observer.h>
 #include <src/controller/controller.h>
@@ -30,6 +31,7 @@
 struct NVMStruct {
     MotorConfig motor_config;
     HallConfig hall_config;
+    MA7xxConfig ma7xx_config;
     EncoderConfig encoder_config;
     ObserverConfig observer_config;
     ControllerConfig controller_config;
