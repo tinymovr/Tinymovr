@@ -4,7 +4,7 @@
 API REFERENCE
 =============
 
-Spec version 0.9.0
+Spec version 1.0.1
 
 
 protocol_hash
