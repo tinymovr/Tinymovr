@@ -1,10 +1,13 @@
 
 import os
+import enum
 import pint
 from PySide2 import QtGui
 
 
 def format_value(value, include_unit=True):
+    if isinstance(value, enum.IntFlag):
+        return str(value) if value > 0 else "(no flags)"
     if not include_unit and isinstance(value, pint.Quantity):
         return str(value.magnitude)
     if isinstance(value, float):
