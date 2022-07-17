@@ -22,7 +22,7 @@
             "preLaunchTask": "Build Project (Debug)",
             "windows": {
                 // Update the path below as necessary
-                "serverpath": "C:\\Program Files (x86)\\SEGGER\\JLink_V631b\\JLinkGDBServerCL.exe" 
+                "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
             }
         }
     ]
