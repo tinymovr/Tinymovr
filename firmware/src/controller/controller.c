@@ -244,7 +244,7 @@ PAC5XXX_RAMFUNC void controller_set_state(ControlState new_state)
 {
     if ((new_state != state.state) && (false == state.is_calibrating))
     {
-        if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE) && (!errors_exist()) && motor_is_calibrated())
+        if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE) && (!errors_exist()) && motor_get_calibrated())
         {
             state.pos_setpoint = observer_get_pos_estimate();
             gate_driver_enable();

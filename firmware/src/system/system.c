@@ -118,6 +118,11 @@ PAC5XXX_RAMFUNC float system_get_Vbus(void)
     return state.Vbus;
 }
 
+PAC5XXX_RAMFUNC bool system_get_calibrated(void)
+{
+    return motor_get_calibrated() & encoder_get_calibrated();
+}
+
 PAC5XXX_RAMFUNC uint8_t system_get_errors(void)
 {
     return state.errors;

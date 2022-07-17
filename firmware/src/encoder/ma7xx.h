@@ -48,7 +48,7 @@ PAC5XXX_RAMFUNC void ma7xx_update(bool check_error);
 
 void ma7xx_clear_rec_table(void);
 void ma7xx_set_rec_calibrated(void);
-void ma7xx_rec_is_calibrated(void);
+bool ma7xx_rec_is_calibrated(void);
 int16_t *ma7xx_get_rec_table_ptr(void);
 MA7xxConfig* ma7xx_get_config(void);
 void ma7xx_restore_config(MA7xxConfig* config_);

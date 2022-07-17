@@ -100,6 +100,11 @@ void ma7xx_set_rec_calibrated(void)
     config.rec_calibrated = true;
 }
 
+bool ma7xx_rec_is_calibrated(void)
+{
+    return config.rec_calibrated;
+}
+
 int16_t *ma7xx_get_rec_table_ptr(void)
 {
     return config.rec_table;

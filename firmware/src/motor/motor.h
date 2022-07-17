@@ -69,7 +69,7 @@ PAC5XXX_RAMFUNC void motor_set_I_cal(float I);
 PAC5XXX_RAMFUNC bool motor_phases_swapped(void);
 PAC5XXX_RAMFUNC void motor_set_phases_swapped(bool swapped);
 
-PAC5XXX_RAMFUNC bool motor_is_calibrated(void);
+PAC5XXX_RAMFUNC bool motor_get_calibrated(void);
 
 PAC5XXX_RAMFUNC bool motor_get_is_gimbal(void);
 PAC5XXX_RAMFUNC void motor_set_is_gimbal(bool gimbal);

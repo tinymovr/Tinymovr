@@ -40,6 +40,7 @@ PAC5XXX_RAMFUNC inline uint32_t system_get_uid(void)
 }
 
 PAC5XXX_RAMFUNC float system_get_Vbus(void);
+PAC5XXX_RAMFUNC bool system_get_calibrated(void);
 PAC5XXX_RAMFUNC uint8_t system_get_errors(void);
 PAC5XXX_RAMFUNC bool errors_exist(void);
 

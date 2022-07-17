@@ -20,6 +20,10 @@ remote_attributes:
     unit: degC
     c_getter: adc_get_mcu_temp
     summary: The internal temperature of the PAC55xx MCU.
+  - name: calibrated
+    dtype: bool
+    c_getter: system_get_calibrated
+    summary: Whether the system has been calibrated.
   - name: errors
     flags: [UNDERVOLTAGE, DRIVER_FAULT]
     c_getter: system_get_errors

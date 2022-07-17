@@ -167,7 +167,7 @@ PAC5XXX_RAMFUNC void motor_set_phases_swapped(bool swapped)
 	config.phases_swapped = swapped;
 }
 
-PAC5XXX_RAMFUNC bool motor_is_calibrated(void)
+PAC5XXX_RAMFUNC bool motor_get_calibrated(void)
 {
 	return config.resistance_calibrated && config.inductance_calibrated && config.poles_calibrated;
 }

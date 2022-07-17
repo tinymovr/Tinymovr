@@ -47,10 +47,20 @@ Units: degree_Celsius
 The internal temperature of the PAC55xx MCU.
 
 
-errors
+calibrated
 -------------------------------------------------------------------
 
 ID: 4
+Type: bool
+
+
+Whether the system has been calibrated.
+
+
+errors
+-------------------------------------------------------------------
+
+ID: 5
 Type: uint8
 
 
@@ -60,7 +70,7 @@ Any system errors, as a bitmask
 save_config() -> void
 -------------------------------------------------------------------
 
-ID: 5
+ID: 6
 Return Type: void
 
 
@@ -70,7 +80,7 @@ Save configuration to non-volatile memory.
 erase_config() -> void
 -------------------------------------------------------------------
 
-ID: 6
+ID: 7
 Return Type: void
 
 
@@ -80,7 +90,7 @@ Erase the config stored in non-volatile memory and reset the device.
 reset() -> void
 -------------------------------------------------------------------
 
-ID: 7
+ID: 8
 Return Type: void
 
 
@@ -90,7 +100,7 @@ Reset the device.
 scheduler.total
 -------------------------------------------------------------------
 
-ID: 8
+ID: 9
 Type: uint32
 
 
@@ -100,7 +110,7 @@ Total processor cycles in a single PWM cycle.
 scheduler.busy
 -------------------------------------------------------------------
 
-ID: 9
+ID: 10
 Type: uint32
 
 
@@ -110,7 +120,7 @@ Busy processor cycles in a single PWM cycle.
 scheduler.errors
 -------------------------------------------------------------------
 
-ID: 10
+ID: 11
 Type: uint8
 
 
@@ -120,7 +130,7 @@ Any scheduler errors, as a bitmask
 controller.state
 -------------------------------------------------------------------
 
-ID: 11
+ID: 12
 Type: uint8
 
 
@@ -130,7 +140,7 @@ The state of the controller.
 controller.mode
 -------------------------------------------------------------------
 
-ID: 12
+ID: 13
 Type: uint8
 
 
@@ -140,7 +150,7 @@ The control mode of the controller.
 controller.errors
 -------------------------------------------------------------------
 
-ID: 13
+ID: 14
 Type: uint8
 
 
@@ -150,7 +160,7 @@ Any controller errors, as a bitmask
 controller.position.setpoint
 -------------------------------------------------------------------
 
-ID: 14
+ID: 15
 Type: float
 Units: tick
 
@@ -160,7 +170,7 @@ The position setpoint.
 controller.position.p_gain
 -------------------------------------------------------------------
 
-ID: 15
+ID: 16
 Type: float
 
 
@@ -170,7 +180,7 @@ The proportional gain of the position controller.
 controller.velocity.setpoint
 -------------------------------------------------------------------
 
-ID: 16
+ID: 17
 Type: float
 Units: tick / second
 
@@ -180,7 +190,7 @@ The velocity setpoint.
 controller.velocity.limit
 -------------------------------------------------------------------
 
-ID: 17
+ID: 18
 Type: float
 Units: tick / second
 
@@ -190,7 +200,7 @@ The velocity limit.
 controller.velocity.p_gain
 -------------------------------------------------------------------
 
-ID: 18
+ID: 19
 Type: float
 
 
@@ -200,7 +210,7 @@ The proportional gain of the velocity controller.
 controller.velocity.i_gain
 -------------------------------------------------------------------
 
-ID: 19
+ID: 20
 Type: float
 
 
@@ -212,7 +222,7 @@ The integral gain of the velocity controller.
 controller.velocity.deadband
 -------------------------------------------------------------------
 
-ID: 20
+ID: 21
 Type: float
 
 
@@ -222,7 +232,7 @@ The deadband of the velocity integrator. A region around the position setpoint w
 controller.current.Iq_setpoint
 -------------------------------------------------------------------
 
-ID: 21
+ID: 22
 Type: float
 Units: ampere
 
@@ -232,7 +242,7 @@ The Iq setpoint.
 controller.current.Iq_limit
 -------------------------------------------------------------------
 
-ID: 22
+ID: 23
 Type: float
 Units: ampere
 
@@ -242,7 +252,7 @@ The Iq limit.
 controller.current.Iq_estimate
 -------------------------------------------------------------------
 
-ID: 23
+ID: 24
 Type: float
 Units: ampere
 
@@ -252,7 +262,7 @@ The Iq estimate.
 controller.current.bandwidth
 -------------------------------------------------------------------
 
-ID: 24
+ID: 25
 Type: float
 
 
@@ -262,7 +272,7 @@ The current controller bandwidth.
 controller.current.Iq_p_gain
 -------------------------------------------------------------------
 
-ID: 25
+ID: 26
 Type: float
 
 
@@ -272,7 +282,7 @@ The current controller proportional gain.
 calibrate() -> void
 -------------------------------------------------------------------
 
-ID: 26
+ID: 27
 Return Type: void
 
 
@@ -282,7 +292,7 @@ Calibrate the device.
 idle() -> void
 -------------------------------------------------------------------
 
-ID: 27
+ID: 28
 Return Type: void
 
 
@@ -292,7 +302,7 @@ Set idle mode, disabling the driver.
 position_mode() -> void
 -------------------------------------------------------------------
 
-ID: 28
+ID: 29
 Return Type: void
 
 
@@ -302,7 +312,7 @@ Set position control mode.
 velocity_mode() -> void
 -------------------------------------------------------------------
 
-ID: 29
+ID: 30
 Return Type: void
 
 
@@ -312,7 +322,7 @@ Set velocity control mode.
 current_mode() -> void
 -------------------------------------------------------------------
 
-ID: 30
+ID: 31
 Return Type: void
 
 
@@ -324,7 +334,7 @@ Set current control mode.
 comms.can.rate
 -------------------------------------------------------------------
 
-ID: 31
+ID: 32
 Type: uint32
 
 
@@ -334,7 +344,7 @@ The baud rate of the CAN interface.
 comms.can.id
 -------------------------------------------------------------------
 
-ID: 32
+ID: 33
 Type: uint32
 
 
@@ -344,7 +354,7 @@ The ID of the CAN interface.
 motor.R
 -------------------------------------------------------------------
 
-ID: 33
+ID: 34
 Type: float
 Units: ohm
 
@@ -354,7 +364,7 @@ The motor Resistance value.
 motor.L
 -------------------------------------------------------------------
 
-ID: 34
+ID: 35
 Type: float
 Units: henry
 
@@ -364,7 +374,7 @@ The motor Inductance value.
 motor.pole_pairs
 -------------------------------------------------------------------
 
-ID: 35
+ID: 36
 Type: uint8
 
 
@@ -374,7 +384,7 @@ The motor pole pair count.
 motor.type
 -------------------------------------------------------------------
 
-ID: 36
+ID: 37
 Type: uint8
 
 
@@ -384,7 +394,7 @@ The type of the motor. Either high current or gimbal.
 motor.offset
 -------------------------------------------------------------------
 
-ID: 37
+ID: 38
 Type: float
 
 
@@ -394,7 +404,7 @@ User-defined offset of the motor.
 motor.direction
 -------------------------------------------------------------------
 
-ID: 38
+ID: 39
 Type: uint8
 
 
@@ -404,7 +414,7 @@ User-defined direction of the motor.
 motor.errors
 -------------------------------------------------------------------
 
-ID: 39
+ID: 40
 Type: uint8
 
 
@@ -414,7 +424,7 @@ Any motor/calibration errors, as a bitmask
 encoder.position_estimate
 -------------------------------------------------------------------
 
-ID: 40
+ID: 41
 Type: float
 Units: tick
 
@@ -424,7 +434,7 @@ The filtered encoder position estimate.
 encoder.velocity_estimate
 -------------------------------------------------------------------
 
-ID: 41
+ID: 42
 Type: float
 Units: tick / second
 
@@ -434,7 +444,7 @@ The filtered encoder velocity estimate.
 encoder.type
 -------------------------------------------------------------------
 
-ID: 42
+ID: 43
 Type: uint8
 
 
@@ -444,7 +454,7 @@ The encoder type. Either INTERNAL or HALL.
 encoder.bandwidth
 -------------------------------------------------------------------
 
-ID: 43
+ID: 44
 Type: float
 Units: radian / second
 
@@ -454,7 +464,7 @@ The encoder observer bandwidth.
 encoder.errors
 -------------------------------------------------------------------
 
-ID: 44
+ID: 45
 Type: uint8
 
 
@@ -464,7 +474,7 @@ Any encoder errors, as a bitmask
 traj_planner.max_accel
 -------------------------------------------------------------------
 
-ID: 45
+ID: 46
 Type: float
 Units: tick / second
 
@@ -474,7 +484,7 @@ The trajectory planner max acceleration.
 traj_planner.max_decel
 -------------------------------------------------------------------
 
-ID: 46
+ID: 47
 Type: float
 Units: tick / second ** 2
 
@@ -484,7 +494,7 @@ The trajectory planner max deceleration.
 traj_planner.max_vel
 -------------------------------------------------------------------
 
-ID: 47
+ID: 48
 Type: float
 Units: tick / second
 
@@ -494,7 +504,7 @@ The trajectory planner max cruise velocity.
 move_to(pos_setpoint) -> void
 -------------------------------------------------------------------
 
-ID: 48
+ID: 49
 Return Type: void
 
 
@@ -504,7 +514,7 @@ Move to target position respecting velocity and acceleration limits.
 move_to_tlimit(pos_setpoint) -> void
 -------------------------------------------------------------------
 
-ID: 49
+ID: 50
 Return Type: void
 
 
@@ -514,7 +524,7 @@ Move to target position respecting time limits for each sector.
 traj_planner.errors
 -------------------------------------------------------------------
 
-ID: 50
+ID: 51
 Type: uint8
 
 

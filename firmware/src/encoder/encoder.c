@@ -17,6 +17,7 @@ void encoder_init(void)
         ma7xx_init();
         state.current_encoder_type = ENCODER_MA7XX;
         state.get_error_ptr = &ma7xx_get_errors;
+        state.get_calibrated_ptr = &ma7xx_rec_is_calibrated;
         state.get_angle_ptr = &ma7xx_get_angle_rectified;
         state.update_angle_ptr = &ma7xx_update;
         state.reset_encoder_ptr = &ma7xx_clear_rec_table;
@@ -28,6 +29,7 @@ void encoder_init(void)
         hall_init();
         state.current_encoder_type = ENCODER_HALL;
         state.get_error_ptr = &hall_get_errors;
+        state.get_calibrated_ptr = &hall_sector_map_is_calibrated;
         state.get_angle_ptr = &hall_get_angle;
         state.update_angle_ptr = &hall_update;
         state.reset_encoder_ptr = &hall_clear_sector_map;
@@ -77,6 +79,11 @@ PAC5XXX_RAMFUNC float encoder_ticks_to_eangle()
 EncoderType encoder_get_type(void)
 {
     return state.current_encoder_type;
+}
+
+PAC5XXX_RAMFUNC bool encoder_get_calibrated(void)
+{
+    return state.get_calibrated_ptr();
 }
 
 PAC5XXX_RAMFUNC void encoder_set_type(EncoderType enc_type)

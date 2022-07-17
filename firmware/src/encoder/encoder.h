@@ -20,6 +20,7 @@
 #include <src/common.h>
 
 // TODO: Make external in a separate unit
+typedef bool (*bool_getter)(void);
 typedef void (*bool_setter)(bool);
 typedef uint8_t (*uint8_getter)(void);
 typedef int16_t (*int16_getter)(void);
@@ -33,6 +34,7 @@ typedef enum {
 typedef struct {
     EncoderType current_encoder_type;
     uint8_getter get_error_ptr;
+    bool_getter get_calibrated_ptr;
     bool_setter update_angle_ptr;
     int16_getter get_angle_ptr;
     void_func reset_encoder_ptr;
@@ -55,6 +57,8 @@ PAC5XXX_RAMFUNC float encoder_ticks_to_eangle(void);
 
 PAC5XXX_RAMFUNC EncoderType encoder_get_type(void);
 void encoder_set_type(EncoderType enc_type);
+
+PAC5XXX_RAMFUNC bool encoder_get_calibrated(void);
 
 PAC5XXX_RAMFUNC uint8_t encoder_get_errors(void);
 
