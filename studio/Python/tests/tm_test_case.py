@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import os
 import time
 import can
 
@@ -26,13 +27,16 @@ import unittest
 class TMTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        bustype, channel = get_bus_config(["socketcan"])
+        if os.name == 'nt':
+            bustype, channel = "slcan", guess_slcan()
+        else:
+            bustype, channel = get_bus_config(["socketcan"])
         cls.can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=1000000)
         cls.tm = create_device(node_id=1, bus=cls.can_bus)
         cls.reset_and_wait()
 
     def tearDown(self):
-        self.tm.controller.idle_mode()
+        self.tm.controller.idle()
 
     @classmethod
     def tearDownClass(cls):
@@ -45,10 +49,10 @@ class TMTestCase(unittest.TestCase):
         time.sleep(timeout)
 
     def try_calibrate(self, force=False, *args, **kwargs):
-        if True == force or self.tm.motor.calibrated:
-            self.tm.calibrate()
+        if True == force or not self.tm.calibrated:
+            self.tm.controller.calibrate()
             self.wait_for_calibration(*args, **kwargs)
-            self.assertTrue(self.tm.motor.calibrated)
+            self.assertTrue(self.tm.calibrated)
 
     def wait_for_calibration(self, check_interval=0.05):
         for _ in range(1000):
@@ -64,3 +68,25 @@ class TMTestCase(unittest.TestCase):
         else:
             self.assertEqual(errors, 0)
         self.assertEqual(self.tm.controller.state, target_state)
+
+
+# TODO: This is temporary, should be removed when
+# slcan autodiscovery is merged in python-can
+import serial
+from serial.tools import list_ports
+import logging
+
+
+def guess_slcan():
+    device_strings = ("canable", "cantact")
+    ports = []
+    for p in serial.tools.list_ports.comports():
+        desc_lower: str = p.description.lower()
+        if any([s in desc_lower for s in device_strings]):
+            ports.append(p.device)
+    if not ports:
+        raise IOError("Could not autodiscover CAN channel")
+    if len(ports) > 1:
+        logging.warning("Multiple channels discovered - using the first")
+
+    return ports[0]
