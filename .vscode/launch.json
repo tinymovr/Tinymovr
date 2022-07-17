@@ -24,6 +24,25 @@
                 // Update the path below as necessary
                 "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
             }
+        },
+        {
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
+            "name": "Attach to Tinymovr",
+            "request": "attach",
+            "type": "cortex-debug",
+            "servertype": "jlink",
+            "device": "PAC55XX",
+            "interface": "swd",
+            "serverArgs": [
+                // Add any arguments to pass to the JLink GDB server here
+                // "-speed 2000"
+            ],
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
+            "windows": {
+                // Update the path below as necessary
+                "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
+            }
         }
     ]
 }
