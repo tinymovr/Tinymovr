@@ -18,7 +18,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 import random
 import time
 import statistics as st
-from tinymovr.units import get_registry
+from avlos.unit_field import get_registry
 
 import unittest
 from tests import TMTestCase
