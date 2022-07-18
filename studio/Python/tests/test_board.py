@@ -218,7 +218,7 @@ class TestBoard(TMTestCase):
         self.tm.controller.position_mode()
         time.sleep(0.5)
         self.assertEqual(self.tm.controller.state, 2)
-        self.tm.controller.idle_mode()
+        self.tm.controller.idle()
 
     def test_j_gimbal_mode(self):
         """
@@ -227,7 +227,7 @@ class TestBoard(TMTestCase):
         self.reset_and_wait()
         # Ensure we're idle
         self.check_state(0)
-        self.tm.motor.is_gimbal = True
+        self.tm.motor.type = 1 # gimbal
         self.tm.motor.I_cal = 5.0
         self.tm.motor.R = 0.2
         self.tm.motor.L = 20 * 1e-5
@@ -305,7 +305,7 @@ class TestBoard(TMTestCase):
         time.sleep(1.5)
         self.tm.controller.position.setpoint = 50000
         time.sleep(1.5)
-        self.tm.controller.idle_mode()
+        self.tm.controller.idle()
         time.sleep(0.5)
         self.try_calibrate(force=True)
         self.check_state(0)
@@ -314,7 +314,7 @@ class TestBoard(TMTestCase):
         for k in range(50):
             pos_estimates.append(self.tm.encoder.position_estimate)
             time.sleep(0.05)
-        self.tm.controller.idle_mode()
+        self.tm.controller.idle()
         self.assertLess(st.pstdev(pos_estimates) * ticks, 100 * ticks)
 
 
