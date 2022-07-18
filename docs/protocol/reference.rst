@@ -421,10 +421,20 @@ Type: bool
 Whether the motor has been calibrated.
 
 
-motor.errors
+motor.I_cal
 -------------------------------------------------------------------
 
 ID: 41
+Type: float
+Units: ampere
+
+The calibration current.
+
+
+motor.errors
+-------------------------------------------------------------------
+
+ID: 42
 Type: uint8
 
 
@@ -434,7 +444,7 @@ Any motor/calibration errors, as a bitmask
 encoder.position_estimate
 -------------------------------------------------------------------
 
-ID: 42
+ID: 43
 Type: float
 Units: tick
 
@@ -444,7 +454,7 @@ The filtered encoder position estimate.
 encoder.velocity_estimate
 -------------------------------------------------------------------
 
-ID: 43
+ID: 44
 Type: float
 Units: tick / second
 
@@ -454,7 +464,7 @@ The filtered encoder velocity estimate.
 encoder.type
 -------------------------------------------------------------------
 
-ID: 44
+ID: 45
 Type: uint8
 
 
@@ -464,7 +474,7 @@ The encoder type. Either INTERNAL or HALL.
 encoder.bandwidth
 -------------------------------------------------------------------
 
-ID: 45
+ID: 46
 Type: float
 Units: radian / second
 
@@ -474,7 +484,7 @@ The encoder observer bandwidth.
 encoder.calibrated
 -------------------------------------------------------------------
 
-ID: 46
+ID: 47
 Type: bool
 
 
@@ -484,7 +494,7 @@ Whether the encoder has been calibrated.
 encoder.errors
 -------------------------------------------------------------------
 
-ID: 47
+ID: 48
 Type: uint8
 
 
@@ -494,7 +504,7 @@ Any encoder errors, as a bitmask
 traj_planner.max_accel
 -------------------------------------------------------------------
 
-ID: 48
+ID: 49
 Type: float
 Units: tick / second
 
@@ -504,7 +514,7 @@ The trajectory planner max acceleration.
 traj_planner.max_decel
 -------------------------------------------------------------------
 
-ID: 49
+ID: 50
 Type: float
 Units: tick / second ** 2
 
@@ -514,7 +524,7 @@ The trajectory planner max deceleration.
 traj_planner.max_vel
 -------------------------------------------------------------------
 
-ID: 50
+ID: 51
 Type: float
 Units: tick / second
 
@@ -524,7 +534,7 @@ The trajectory planner max cruise velocity.
 move_to(pos_setpoint) -> void
 -------------------------------------------------------------------
 
-ID: 51
+ID: 52
 Return Type: void
 
 
@@ -534,7 +544,7 @@ Move to target position respecting velocity and acceleration limits.
 move_to_tlimit(pos_setpoint) -> void
 -------------------------------------------------------------------
 
-ID: 52
+ID: 53
 Return Type: void
 
 
@@ -544,7 +554,7 @@ Move to target position respecting time limits for each sector.
 traj_planner.errors
 -------------------------------------------------------------------
 
-ID: 53
+ID: 54
 Type: uint8
 
 

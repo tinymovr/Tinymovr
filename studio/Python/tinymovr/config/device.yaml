@@ -223,6 +223,12 @@ remote_attributes:
         dtype: bool
         c_getter: motor_get_calibrated
         summary: Whether the motor has been calibrated.
+      - name: I_cal
+        dtype: float
+        unit: ampere
+        c_getter: motor_get_I_cal
+        c_setter: motor_set_I_cal
+        summary: The calibration current.
       - name: errors
         flags: [PHASE_RESISTANCE_OUT_OF_RANGE, PHASE_INDUCTANCE_OUT_OF_RANGE,INVALID_POLE_PAIRS]
         c_getter: motor_get_errors
