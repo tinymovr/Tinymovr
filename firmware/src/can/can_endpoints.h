@@ -65,7 +65,7 @@ typedef enum
 } traj_planner_errors_flags;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[52])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[54])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -469,6 +469,16 @@ uint8_t avlos_motor_offset(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command
 uint8_t avlos_motor_direction(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
+* avlos_motor_calibrated
+*
+* Whether the motor has been calibrated.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_motor_calibrated(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
 * avlos_motor_errors
 *
 * Any motor/calibration errors, as a bitmask
@@ -517,6 +527,16 @@ uint8_t avlos_encoder_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command
 * @param buffer_len
 */
 uint8_t avlos_encoder_bandwidth(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_encoder_calibrated
+*
+* Whether the encoder has been calibrated.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_encoder_calibrated(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_encoder_errors

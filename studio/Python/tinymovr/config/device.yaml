@@ -219,6 +219,10 @@ remote_attributes:
         c_getter: motor_get_user_direction
         c_setter: motor_set_user_direction
         summary: User-defined direction of the motor.
+      - name: calibrated
+        dtype: bool
+        c_getter: motor_get_calibrated
+        summary: Whether the motor has been calibrated.
       - name: errors
         flags: [PHASE_RESISTANCE_OUT_OF_RANGE, PHASE_INDUCTANCE_OUT_OF_RANGE,INVALID_POLE_PAIRS]
         c_getter: motor_get_errors
@@ -264,6 +268,10 @@ remote_attributes:
         c_getter: observer_get_bw
         c_setter: observer_set_bw
         summary: The encoder observer bandwidth.
+      - name: calibrated
+        dtype: bool
+        c_getter: encoder_get_calibrated
+        summary: Whether the encoder has been calibrated.
       - name: errors
         flags: [CALIBRATION_FAILED, READING_UNSTABLE]
         c_getter: encoder_get_errors
