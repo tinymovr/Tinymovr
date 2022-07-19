@@ -146,9 +146,11 @@ class TestBoard(TMTestCase):
         for _ in range(10):
             new_pos = random.uniform(-24000, 24000)
             self.tm.controller.position.setpoint = new_pos * ticks
-            time.sleep(0.5)
+            time.sleep(0.35)
             self.assertAlmostEqual(
-                self.tm.encoder.position_estimate, self.tm.controller.position.setpoint
+                self.tm.encoder.position_estimate,
+                self.tm.controller.position.setpoint,
+                delta=1900 * ticks,
             )
 
     def test_g_limits(self):
@@ -165,7 +167,9 @@ class TestBoard(TMTestCase):
         self.assertAlmostEqual(
             self.tm.controller.velocity.limit, 30000 * ticks / s, delta=1 * ticks / s
         )
-        self.assertAlmostEqual(self.tm.controller.current.Iq_limit, 0.8 * A, delta=0.01 * A)
+        self.assertAlmostEqual(
+            self.tm.controller.current.Iq_limit, 0.8 * A, delta=0.01 * A
+        )
 
         self.tm.controller.velocity.setpoint = 400000 * ticks / s
         time.sleep(0.5)
@@ -201,10 +205,10 @@ class TestBoard(TMTestCase):
         # Ensure we're idle
         self.check_state(0)
         # Start calibration
-        self.tm.calibrate()
+        self.tm.controller.calibrate()
         time.sleep(0.5)
         # Test if idle command works (it should be ignored because we're calibrating)
-        self.tm.idle()
+        self.tm.controller.idle()
         time.sleep(0.5)
         self.assertEqual(self.tm.controller.state, 1)
         # Same for closed loop control command
@@ -227,7 +231,7 @@ class TestBoard(TMTestCase):
         self.reset_and_wait()
         # Ensure we're idle
         self.check_state(0)
-        self.tm.motor.type = 1 # gimbal
+        self.tm.motor.type = 1  # gimbal
         self.tm.motor.I_cal = 5.0
         self.tm.motor.R = 0.2
         self.tm.motor.L = 20 * 1e-5
