@@ -405,7 +405,7 @@ motor.direction
 -------------------------------------------------------------------
 
 ID: 39
-Type: uint8
+Type: int8
 
 
 User-defined direction of the motor.

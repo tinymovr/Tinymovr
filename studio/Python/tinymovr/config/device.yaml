@@ -215,7 +215,7 @@ remote_attributes:
         c_setter: motor_set_user_offset
         summary: User-defined offset of the motor.
       - name: direction
-        dtype: uint8
+        dtype: int8
         c_getter: motor_get_user_direction
         c_setter: motor_set_user_direction
         summary: User-defined direction of the motor.
