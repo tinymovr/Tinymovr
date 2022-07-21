@@ -28,29 +28,29 @@ class TestRates(TMTestCase):
         Test round-trip message time (2 packets)
         """
         self.try_calibrate()
-        self.tm.position_control()
+        self.tm.controller.position_mode()
         time.sleep(0.2)
         elapsed_time()
         sum = 0
         for _ in range(iterations):
-            sum += self.tm.encoder_estimates.position
+            sum += self.tm.encoder.position_estimate
         res = elapsed_time()
         print("Round-trip time (2 packets): " + str(res / iterations) + " seconds")
 
-    def test_round_trip_time_with_write(self):
-        """
-        Test round-trip message time of r/w endpoints (2 packets)
-        """
-        self.try_calibrate()
-        self.tm.position_control()
-        time.sleep(0.2)
-        elapsed_time()
-        sum = 0
-        pos = self.tm.encoder_estimates.position
-        for _ in range(iterations):
-            sum += self.tm.get_set_pos_vel(pos, 0).position
-        res = elapsed_time()
-        print("Round-trip time (2 packets, rw): " + str(res / iterations) + " seconds")
+    # def test_round_trip_time_with_write(self):
+    #     """
+    #     Test round-trip message time of r/w endpoints (2 packets)
+    #     """
+    #     self.try_calibrate()
+    #     self.tm.controller.position_mode()
+    #     time.sleep(0.2)
+    #     elapsed_time()
+    #     sum = 0
+    #     pos = self.tm.encoder.position_estimate
+    #     for _ in range(iterations):
+    #         sum += self.tm.get_set_pos_vel(pos, 0).position
+    #     res = elapsed_time()
+    #     print("Round-trip time (2 packets, rw): " + str(res / iterations) + " seconds")
 
 
 def elapsed_time(prefix=""):

@@ -30,7 +30,7 @@ class TestTrajPlanner(TMTestCase):
         """
         self.check_state(0)
         self.try_calibrate()
-        self.tm.position_control()
+        self.tm.controller.position_mode()
         self.check_state(2)
 
         time.sleep(1)
@@ -50,7 +50,7 @@ class TestTrajPlanner(TMTestCase):
         """
         self.check_state(0)
         self.try_calibrate()
-        self.tm.position_control()
+        self.tm.controller.position_mode()
         self.check_state(2)
 
         time.sleep(1)
