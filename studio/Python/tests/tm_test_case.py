@@ -44,7 +44,7 @@ class TMTestCase(unittest.TestCase):
         cls.can_bus.shutdown()
 
     @classmethod
-    def reset_and_wait(cls, timeout=3):
+    def reset_and_wait(cls, timeout=0.5):
         cls.tm.reset()
         time.sleep(timeout)
 
