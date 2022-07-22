@@ -41,7 +41,7 @@ class TestTrajPlanner(TMTestCase):
             self.tm.traj_planner.move_to(random.randrange(-200000, 200000))
             time.sleep(0.6)
 
-        self.tm.traj_planner.move_to(self.tm.controller.pos_setpoint)
+        self.tm.traj_planner.move_to(self.tm.controller.position.setpoint)
         time.sleep(4)
 
     def test_traj_planner_alt(self):
@@ -63,7 +63,7 @@ class TestTrajPlanner(TMTestCase):
             self.tm.traj_planner.move_to(random.randrange(-200000, 200000))
             time.sleep(0.6)
 
-        self.tm.traj_planner.move_to(self.tm.controller.pos_setpoint)
+        self.tm.traj_planner.move_to(self.tm.controller.position.setpoint)
         time.sleep(4)
 
 
