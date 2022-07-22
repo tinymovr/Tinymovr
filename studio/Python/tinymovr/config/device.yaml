@@ -112,6 +112,7 @@ remote_attributes:
             summary: The integral gain of the velocity controller.
           - name: deadband
             dtype: float
+            unit: tick
             getter_name: controller_get_vel_integrator_deadband
             setter_name: controller_set_vel_integrator_deadband
             rst_target: integrator-deadband

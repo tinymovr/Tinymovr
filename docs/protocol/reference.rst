@@ -224,7 +224,7 @@ controller.velocity.deadband
 
 ID: 21
 Type: float
-
+Units: tick
 
 The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
 
