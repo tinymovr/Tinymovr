@@ -218,8 +218,8 @@ class MainWindow(QMainWindow):
         if 1 == column:
             if (
                 hasattr(item, "_tm_attribute") and
-                hasattr(item._tm_attribute, "c_setter")
-                and None != item._tm_attribute.c_setter
+                hasattr(item._tm_attribute, "setter_name")
+                and None != item._tm_attribute.setter_name
             ):
                 item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
                 item._editing = True
