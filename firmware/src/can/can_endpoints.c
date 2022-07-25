@@ -399,7 +399,7 @@ uint8_t CAN_SetIntegratorGains(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 
 uint8_t CAN_DeviceInfo(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
-    const uint32_t idr = PAC55XX_INFO2->PACIDR;
+    const uint32_t idr = PAC55XX_INFO1->UNIQUEID[0];
     const uint8_t v_major = VERSION_MAJOR;
     const uint8_t v_minor = VERSION_MINOR;
     const uint8_t v_patch = VERSION_PATCH;
