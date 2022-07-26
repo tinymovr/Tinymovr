@@ -16,11 +16,11 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from threading import Lock
+from tinymovr.singleton import Singleton
 
-
-class Tee:
+class Tee(Singleton):
     """
-    Sistribute incoming messages based on the boolean result
+    Distribute incoming messages based on the boolean result
     of a filter callback.
 
     python-can does not allow filtering messages per recipient therefore
@@ -30,23 +30,21 @@ class Tee:
     simplify interfacing with CAN bus objects.
     """
 
-    tees = []
     lock = Lock()
 
     def __init__(self, bus, filter_cb):
         self.bus = bus
-        self.filter_cb = filter_cb
-        self.queue = []
-        self.tees.append(self)
+        self.update_thread = threading.Thread(target=self.update, daemon=True)
+        self.update_thread.start()
 
-    def recv(self, *args, **kwargs):
+    def update(self):
         """
         Tries to receive a message from the bus object and if successful,
         tests reception of each tee instance in the global index.
         """
         self.lock.acquire()
         response = None
-        frame = self.bus.recv(*args, **kwargs)
+        frame = self.bus.recv(0)
         if frame:
             for tee in self.tees:
                 if tee.filter_cb(frame):
