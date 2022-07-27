@@ -15,9 +15,9 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from tinymovr import init_tee
 from tinymovr.channel import ResponseError
 from tinymovr.config import create_device
-import can
 from unittest.mock import patch, MagicMock
 import unittest
 
@@ -30,9 +30,9 @@ class TestSimulation(unittest.TestCase):
         """
         can_bus.send = MagicMock()
         can_bus.recv = MagicMock()
-        # can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=1000000)
+        init_tee(can_bus)
         with self.assertRaises(ResponseError):
-            tm = create_device(node_id=1, bus=can_bus)
+            tm = create_device(node_id=1)
         assert can_bus.send.called
         assert can_bus.recv.called
 

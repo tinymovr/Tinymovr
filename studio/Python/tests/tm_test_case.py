@@ -19,6 +19,7 @@ import os
 import time
 import can
 
+from tinymovr import init_tee
 from tinymovr.config import get_bus_config, create_device
 
 import unittest
@@ -31,8 +32,8 @@ class TMTestCase(unittest.TestCase):
             bustype, channel = "slcan", guess_slcan()
         else:
             bustype, channel = get_bus_config(["socketcan"])
-        cls.can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=1000000)
-        cls.tm = create_device(node_id=1, bus=cls.can_bus)
+        init_tee(can.Bus(bustype=bustype, channel=channel, bitrate=1000000))
+        cls.tm = create_device(node_id=1)
         cls.reset_and_wait()
 
     def tearDown(self):
