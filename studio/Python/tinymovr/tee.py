@@ -15,10 +15,32 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from threading import Lock
-from tinymovr.singleton import Singleton
 
-class Tee(Singleton):
+# def _recv_frame(self, timeout=0.1, sleep_interval=0.01):
+#     # TODO: Move logic to Tee
+#     total_interval = 0
+#     while total_interval < timeout:
+#         frame = self.bus.recv(0)
+#         if frame:
+#             return frame
+#         time.sleep(sleep_interval)
+#         total_interval += sleep_interval
+#     raise ResponseError(self.node_id)
+
+import time
+from threading import Thread, Lock
+
+
+tee = None
+
+
+class Client:
+    def __init__(self, filter_cb, recv_cb):
+        self.filter_cb = filter_cb
+        self.recv_cb = recv_cb
+
+
+class Tee:
     """
     Distribute incoming messages based on the boolean result
     of a filter callback.
@@ -30,31 +52,37 @@ class Tee(Singleton):
     simplify interfacing with CAN bus objects.
     """
 
-    lock = Lock()
-
-    def __init__(self, bus, filter_cb):
+    def __init__(self, bus, sleep_interval=0.05):
         self.bus = bus
-        self.update_thread = threading.Thread(target=self.update, daemon=True)
+        self.sleep_interval = sleep_interval
+        self.lock = Lock()
+        self.clients = []
+        self.update_thread = Thread(target=self.update, daemon=True)
         self.update_thread.start()
 
+    def add(self, filter_cb, recv_cb):
+        self.clients.append(Client(filter_cb, recv_cb))
+
     def update(self):
+        """
+
+        """
+        while True:  # TODO: while bus is active
+            self.update_once()
+            time.sleep(self.sleep_interval)
+
+    def update_once(self):
         """
         Tries to receive a message from the bus object and if successful,
         tests reception of each tee instance in the global index.
         """
         self.lock.acquire()
-        response = None
         frame = self.bus.recv(0)
         if frame:
-            for tee in self.tees:
-                if tee.filter_cb(frame):
-                    tee.queue.append(frame)
-        try:
-            response = self.queue.pop(0)
-        except IndexError:
-            pass
+            for client in self.clients:
+                if client.filter_cb(frame):
+                    client.recv_cb(frame)
         self.lock.release()
-        return response
 
     def send(self, frame):
         """
@@ -63,3 +91,12 @@ class Tee(Singleton):
         self.lock.acquire()
         self.bus.send(frame)
         self.lock.release()
+
+
+def init_tee(bus):
+    global tee
+    assert(None == tee)
+    tee = Tee(bus)
+
+def get_tee():
+    return tee
