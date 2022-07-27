@@ -25,8 +25,6 @@ setup(
     python_requires=">=3.8",
     install_requires=[
         "ipython",
-        "pyside2",
-        "pyqtgraph",
         "python-can>=4.0.0.dev0",
         "avlos @ git+https://github.com/tinymovr/avlos.git",
         "pyserial",
@@ -35,13 +33,14 @@ setup(
         "flatten-dict",
         "pint",
     ],
+    extras_require={"gui": ["pyside2", "pyqtgraph"]},
     entry_points={
         "console_scripts": [
             "tinymovr_cli=tinymovr.cli:spawn",
             "tinymovr=tinymovr.gui:spawn",
         ],
-        "can.interface": [
-            "insilico=tinymovr.bus:InSilico",
-        ],
+        # "can.interface": [
+        #     "insilico=tinymovr.bus:InSilico",
+        # ],
     },
 )
