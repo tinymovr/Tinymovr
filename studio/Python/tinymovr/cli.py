@@ -19,7 +19,7 @@ from docopt import docopt
 
 from tinymovr.discovery import Discovery
 from tinymovr.constants import app_name, base_node_name
-from tinymovr.config import get_bus_config, configure_logging
+from tinymovr.config import get_bus_config, configure_logging, init_tee
 
 """
 Tinymovr CLI Module
@@ -61,7 +61,6 @@ def spawn():
             "channel": channel,
             "bitrate": bitrate
         }
-    bus = can.Bus(**params)
 
     tms = {}
     user_ns = {}
@@ -80,7 +79,9 @@ def spawn():
         del user_ns[node_name]
 
     print(app_name + " " + str(version))
-    dsc = Discovery(bus, node_appeared, node_disappeared, logger)
+
+    init_tee(can.Bus(**params))
+    dsc = Discovery(node_appeared, node_disappeared, logger)
     print("Listening for nodes...")
 
     c = Config()

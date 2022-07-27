@@ -20,6 +20,7 @@ from threading import Lock
 import can
 from functools import cached_property
 from avlos.channel import BaseChannel
+from tinymovr.tee import get_tee
 from tinymovr.constants import (
     CAN_DEV_MASK,
     CAN_EP_SIZE,
@@ -38,44 +39,39 @@ class ResponseError(Exception):
 
 
 class CANChannel(BaseChannel):
-    def __init__(self, node_id, bus):
+    def __init__(self, node_id):
         self.node_id = node_id
-        self.bus = bus
-        self.lock = Lock()
+        get_tee().add(
+            lambda frame: frame.is_remote_frame == False
+            and ids_from_arbitration(frame.arbitration_id)[2] == node_id,
+            self._recv_cb,
+        )
+        self.queue = []
+        self.recv_lock = Lock()
 
     def send(self, data, ep_id):
-        self.lock.acquire()
         rtr = False if data and len(data) else True
-        self.bus.send(self.create_frame(ep_id, rtr, data))
-        self.lock.release()
+        get_tee().send(self.create_frame(ep_id, rtr, data))
+
+    def _recv_cb(self, frame):
+        self.queue.append(frame)
+        self.recv_lock.release()
 
     def recv(self, ep_id, timeout=0.1):
-        self.lock.acquire()
+        self.recv_lock.acquire()
         frame_id = arbitration_from_ids(ep_id, 0, self.node_id)
+        index = 0
+        while index < len(self.queue):
+            if self.queue[index].arbitration_id == frame_id:
+                return self.queue.pop(index)
+        self.recv_lock.acquire(timeout=timeout)
         try:
-            frame = self._recv_frame(timeout=timeout)
-        finally:
-            self.lock.release()
-        if frame.arbitration_id == frame_id:
-            return frame.data
-        else:
-            e_ep_id, _, e_node_id = ids_from_arbitration(frame_id)
-            s_ep_id, _, s_node_id = ids_from_arbitration(frame.arbitration_id)
-            raise IOError(
-                "Received id mismatch. Expected: Node: {}, Endpoint:{}; Got: Node: {}, Endpoint:{}".format(
-                    e_node_id, e_ep_id, s_node_id, s_ep_id
-                )
-            )
-
-    def _recv_frame(self, timeout=0.1, sleep_interval=0.01):
-        # TODO: Move logic to Tee
-        total_interval = 0
-        while total_interval < timeout:
-            frame = self.bus.recv(0)
-            if frame:
-                return frame
-            time.sleep(sleep_interval)
-            total_interval += sleep_interval
+            self.recv_lock.release()
+        except RuntimeError:
+            pass
+        while index < len(self.queue):
+            if self.queue[index].arbitration_id == frame_id:
+                return self.queue.pop(index)
         raise ResponseError(self.node_id)
 
     def create_frame(self, endpoint_id, rtr=False, payload=None):

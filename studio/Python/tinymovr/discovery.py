@@ -16,12 +16,9 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import time
-import threading
-import yaml
-import importlib.resources
-from tinymovr.channel import CANChannel, ResponseError
-from tinymovr.tee import Tee
-from tinymovr.constants import HEARTBEAT_BASE, CAN_EP_SIZE
+from tinymovr.channel import ResponseError
+from tinymovr.tee import get_tee
+from tinymovr.constants import HEARTBEAT_BASE
 from tinymovr.config import create_device_with_hash_msg, ProtocolVersionError
 
 
@@ -31,8 +28,7 @@ class Discovery:
     transmitted heartbeat frame.
     """
 
-    def __init__(self, bus, appeared_cb, disappeared_cb, logger, lost_timeout=2.0):
-        self.bus = bus
+    def __init__(self, appeared_cb, disappeared_cb, logger, lost_timeout=2.0):
         self.logger = logger
         self.appeared_cb = appeared_cb
         self.disappeared_cb = disappeared_cb
@@ -43,57 +39,32 @@ class Discovery:
         self.pending_nodes = set()
         self.incompatible_nodes = set()
 
-        self.tee = Tee(
-            bus, lambda msg: HEARTBEAT_BASE == msg.arbitration_id & HEARTBEAT_BASE
+        get_tee().add(
+            lambda msg: HEARTBEAT_BASE == msg.arbitration_id & HEARTBEAT_BASE,
+            self.recv_cb,
         )
 
-        def_path_str = str(
-            importlib.resources.files("tinymovr").joinpath("config/device.yaml")
-        )
-        with open(def_path_str) as dev_def_raw:
-            self.dev_def = yaml.safe_load(dev_def_raw)
-
-        self.update_thread = threading.Thread(target=self.update, daemon=True)
-        self.update_thread.start()
-
-    def update(self):
+    def recv_cb(self, msg):
         """
-        Periodically process pending messages.
-
-        Note that this will receive only filtered messages from the
-        correct tee, as such will not disrupt other receivers.
+        Callback that processes a received message,
+        initializing a new node.
         """
-        while True:
-            self.logger.debug("Discovery iteration...")
-            now = time.time()
-            msg = self.tee.recv(0)
-            while msg:
-                node_id = msg.arbitration_id & 0x3F
-                if node_id in self.incompatible_nodes:
-                    pass
-                elif node_id in self.active_nodes:
-                    self.update_stamps[node_id] = now
-                elif node_id not in self.pending_nodes:
-                    self.pending_nodes.add(node_id)
-                    try:
-                        node = create_device_with_hash_msg(msg, self.bus)
-                        self.active_nodes[node_id] = node
-                        self.update_stamps[node_id] = now
-                        self.appeared_cb(node, node_id)
-                    except ResponseError as e:
-                        self.logger.error(e)
-                    except ProtocolVersionError as e:
-                        self.logger.error(e)
-                        self.incompatible_nodes.add(node_id)
-                    self.pending_nodes.remove(node_id)
-                msg = self.tee.recv(0)
-
-            # for_removal = set()
-            # for node_id, stamp in self.update_stamps.items():
-            #     if now - stamp > self.lost_timeout:
-            #         for_removal.add(node_id)
-            # for node_id in for_removal:
-            #     del self.active_nodes[node_id]
-            #     del self.update_stamps[node_id]
-            #     self.disappeared_cb(node_id)
-            time.sleep(0.1)
+        now = time.time()
+        node_id = msg.arbitration_id & 0x3F
+        if node_id in self.incompatible_nodes:
+            pass
+        elif node_id in self.active_nodes:
+            self.update_stamps[node_id] = now
+        elif node_id not in self.pending_nodes:
+            self.pending_nodes.add(node_id)
+            try:
+                node = create_device_with_hash_msg(msg)
+                self.active_nodes[node_id] = node
+                self.update_stamps[node_id] = now
+                self.appeared_cb(node, node_id)
+            except ResponseError as e:
+                self.logger.error(e)
+            except ProtocolVersionError as e:
+                self.logger.error(e)
+                self.incompatible_nodes.add(node_id)
+            self.pending_nodes.remove(node_id)

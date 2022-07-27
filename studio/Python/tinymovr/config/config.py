@@ -15,7 +15,6 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import time
 import yaml
 import logging
 import importlib
@@ -23,9 +22,7 @@ import can
 
 from avlos.deserializer import deserialize
 from tinymovr.codec import DataType
-from tinymovr.tee import Tee
-from tinymovr.channel import CANChannel, ids_from_arbitration
-from tinymovr.constants import CAN_EP_SIZE
+from tinymovr.channel import CANChannel
 
 dev_def = None
 
@@ -55,36 +52,32 @@ def get_bus_config(suggested_types=None):
         raise can.CanInitializationError("No active interface found") from exc
 
 
-def create_device(node_id, bus):
+def create_device(node_id):
     """
-    Create a device with the defined ID and bus.
+    Create a device with the defined ID.
     The hash value will be retrieved from the remote.
     """
-    tee = Tee(bus, lambda msg: ids_from_arbitration(msg.arbitration_id)[2] == node_id)
-    chan = CANChannel(node_id, tee)
+    chan = CANChannel(node_id)
     node = deserialize(dev_def)
-
     # We use the generated node to retrieve the hash from
     # the remote. This is ok as long as we know that the
     # hash endpoint will always be the 0th one. If there
     # is a hash mismatch, we raise an exception, otherwise
     # we return the device node as is.
     node._channel = chan
-    if (
-        node.hash_uint32 != node.protocol_hash
-    ):  # hash_uint32 is local, proto_hash is remote
+    # hash_uint32 is local, proto_hash is remote
+    if node.hash_uint32 != node.protocol_hash:
         raise ProtocolVersionError()
     return node
 
 
-def create_device_with_hash_msg(heartbeat_msg, bus):
+def create_device_with_hash_msg(heartbeat_msg):
     """
-    Create a device, the hash msg will be used
-    to decode the actual hash value
+    Create a device, the heartbeat msg will be used
+    to decode the actual hash value and id
     """
     node_id = heartbeat_msg.arbitration_id & 0x3F
-    tee = Tee(bus, lambda msg: msg.is_remote_frame == False and ids_from_arbitration(msg.arbitration_id)[2] == node_id)
-    chan = CANChannel(node_id, tee)
+    chan = CANChannel(node_id)
     node = deserialize(dev_def)
     hash, *_ = chan.serializer.deserialize(heartbeat_msg.data[:4], DataType.UINT32)
     if node.hash_uint32 != hash:  # hash_uint32 is local, hash is remote
