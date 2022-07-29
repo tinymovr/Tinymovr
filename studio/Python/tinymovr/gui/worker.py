@@ -18,7 +18,6 @@ class Worker(QObject):
     def __init__(self, bustype, channel, bitrate, logger):
         super().__init__()
         self.logger = logger
-        self.cnt = 0
 
         init_tee(can.Bus(bustype=bustype, channel=channel, bitrate=bitrate))
         self.dsc = Discovery(
@@ -32,9 +31,7 @@ class Worker(QObject):
         while self.running:
             self.get_values()
             QApplication.processEvents()
-            print(self.cnt)
-            self.cnt += 1
-            time.sleep(0.005)
+            time.sleep(0.05)
 
     @QtCore.Slot()
     def stop(self):
