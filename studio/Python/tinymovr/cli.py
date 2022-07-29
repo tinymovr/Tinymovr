@@ -17,9 +17,10 @@ import IPython
 from traitlets.config import Config
 from docopt import docopt
 
+from tinymovr import init_tee
 from tinymovr.discovery import Discovery
 from tinymovr.constants import app_name, base_node_name
-from tinymovr.config import get_bus_config, configure_logging, init_tee
+from tinymovr.config import get_bus_config, configure_logging
 
 """
 Tinymovr CLI Module

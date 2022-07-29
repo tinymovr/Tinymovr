@@ -16,17 +16,6 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 
-# def _recv_frame(self, timeout=0.1, sleep_interval=0.01):
-#     # TODO: Move logic to Tee
-#     total_interval = 0
-#     while total_interval < timeout:
-#         frame = self.bus.recv(0)
-#         if frame:
-#             return frame
-#         time.sleep(sleep_interval)
-#         total_interval += sleep_interval
-#     raise ResponseError(self.node_id)
-
 import time
 from threading import Thread, Lock
 
@@ -52,7 +41,7 @@ class Tee:
     simplify interfacing with CAN bus objects.
     """
 
-    def __init__(self, bus, sleep_interval=0.05):
+    def __init__(self, bus, sleep_interval=0.01):
         self.bus = bus
         self.sleep_interval = sleep_interval
         self.lock = Lock()
@@ -88,9 +77,7 @@ class Tee:
         """
         Send a frame by forwarding to the bus object
         """
-        self.lock.acquire()
         self.bus.send(frame)
-        self.lock.release()
 
 
 def init_tee(bus):

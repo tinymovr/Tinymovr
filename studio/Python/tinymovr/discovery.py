@@ -16,6 +16,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import time
+from threading import Thread
 from tinymovr.channel import ResponseError
 from tinymovr.tee import get_tee
 from tinymovr.constants import HEARTBEAT_BASE
@@ -41,16 +42,16 @@ class Discovery:
 
         get_tee().add(
             lambda msg: HEARTBEAT_BASE == msg.arbitration_id & HEARTBEAT_BASE,
-            self.recv_cb,
+            self._recv_cb,
         )
 
-    def recv_cb(self, msg):
+    def _recv_cb(self, frame):
         """
         Callback that processes a received message,
         initializing a new node.
         """
         now = time.time()
-        node_id = msg.arbitration_id & 0x3F
+        node_id = frame.arbitration_id & 0x3F
         if node_id in self.incompatible_nodes:
             pass
         elif node_id in self.active_nodes:
@@ -58,10 +59,13 @@ class Discovery:
         elif node_id not in self.pending_nodes:
             self.pending_nodes.add(node_id)
             try:
-                node = create_device_with_hash_msg(msg)
+                node = create_device_with_hash_msg(frame)
                 self.active_nodes[node_id] = node
                 self.update_stamps[node_id] = now
-                self.appeared_cb(node, node_id)
+                self.thread = Thread(
+                    target=self.appeared_cb, args=(node, node_id), daemon=True
+                )
+                self.thread.start()
             except ResponseError as e:
                 self.logger.error(e)
             except ProtocolVersionError as e:

@@ -49,31 +49,37 @@ class CANChannel(BaseChannel):
         self.queue = []
         self.recv_lock = Lock()
 
+    def _recv_cb(self, frame):
+        self.queue.append(frame)
+        self.try_release()
+
     def send(self, data, ep_id):
         rtr = False if data and len(data) else True
         get_tee().send(self.create_frame(ep_id, rtr, data))
 
-    def _recv_cb(self, frame):
-        self.queue.append(frame)
-        self.recv_lock.release()
-
-    def recv(self, ep_id, timeout=0.1):
+    def recv(self, ep_id, timeout=1.0):
         self.recv_lock.acquire()
+        get_tee().update_once()
         frame_id = arbitration_from_ids(ep_id, 0, self.node_id)
         index = 0
         while index < len(self.queue):
             if self.queue[index].arbitration_id == frame_id:
-                return self.queue.pop(index)
+                return self.queue.pop(index).data
+            index += 1
         self.recv_lock.acquire(timeout=timeout)
+        self.try_release()
+        while index < len(self.queue):
+            if self.queue[index].arbitration_id == frame_id:
+                return self.queue.pop(index).data
+            index += 1
+        raise ResponseError(self.node_id)
+
+    def try_release(self):
         try:
             self.recv_lock.release()
         except RuntimeError:
             pass
-        while index < len(self.queue):
-            if self.queue[index].arbitration_id == frame_id:
-                return self.queue.pop(index)
-        raise ResponseError(self.node_id)
-
+        
     def create_frame(self, endpoint_id, rtr=False, payload=None):
         """
         Generate a CAN frame using python-can Message class
