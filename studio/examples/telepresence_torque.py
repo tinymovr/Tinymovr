@@ -6,7 +6,7 @@ import can
 from tinymovr import Tinymovr
 from tinymovr.iface import IFace
 from tinymovr.iface.can_bus import CANBus, guess_channel
-from tinymovr.units import get_registry
+from avlos import get_registry
 
 
 tm1: Tinymovr = None

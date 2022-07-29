@@ -139,7 +139,7 @@ For instance, to define a few frequently used shortcuts in a program:
 
 .. code-block:: python
 
-    from tinymovr.units import get_registry
+    from avlos import get_registry
     ureg = get_registry()
     mA = ureg.milliampere
     rad = ureg.radian
