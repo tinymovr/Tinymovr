@@ -16,7 +16,7 @@ from PySide2.QtWidgets import (
 import pyqtgraph as pg
 from tinymovr.constants import app_name
 from tinymovr.config import get_bus_config, configure_logging
-from tinymovr.units import get_registry
+from avlos import get_registry
 from tinymovr.gui import Worker, format_value, load_icon
 
 class MainWindow(QMainWindow):
