@@ -20,7 +20,6 @@
 #include <src/rtt/SEGGER_RTT.h>
 #include <src/controller/controller.h>
 #include <src/system/system.h>
-#include <src/can/watchdog.h>
 
 uint8_t error_flags[ERROR_FLAG_MAX_SIZE] = {0};
 uint8_t error_count = 0;
@@ -129,12 +128,6 @@ PAC5XXX_RAMFUNC bool health_check(void)
     if (VBus < VBUS_LOW_THRESHOLD)
     {
         add_error_flag(ERROR_VBUS_UNDERVOLTAGE);
-        success = false;
-    }
-
-    if (Watchdog_increment_and_check())
-    {
-        add_error_flag(ERROR_WATCHDOG_TIMEOUT);
         success = false;
     }
     return success;

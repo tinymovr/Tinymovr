@@ -25,6 +25,8 @@
 #include <src/scheduler/scheduler.h>
 #include <src/motor/calibration.h>
 #include <src/controller/controller.h>
+#include "src/watchdog/watchdog.h"
+#include "src/rtt/SEGGER_RTT.h"
 
 PAC5XXX_RAMFUNC void CLControlStep(void);
 PAC5XXX_RAMFUNC void IdleStep(void);
@@ -116,6 +118,13 @@ void Controller_ControlLoop(void)
 
 PAC5XXX_RAMFUNC void CLControlStep(void)
 {
+    // Check that the watchdog hasn't timed out/we're still being controlled
+    if (Watchdog_increment_and_check())
+    {
+        Controller_SetState(STATE_IDLE);
+        return;
+    }
+
     if (state.mode >= CTRL_TRAJECTORY)
     {
         state.t_plan += PWM_PERIOD_S;

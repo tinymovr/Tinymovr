@@ -30,7 +30,7 @@
 #include "src/nvm/nvm.h"
 
 #include <src/can/can_endpoints.h>
-#include "src/can/watchdog.h"
+#include "src/watchdog/watchdog.h"
 
 #define EP_LIST_SIZE 64
 #define EP_MAP_SIZE 64
@@ -610,7 +610,7 @@ uint8_t CAN_SetWatchdog(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     uint8_t enabled;
     float timeout_s;
 
-    memcpy(&enabled, &buffer[0], sizeof(bool));
+    memcpy(&enabled, &buffer[0], sizeof(uint8_t));
     memcpy(&timeout_s, &buffer[1], sizeof(float));
 
     if(enabled == 0)
