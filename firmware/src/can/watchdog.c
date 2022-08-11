@@ -12,7 +12,7 @@ void Watchdog_reset(void)
     watchdog.counter = 0;
 }
 
-bool Watchdog_increment_and_check(void)
+PAC5XXX_RAMFUNC bool Watchdog_increment_and_check(void)
 {
     if (!watchdog.enabled)
     {

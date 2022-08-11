@@ -30,6 +30,7 @@
 #include "src/nvm/nvm.h"
 
 #include <src/can/can_endpoints.h>
+#include "src/can/watchdog.h"
 
 #define EP_LIST_SIZE 64
 #define EP_MAP_SIZE 64
@@ -80,7 +81,7 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_GetMotorRL, 0x027);
     CANEP_AddEndpoint(&CAN_SetMotorRL, 0x028);
     CANEP_AddEndpoint(&CAN_GetHallSectorMap, 0x029);
-    // 0x02A AVAIL
+    CANEP_AddEndpoint(&CAN_SetWatchdog, 0x02A);
     // 0x02B AVAIL
     // 0x02C AVAIL
     // 0x02D AVAIL
@@ -602,4 +603,26 @@ uint8_t CAN_GetHallSectorMap(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     memcpy(&buffer[0], sector_map, sizeof(uint8_t) * 7);
 	memcpy(&buffer[8], &sector, sizeof(uint8_t));
 	return CANRP_Read;
+}
+
+uint8_t CAN_SetWatchdog(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+{
+    uint8_t enabled;
+    float timeout_s;
+
+    memcpy(&enabled, &buffer[0], sizeof(bool));
+    memcpy(&timeout_s, &buffer[1], sizeof(float));
+
+    if(enabled == 0)
+    {
+        Watchdog_disable();
+        return CANRP_Write;
+    }
+    else if(enabled == 1)
+    {
+        Watchdog_set_timeout_s(timeout_s);
+        Watchdog_enable();
+        return CANRP_Write;
+    }
+    return CANRP_NoAction;
 }

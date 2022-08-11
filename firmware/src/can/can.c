@@ -155,6 +155,8 @@ void CAN_process_interrupt(void)
             can_transmit(data_length, (config.id << CAN_EP_SIZE) | command_id, can_msg_buffer);
         }
     }
+
+    Watchdog_reset();
 }
 
 CANConfig* CAN_get_config(void)

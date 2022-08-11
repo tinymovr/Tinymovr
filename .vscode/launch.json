@@ -19,6 +19,10 @@
             "windows": {
                 // Update the path below as necessary
                 "serverpath": "C:\\Program Files (x86)\\SEGGER\\JLink_V631b\\JLinkGDBServerCL.exe" 
+            },
+            "linux": {
+                // Update the path below as necessary
+                "serverpath": "/opt/SEGGER/JLink/JLinkGDBServer" 
             }
         }
     ]
