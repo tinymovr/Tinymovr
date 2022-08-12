@@ -1,7 +1,8 @@
 
 /*
-
-
+The watchdog is used as a timer for inactivity on the CAN bus.
+When it times out, it sets the control state back to idle as a failsafe if the ESC becomes disconnected.
+It can be enabled/disabled via the set_watchdog can endpoint.
 */
 
 #pragma once

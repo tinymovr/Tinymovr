@@ -378,7 +378,7 @@ for velocity-limited plan moves",
     },
     "set_watchdog":
     {
-        "description": "Enable/disable the CAN timeout failsafe watchdog and set its timeout in seconds",
+        "description": "Enable/disable the CAN timeout watchdog and set its timeout in seconds",
         "type": "w",
         "ep_id": 0x02A,
         "types": (DataType.INT8, DataType.FLOAT),
