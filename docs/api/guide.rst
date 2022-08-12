@@ -1065,6 +1065,35 @@ Example
     >>>tmx.set_motor_RL(0.5, 0.0001)
 
 
+set_watchdog
+************
+
+| **endpoint**: ``0x2A``
+| **type**: Write-only
+
+Enables/disables the CAN timeout watchdog, which sets the control state to idle after a period of inactivity on the CAN bus. Also sets the inactivity timeout.
+
+Arguments
+---------
+
+===============   ===================  =========  =========== ================
+Member            Description          Data Type  Data Offset Default Unit
+---------------   -------------------  ---------  ----------- ----------------
+``enable``        Enable/disable       uint8      0           state
+``timeout``       Watchdog timeout     float32    1           second
+===============   ===================  =========  =========== ================
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.set_watchdog(1, 5)
+
+.. code-block:: python
+
+    >>>tmx.set_watchdog(0)
+
 Error Codes
 ###########
 
