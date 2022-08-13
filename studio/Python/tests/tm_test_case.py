@@ -32,7 +32,8 @@ class TMTestCase(unittest.TestCase):
             bustype, channel = "slcan", guess_slcan()
         else:
             bustype, channel = get_bus_config(["socketcan"])
-        init_tee(can.Bus(bustype=bustype, channel=channel, bitrate=1000000))
+        cls.can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=1000000)
+        init_tee(can_bus)
         cls.tm = create_device(node_id=1)
         cls.reset_and_wait()
 
