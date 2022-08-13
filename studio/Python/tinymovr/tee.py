@@ -97,17 +97,26 @@ class Tee:
 
 
 def init_tee(bus):
+    '''
+    Initializes a tee using a pytho-can bus instance
+    '''
     global tee
-    assert None == tee
+    assert(None == tee)
     tee = Tee(bus)
 
 
 def destroy_tee():
+    '''
+    Destroys the existing tee, stopping its thread.
+    '''
     global tee
-    assert None != tee
+    assert(None != tee)
     tee.stop()
     tee = None
 
 
 def get_tee():
+    '''
+    Get the current tee object
+    '''
     return tee
