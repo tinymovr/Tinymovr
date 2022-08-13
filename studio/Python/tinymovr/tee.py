@@ -17,6 +17,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 import time
+from enum import Enum
 from threading import Thread, Lock
 
 
@@ -27,6 +28,13 @@ class Client:
     def __init__(self, filter_cb, recv_cb):
         self.filter_cb = filter_cb
         self.recv_cb = recv_cb
+
+
+class TeeState(Enum):
+    INIT = 0
+    RUNNING = 1
+    STOPPING = 2
+    STOPPED = 3
 
 
 class Tee:
@@ -46,6 +54,7 @@ class Tee:
         self.sleep_interval = sleep_interval
         self.lock = Lock()
         self.clients = []
+        self.state = TeeState.INIT
         self.update_thread = Thread(target=self.update, daemon=True)
         self.update_thread.start()
 
@@ -53,12 +62,13 @@ class Tee:
         self.clients.append(Client(filter_cb, recv_cb))
 
     def update(self):
-        """
-
-        """
-        while True:  # TODO: while bus is active
+        """ """
+        self.state = TeeState.RUNNING
+        while TeeState.RUNNING == self.state:
             self.update_once()
             time.sleep(self.sleep_interval)
+        assert(TeeState.STOPPING == self.state)
+        self.state = TeeState.STOPPED
 
     def update_once(self):
         """
@@ -79,11 +89,25 @@ class Tee:
         """
         self.bus.send(frame)
 
+    def stop(self):
+        self.state = TeeState.STOPPING
+        while TeeState.STOPPING == self.state:
+            time.sleep(0.01)
+        assert(TeeState.STOPPED == self.state)
+
 
 def init_tee(bus):
     global tee
-    assert(None == tee)
+    assert None == tee
     tee = Tee(bus)
+
+
+def destroy_tee():
+    global tee
+    assert None != tee
+    tee.stop()
+    tee = None
+
 
 def get_tee():
     return tee
