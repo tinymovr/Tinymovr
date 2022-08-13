@@ -1,3 +1,6 @@
+.. role:: python(code)
+   :language: python
+
 API
 +++
 
@@ -36,6 +39,50 @@ The above code block will instantiate a Tinymovr with CAN bus id of 1 and calibr
 
     tm.velocity_control()
     tm.set_vel_setpoint(80000)
+
+Shortcuts
+#########
+
+A few commands exist in Tinymovr studio which are shortcuts to Tinymovr endpoints with specific argument values. These are mostly shortcuts to changes of states and modes that are easier to read and remember. They are briefly presented below.
+
+idle()
+******
+
+Switch to idle mode and disable the inverter.
+
+Shortcut for :python:`tmx.set_state(0, 0)`
+
+
+calibrate()
+***********
+
+Start calibration sequence. This command presents a safety notice that needs to be accepted by the user before proceeding.
+
+Shortcut for :python:`tmx.set_state(1, 0)`
+
+
+position_control()
+******************
+
+Switch to closed loop control (enable the inverter) and to position control mode.
+
+Shortcut for :python:`tmx.set_state(2, 2)`
+
+velocity_control()
+******************
+
+Switch to closed loop control (enable the inverter) and to velocity control mode.
+
+Shortcut for :python:`tmx.set_state(2, 1)`
+
+
+current_control()
+******************
+
+Switch to closed loop control (enable the inverter) and to current control mode.
+
+Shortcut for :python:`tmx.set_state(2, 0)`
+
 
 .. _api-reference:
 
