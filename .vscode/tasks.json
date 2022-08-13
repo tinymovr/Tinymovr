@@ -70,6 +70,19 @@
                 "base": "$gcc", 
                 "fileLocation": ["relative", "${workspaceFolder}/firmware"]
             }
+        },
+        {
+            "type": "shell",
+            "label": "Build Docs",
+            "command": "make html",
+            "options": {
+                "cwd": "${workspaceFolder}/docs"
+            },
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc", 
+                "fileLocation": ["relative", "${workspaceFolder}/docs"]
+            }
         }
     ],
     "inputs": [
