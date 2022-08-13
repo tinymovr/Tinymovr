@@ -14,19 +14,24 @@ All Tinymovr controllers feature an onboard magnetic absolute angle sensor that 
 Hall Effect Sensor
 ******************
 
-Tinymovr R5 supports external Hall effect sensors for commutation and positioning. Hall effect sensors generate a specific sequence in the 3 phase encoder signal as the rotor moves. By reading this sequence, the rotor position in one of six 60 degree sectors along the electrical cycle. 
+Tinymovr R5 supports external Hall effect sensors for commutation and positioning. Hall effect sensors generate a specific sequence in the 3 phase encoder signal as the rotor moves. By reading this sequence, the rotor position is determined in one of six 60 degree sectors along the electrical cycle. 
 
 Hardware Setup
 --------------
 
-To use Hall effect sensors, you need to connect the sensor's power supply, phases and ground to the correct pins on the Tinymovr board. the correct connection diagram is demonstrated below.
+To use Hall effect sensors, you need to connect the sensor's power supply, phases and ground to the correct pins on the Tinymovr board. The pinout for the Hall effect sensor connector is shown below.
 
-.. image:: hall_connection.png
+.. image:: hall_pinout.jpg
   :width: 800
   :alt: Hall effect sensor connection diagram
 
 .. note::
-  Tinymovr supplies 3.3V on the AUX power supply pin. If your sensor uses 5V you'll need an external power supply. 
+  The diagram shows the connector side of the board, i.e. the side where the CAN, UART and SPI connectors, and also the DC-link capacitors are located.
+
+Note the U, V and W pins. These need to be connected to the respective pins of the sensor. The pin labeled T is currently not in use. In addition, the 3.3V power supply and the GND need to be connected to the sensor as well.
+
+.. note::
+  Tinymovr supplies 3.3V on the AUX power supply pin. If your sensor uses 5V, or if it needs more than 50mA, you'll need to provide power externally, e.g. through a dedicated buck converter. 
 
 Configuration
 -------------
@@ -37,7 +42,7 @@ As a first step you need to configure the sensor type and observer bandwidth.
 
     tm1.set_encoder_config(1, 100) # encoder type, bandwidth
 
-This sets the encoder type to Hall effect sensor, and the encoder bandwidth to 100 {}:
+This sets the encoder type to Hall effect sensor, and the encoder bandwidth to 100.
 
 The bandwidth value is configurable and depends on the dynamics that you wish to achieve with your motor. Keep in mind that high bandwidth values used with motors with fewer pole pairs will make the motors oscillate around the setpoint and have a rough tracking performance (perceivable "knocks" when the rotor moves). On the other hand, too low of a bandwidth value may cause the motor to lose tracking in highly dynamic motions. If you are certain such motions will not be possible (e.g. in heavy moving platforms) you may reduce the bandwidth to ensure smoother motion.
 
