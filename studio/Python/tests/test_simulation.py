@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from tinymovr import init_tee
+from tinymovr import init_tee, destroy_tee
 from tinymovr.channel import ResponseError
 from tinymovr.config import create_device
 from unittest.mock import patch, MagicMock
@@ -23,6 +23,7 @@ import unittest
 
 
 class TestSimulation(unittest.TestCase):
+    
     @patch("can.Bus")
     def test_response_error(self, can_bus):
         """
@@ -35,6 +36,8 @@ class TestSimulation(unittest.TestCase):
             tm = create_device(node_id=1)
         assert can_bus.send.called
         assert can_bus.recv.called
+        destroy_tee()
+
 
 
 if __name__ == "__main__":
