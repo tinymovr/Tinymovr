@@ -25,12 +25,15 @@
 #include <src/encoder/encoder.h>
 #include <src/encoder/ma7xx.h>
 #include <src/observer/observer.h>
+#include "src/watchdog/watchdog.h"
+
 
 struct SchedulerState
 {
 	bool adc_interrupt;
 	bool can_interrupt;
 	bool uart_message_interrupt;
+	bool wwdt_interrupt;
 	bool busy;
 
     uint32_t busy_cycles;
@@ -58,6 +61,11 @@ void WaitForControlLoopInterrupt(void)
 			// Handle UART
 			state.uart_message_interrupt = false;
 			UART_ProcessMessage();
+		}
+		else if (state.wwdt_interrupt)
+		{
+			state.wwdt_interrupt = false;
+			WWDT_process_interrupt();
 		}
 		else
 		{
@@ -114,6 +122,14 @@ void CAN_IRQHandler(void)
 void UART_ReceiveMessageHandler(void)
 {
 	state.uart_message_interrupt = true;
+}
+
+void Wdt_IRQHandler(void)
+{
+	state.wwdt_interrupt = true;
+	PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_WRITE_AVALABLE;
+    // Interrupt flag needs to be cleared here
+    PAC55XX_WWDT->WWDTFLAG.IF = 1;
 }
 
 uint32_t Scheduler_GetTotalCycles(void)

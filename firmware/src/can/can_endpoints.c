@@ -620,7 +620,7 @@ uint8_t CAN_SetWatchdog(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     }
     else if(enabled == 1)
     {
-        Watchdog_set_timeout_s(timeout_s);
+        Watchdog_set_timeout_seconds(timeout_s);
         Watchdog_enable();
         return CANRP_Write;
     }

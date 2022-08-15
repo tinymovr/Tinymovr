@@ -118,9 +118,10 @@ void Controller_ControlLoop(void)
 PAC5XXX_RAMFUNC void CLControlStep(void)
 {
     // Check that the watchdog and revert to idle if it has timed out
-    if (Watchdog_increment_and_check())
+    if (Watchdog_triggered())
     {
         Controller_SetState(STATE_IDLE);
+        Watchdog_reset();
         return;
     }
 
