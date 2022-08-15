@@ -42,7 +42,7 @@ PAC5XXX_RAMFUNC void Watchdog_reset(void)
 
 }
 
-void Watchdog_set_timeout_cycles(uint32_t cycles)
+void Watchdog_set_timeout_cycles(uint16_t cycles)
 {
     PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_WRITE_AVALABLE;
     // Set the counter start value
@@ -51,7 +51,7 @@ void Watchdog_set_timeout_cycles(uint32_t cycles)
 
 void Watchdog_set_timeout_seconds(float seconds)
 {
-    uint32_t cycles = (uint32_t)(seconds * wwdt_freq);
+    uint16_t cycles = (uint16_t)(seconds * wwdt_freq);
     Watchdog_set_timeout_cycles(cycles);
 }
 
@@ -64,7 +64,7 @@ void Watchdog_enable(void)
     // The WWDTCTR is automatically reset on enabling
     PAC55XX_WWDT->WWDTCTL.EN = 1;
     // Enable WWDT interrupt in the NVIC
-    NVIC_EnableIRQ(Wdt_IRQn); //NN
+    NVIC_EnableIRQ(Wdt_IRQn);
 }
 
 void Watchdog_disable(void)

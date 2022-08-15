@@ -8,10 +8,9 @@ Timing works via the PAC55 Watchdog timer (WWDT)
 
 #pragma once
 
-// #include "src/common.h"
 #include "src/system/system.h"
 
-// 4MHz CLKREF >>> FRCLK (from system.h) >>> /32768 WWDT = 122.07 Hz
+// 4MHz CLKREF >>> FRCLK (set in system.h) >>> /32768 WWDT = 122.07 Hz
 // 2^16 / 122.07 = 536.87s maximum
 #define WWDT_CLKDIV 32768
 
@@ -26,7 +25,7 @@ typedef struct
 void Watchdog_init(void);
 void Watchdog_reset(void);
 bool Watchdog_triggered(void);
-void Watchdog_set_timeout_cycles(uint32_t cycles);
+void Watchdog_set_timeout_cycles(uint16_t cycles);
 void Watchdog_set_timeout_seconds(float s);
 void Watchdog_enable(void);
 void Watchdog_disable(void);
