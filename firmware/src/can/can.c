@@ -18,7 +18,7 @@
 #include <string.h>
 
 #include <src/utils/utils.h>
-
+#include <src/watchdog/watchdog.h>
 #include <src/can/can_endpoints.h>
 #include <src/can/can_func.h>
 #include <src/can/can.h>
