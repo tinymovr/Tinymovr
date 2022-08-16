@@ -67,7 +67,7 @@ class Tee:
         while TeeState.RUNNING == self.state:
             self.update_once()
             time.sleep(self.sleep_interval)
-        assert(TeeState.STOPPING == self.state)
+        assert TeeState.STOPPING == self.state
         self.state = TeeState.STOPPED
 
     def update_once(self):
@@ -93,30 +93,30 @@ class Tee:
         self.state = TeeState.STOPPING
         while TeeState.STOPPING == self.state:
             time.sleep(0.01)
-        assert(TeeState.STOPPED == self.state)
+        assert TeeState.STOPPED == self.state
 
 
 def init_tee(bus):
-    '''
+    """
     Initializes a tee using a pytho-can bus instance
-    '''
+    """
     global tee
-    assert(None == tee)
+    assert None == tee
     tee = Tee(bus)
 
 
 def destroy_tee():
-    '''
+    """
     Destroys the existing tee, stopping its thread.
-    '''
+    """
     global tee
-    assert(None != tee)
+    assert None != tee
     tee.stop()
     tee = None
 
 
 def get_tee():
-    '''
+    """
     Get the current tee object
-    '''
+    """
     return tee
