@@ -2,7 +2,7 @@
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
 //  * 
-//  * Copyright (c) 2022 @eufrizz
+//  * Copyright (c) 2022 Eugene Frizza
 //  * Copyright (c) 2022 Ioannis Chatzikonstantinou.
 //  * 
 //  * This program is free software: you can redistribute it and/or modify  
@@ -31,8 +31,8 @@ Timing works via the PAC55 Watchdog timer (WWDT)
 // 4MHz CLKREF >>> FRCLK (set in system.h) >>> /32768 WWDT = 122.07 Hz
 // 2^16 / 122.07 = 536.87s maximum
 #define WWDT_CLKDIV 32768
-
 static const float wwdt_freq = FRCLK_FREQ_HZ / WWDT_CLKDIV;
+static const float max_watchdog_seconds = 0xFFFF * WWDT_CLKDIV / FRCLK_FREQ_HZ;
 
 typedef struct
 {

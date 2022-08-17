@@ -2,7 +2,7 @@
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
 //  * 
-//  * Copyright (c) 2022 @eufrizz
+//  * Copyright (c) 2022 Eugene Frizza
 //  * Copyright (c) 2022 Ioannis Chatzikonstantinou.
 //  * 
 //  * This program is free software: you can redistribute it and/or modify  
@@ -44,7 +44,7 @@ void Watchdog_init(void)
     NVIC_SetPriority(Wdt_IRQn, 4);
 
     // Set initial 1s timeout
-    Watchdog_set_timeout_cycles(0xF000);
+    Watchdog_set_timeout_cycles(wwdt_freq);
 }
 
 PAC5XXX_RAMFUNC bool Watchdog_triggered(void)
@@ -70,7 +70,16 @@ void Watchdog_set_timeout_cycles(uint16_t cycles)
 
 void Watchdog_set_timeout_seconds(float seconds)
 {
-    uint16_t cycles = (uint16_t)(seconds * wwdt_freq);
+    uint16_t cycles;
+    // If the timeout requested is greater than the maximum possible, cap it to the maximum instead of overflowing
+    if (seconds > max_watchdog_seconds)
+    {
+        cycles = 0xFFFF;
+    }
+    else
+    {
+        cycles = (uint16_t)(seconds * wwdt_freq);
+    }
     Watchdog_set_timeout_cycles(cycles);
 }
 

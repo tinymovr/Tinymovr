@@ -1071,7 +1071,7 @@ set_watchdog
 | **endpoint**: ``0x2A``
 | **type**: Write-only
 
-Enables/disables the CAN timeout watchdog, which sets the control state to idle after a period of inactivity on the CAN bus. Also sets the inactivity timeout.
+Enables/disables the CAN timeout watchdog, and sets the timeout length in seconds. This watchdog sets the control state to idle after a period of inactivity on the CAN bus. Maximum of 536s.
 
 Arguments
 ---------
