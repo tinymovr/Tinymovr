@@ -25,7 +25,7 @@ from tinymovr.constants import ControlStates, ControlModes
 from pint import Quantity as _Q
 
 
-min_fw_version = "0.8.15"
+min_fw_version = "0.8.16"
 
 
 class VersionError(Exception):

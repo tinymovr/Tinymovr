@@ -67,6 +67,8 @@
 #define INVTWOPI (0.159155f)
 #define EPSILON (2.718281f)
 
+// #define ROSCCLK_FREQ_HZ              (16000000)
+
 #define PWM_PERIOD_S (1.0f / PWM_FREQ_HZ)
 
 #define READ_UINT16(address) (*((uint16_t *)address))

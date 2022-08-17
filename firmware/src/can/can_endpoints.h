@@ -72,3 +72,5 @@ uint8_t CAN_GetSetPosVel(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 uint8_t CAN_GetSetPosVelIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
 
 uint8_t CAN_GetHallSectorMap(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
+
+uint8_t CAN_SetWatchdog(uint8_t buffer[], uint8_t *buffer_len, bool rtr);
