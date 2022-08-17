@@ -179,7 +179,7 @@ class InSilico(can.BusABC):
         self.buffer = create_frame(self.node_id, 0x17, False, gen_payload)
 
     def _get_device_info(self, payload):
-        vals: Tuple = (0, 0, 8, 15, 25)
+        vals: Tuple = (0, 0, 8, 16, 25)
         gen_payload = self.codec.serialize(vals, *can_endpoints["device_info"]["types"])
         self.buffer = create_frame(self.node_id, 0x1A, False, gen_payload)
 
