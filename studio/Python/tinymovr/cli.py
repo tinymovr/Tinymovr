@@ -17,7 +17,7 @@ import IPython
 from traitlets.config import Config
 from docopt import docopt
 
-from tinymovr import init_tee
+from tinymovr import init_tee, destroy_tee
 from tinymovr.discovery import Discovery
 from tinymovr.constants import app_name, base_node_name
 from tinymovr.config import get_bus_config, configure_logging
@@ -90,3 +90,4 @@ def spawn():
     c.TerminalIPythonApp.display_banner = False
     IPython.start_ipython(argv=[], config=c, user_ns=user_ns)
     logger.debug("Exiting...")
+    destroy_tee()

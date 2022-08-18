@@ -5,7 +5,7 @@ from PySide2.QtCore import QObject
 from PySide2.QtWidgets import (
     QApplication,
 )
-from tinymovr.tee import init_tee
+from tinymovr.tee import init_tee, destroy_tee
 from tinymovr.discovery import Discovery
 from tinymovr.constants import base_node_name
 
@@ -32,6 +32,7 @@ class Worker(QObject):
             self.get_values()
             QApplication.processEvents()
             time.sleep(0.05)
+        destroy_tee()
 
     @QtCore.Slot()
     def stop(self):
