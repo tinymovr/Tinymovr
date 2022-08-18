@@ -13,6 +13,14 @@ This repository holds the open source firmware, client library, hardware designs
 
 ### Repository Structure
 
+The master branch of this repository reflects the latest release.
+
+Development takes place at the [develop](https://github.com/tinymovr/Tinymovr/tree/develop) branch.
+
+We try to follow [A successful Git branching model](https://nvie.com/posts/a-successful-git-branching-model/) as much as possible.
+
+The repository is organized as follows:
+
 [firmware](./firmware/): Firmware for the PAC5527 MCU in Tinymovr
 
 [studio](./studio/): Tinymovr Studio client software and library
