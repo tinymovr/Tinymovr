@@ -11,13 +11,6 @@ This is the most straightforward method to install Tinymovr studio and have acce
 
     pip3 install tinymovr
 
-#### Installing earlier versions
-
-The above command will install the latest version of Tinymovr Studio available on PyPI. In order to maintain backwards compatibility with existing projects, earlier versions of Tinymovr are made available. Currently, the following versions are recommended:
-
-- [Tinymovr Studio Latest](https://pypi.org/project/tinymovr/) (latest version)
-- [Tinymovr Studio 2.7](https://pypi.org/project/tinymovr/0.2.7/) (latest version without units)
-
 ### Installing using git clone
 
 First clone the Tinymovr repo to a local directory:
@@ -29,16 +22,17 @@ Then cd to the cloned repo directory and install in developer mode:
     cd Tinymovr/studio/Python
     pip3 install -e .
 
-### Launching the command line app
+### Launching the GUI app
 
     tinymovr
 
+### Launching the command line app
+
+    tinymovr_cli
+
 ### More information
 
-For documentation:
+[Website and Store](https://tinymovr.com)
 
-https://tinymovr.readthedocs.io
+[Documentation](https://tinymovr.readthedocs.io)
 
-For more information on Tinymovr:
-
-https://hackaday.io/project/168650-tinymovr-motor-controller
