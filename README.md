@@ -7,17 +7,19 @@
 
 This repository holds the open source firmware, client library, hardware designs and documentation source.
 
-### Documentation
+**[Documentation@Readthedocs](https://tinymovr.readthedocs.io)**
 
-[Documentation is available at Readthedocs.](https://tinymovr.readthedocs.io)
+## Getting Started
+
+Please visit the [Quick Start Guide](https://tinymovr.readthedocs.io/en/latest/quickstart.html)
+
+## Getting Help
+
+Please visit the [Discussions Page](https://github.com/tinymovr/Tinymovr/discussions) and the [Discord Server](https://discord.gg/vNvmpfthug) to ask any questions. If you are unable to find an answer to your question, you are welcome to start a new discussion or ask away at Discord.
+
+If you would like to propose a feature or think you have found a bug, please open a new issue.
 
 ### Repository Structure
-
-The master branch of this repository reflects the latest release.
-
-Development takes place at the [develop](https://github.com/tinymovr/Tinymovr/tree/develop) branch.
-
-We try to follow [A successful Git branching model](https://nvie.com/posts/a-successful-git-branching-model/) as much as possible.
 
 The repository is organized as follows:
 
@@ -28,6 +30,28 @@ The repository is organized as follows:
 [hardware](./hardware): Designs and drawings for related hardware
 
 [documentation](./docs): Documentation source
+
+### Branching Model
+
+The master branch reflects the latest release.
+
+Features are merged into the [develop](https://github.com/tinymovr/Tinymovr/tree/develop) branch.
+
+Hotfixes are merged directly into master, resulting in a new release.
+
+We try to follow [A successful Git branching model](https://nvie.com/posts/a-successful-git-branching-model/) as much as possible, but within reason.
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/tinymovr/tinymovr/tags). 
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+[GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
 
 ### External Links
 
