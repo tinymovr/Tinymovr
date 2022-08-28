@@ -153,7 +153,7 @@ class MainWindow(QMainWindow):
                 widget.setCheckState(0, QtCore.Qt.Unchecked)
                 widget._tm_attribute = node
                 widget._editing = False
-                attribute_widgets_by_id[node.ep_id] = {"node": node, "widget": widget}
+                attribute_widgets_by_id[node.full_name] = {"node": node, "widget": widget}
             except AttributeError:
                 # Must be a RemoteFunction then
                 widget._tm_function = node
@@ -182,24 +182,24 @@ class MainWindow(QMainWindow):
             attr = item._tm_attribute
         except AttributeError:
             return
-        attr_id = attr.ep_id
+        attr_name = attr.full_name
         self.TreeItemCheckedSignal.emit({"attr": attr, "enabled": enabled})
-        if enabled and attr_id not in self.graphs_by_id:
+        if enabled and attr_name not in self.graphs_by_id:
             graph = self.make_graph(attr)
-            self.graphs_by_id[attr_id] = graph
+            self.graphs_by_id[attr_name] = graph
             self.right_layout.addWidget(graph["widget"])
-        elif not enabled and attr_id in self.graphs_by_id:
-            self.graphs_by_id[attr_id]["widget"].deleteLater()
-            del self.graphs_by_id[attr_id]
+        elif not enabled and attr_name in self.graphs_by_id:
+            self.graphs_by_id[attr_name]["widget"].deleteLater()
+            del self.graphs_by_id[attr_name]
 
     @QtCore.Slot()
     def update_attrs(self, data):
-        for attr_id, val in data.items():
-            self.attribute_widgets_by_id[attr_id]["widget"].setText(
+        for attr_name, val in data.items():
+            self.attribute_widgets_by_id[attr_name]["widget"].setText(
                 1, format_value(val)
             )
-            if attr_id in self.graphs_by_id:
-                graph_info = self.graphs_by_id[attr_id]
+            if attr_name in self.graphs_by_id:
+                graph_info = self.graphs_by_id[attr_name]
                 data_line = graph_info["data_line"]
                 x = graph_info["data"]["x"]
                 y = graph_info["data"]["y"]

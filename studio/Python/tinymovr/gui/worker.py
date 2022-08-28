@@ -40,7 +40,7 @@ class Worker(QObject):
 
     def get_values(self):
         # TODO: Handle possible exception
-        updated_attrs = {attr.ep_id: attr.get_value() for attr in self.active_attrs}
+        updated_attrs = {attr.full_name: attr.get_value() for attr in self.active_attrs}
         if len(updated_attrs) > 0:
             self.update_attrs.emit(updated_attrs)
 
