@@ -48,6 +48,7 @@ class Worker(QObject):
         node_name = "{}{}".format(base_node_name, name)
         self.tms_by_id[node_name] = node
         node.name = node_name
+        node.include_base_name = True
         self.regen.emit(self.tms_by_id)
 
     def node_disappeared(self, name):
