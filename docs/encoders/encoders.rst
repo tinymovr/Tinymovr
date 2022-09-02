@@ -42,7 +42,7 @@ As a first step you need to configure the sensor type and observer bandwidth.
 
     tm1.set_encoder_config(1, 100) # encoder type, bandwidth
 
-This sets the encoder type to Hall effect sensor, and the encoder bandwidth to 100.
+This sets the encoder type to Hall effect sensor, and the encoder bandwidth to 100. 
 
 The bandwidth value is configurable and depends on the dynamics that you wish to achieve with your motor. Keep in mind that high bandwidth values used with motors with fewer pole pairs will make the motors oscillate around the setpoint and have a rough tracking performance (perceivable "knocks" when the rotor moves). On the other hand, too low of a bandwidth value may cause the motor to lose tracking in highly dynamic motions. If you are certain such motions will not be possible (e.g. in heavy moving platforms) you may reduce the bandwidth to ensure smoother motion.
 
@@ -51,9 +51,22 @@ Next, you need to set the motor configuration:
 .. code-block:: python
 
     tm1.set_motor_config(0, 15) # motor type, pole pairs
-    tm1.reset()
+    tm1.save_config()
+    tm1.reset() # encoder change is applied after reset
     
-This sets the motor type and pole pairs, and restarts Tinymovr. The board restart is mandatory, as the encoder setup is performed on board startup only. Next comes motor/encoder calibration:
+This sets the motor type and pole pairs, and restarts Tinymovr. The board needs to be reset following saving of the config, to enable the encoder change. For safety reasons, any change to the encoder type is only enabled at next boot. 
+
+Next comes tuning of gains. Gains are determined on the resolution of a full mechanical turn fo the motor. When using the onboard magnetic sensor, the resolution is fixed to 8192 ticks. However, when using the Hall effect sensor, the mechanical resolution is variable, and amounts to `6 * pole_pair_count`. As such, if you have a 15 pp motor, your mechanical resolution would be 90. 
+
+Because of this vast change in resolution (almost 2 orders of magnitude), the gains need to be updated:
+
+.. code-block:: python
+
+    tm1.set_gains(5, 0.07) # position gain, velocity gain
+
+The values above are just an example using a 15 pp hoverboard motor. For your own motor, you need to determine these experimentally. In position control mode, start by raising the default velocity gain until your motor experiences oscillations. The back up by a factor of two, and repeat the same for position control. This simple tuning heuristic does not result in an optimal configuration but the gains are workable.
+
+Last step is motor/encoder calibration:
 
 .. code-block:: python
 
@@ -64,6 +77,6 @@ After calibration finishes, you should be able to control the motor:
 .. code-block:: python
 
     tm1.velocity_control()
-    tm1.set_vel_setpoint(100)
+    tm1.set_vel_setpoint(100) # around 60 rpm for a 15 pp motor
 
 The motor should now move at a constant velocity.
