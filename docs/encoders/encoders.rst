@@ -6,10 +6,25 @@ Overview
 
 This document provides information and guides for using the various encoder types supported by Tinymovr.
 
+Observer bandwidth
+******************
+
+Tinymovr uses an observer in order to filter readings from the encoders. The bandwidth value corresponds to the desired observer bandwidth. It is a configurable value and depends on the dynamics that you wish to achieve with your motor. Keep in mind that high bandwidth values used with motors with fewer pole pairs will make the motors oscillate around the setpoint and have a rough tracking performance (perceivable "knocks" when the rotor moves). On the other hand, too low of a bandwidth value may cause the motor to lose tracking in highly dynamic motions. If you are certain such motions will not be possible (e.g. in heavy moving platforms) you may reduce the bandwidth to ensure smoother motion.
+
 Onboard Magnetic
 ****************
 
 All Tinymovr controllers feature an onboard magnetic absolute angle sensor that allows high precision angle measurement for efficient commutation and high bandwidth motor control. This is enabled by default and does not require any specific setup, apart from initial encoder/motor calibration.
+
+The onboard sensor is enabled by default, so no special configuration is necessary. Should you need to switch to the onboard sensor, use the following commands:
+
+.. code-block:: python
+
+    tm1.set_encoder_config(0, 1500) # encoder type, bandwidth
+    tm1.save_config()
+    tm1.reset() # encoder change is applied after reset
+
+The value of 1500 in bandwidth is the default value configured for the onboard sensor, which works well for most configurations.
 
 Hall Effect Sensor
 ******************
@@ -43,8 +58,6 @@ As a first step you need to configure the sensor type and observer bandwidth.
     tm1.set_encoder_config(1, 100) # encoder type, bandwidth
 
 This sets the encoder type to Hall effect sensor, and the encoder bandwidth to 100. 
-
-The bandwidth value is configurable and depends on the dynamics that you wish to achieve with your motor. Keep in mind that high bandwidth values used with motors with fewer pole pairs will make the motors oscillate around the setpoint and have a rough tracking performance (perceivable "knocks" when the rotor moves). On the other hand, too low of a bandwidth value may cause the motor to lose tracking in highly dynamic motions. If you are certain such motions will not be possible (e.g. in heavy moving platforms) you may reduce the bandwidth to ensure smoother motion.
 
 Next, you need to set the motor configuration:
 
