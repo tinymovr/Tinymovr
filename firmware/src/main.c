@@ -28,6 +28,7 @@
 #include "src/timer/timer.h"
 #include "src/can/can.h"
 #include "src/nvm/nvm.h"
+#include "src/watchdog/watchdog.h"
 
 int main(void)
 {
@@ -41,6 +42,7 @@ int main(void)
 	GateDriver_Init();
     CAN_init();
     Timer_Init();
+    Watchdog_init();
     __enable_irq();
 
     Controller_ControlLoop();

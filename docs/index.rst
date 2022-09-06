@@ -22,6 +22,7 @@ Welcome to Tinymovr documentation!
    protocol/reference
    interfaces/interfaces
    
+   encoders/encoders
    planner/planner
    upgrade/upgrade
    hardware/gimbal

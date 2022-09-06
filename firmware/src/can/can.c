@@ -17,7 +17,7 @@
 #include <string.h>
 
 #include <src/utils/utils.h>
-
+#include <src/watchdog/watchdog.h>
 #include <src/can/can_endpoints.h>
 #include <src/can/can_func.h>
 #include <src/can/can.h>
@@ -129,6 +129,8 @@ void CAN_process_interrupt(void)
             can_transmit_extended(data_length, rx_id, can_msg_buffer);
         }
     }
+
+    Watchdog_reset();
 }
 
 CANConfig *CAN_get_config(void)

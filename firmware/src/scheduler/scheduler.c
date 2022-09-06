@@ -50,6 +50,11 @@ void WaitForControlLoopInterrupt(void)
 			state.uart_message_interrupt = false;
 			UART_process_message();
 		}
+		else if (state.wwdt_interrupt)
+		{
+			state.wwdt_interrupt = false;
+			WWDT_process_interrupt();
+		}
 		else
 		{
 			// Go back to sleep
@@ -112,6 +117,14 @@ void SysTick_Handler(void)  /* SysTick interrupt Handler. */
 void UART_ReceiveMessageHandler(void)
 {
 	state.uart_message_interrupt = true;
+}
+
+void Wdt_IRQHandler(void)
+{
+	state.wwdt_interrupt = true;
+	PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_WRITE_AVALABLE;
+    // Interrupt flag needs to be cleared here
+    PAC55XX_WWDT->WWDTFLAG.IF = 1;
 }
 
 uint32_t Scheduler_GetTotalCycles(void)

@@ -19,6 +19,8 @@
 #define SYSTEM_SYSTEM_H_
 
 #include "src/common.h"
+#define CLKREF_FREQ_HZ              (4000000)
+#define FRCLK_FREQ_HZ               CLKREF_FREQ_HZ
 
 typedef struct {
     float Vbus;
