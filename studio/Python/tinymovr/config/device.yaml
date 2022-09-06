@@ -321,3 +321,20 @@ remote_attributes:
         flags: [INVALID_INPUT, VCRUISE_OVER_LIMIT]
         getter_name: planner_get_errors
         summary: Any errors in the trajectory planner, as a bitmask
+  - name: watchdog
+    remote_attributes:
+      - name: enabled
+        dtype: bool
+        getter_name: Watchdog_get_enabled
+        setter_name: Watchdog_set_enabled
+        summary: Whether the watchdog is enabled or not.
+      - name: triggered
+        dtype: bool
+        getter_name: Watchdog_triggered
+        summary: Whether the watchdog has been triggered or not.
+      - name: timeout
+        dtype: float
+        unit: s
+        getter_name: Watchdog_get_timeout_seconds
+        setter_name: Watchdog_set_timeout_seconds
+        summary: The watchdog timeout period.

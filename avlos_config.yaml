@@ -19,6 +19,7 @@ generators:
     - src/scheduler/scheduler.h
     - src/controller/controller.h
     - src/nvm/nvm.h
+    - src/watchdog/watchdog.h
     - src/can/can_endpoints.h
   generator_rst:
     enabled: true

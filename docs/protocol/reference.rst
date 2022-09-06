@@ -561,3 +561,33 @@ Type: uint8
 Any errors in the trajectory planner, as a bitmask
 
 
+watchdog.enabled
+-------------------------------------------------------------------
+
+ID: 55
+Type: bool
+
+
+Whether the watchdog is enabled or not.
+
+
+watchdog.triggered
+-------------------------------------------------------------------
+
+ID: 56
+Type: bool
+
+
+Whether the watchdog has been triggered or not.
+
+
+watchdog.timeout
+-------------------------------------------------------------------
+
+ID: 57
+Type: float
+Units: second
+
+The watchdog timeout period.
+
+
