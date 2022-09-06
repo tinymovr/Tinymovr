@@ -22,6 +22,7 @@ typedef struct
 	bool adc_interrupt;
 	bool can_interrupt;
 	bool uart_message_interrupt;
+    bool wwdt_interrupt;
 	bool busy;
 
     uint8_t errors;

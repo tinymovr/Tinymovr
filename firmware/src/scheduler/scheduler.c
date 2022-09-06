@@ -27,6 +27,7 @@
 #include <src/observer/observer.h>
 #include <src/can/can_endpoints.h>
 #include <src/scheduler/scheduler.h>
+#include <src/watchdog/watchdog.h>
 
 volatile uint32_t msTicks = 0;
 
