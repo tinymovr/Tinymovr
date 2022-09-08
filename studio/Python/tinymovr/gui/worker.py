@@ -31,7 +31,7 @@ class Worker(QObject):
         while self.running:
             self.get_values()
             QApplication.processEvents()
-            time.sleep(0.05)
+            time.sleep(0.02)
         destroy_tee()
 
     @QtCore.Slot()
