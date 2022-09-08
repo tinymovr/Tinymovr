@@ -48,6 +48,7 @@ static ControllerState state = {
 
     .pos_setpoint = 0.0f,
     .vel_setpoint = 0.0f,
+    .vel_setpoint_goal = 0.0f,
     .Iq_setpoint = 0.0f,
 
     .vel_integrator_Iq = 0.0f,
@@ -70,7 +71,9 @@ static ControllerConfig config = {
     .I_gain = 0.0f,
     .Iq_integrator_gain = 0.0f,
     .Id_integrator_gain = 0.0f,
-    .I_k = 0.3f};
+    .I_k = 0.3f,
+
+    .max_vel_increment = 20.0f}; // ticks/s 
 
 void Controller_ControlLoop(void)
 {
@@ -137,6 +140,22 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         }
     }
 
+    const float vel_setpoint_delta = state.vel_setpoint_goal - state.vel_setpoint;
+    if (abs(vel_setpoint_delta) <= config.max_vel_increment)
+    {
+        state.vel_setpoint = state.vel_setpoint_goal;
+    }
+    else
+    {
+        if (vel_setpoint_delta < 0)
+        {
+            state.vel_setpoint -= config.max_vel_increment;
+        }
+        else 
+        {
+            state.vel_setpoint += config.max_vel_increment;
+        }
+    }
     // The actual velocity setpoint and the one used by the velocity integrator are
     // separate because the latter takes into account a user-confiugurable deadband
     // around the position setpoint, where the integrator "sees" no error
@@ -324,7 +343,7 @@ PAC5XXX_RAMFUNC float controller_get_vel_setpoint_user_frame(void)
 PAC5XXX_RAMFUNC void controller_set_vel_setpoint_user_frame(float value)
 {
     // direction is either 1 or -1 so we can multiply instead of divide
-    state.vel_setpoint = value * motor_get_user_direction();
+    state.vel_setpoint_goal = value * motor_get_user_direction();
 }
 
 PAC5XXX_RAMFUNC float controller_get_Iq_estimate(void)
@@ -446,6 +465,19 @@ void Controller_SetVelLimit(float limit)
     {
         config.vel_limit = limit;
     }
+}
+
+void Controller_SetVelIncrement(float increment)
+{
+    if (increment > 0.0f)
+    {
+        config.max_vel_increment = increment;
+    }
+}
+
+float Controller_GetVelIncrement(void)
+{
+    return config.max_vel_increment;
 }
 
 float Controller_GetIqLimit(void)

@@ -386,4 +386,14 @@ for velocity-limited plan moves",
         "defaults": {"timeout": 3},
         "labels": ("enabled", "timeout")
     },
+    "set_vel_inc":
+    {
+        "description": "Set vel inc.",
+        "type": "rw",
+        "ep_id": 0x02B,
+        "types": (DataType.FLOAT,),
+        "units": ("ticks/second",),
+        "labels": ("increment",),
+        "defaults": {"increment": 100,}
+    },
 }

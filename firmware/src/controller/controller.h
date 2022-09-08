@@ -51,6 +51,7 @@ typedef struct
 
     float pos_setpoint;
     float vel_setpoint;
+    float vel_setpoint_goal;
     float Iq_setpoint;
 
     float vel_integrator_Iq;
@@ -76,6 +77,8 @@ typedef struct
     float Iq_integrator_gain;
     float Id_integrator_gain;
     float I_k;
+    
+    float max_vel_increment;
 } ControllerConfig;
 
 void Controller_ControlLoop(void);
@@ -117,6 +120,8 @@ float Controller_GetVelLimit(void);
 void Controller_SetVelLimit(float limit);
 float Controller_GetIqLimit(void);
 void Controller_SetIqLimit(float limit);
+float Controller_GetVelIncrement(void);
+void Controller_SetVelIncrement(float inc);
 
 void controller_set_motion_plan(MotionPlan mp);
 
