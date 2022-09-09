@@ -23,15 +23,19 @@ class Worker(QObject):
         self.dsc = Discovery(
             self.node_appeared, self.node_disappeared, self.logger
         )
+        self.target_dt = 0.02
         self.active_attrs = []
         self.tms_by_id = {}
         self.running = True
 
     def run(self):
         while self.running:
+            startTime = time.time()
             self.get_values()
             QApplication.processEvents()
-            time.sleep(0.02)
+            dt = time.time() - startTime
+            if dt < self.target_dt:
+                time.sleep(self.target_dt - dt)
         destroy_tee()
 
     @QtCore.Slot()
