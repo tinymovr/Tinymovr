@@ -54,6 +54,8 @@ typedef struct
     float vel_setpoint;
     float Iq_setpoint;
 
+    float Vq_setpoint;
+
     float vel_integrator_Iq;
 
     float Iq_integrator_Vq;
@@ -105,6 +107,8 @@ PAC5XXX_RAMFUNC void controller_set_Iq_setpoint(float value);
 PAC5XXX_RAMFUNC float controller_get_Iq_estimate_user_frame(void);
 PAC5XXX_RAMFUNC float controller_get_Iq_setpoint_user_frame(void);
 PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value);
+
+PAC5XXX_RAMFUNC float controller_get_Vq_setpoint_user_frame(void);
 
 void controller_get_modulation_values(struct FloatTriplet *dc);
 

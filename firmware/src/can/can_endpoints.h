@@ -65,7 +65,7 @@ typedef enum
 } traj_planner_errors_flags;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[58])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[59])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -337,6 +337,16 @@ uint8_t avlos_controller_current_bandwidth(uint8_t * buffer, uint8_t * buffer_le
 * @param buffer_len
 */
 uint8_t avlos_controller_current_Iq_p_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_controller_voltage_Vq_setpoint
+*
+* The Vq setpoint.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_controller_voltage_Vq_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_controller_calibrate

@@ -51,6 +51,8 @@ static ControllerState state = {
     .vel_setpoint = 0.0f,
     .Iq_setpoint = 0.0f,
 
+    .Vq_setpoint = 0.0f,
+
     .vel_integrator_Iq = 0.0f,
 
     .Iq_integrator_Vq = 0.0f,
@@ -219,7 +221,8 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         Vd = (delta_Id * config.I_gain) + state.Id_integrator_Vd;
         Vq = (delta_Iq * config.I_gain) + state.Iq_integrator_Vq;
     }
-
+    state.Vq_setpoint = Vq;
+    
     float mod_q = Vq / VBus;
     float mod_d = Vd / VBus;
 
@@ -351,6 +354,11 @@ PAC5XXX_RAMFUNC float controller_get_Iq_setpoint_user_frame(void)
 PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value)
 {
     state.Iq_setpoint = value * motor_get_user_direction();
+}
+
+PAC5XXX_RAMFUNC float controller_get_Vq_setpoint_user_frame(void)
+{
+    return state.Vq_setpoint * motor_get_user_direction();
 }
 
 void controller_get_modulation_values(struct FloatTriplet *dc)

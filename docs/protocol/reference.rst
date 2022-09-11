@@ -279,10 +279,20 @@ Type: float
 The current controller proportional gain.
 
 
-calibrate() -> void
+controller.voltage.Vq_setpoint
 -------------------------------------------------------------------
 
 ID: 27
+Type: float
+Units: volt
+
+The Vq setpoint.
+
+
+calibrate() -> void
+-------------------------------------------------------------------
+
+ID: 28
 Return Type: void
 
 
@@ -292,7 +302,7 @@ Calibrate the device.
 idle() -> void
 -------------------------------------------------------------------
 
-ID: 28
+ID: 29
 Return Type: void
 
 
@@ -302,7 +312,7 @@ Set idle mode, disabling the driver.
 position_mode() -> void
 -------------------------------------------------------------------
 
-ID: 29
+ID: 30
 Return Type: void
 
 
@@ -312,7 +322,7 @@ Set position control mode.
 velocity_mode() -> void
 -------------------------------------------------------------------
 
-ID: 30
+ID: 31
 Return Type: void
 
 
@@ -322,7 +332,7 @@ Set velocity control mode.
 current_mode() -> void
 -------------------------------------------------------------------
 
-ID: 31
+ID: 32
 Return Type: void
 
 
@@ -334,7 +344,7 @@ Set current control mode.
 comms.can.rate
 -------------------------------------------------------------------
 
-ID: 32
+ID: 33
 Type: uint32
 
 
@@ -344,7 +354,7 @@ The baud rate of the CAN interface.
 comms.can.id
 -------------------------------------------------------------------
 
-ID: 33
+ID: 34
 Type: uint32
 
 
@@ -354,7 +364,7 @@ The ID of the CAN interface.
 motor.R
 -------------------------------------------------------------------
 
-ID: 34
+ID: 35
 Type: float
 Units: ohm
 
@@ -364,7 +374,7 @@ The motor Resistance value.
 motor.L
 -------------------------------------------------------------------
 
-ID: 35
+ID: 36
 Type: float
 Units: henry
 
@@ -374,7 +384,7 @@ The motor Inductance value.
 motor.pole_pairs
 -------------------------------------------------------------------
 
-ID: 36
+ID: 37
 Type: uint8
 
 
@@ -384,7 +394,7 @@ The motor pole pair count.
 motor.type
 -------------------------------------------------------------------
 
-ID: 37
+ID: 38
 Type: uint8
 
 
@@ -394,7 +404,7 @@ The type of the motor. Either high current or gimbal.
 motor.offset
 -------------------------------------------------------------------
 
-ID: 38
+ID: 39
 Type: float
 
 
@@ -404,7 +414,7 @@ User-defined offset of the motor.
 motor.direction
 -------------------------------------------------------------------
 
-ID: 39
+ID: 40
 Type: int8
 
 
@@ -414,7 +424,7 @@ User-defined direction of the motor.
 motor.calibrated
 -------------------------------------------------------------------
 
-ID: 40
+ID: 41
 Type: bool
 
 
@@ -424,7 +434,7 @@ Whether the motor has been calibrated.
 motor.I_cal
 -------------------------------------------------------------------
 
-ID: 41
+ID: 42
 Type: float
 Units: ampere
 
@@ -434,7 +444,7 @@ The calibration current.
 motor.errors
 -------------------------------------------------------------------
 
-ID: 42
+ID: 43
 Type: uint8
 
 
@@ -444,7 +454,7 @@ Any motor/calibration errors, as a bitmask
 encoder.position_estimate
 -------------------------------------------------------------------
 
-ID: 43
+ID: 44
 Type: float
 Units: tick
 
@@ -454,7 +464,7 @@ The filtered encoder position estimate.
 encoder.velocity_estimate
 -------------------------------------------------------------------
 
-ID: 44
+ID: 45
 Type: float
 Units: tick / second
 
@@ -464,7 +474,7 @@ The filtered encoder velocity estimate.
 encoder.type
 -------------------------------------------------------------------
 
-ID: 45
+ID: 46
 Type: uint8
 
 
@@ -474,7 +484,7 @@ The encoder type. Either INTERNAL or HALL.
 encoder.bandwidth
 -------------------------------------------------------------------
 
-ID: 46
+ID: 47
 Type: float
 Units: radian / second
 
@@ -484,7 +494,7 @@ The encoder observer bandwidth.
 encoder.calibrated
 -------------------------------------------------------------------
 
-ID: 47
+ID: 48
 Type: bool
 
 
@@ -494,7 +504,7 @@ Whether the encoder has been calibrated.
 encoder.errors
 -------------------------------------------------------------------
 
-ID: 48
+ID: 49
 Type: uint8
 
 
@@ -504,7 +514,7 @@ Any encoder errors, as a bitmask
 traj_planner.max_accel
 -------------------------------------------------------------------
 
-ID: 49
+ID: 50
 Type: float
 Units: tick / second
 
@@ -514,7 +524,7 @@ The trajectory planner max acceleration.
 traj_planner.max_decel
 -------------------------------------------------------------------
 
-ID: 50
+ID: 51
 Type: float
 Units: tick / second ** 2
 
@@ -524,7 +534,7 @@ The trajectory planner max deceleration.
 traj_planner.max_vel
 -------------------------------------------------------------------
 
-ID: 51
+ID: 52
 Type: float
 Units: tick / second
 
@@ -534,7 +544,7 @@ The trajectory planner max cruise velocity.
 move_to(pos_setpoint) -> void
 -------------------------------------------------------------------
 
-ID: 52
+ID: 53
 Return Type: void
 
 
@@ -544,7 +554,7 @@ Move to target position respecting velocity and acceleration limits.
 move_to_tlimit(pos_setpoint) -> void
 -------------------------------------------------------------------
 
-ID: 53
+ID: 54
 Return Type: void
 
 
@@ -554,7 +564,7 @@ Move to target position respecting time limits for each sector.
 traj_planner.errors
 -------------------------------------------------------------------
 
-ID: 54
+ID: 55
 Type: uint8
 
 
@@ -564,7 +574,7 @@ Any errors in the trajectory planner, as a bitmask
 watchdog.enabled
 -------------------------------------------------------------------
 
-ID: 55
+ID: 56
 Type: bool
 
 
@@ -574,7 +584,7 @@ Whether the watchdog is enabled or not.
 watchdog.triggered
 -------------------------------------------------------------------
 
-ID: 56
+ID: 57
 Type: bool
 
 
@@ -584,7 +594,7 @@ Whether the watchdog has been triggered or not.
 watchdog.timeout
 -------------------------------------------------------------------
 
-ID: 57
+ID: 58
 Type: float
 Units: second
 
