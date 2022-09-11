@@ -90,7 +90,7 @@ class MainWindow(QMainWindow):
 
         self.thread = QtCore.QThread()
         self.worker = Worker(bustype, channel, bitrate, self.logger)
-        self.TreeItemCheckedSignal.connect(self.worker.update_checkstates)
+        self.TreeItemCheckedSignal.connect(self.worker.update_active_attrs)
         self.thread.started.connect(self.worker.run)
         self.worker.moveToThread(self.thread)
         self.worker.regen.connect(self.regen_tree)

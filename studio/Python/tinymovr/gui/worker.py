@@ -1,10 +1,12 @@
 import time
+from tracemalloc import start
 import can
 from PySide2 import QtCore
 from PySide2.QtCore import QObject
 from PySide2.QtWidgets import (
     QApplication,
 )
+from avlos.definitions import RemoteAttribute
 from tinymovr.tee import init_tee, destroy_tee
 from tinymovr.discovery import Discovery
 from tinymovr.constants import base_node_name
@@ -25,15 +27,20 @@ class Worker(QObject):
         )
         self.target_dt = 0.02
         self.active_attrs = []
+        self.dynamic_attrs = []
         self.tms_by_id = {}
+        self.dynamic_attrs_last_update = {}
+        self.dynamic_attrs_update_period = 0.5 #sec
         self.running = True
 
     def run(self):
         while self.running:
-            startTime = time.time()
-            self.get_values()
+            start_time = time.time()
+            last_updated = self.get_attr_values()
+            if len(last_updated) > 0:
+                self.update_attrs.emit(last_updated)
             QApplication.processEvents()
-            dt = time.time() - startTime
+            dt = time.time() - start_time
             if dt < self.target_dt:
                 time.sleep(self.target_dt - dt)
         destroy_tee()
@@ -42,28 +49,55 @@ class Worker(QObject):
     def stop(self):
         self.running = False
 
-    def get_values(self):
+    def get_attr_values(self):
+        """
+        
+        """
         # TODO: Handle possible exception
-        updated_attrs = {attr.full_name: attr.get_value() for attr in self.active_attrs}
-        if len(updated_attrs) > 0:
-            self.update_attrs.emit(updated_attrs)
+        vals = {attr.full_name: attr.get_value() for attr in self.active_attrs}
+        start_time = time.time()
+        for attr in self.dynamic_attrs:
+            try:
+                t = self.dynamic_attrs_last_update[attr.full_name]
+            except KeyError:
+                t = 0
+            if start_time - t > self.dynamic_attrs_update_period:
+                vals[attr.full_name] = attr.get_value()
+                self.dynamic_attrs_last_update[attr.full_name] = start_time
+                break
+        return vals
 
     def node_appeared(self, node, name):
         node_name = "{}{}".format(base_node_name, name)
         self.tms_by_id[node_name] = node
         node.name = node_name
         node.include_base_name = True
+        self.dynamic_attrs = self.get_dynamic_attrs(self.tms_by_id)
         self.regen.emit(self.tms_by_id)
 
     def node_disappeared(self, name):
         node_name = "{}{}".format(base_node_name, name)
         del self.tms_by_id[node_name]
+        self.dynamic_attrs = self.get_dynamic_attrs(self.tms_by_id)
         self.regen.emit(self.tms_by_id)
 
     @QtCore.Slot(dict)
-    def update_checkstates(self, d):
+    def update_active_attrs(self, d):
         attr = d["attr"]
         if d["enabled"] == True and attr not in self.active_attrs:
             self.active_attrs.append(attr)
         elif d["enabled"] == False and attr in self.active_attrs:
             self.active_attrs.remove(attr)
+
+    def get_dynamic_attrs(self, attr_dict):
+        """
+        Get the attributes that are marked as dynamic in the spec.
+        """
+        dynamic_attrs = []
+        for _, attr in attr_dict.items():
+            if isinstance(attr, RemoteAttribute):
+                if attr.dynamic_value == True:
+                    dynamic_attrs.append(attr)
+            elif hasattr(attr, "remote_attributes"):
+                dynamic_attrs.extend(self.get_dynamic_attrs(attr.remote_attributes))
+        return dynamic_attrs
