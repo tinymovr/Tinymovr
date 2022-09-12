@@ -11,7 +11,6 @@ Options:
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
 
-import os
 import sys
 import pkg_resources
 from docopt import docopt
