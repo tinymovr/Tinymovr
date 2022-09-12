@@ -26,6 +26,8 @@ class Worker(QObject):
             self.node_appeared, self.node_disappeared, self.logger
         )
         self.target_dt = 0.02
+        self.meas_dt = self.target_dt
+        self.load = 0
         self.active_attrs = []
         self.dynamic_attrs = []
         self.tms_by_id = {}
@@ -40,9 +42,14 @@ class Worker(QObject):
             if len(last_updated) > 0:
                 self.update_attrs.emit(last_updated)
             QApplication.processEvents()
-            dt = time.time() - start_time
-            if dt < self.target_dt:
-                time.sleep(self.target_dt - dt)
+            busy_dt = time.time() - start_time
+            if busy_dt < self.target_dt:
+                self.load = busy_dt/self.target_dt
+                time.sleep(self.target_dt - busy_dt)
+                self.meas_dt = self.target_dt
+            else:
+                self.load = 1
+                self.meas_dt = busy_dt
         destroy_tee()
 
     @QtCore.Slot()

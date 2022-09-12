@@ -19,6 +19,7 @@ from tinymovr.config import get_bus_config, configure_logging
 from avlos import get_registry
 from tinymovr.gui import Worker, format_value, load_icon
 
+
 class MainWindow(QMainWindow):
 
     TreeItemCheckedSignal = Signal(dict)
@@ -153,7 +154,10 @@ class MainWindow(QMainWindow):
                 widget.setCheckState(0, QtCore.Qt.Unchecked)
                 widget._tm_attribute = node
                 widget._editing = False
-                attribute_widgets_by_id[node.full_name] = {"node": node, "widget": widget}
+                attribute_widgets_by_id[node.full_name] = {
+                    "node": node,
+                    "widget": widget,
+                }
             except AttributeError:
                 # Must be a RemoteFunction then
                 widget._tm_function = node
@@ -212,13 +216,18 @@ class MainWindow(QMainWindow):
                 except AttributeError:
                     y.append(val)
                 data_line.setData(x, y)
+        self.status_label.setText(
+            "Rate: {:.1f}, Channel Load: {:.1f}".format(
+                1 / self.worker.meas_dt, self.worker.load * 100
+            )
+        )
 
     @QtCore.Slot()
     def double_click(self, item, column):
         if 1 == column:
             if (
-                hasattr(item, "_tm_attribute") and
-                hasattr(item._tm_attribute, "setter_name")
+                hasattr(item, "_tm_attribute")
+                and hasattr(item._tm_attribute, "setter_name")
                 and None != item._tm_attribute.setter_name
             ):
                 item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
