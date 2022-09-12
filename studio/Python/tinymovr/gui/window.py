@@ -34,6 +34,9 @@ class MainWindow(QMainWindow):
         }
         self.tau = 0.02
 
+        # set units default format
+        get_registry().default_format = ".6f~"
+
         self.start_time = time.time()
         self.logger = configure_logging()
         bitrate = int(arguments["--bitrate"])
