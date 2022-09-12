@@ -27,6 +27,7 @@ class Worker(QObject):
         )
         self.target_dt = 0.02
         self.meas_dt = self.target_dt
+        self.rt_dt = 0.0
         self.load = 0
         self.active_attrs = []
         self.dynamic_attrs = []
@@ -44,7 +45,7 @@ class Worker(QObject):
             QApplication.processEvents()
             busy_dt = time.time() - start_time
             if busy_dt < self.target_dt:
-                self.load = busy_dt/self.target_dt
+                self.load = self.load * 0.99 + busy_dt/self.target_dt * 0.01
                 time.sleep(self.target_dt - busy_dt)
                 self.meas_dt = self.target_dt
             else:
@@ -61,7 +62,9 @@ class Worker(QObject):
         
         """
         # TODO: Handle possible exception
-        vals = {attr.full_name: attr.get_value() for attr in self.active_attrs}
+        vals = {}
+        for attr in self.active_attrs:
+            vals[attr.full_name] = self.get_value_meas(attr)
         start_time = time.time()
         for attr in self.dynamic_attrs:
             try:
@@ -69,10 +72,17 @@ class Worker(QObject):
             except KeyError:
                 t = 0
             if start_time - t > self.dynamic_attrs_update_period:
-                vals[attr.full_name] = attr.get_value()
+                vals[attr.full_name] = self.get_value_meas(attr)
                 self.dynamic_attrs_last_update[attr.full_name] = start_time
                 break
         return vals
+
+    def get_value_meas(self, attr):
+        get_start_time = time.time()
+        val = attr.get_value()
+        get_dt = time.time() - get_start_time
+        self.rt_dt = self.rt_dt * 0.99 + get_dt * 0.01
+        return val
 
     def node_appeared(self, node, name):
         node_name = "{}{}".format(base_node_name, name)

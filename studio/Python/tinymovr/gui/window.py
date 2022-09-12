@@ -217,8 +217,10 @@ class MainWindow(QMainWindow):
                     y.append(val)
                 data_line.setData(x, y)
         self.status_label.setText(
-            "Rate: {:.1f}, Channel Load: {:.1f}".format(
-                1 / self.worker.meas_dt, self.worker.load * 100
+            "Rate: {:.1f}\t Ch. Load: {:.0f}%\t RT: {:.1f}ms".format(
+                1 / self.worker.meas_dt,
+                self.worker.load * 100,
+                self.worker.rt_dt * 1000,
             )
         )
 
