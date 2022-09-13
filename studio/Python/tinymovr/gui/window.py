@@ -26,14 +26,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self, app, arguments):
         super(MainWindow, self).__init__()
-
-        self.timings = {
-            "set_period": 0.01,
-            "total_meas_period": {"last": 1, "ravg": 1},
-            "can_meas_period": {"last": 1, "ravg": 1},
-        }
-        self.tau = 0.02
-
+        
         # set units default format
         get_registry().default_format = ".6f~"
 
@@ -47,8 +40,7 @@ class MainWindow(QMainWindow):
         self.tree_widget = QTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
         self.tree_widget.itemDoubleClicked.connect(self.double_click)
-        headers = ["Attribute", "Value"]
-        self.tree_widget.setHeaderLabels(headers)
+        self.tree_widget.setHeaderLabels(["Attribute", "Value"])
 
         self.status_label = QLabel()
         self.status_label.setStyleSheet("margin: 5px;")
