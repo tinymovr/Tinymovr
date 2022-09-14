@@ -39,5 +39,5 @@ error_descriptions = {
     ErrorIDs.EncoderReadingOutOfRange: "The encoder angle reading is out of range",
     ErrorIDs.InvalidPlannerInput: "The trajectory planner received invalid input",
     ErrorIDs.PlannerVCruiseOverLimit: "The computed trajectory planner cruise velocity is over the current velocity limit",
-    ErrorIDs.HallSensorCalibrationFailed: "Sectors failed"
+    ErrorIDs.HallSensorCalibrationFailed: "Hall sensor calibration failed. Try again."
 }    

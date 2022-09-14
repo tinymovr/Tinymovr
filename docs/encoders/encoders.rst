@@ -63,7 +63,7 @@ Next, you need to set the motor configuration:
 
 .. code-block:: python
 
-    tm1.set_motor_config(0, 15) # motor type, pole pairs
+    tm1.set_motor_config(0, 15, 4) # motor type, pole pairs, calibration current
     tm1.save_config()
     tm1.reset() # encoder change is applied after reset
     
@@ -77,7 +77,7 @@ Because of this vast change in resolution (almost 2 orders of magnitude), the ga
 
     tm1.set_gains(5, 0.07) # position gain, velocity gain
 
-The values above are just an example using a 15 pp hoverboard motor. For your own motor, you need to determine these experimentally. In position control mode, start by raising the default velocity gain until your motor experiences oscillations. The back up by a factor of two, and repeat the same for position control. This simple tuning heuristic does not result in an optimal configuration but the gains are workable.
+The values above are just an example using a 15 pp hoverboard motor. For your own motor, you need to determine these experimentally. In position control mode, start by raising the default velocity gain until your motor experiences oscillations. The back up by a factor of two, and repeat the same for velocity control. This simple tuning heuristic does not result in an optimal configuration but the gains are workable.
 
 Last step is motor/encoder calibration:
 

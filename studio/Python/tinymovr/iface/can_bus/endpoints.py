@@ -285,7 +285,6 @@ can_endpoints: Dict[str, Dict] = {
         "types": (DataType.UINT8, DataType.UINT8, DataType.FLOAT),
         "labels": ("flags", "pole_pairs", "I_cal"),
         "units": (None, None, "ampere"),
-        "defaults": {"I_cal": 1},
         "ser_map": {"motor": ("pole_pairs", "I_cal")}
     },
     "plan_t_limit":
