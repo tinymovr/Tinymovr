@@ -7,7 +7,7 @@
 #define AIO_INPUT                       0x00
 
 static HallConfig config = { 0 };
-static HAllState state = { 0 };
+static HallState state = { 0 };
 
 void hall_init(void)
 {

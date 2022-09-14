@@ -38,7 +38,9 @@ typedef enum {
 // MA702 commands
 typedef enum {
     MA_CMD_NOP              = 0x0000,
-    MA_CMD_ANGLE            = 0x0000
+    MA_CMD_ANGLE            = 0x0000,
+    MA_CMD_WRITE            = 0x8000,
+    MA_CMD_READ             = 0x4000
 } MA702Command;
 
 void ma7xx_init(void);
@@ -54,3 +56,6 @@ void ma7xx_rec_is_calibrated(void);
 int16_t *ma7xx_get_rec_table_ptr(void);
 MA7xxConfig* ma7xx_get_config(void);
 void ma7xx_restore_config(MA7xxConfig* config_);
+uint16_t ma7xx_write_reg(uint8_t, uint8_t);
+uint16_t ma7xx_write_data(uint16_t);
+uint8_t ma7xx_read_reg(uint8_t);

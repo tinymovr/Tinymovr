@@ -599,9 +599,9 @@ uint8_t CAN_GetHallSectorMap(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     const uint8_t *sector_map = hall_get_sector_map_ptr();
 	const uint8_t sector = hall_get_sector();
     
-    *buffer_len = sizeof(uint8_t);
+    *buffer_len = sizeof(uint8_t) * 8;
     memcpy(&buffer[0], sector_map, sizeof(uint8_t) * 7);
-	memcpy(&buffer[8], &sector, sizeof(uint8_t));
+	memcpy(&buffer[7], &sector, sizeof(uint8_t));
 	return CANRP_Read;
 }
 

@@ -285,6 +285,7 @@ can_endpoints: Dict[str, Dict] = {
         "types": (DataType.UINT8, DataType.UINT8, DataType.FLOAT),
         "labels": ("flags", "pole_pairs", "I_cal"),
         "units": (None, None, "ampere"),
+        "defaults": {"I_cal": 1},
         "ser_map": {"motor": ("pole_pairs", "I_cal")}
     },
     "plan_t_limit":
@@ -374,7 +375,7 @@ for velocity-limited plan moves",
             DataType.UINT8, DataType.UINT8,
             DataType.UINT8, DataType.UINT8,
             DataType.UINT8, DataType.UINT8),
-        "labels": ("s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "current")
+        "labels": ("s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "current hall angle")
     },
     "set_watchdog":
     {

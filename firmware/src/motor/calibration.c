@@ -163,32 +163,67 @@ bool calibrate_hall_sequence(void)
 {
     hall_clear_sector_map();
     uint8_t *sector_map = hall_get_sector_map_ptr();
-    // We'll just do a single electrical cycle
     const float I_setpoint = motor_get_I_cal();
     bool success = true;
+
     // Stay a bit at starting epos
 	for (uint32_t i=0; i<CAL_STAY_LEN; i++)
 	{
 		set_epos_and_wait(0, I_setpoint);
 	}
+    const uint8_t init_sector = hall_get_sector();
+    uint8_t current_sector = init_sector;
+    uint8_t last_sector = init_sector;
+    uint8_t sector_pos = 0;
+    const float increment = TWOPI / CAL_DIR_LEN;
+    float angle = 0;
 
-    // Make a full ecycle and store the sector every 60 deg
-    for (uint8_t j=0; j<HALL_SECTORS; j++)
+    sector_map[current_sector] = sector_pos;
+
+    // Move to the 2nd sector
+    while ((current_sector == init_sector) && (angle < TWOPI / HALL_SECTORS))
     {
-        sector_map[hall_get_sector()] = j;
-        // Move to next epos
-        for (uint32_t i=0; i<CAL_DIR_LEN_PER_SECTOR; i++)
+        set_epos_and_wait(angle, I_setpoint);
+        angle += increment;
+        current_sector = hall_get_sector();
+    }
+
+    // Save the rest of the sectors
+    while ((current_sector != init_sector) && (angle < TWOPI))
+    {
+        if (current_sector != last_sector)
         {
-            set_epos_and_wait(HALL_SECTOR_ANGLE * (j + (float)i/CAL_DIR_LEN_PER_SECTOR), I_setpoint);
+            sector_pos++;
+            if (sector_pos >= HALL_SECTORS)
+            {
+                success = false;
+                break;
+            }
+            sector_map[current_sector] = sector_pos;
         }
+        set_epos_and_wait(angle, I_setpoint);
+        angle += increment;
+        last_sector = current_sector;
+        current_sector = hall_get_sector();
     }
-    // TODO: Assert all expected sectors covered
-    // Move back to start epos
-    for (uint32_t i=0; i<CAL_DIR_LEN; i++)
+
+    gate_driver_set_duty_cycle(&zeroDC);
+
+    // Check that the number of sectors discovered is the same as expected
+    if (sector_pos != HALL_SECTORS - 1)
     {
-        set_epos_and_wait(TWOPI * (1.0f - ((float)i/CAL_DIR_LEN)), I_setpoint);
+        success = false;
     }
-    hall_set_sector_map_calibrated();
+
+    if (success)
+    {
+        hall_set_sector_map_calibrated();
+    }
+    else
+    {
+        add_error_flag(ERROR_HALL_SENSOR_CALIBRATION_FAILED);
+
+    }
     return success;
 }
 
