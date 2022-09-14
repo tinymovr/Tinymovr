@@ -17,11 +17,11 @@ class Worker(QObject):
     update_attrs = QtCore.Signal(dict)
     regen = QtCore.Signal(dict)
 
-    def __init__(self, bustype, channel, bitrate, logger):
+    def __init__(self, busparams, logger):
         super().__init__()
         self.logger = logger
 
-        init_tee(can.Bus(bustype=bustype, channel=channel, bitrate=bitrate))
+        init_tee(can.Bus(**busparams))
         self.dsc = Discovery(
             self.node_appeared, self.node_disappeared, self.logger
         )

@@ -87,13 +87,20 @@ class MainWindow(QMainWindow):
 
         buses = arguments["--bus"].rsplit(sep=",")
         channel = arguments["--chan"]
+        bitrate = int(arguments["--bitrate"])
+
         if not channel:
-            bustype, channel = get_bus_config(buses)
+            params = get_bus_config(buses)
+            params["bitrate"] = bitrate
         else:
-            bustype = buses[0]
+            params = {
+                "bustype": buses[0],
+                "channel": channel,
+                "bitrate": bitrate
+            }
 
         self.thread = QtCore.QThread()
-        self.worker = Worker(bustype, channel, bitrate, self.logger)
+        self.worker = Worker(params, self.logger)
         self.TreeItemCheckedSignal.connect(self.worker.update_active_attrs)
         self.thread.started.connect(self.worker.run)
         self.worker.moveToThread(self.thread)

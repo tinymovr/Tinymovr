@@ -43,7 +43,8 @@ class ProtocolVersionError(Exception):
 def get_bus_config(suggested_types=None):
     """
     Get the bus configuration (interface, channel) for
-    the first of the suggested interface types
+    the first of the suggested interface types. Present
+    a pretty exception if none available.
     """
     configs = can.interface.detect_available_configs(suggested_types)
     try:
