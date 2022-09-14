@@ -78,7 +78,7 @@ typedef struct
     float Id_integrator_gain;
     float I_k;
     
-    float max_vel_increment;
+    float vel_increment;
 } ControllerConfig;
 
 void Controller_ControlLoop(void);

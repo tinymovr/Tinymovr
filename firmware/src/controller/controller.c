@@ -73,7 +73,7 @@ static ControllerConfig config = {
     .Id_integrator_gain = 0.0f,
     .I_k = 0.3f,
 
-    .max_vel_increment = 20.0f}; // ticks/s 
+    .vel_increment = 50.0f}; // ticks/s 
 
 void Controller_ControlLoop(void)
 {
@@ -141,7 +141,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     }
 
     const float vel_setpoint_delta = state.vel_setpoint_goal - state.vel_setpoint;
-    if (abs(vel_setpoint_delta) <= config.max_vel_increment)
+    if (abs(vel_setpoint_delta) <= config.vel_increment)
     {
         state.vel_setpoint = state.vel_setpoint_goal;
     }
@@ -149,11 +149,11 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     {
         if (vel_setpoint_delta < 0)
         {
-            state.vel_setpoint -= config.max_vel_increment;
+            state.vel_setpoint -= config.vel_increment;
         }
         else 
         {
-            state.vel_setpoint += config.max_vel_increment;
+            state.vel_setpoint += config.vel_increment;
         }
     }
     // The actual velocity setpoint and the one used by the velocity integrator are
@@ -471,13 +471,13 @@ void Controller_SetVelIncrement(float increment)
 {
     if (increment > 0.0f)
     {
-        config.max_vel_increment = increment;
+        config.vel_increment = increment;
     }
 }
 
 float Controller_GetVelIncrement(void)
 {
-    return config.max_vel_increment;
+    return config.vel_increment;
 }
 
 float Controller_GetIqLimit(void)

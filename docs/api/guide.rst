@@ -1141,6 +1141,31 @@ Example
 
     >>>tmx.set_watchdog(0)
 
+set_vel_increment
+************
+
+| **endpoint**: ``0x2B``
+| **type**: Write-only
+
+Sets the maxiumum increment by which the velocity can change each control loop, making it ramp between velocities to reduce voltage spikes. Default of 50.
+
+Arguments
+---------
+
+===============   ===================  =========  =========== ================
+Member            Description          Data Type  Data Offset Default Unit
+---------------   -------------------  ---------  ----------- ----------------
+``increment``     Velocity increment   float32    0           ticks
+===============   ===================  =========  =========== ================
+
+Example
+-------
+
+.. code-block:: python
+
+    >>>tmx.set_vel_increment(100)
+
+
 Error Codes
 ###########
 

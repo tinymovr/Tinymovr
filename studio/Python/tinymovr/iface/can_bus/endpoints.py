@@ -389,11 +389,11 @@ for velocity-limited plan moves",
     "set_vel_inc":
     {
         "description": "Set vel inc.",
-        "type": "rw",
+        "type": "w",
         "ep_id": 0x02B,
         "types": (DataType.FLOAT,),
         "units": ("ticks/second",),
         "labels": ("increment",),
-        "defaults": {"increment": 100,}
+        "defaults": {"increment": 50,}
     },
 }
