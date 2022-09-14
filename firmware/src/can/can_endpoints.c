@@ -596,8 +596,10 @@ uint8_t CAN_GetSetPosVelIq(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 
 uint8_t CAN_GetHallSectorMap(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
 {
+    // The first and last states (0 and 7) are never used because the hall sensor UVW is never 000 or 111
+    // Thus we can replace the last state with the current angle reading, which is much more useful.
     const uint8_t *sector_map = hall_get_sector_map_ptr();
-	const uint8_t sector = hall_get_sector();
+	const uint8_t sector = hall_get_angle();
     
     *buffer_len = sizeof(uint8_t) * 8;
     memcpy(&buffer[0], sector_map, sizeof(uint8_t) * 7);

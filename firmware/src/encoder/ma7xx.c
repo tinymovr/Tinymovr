@@ -24,19 +24,6 @@
 static MA7xxConfig config = { 0 };
 static MA7xxState state = { 0 };
 
-#define MAX_ALLOWED_DELTA     (ENCODER_TICKS / 6)
-#define MAX_ALLOWED_DELTA_ADD (MAX_ALLOWED_DELTA + ENCODER_TICKS)
-#define MAX_ALLOWED_DELTA_SUB (MAX_ALLOWED_DELTA - ENCODER_TICKS)
-#define MIN_ALLOWED_DELTA_ADD (-MAX_ALLOWED_DELTA + ENCODER_TICKS)
-#define MIN_ALLOWED_DELTA_SUB (-MAX_ALLOWED_DELTA - ENCODER_TICKS)
-
-#if defined(BOARD_REV_R3)
-#define PRIMARY_ENCODER_SSP_PORT SSPD
-#define PRIMARY_ENCODER_SSP_STRUCT PAC55XX_SSPD
-#elif defined(BOARD_REV_R5)
-#define PRIMARY_ENCODER_SSP_PORT SSPC
-#define PRIMARY_ENCODER_SSP_STRUCT PAC55XX_SSPC
-#endif
 
 void ma7xx_init(void)
 {
@@ -108,33 +95,41 @@ void ma7xx_restore_config(MA7xxConfig* config_)
     config = *config_;
 }
 
+/**
+ * @brief Write to a register of the encoder
+ * 
+ * @param reg The 5-bit register address
+ * @param value The value to write
+ * @return uint16_t 
+ */
 uint16_t ma7xx_write_reg(uint8_t reg, uint8_t value)
 {
-    volatile uint16_t cmd = MA_CMD_WRITE | reg << 8 | value;
-    volatile uint32_t result = ssp_write_one(PRIMARY_ENCODER_SSP_STRUCT, cmd);
+    uint16_t cmd = MA_CMD_WRITE | reg << 8 | value;
+    uint32_t result = ssp_write_one(PRIMARY_ENCODER_SSP_STRUCT, cmd);
 
-    delay_us(25000);
+    // Delay at least 20ms to let the encoder write to memory
+    delay_us(20100);
     result |= ssp_write_one(PRIMARY_ENCODER_SSP_STRUCT, 0);
 
-    volatile uint8_t retval =  ssp_read_one(PRIMARY_ENCODER_SSP_STRUCT) >> 8;
-    if (retval != value || result != 0)
+    // The encoder returns the value written to memory, so check that it is the same as what we wrote
+    uint8_t retval =  ssp_read_one(PRIMARY_ENCODER_SSP_STRUCT) >> 8;
+    if ((retval != value) || (result != 0))
     {
         return false;
     }
-    // Truncate from 32 bit to 16 bit
     return true;
 }
 
 /**
- * @brief 
+ * @brief Read from a register of the encoder
  * 
- * @param register 5-bit register address
+ * @param register The 5-bit register address
  * @return uint8_t 
  */
 uint8_t ma7xx_read_reg(uint8_t reg)
 {
     uint16_t cmd[2] = {MA_CMD_READ  | (reg << 8), 0};
-    volatile uint16_t result = ssp_write_multi(PRIMARY_ENCODER_SSP_STRUCT, cmd, 2u);
+    uint16_t result = ssp_write_multi(PRIMARY_ENCODER_SSP_STRUCT, cmd, 2u);
     if (result != 0)
     {
         return false;
