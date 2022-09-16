@@ -21,21 +21,21 @@ class Worker(QObject):
         super().__init__()
         self.logger = logger
 
-        init_tee(can.Bus(bustype=bustype, channel=channel, bitrate=bitrate))
-        self.dsc = Discovery(self.node_appeared, self.node_disappeared, self.logger)
-
-        self.target_dt = 0.02 # target refresh period
-        self.tau = 0.01 # filter value for statistics
-        self.meas_dt = self.target_dt # measured (actual) refresh period
-        self.rt_dt = 0.0 # round-trip time
-        self.load = 0 # channel load, 0-1
-
+        init_tee(can.Bus(**busparams))
+        self.dsc = Discovery(
+            self.node_appeared, self.node_disappeared, self.logger
+        )
+        self.target_dt = 0.02
+        self.meas_dt = self.target_dt
+        self.rt_dt = 0.0
+        self.load = 0
         self.active_attrs = []
         self.dynamic_attrs = []
         self.tms_by_id = {}
         self.dynamic_attrs_last_update = {}
-        self.dynamic_attrs_update_period = 0.5  # sec
+        self.dynamic_attrs_update_period = 0.5 #sec
         self.running = True
+
 
     def run(self):
         while self.running:
