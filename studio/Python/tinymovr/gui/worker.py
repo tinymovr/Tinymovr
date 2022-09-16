@@ -23,7 +23,7 @@ class Worker(QObject):
 
         init_tee(can.Bus(bustype=bustype, channel=channel, bitrate=bitrate))
         self.dsc = Discovery(self.node_appeared, self.node_disappeared, self.logger)
-        
+
         self.target_dt = 0.02 # target refresh period
         self.tau = 0.01 # filter value for statistics
         self.meas_dt = self.target_dt # measured (actual) refresh period
@@ -61,7 +61,12 @@ class Worker(QObject):
         self.running = False
 
     def get_attr_values(self):
-        """ """
+        """
+        Get new values from the channel, for the selected
+        attributes and those marked as dynamic. The values
+        are returned as a dictionary with the full attribute
+        name as key.
+        """
         # TODO: Handle possible exception
         vals = {}
         for attr in self.active_attrs:
@@ -79,6 +84,11 @@ class Worker(QObject):
         return vals
 
     def get_value_meas(self, attr):
+        """
+        Get the value of the passed attribute and measure
+        the round-trip time for getting it. Update the
+        instance statistic.
+        """
         get_start_time = time.time()
         val = attr.get_value()
         get_dt = time.time() - get_start_time
@@ -86,6 +96,9 @@ class Worker(QObject):
         return val
 
     def node_appeared(self, node, name):
+        """
+        Handle the appearance of a new node
+        """
         node_name = "{}{}".format(base_node_name, name)
         self.tms_by_id[node_name] = node
         node.name = node_name
@@ -94,6 +107,9 @@ class Worker(QObject):
         self.regen.emit(self.tms_by_id)
 
     def node_disappeared(self, name):
+        """
+        Handle the disappearance of an existing node
+        """
         node_name = "{}{}".format(base_node_name, name)
         del self.tms_by_id[node_name]
         self.dynamic_attrs = get_dynamic_attrs(self.tms_by_id)
@@ -101,6 +117,9 @@ class Worker(QObject):
 
     @QtCore.Slot(dict)
     def update_active_attrs(self, d):
+        """
+        Update the active (selected) attributes
+        """
         attr = d["attr"]
         if d["enabled"] == True and attr not in self.active_attrs:
             self.active_attrs.append(attr)
@@ -110,7 +129,8 @@ class Worker(QObject):
 
 def get_dynamic_attrs(attr_dict):
     """
-    Get the attributes that are marked as dynamic in the spec.
+    Get the attributes that are marked as dynamic in the
+    spec. Returns an array of attribute objects.
     """
     dynamic_attrs = []
     for _, attr in attr_dict.items():

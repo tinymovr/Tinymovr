@@ -26,7 +26,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self, app, arguments):
         super(MainWindow, self).__init__()
-        
+
         # set units default format
         get_registry().default_format = ".6f~"
 
@@ -100,10 +100,12 @@ class MainWindow(QMainWindow):
         self.thread.quit()
         self.thread.wait()
 
-    def get_rel_time(self):
-        return time.time() - self.start_time
-
     def make_graph(self, attr):
+        """
+        Create a new pyqtgraph object, for the passed
+        attribute. Return a dictionary containing the
+        object and related data container.
+        """
         graph_widget = pg.PlotWidget(title=attr.full_name)
         pi = graph_widget.getPlotItem()
         if attr.unit:
@@ -122,6 +124,9 @@ class MainWindow(QMainWindow):
 
     @QtCore.Slot()
     def regen_tree(self, tms_by_id):
+        """
+        Regenerate the attribute tree
+        """
         self.attribute_widgets_by_id = {}
         self.tree_widget.clear()
         for name, node in tms_by_id.items():
@@ -132,14 +137,14 @@ class MainWindow(QMainWindow):
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
         header.setStretchLastSection(False)
 
-    def parse_node(self, node, name, attribute_widgets_by_id):
+    def parse_node(self, node, name):
         widget = QTreeWidgetItem([name, 0, ""])
         widget._orig_flags = widget.flags()
         try:
             # Let's assume it's a RemoteNode
             for attr_name, attr in node.remote_attributes.items():
                 widget.addChild(
-                    self.parse_node(attr, attr_name, attribute_widgets_by_id)
+                    self.parse_node(attr, attr_name, self.attribute_widgets_by_id)
                 )
         except AttributeError:
             # Maybe a RemoteAttribute
@@ -149,7 +154,7 @@ class MainWindow(QMainWindow):
                 widget.setCheckState(0, QtCore.Qt.Unchecked)
                 widget._tm_attribute = node
                 widget._editing = False
-                attribute_widgets_by_id[node.full_name] = {
+                self.attribute_widgets_by_id[node.full_name] = {
                     "node": node,
                     "widget": widget,
                 }
@@ -205,7 +210,7 @@ class MainWindow(QMainWindow):
                 if len(x) >= 200:
                     x.pop(0)
                     y.pop(0)
-                x.append(self.get_rel_time())
+                x.append(time.time() - self.start_time)
                 try:
                     y.append(val.magnitude)
                 except AttributeError:
