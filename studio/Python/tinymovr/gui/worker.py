@@ -17,7 +17,7 @@ class Worker(QObject):
     update_attrs = QtCore.Signal(dict)
     regen = QtCore.Signal(dict)
 
-    def __init__(self, bustype, channel, bitrate, logger):
+    def __init__(self, busparams, logger):
         super().__init__()
         self.logger = logger
 
