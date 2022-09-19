@@ -16,7 +16,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import time
-from threading import Lock
+from threading import BoundedSemaphore
 import can
 from functools import cached_property
 from avlos.channel import BaseChannel
@@ -39,7 +39,7 @@ class ResponseError(Exception):
 
 
 class CANChannel(BaseChannel):
-    def __init__(self, node_id):
+    def __init__(self, node_id, timeout=1.0):
         self.node_id = node_id
         get_tee().add(
             lambda frame: frame.is_remote_frame == False
@@ -47,38 +47,28 @@ class CANChannel(BaseChannel):
             self._recv_cb,
         )
         self.queue = []
-        self.recv_lock = Lock()
+        self.phore = BoundedSemaphore(0, timeout=timeout)
 
     def _recv_cb(self, frame):
         self.queue.append(frame)
-        self.try_release()
+        try:
+            self.phore.release()
+        except ValueError:
+            pass
 
     def send(self, data, ep_id):
         rtr = False if data and len(data) else True
         get_tee().send(self.create_frame(ep_id, rtr, data))
 
-    def recv(self, ep_id, timeout=1.0):
-        self.recv_lock.acquire()
-        get_tee().update_once()
-        frame_id = arbitration_from_ids(ep_id, 0, self.node_id)
-        index = 0
-        while index < len(self.queue):
-            if self.queue[index].arbitration_id == frame_id:
-                return self.queue.pop(index).data
-            index += 1
-        self.recv_lock.acquire(timeout=timeout)
-        self.try_release()
-        while index < len(self.queue):
-            if self.queue[index].arbitration_id == frame_id:
-                return self.queue.pop(index).data
-            index += 1
+    def recv(self, ep_id):
+        with self.phore:
+            frame_id = arbitration_from_ids(ep_id, 0, self.node_id)
+            index = 0
+            while index < len(self.queue):
+                if self.queue[index].arbitration_id == frame_id:
+                    return self.queue.pop(index).data
+                index += 1
         raise ResponseError(self.node_id)
-
-    def try_release(self):
-        try:
-            self.recv_lock.release()
-        except RuntimeError:
-            pass
         
     def create_frame(self, endpoint_id, rtr=False, payload=None):
         """

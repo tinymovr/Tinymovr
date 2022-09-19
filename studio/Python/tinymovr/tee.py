@@ -66,7 +66,6 @@ class Tee:
         self.state = TeeState.RUNNING
         while TeeState.RUNNING == self.state:
             self.update_once()
-            time.sleep(self.sleep_interval)
         assert TeeState.STOPPING == self.state
         self.state = TeeState.STOPPED
 
@@ -75,13 +74,12 @@ class Tee:
         Tries to receive a message from the bus object and if successful,
         tests reception of each tee instance in the global index.
         """
-        self.lock.acquire()
-        frame = self.bus.recv(0)
+        with self.lock:
+            frame = self.bus.recv(0)
         if frame:
             for client in self.clients:
                 if client.filter_cb(frame):
                     client.recv_cb(frame)
-        self.lock.release()
 
     def send(self, frame):
         """
