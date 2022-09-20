@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from threading import BoundedSemaphore
+from threading import Event
 import can
 from functools import cached_property
 from avlos.channel import BaseChannel
@@ -46,34 +46,31 @@ class CANChannel(BaseChannel):
             self._recv_cb,
         )
         self.queue = []
-        self.phore = BoundedSemaphore(0)
+        self.evt = Event()
 
     def _recv_cb(self, frame):
         self.queue.append(frame)
-        self.try_release()
+        self.evt.set()
 
     def send(self, data, ep_id):
         rtr = False if data and len(data) else True
         get_tee().send(self.create_frame(ep_id, rtr, data))
 
     def recv(self, ep_id, timeout=1.0):
-        self.phore.acquire(timeout=timeout)
+        self.evt.wait(timeout=timeout)
         try:
-            frame_id = arbitration_from_ids(ep_id, 0, self.node_id)
-            index = 0
-            while index < len(self.queue):
-                if self.queue[index].arbitration_id == frame_id:
-                    return self.queue.pop(index).data
-                index += 1
+            self.get_from_queue(ep_id)
         finally:
-            self.try_release()
+            self.evt.clear()
         raise ResponseError(self.node_id)
 
-    def try_release(self):
-        try:
-            self.phore.release()
-        except ValueError:
-            pass
+    def get_from_queue(self, ep_id):
+        frame_id = arbitration_from_ids(ep_id, 0, self.node_id)
+        index = 0
+        while index < len(self.queue):
+            if self.queue[index].arbitration_id == frame_id:
+                return self.queue.pop(index).data
+            index += 1
         
     def create_frame(self, endpoint_id, rtr=False, payload=None):
         """
