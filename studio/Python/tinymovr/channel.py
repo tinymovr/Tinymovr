@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from threading import Event
+from threading import Lock, Event
 import can
 from functools import cached_property
 from avlos.channel import BaseChannel
@@ -46,6 +46,7 @@ class CANChannel(BaseChannel):
             self._recv_cb,
         )
         self.queue = []
+        self.lock = Lock()
         self.evt = Event()
 
     def _recv_cb(self, frame):
@@ -57,20 +58,18 @@ class CANChannel(BaseChannel):
         get_tee().send(self.create_frame(ep_id, rtr, data))
 
     def recv(self, ep_id, timeout=1.0):
-        self.evt.wait(timeout=timeout)
-        try:
-            self.get_from_queue(ep_id)
-        finally:
+        with self.lock:
+            get_tee().update_once()
+            if not self.evt.wait(timeout=timeout):
+                print("missed")
             self.evt.clear()
-        raise ResponseError(self.node_id)
-
-    def get_from_queue(self, ep_id):
-        frame_id = arbitration_from_ids(ep_id, 0, self.node_id)
-        index = 0
-        while index < len(self.queue):
-            if self.queue[index].arbitration_id == frame_id:
-                return self.queue.pop(index).data
-            index += 1
+            frame_id = arbitration_from_ids(ep_id, 0, self.node_id)
+            index = 0
+            while index < len(self.queue):
+                if self.queue[index].arbitration_id == frame_id:
+                    return self.queue.pop(index).data
+                index += 1  
+            raise ResponseError(self.node_id)
         
     def create_frame(self, endpoint_id, rtr=False, payload=None):
         """

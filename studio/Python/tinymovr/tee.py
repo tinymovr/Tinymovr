@@ -49,7 +49,7 @@ class Tee:
     simplify interfacing with CAN bus objects.
     """
 
-    def __init__(self, bus, sleep_interval=0.01):
+    def __init__(self, bus, sleep_interval=0.1):
         self.bus = bus
         self.sleep_interval = sleep_interval
         self.lock = Lock()
@@ -66,6 +66,7 @@ class Tee:
         self.state = TeeState.RUNNING
         while TeeState.RUNNING == self.state:
             self.update_once()
+            time.sleep(self.sleep_interval)
         assert TeeState.STOPPING == self.state
         self.state = TeeState.STOPPED
 
@@ -75,11 +76,11 @@ class Tee:
         tests reception of each tee instance in the global index.
         """
         with self.lock:
-            frame = self.bus.recv(0)
-        if frame:
-            for client in self.clients:
-                if client.filter_cb(frame):
-                    client.recv_cb(frame)
+            frame = self.bus.recv(0.002)
+            if frame:
+                for client in self.clients:
+                    if client.filter_cb(frame):
+                        client.recv_cb(frame)
 
     def send(self, frame):
         """
