@@ -15,7 +15,6 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import time
 from threading import BoundedSemaphore
 import can
 from functools import cached_property
@@ -39,7 +38,7 @@ class ResponseError(Exception):
 
 
 class CANChannel(BaseChannel):
-    def __init__(self, node_id, timeout=1.0):
+    def __init__(self, node_id):
         self.node_id = node_id
         get_tee().add(
             lambda frame: frame.is_remote_frame == False
@@ -47,7 +46,7 @@ class CANChannel(BaseChannel):
             self._recv_cb,
         )
         self.queue = []
-        self.phore = BoundedSemaphore(0, timeout=timeout)
+        self.phore = BoundedSemaphore(0)
 
     def _recv_cb(self, frame):
         self.queue.append(frame)
@@ -60,14 +59,17 @@ class CANChannel(BaseChannel):
         rtr = False if data and len(data) else True
         get_tee().send(self.create_frame(ep_id, rtr, data))
 
-    def recv(self, ep_id):
-        with self.phore:
+    def recv(self, ep_id, timeout=1.0):
+        self.phore.acquire(timeout=timeout)
+        try:
             frame_id = arbitration_from_ids(ep_id, 0, self.node_id)
             index = 0
             while index < len(self.queue):
                 if self.queue[index].arbitration_id == frame_id:
                     return self.queue.pop(index).data
                 index += 1
+        finally:
+            self.phore.release()
         raise ResponseError(self.node_id)
         
     def create_frame(self, endpoint_id, rtr=False, payload=None):
