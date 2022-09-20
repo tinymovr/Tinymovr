@@ -50,10 +50,7 @@ class CANChannel(BaseChannel):
 
     def _recv_cb(self, frame):
         self.queue.append(frame)
-        try:
-            self.phore.release()
-        except ValueError:
-            pass
+        self.try_release()
 
     def send(self, data, ep_id):
         rtr = False if data and len(data) else True
@@ -69,8 +66,14 @@ class CANChannel(BaseChannel):
                     return self.queue.pop(index).data
                 index += 1
         finally:
-            self.phore.release()
+            self.try_release()
         raise ResponseError(self.node_id)
+
+    def try_release(self):
+        try:
+            self.phore.release()
+        except ValueError:
+            pass
         
     def create_frame(self, endpoint_id, rtr=False, payload=None):
         """
