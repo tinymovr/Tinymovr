@@ -22,9 +22,7 @@ class Worker(QObject):
         self.logger = logger
 
         init_tee(can.Bus(**busparams))
-        self.dsc = Discovery(
-            self.node_appeared, self.node_disappeared, self.logger
-        )
+        self.dsc = Discovery(self.node_appeared, self.node_disappeared, self.logger)
         self.target_dt = 0.02
         self.meas_dt = self.target_dt
         self.rt_dt = 0.0
@@ -33,9 +31,8 @@ class Worker(QObject):
         self.dynamic_attrs = []
         self.tms_by_id = {}
         self.dynamic_attrs_last_update = {}
-        self.dynamic_attrs_update_period = 0.5 #sec
+        self.dynamic_attrs_update_period = 0.5  # sec
         self.running = True
-
 
     def run(self):
         while self.running:
@@ -46,9 +43,7 @@ class Worker(QObject):
             QApplication.processEvents()
             busy_dt = time.time() - start_time
             if busy_dt < self.target_dt:
-                self.load = (
-                    self.load * (1 - self.tau) + busy_dt / self.target_dt * self.tau
-                )
+                self.load = self.load * 0.99 + busy_dt / self.target_dt * 0.01
                 time.sleep(self.target_dt - busy_dt)
                 self.meas_dt = self.target_dt
             else:
@@ -61,12 +56,7 @@ class Worker(QObject):
         self.running = False
 
     def get_attr_values(self):
-        """
-        Get new values from the channel, for the selected
-        attributes and those marked as dynamic. The values
-        are returned as a dictionary with the full attribute
-        name as key.
-        """
+        """ """
         # TODO: Handle possible exception
         vals = {}
         for attr in self.active_attrs:
@@ -77,66 +67,52 @@ class Worker(QObject):
                 t = self.dynamic_attrs_last_update[attr.full_name]
             except KeyError:
                 t = 0
-            if start_time - t > self.dynamic_attrs_update_period:
+            if (attr.full_name not in vals) and (
+                start_time - t > self.dynamic_attrs_update_period
+            ):
                 vals[attr.full_name] = self.get_value_meas(attr)
                 self.dynamic_attrs_last_update[attr.full_name] = start_time
                 break
         return vals
 
     def get_value_meas(self, attr):
-        """
-        Get the value of the passed attribute and measure
-        the round-trip time for getting it. Update the
-        instance statistic.
-        """
         get_start_time = time.time()
         val = attr.get_value()
         get_dt = time.time() - get_start_time
-        self.rt_dt = self.rt_dt * (1 - self.tau) + get_dt * self.tau
+        self.rt_dt = self.rt_dt * 0.99 + get_dt * 0.01
         return val
 
     def node_appeared(self, node, name):
-        """
-        Handle the appearance of a new node
-        """
         node_name = "{}{}".format(base_node_name, name)
         self.tms_by_id[node_name] = node
         node.name = node_name
         node.include_base_name = True
-        self.dynamic_attrs = get_dynamic_attrs(self.tms_by_id)
+        self.dynamic_attrs = self.get_dynamic_attrs(self.tms_by_id)
         self.regen.emit(self.tms_by_id)
 
     def node_disappeared(self, name):
-        """
-        Handle the disappearance of an existing node
-        """
         node_name = "{}{}".format(base_node_name, name)
         del self.tms_by_id[node_name]
-        self.dynamic_attrs = get_dynamic_attrs(self.tms_by_id)
+        self.dynamic_attrs = self.get_dynamic_attrs(self.tms_by_id)
         self.regen.emit(self.tms_by_id)
 
     @QtCore.Slot(dict)
     def update_active_attrs(self, d):
-        """
-        Update the active (selected) attributes
-        """
         attr = d["attr"]
         if d["enabled"] == True and attr not in self.active_attrs:
             self.active_attrs.append(attr)
         elif d["enabled"] == False and attr in self.active_attrs:
             self.active_attrs.remove(attr)
 
-
-def get_dynamic_attrs(attr_dict):
-    """
-    Get the attributes that are marked as dynamic in the
-    spec. Returns an array of attribute objects.
-    """
-    dynamic_attrs = []
-    for _, attr in attr_dict.items():
-        if isinstance(attr, RemoteAttribute):
-            if attr.dynamic_value == True:
-                dynamic_attrs.append(attr)
-        elif hasattr(attr, "remote_attributes"):
-            dynamic_attrs.extend(get_dynamic_attrs(attr.remote_attributes))
-    return dynamic_attrs
+    def get_dynamic_attrs(self, attr_dict):
+        """
+        Get the attributes that are marked as dynamic in the spec.
+        """
+        dynamic_attrs = []
+        for _, attr in attr_dict.items():
+            if isinstance(attr, RemoteAttribute):
+                if attr.dynamic_value == True:
+                    dynamic_attrs.append(attr)
+            elif hasattr(attr, "remote_attributes"):
+                dynamic_attrs.extend(self.get_dynamic_attrs(attr.remote_attributes))
+        return dynamic_attrs
