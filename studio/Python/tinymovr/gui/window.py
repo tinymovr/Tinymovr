@@ -138,7 +138,7 @@ class MainWindow(QMainWindow):
         self.tree_widget.clear()
         for name, node in tms_by_id.items():
             self.tree_widget.addTopLevelItem(
-                self.parse_node(node, name, self.attribute_widgets_by_id)
+                self.parse_node(node, name)
             )
         header = self.tree_widget.header()
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
@@ -151,7 +151,7 @@ class MainWindow(QMainWindow):
             # Let's assume it's a RemoteNode
             for attr_name, attr in node.remote_attributes.items():
                 widget.addChild(
-                    self.parse_node(attr, attr_name, self.attribute_widgets_by_id)
+                    self.parse_node(attr, attr_name)
                 )
         except AttributeError:
             # Maybe a RemoteAttribute
