@@ -1,3 +1,4 @@
+
 import time
 import pint
 from PySide2 import QtCore
@@ -15,6 +16,7 @@ from PySide2.QtWidgets import (
 )
 import pyqtgraph as pg
 from tinymovr.constants import app_name
+from tinymovr.channel import ResponseError as ChannelResponseError
 from tinymovr.config import get_bus_config, configure_logging
 from avlos import get_registry
 from tinymovr.gui import Worker, format_value, load_icon
@@ -96,6 +98,7 @@ class MainWindow(QMainWindow):
         self.TreeItemCheckedSignal.connect(self.worker.update_active_attrs)
         self.thread.started.connect(self.worker.run)
         self.worker.moveToThread(self.thread)
+        self.worker.handle_error.connect(self.handle_worker_error)
         self.worker.regen.connect(self.regen_tree)
         self.worker.update_attrs.connect(self.update_attrs)
         app.aboutToQuit.connect(self.about_to_quit)
@@ -106,6 +109,13 @@ class MainWindow(QMainWindow):
         self.worker.stop()
         self.thread.quit()
         self.thread.wait()
+
+    @QtCore.Slot()
+    def handle_worker_error(self, e):
+        if isinstance(e, ChannelResponseError):
+            logger.warn("Timeout occured")
+        else:
+            raise e
 
     def make_graph(self, attr):
         """
