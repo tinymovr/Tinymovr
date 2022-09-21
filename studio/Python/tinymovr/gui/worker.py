@@ -16,6 +16,7 @@ class Worker(QObject):
 
     update_attrs = QtCore.Signal(dict)
     regen = QtCore.Signal(dict)
+    handle_error = QtCore.Signal(object)
 
     def __init__(self, busparams, logger):
         super().__init__()
@@ -77,10 +78,13 @@ class Worker(QObject):
 
     def get_value_meas(self, attr):
         get_start_time = time.time()
-        val = attr.get_value()
-        get_dt = time.time() - get_start_time
-        self.rt_dt = self.rt_dt * 0.99 + get_dt * 0.01
-        return val
+        try:
+            val = attr.get_value()
+            get_dt = time.time() - get_start_time
+            self.rt_dt = self.rt_dt * 0.99 + get_dt * 0.01
+            return val
+        except Exception as e:
+            self.handle_error.emit(e)
 
     def node_appeared(self, node, name):
         node_name = "{}{}".format(base_node_name, name)
