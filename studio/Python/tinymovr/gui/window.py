@@ -113,7 +113,7 @@ class MainWindow(QMainWindow):
     @QtCore.Slot()
     def handle_worker_error(self, e):
         if isinstance(e, ChannelResponseError):
-            logger.warn("Timeout occured")
+            self.logger.warn("Timeout occured")
         else:
             raise e
 
