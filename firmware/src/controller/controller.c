@@ -469,7 +469,7 @@ void Controller_SetVelLimit(float limit)
 
 void Controller_SetVelIncrement(float increment)
 {
-    if (increment > 0.0f)
+    if (increment >= 0.0f)
     {
         config.vel_increment = increment;
     }

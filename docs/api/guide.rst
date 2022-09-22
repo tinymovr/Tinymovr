@@ -1147,7 +1147,7 @@ set_vel_increment
 | **endpoint**: ``0x2B``
 | **type**: Write-only
 
-Sets the maxiumum increment by which the velocity can change each control loop, making it ramp between velocities to reduce voltage spikes. Default of 50.
+Sets the maxiumum increment by which the velocity can change each control loop, making it ramp between velocities to reduce voltage spikes. Default of 100. Setting this to 0 disables velocity ramping.
 
 Arguments
 ---------

@@ -631,7 +631,7 @@ uint8_t CAN_GetSetPosVelIncrement(uint8_t buffer[], uint8_t *buffer_len, bool rt
 {
     float inc;
     memcpy(&inc, &buffer[0], sizeof(float));
-    if (inc > 0)
+    if (inc >= 0)
     {
         Controller_SetVelIncrement(inc);
         return CANRP_Write;
