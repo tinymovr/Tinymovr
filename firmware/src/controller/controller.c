@@ -48,7 +48,7 @@ static ControllerState state = {
 
     .pos_setpoint = 0.0f,
     .vel_setpoint = 0.0f,
-    .vel_setpoint_goal = 0.0f,
+    .vel_ramp_setpoint  = 0.0f,
     .Iq_setpoint = 0.0f,
 
     .vel_integrator_Iq = 0.0f,
@@ -73,7 +73,7 @@ static ControllerConfig config = {
     .Id_integrator_gain = 0.0f,
     .I_k = 0.3f,
 
-    .vel_increment = 50.0f}; // ticks/s 
+    .vel_increment = 100.0f}; // ticks/s 
 
 void Controller_ControlLoop(void)
 {
@@ -140,27 +140,23 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         }
     }
 
-    const float vel_setpoint_delta = state.vel_setpoint_goal - state.vel_setpoint;
-    if (abs(vel_setpoint_delta) <= config.vel_increment)
+    // Sudden changes in velocity setpoints would lead to sudden
+    // jerks and current spikes, so a ramping function makes transitions
+    // a bit smoother.
+    if (config.vel_increment > 0)
     {
-        state.vel_setpoint = state.vel_setpoint_goal;
+        state.vel_ramp_setpoint  += our_clamp(state.vel_setpoint - state.vel_ramp_setpoint , -config.vel_increment, config.vel_increment);
     }
     else
     {
-        if (vel_setpoint_delta < 0)
-        {
-            state.vel_setpoint -= config.vel_increment;
-        }
-        else 
-        {
-            state.vel_setpoint += config.vel_increment;
-        }
+        state.vel_ramp_setpoint  = state.vel_setpoint ;
     }
+
     // The actual velocity setpoint and the one used by the velocity integrator are
-    // separate because the latter takes into account a user-confiugurable deadband
+    // separate because the latter takes into account a user-configurable deadband
     // around the position setpoint, where the integrator "sees" no error
-    float vel_setpoint = state.vel_setpoint;
-    float vel_setpoint_integrator = state.vel_setpoint;
+    float vel_setpoint = state.vel_ramp_setpoint ;
+    float vel_setpoint_integrator = state.vel_ramp_setpoint ;
 
     if (state.mode >= CTRL_POSITION)
     {
@@ -196,7 +192,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
 
     // Absolute current & velocity integrator limiting
     const float I_limit = our_fminf(config.I_limit, I_HARD_LIMIT);
-    if (our_clamp(&Iq_setpoint, -I_limit, I_limit) == true)
+    if (our_clampc(&Iq_setpoint, -I_limit, I_limit) == true)
     {
         state.vel_integrator_Iq *= 0.995f;
     }
@@ -343,7 +339,7 @@ PAC5XXX_RAMFUNC float controller_get_vel_setpoint_user_frame(void)
 PAC5XXX_RAMFUNC void controller_set_vel_setpoint_user_frame(float value)
 {
     // direction is either 1 or -1 so we can multiply instead of divide
-    state.vel_setpoint_goal = value * motor_get_user_direction();
+    state.vel_setpoint = value * motor_get_user_direction();
 }
 
 PAC5XXX_RAMFUNC float controller_get_Iq_estimate(void)
@@ -514,7 +510,7 @@ static inline bool Controller_LimitVelocity(float min_limit, float max_limit, fl
 {
     float Imax = (max_limit - vel_estimate) * vel_gain;
     float Imin = (min_limit - vel_estimate) * vel_gain;
-    return our_clamp(I, Imin, Imax);
+    return our_clampc(I, Imin, Imax);
 }
 
 PAC5XXX_RAMFUNC void Controller_UpdateCurrentGains(void)

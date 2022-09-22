@@ -51,7 +51,7 @@ typedef struct
 
     float pos_setpoint;
     float vel_setpoint;
-    float vel_setpoint_goal;
+    float vel_ramp_setpoint;
     float Iq_setpoint;
 
     float vel_integrator_Iq;
