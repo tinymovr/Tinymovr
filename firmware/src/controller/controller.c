@@ -73,7 +73,7 @@ static ControllerConfig config = {
     .Id_integrator_gain = 0.0f,
     .I_k = 0.3f,
 
-    .vel_increment = 100.0f}; // ticks/s 
+    .vel_increment = 100.0f}; // ticks/cycle
 
 void Controller_ControlLoop(void)
 {

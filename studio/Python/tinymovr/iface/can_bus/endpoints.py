@@ -388,12 +388,11 @@ for velocity-limited plan moves",
     },
     "set_vel_inc":
     {
-        "description": "Set vel inc.",
+        "description": "Set velocity increment (ramp). Set to zero to disable.",
         "type": "w",
         "ep_id": 0x02B,
         "types": (DataType.FLOAT,),
-        "units": ("ticks/second",),
         "labels": ("increment",),
-        "defaults": {"increment": 50,}
+        "defaults": {"increment": 100,}
     },
 }
