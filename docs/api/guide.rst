@@ -1141,8 +1141,8 @@ Example
 
     >>>tmx.set_watchdog(0)
 
-set_vel_increment
-************
+set_vel_inc
+***********
 
 | **endpoint**: ``0x2B``
 | **type**: Write-only
@@ -1163,7 +1163,7 @@ Example
 
 .. code-block:: python
 
-    >>>tmx.set_vel_increment(100)
+    >>>tmx.set_vel_inc(100)
 
 
 Error Codes
