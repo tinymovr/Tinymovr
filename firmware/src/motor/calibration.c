@@ -269,7 +269,7 @@ bool calibrate_offset_and_rectification(void)
     gate_driver_set_duty_cycle(&zeroDC);
     gate_driver_disable();
 
-    // FIR and map measurements to lut
+    // FIR filtering and map measurements to lut
     for (int16_t i=0; i<ECN_SIZE; i++)
     {
         int32_t acc = 0;
