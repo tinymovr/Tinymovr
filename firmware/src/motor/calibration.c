@@ -193,6 +193,7 @@ bool calibrate_hall_sequence(void)
     {
         if (current_sector != last_sector)
         {
+            last_sector = current_sector;
             sector_pos++;
             if (sector_pos >= HALL_SECTORS)
             {
@@ -203,7 +204,6 @@ bool calibrate_hall_sequence(void)
         }
         set_epos_and_wait(angle, I_setpoint);
         angle += increment;
-        last_sector = current_sector;
         current_sector = hall_get_sector();
     }
 
