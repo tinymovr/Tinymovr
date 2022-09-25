@@ -386,4 +386,13 @@ for velocity-limited plan moves",
         "defaults": {"timeout": 3},
         "labels": ("enabled", "timeout")
     },
+    "set_vel_inc":
+    {
+        "description": "Set velocity increment (ramp). Set to zero to disable.",
+        "type": "w",
+        "ep_id": 0x02B,
+        "types": (DataType.FLOAT,),
+        "labels": ("increment",),
+        "defaults": {"increment": 100,}
+    },
 }

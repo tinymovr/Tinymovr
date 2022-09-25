@@ -80,11 +80,17 @@ static inline void delay_us(uint32_t us)
     pac_delay_asm(us * 16u);
 }
 
-static inline bool our_clamp(float *d, float min, float max)
+static inline bool our_clampc(float *d, float min, float max)
 {
     const float t = *d < min ? min : *d;
     *d = t > max ? max : t;
     return (*d == min) || (*d == max);
+}
+
+static inline float our_clamp(float d, float min, float max)
+{
+    const float t = d < min ? min : d;
+    return t > max ? max : t;
 }
 
 static inline float our_floorf(float x)

@@ -48,6 +48,7 @@ static ControllerState state = {
 
     .pos_setpoint = 0.0f,
     .vel_setpoint = 0.0f,
+    .vel_ramp_setpoint  = 0.0f,
     .Iq_setpoint = 0.0f,
 
     .vel_integrator_Iq = 0.0f,
@@ -70,7 +71,9 @@ static ControllerConfig config = {
     .I_gain = 0.0f,
     .Iq_integrator_gain = 0.0f,
     .Id_integrator_gain = 0.0f,
-    .I_k = 0.3f};
+    .I_k = 0.3f,
+
+    .vel_increment = 100.0f}; // ticks/cycle
 
 void Controller_ControlLoop(void)
 {
@@ -137,11 +140,23 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         }
     }
 
+    // Sudden changes in velocity setpoints would lead to sudden
+    // jerks and current spikes, so a ramping function makes transitions
+    // a bit smoother.
+    if (config.vel_increment > 0)
+    {
+        state.vel_ramp_setpoint  += our_clamp(state.vel_setpoint - state.vel_ramp_setpoint , -config.vel_increment, config.vel_increment);
+    }
+    else
+    {
+        state.vel_ramp_setpoint  = state.vel_setpoint ;
+    }
+
     // The actual velocity setpoint and the one used by the velocity integrator are
-    // separate because the latter takes into account a user-confiugurable deadband
+    // separate because the latter takes into account a user-configurable deadband
     // around the position setpoint, where the integrator "sees" no error
-    float vel_setpoint = state.vel_setpoint;
-    float vel_setpoint_integrator = state.vel_setpoint;
+    float vel_setpoint = state.vel_ramp_setpoint ;
+    float vel_setpoint_integrator = state.vel_ramp_setpoint ;
 
     if (state.mode >= CTRL_POSITION)
     {
@@ -177,7 +192,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
 
     // Absolute current & velocity integrator limiting
     const float I_limit = our_fminf(config.I_limit, I_HARD_LIMIT);
-    if (our_clamp(&Iq_setpoint, -I_limit, I_limit) == true)
+    if (our_clampc(&Iq_setpoint, -I_limit, I_limit) == true)
     {
         state.vel_integrator_Iq *= 0.995f;
     }
@@ -448,6 +463,19 @@ void Controller_SetVelLimit(float limit)
     }
 }
 
+void Controller_SetVelIncrement(float increment)
+{
+    if (increment >= 0.0f)
+    {
+        config.vel_increment = increment;
+    }
+}
+
+float Controller_GetVelIncrement(void)
+{
+    return config.vel_increment;
+}
+
 float Controller_GetIqLimit(void)
 {
     return config.I_limit;
@@ -482,7 +510,7 @@ static inline bool Controller_LimitVelocity(float min_limit, float max_limit, fl
 {
     float Imax = (max_limit - vel_estimate) * vel_gain;
     float Imin = (min_limit - vel_estimate) * vel_gain;
-    return our_clamp(I, Imin, Imax);
+    return our_clampc(I, Imin, Imax);
 }
 
 PAC5XXX_RAMFUNC void Controller_UpdateCurrentGains(void)

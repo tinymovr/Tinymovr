@@ -5,6 +5,7 @@ of Tinymovr boards.
 import random
 import time
 import statistics as st
+import numpy as np
 
 import tinymovr
 from tinymovr import Tinymovr
@@ -303,6 +304,31 @@ class TestBoard(TMTestCase):
             time.sleep(0.05)
         self.tm.idle()
         self.assertLess(st.pstdev(pos_estimates) * ticks, 100 * ticks)
+
+    def test_n_velocity_ramp(self):
+        """
+        Test velocity ramp
+        """
+        ramp_value = 1
+        interval = 0.05
+        frequency = 20000
+
+        self.reset_and_wait()
+        # Ensure we're idle
+        self.check_state(0)
+        self.try_calibrate()
+        self.tm.set_vel_inc(ramp_value)
+        vel_estimates = []
+        t_points = []
+        self.tm.velocity_control()
+        self.tm.set_vel_setpoint(200000)
+        for k in range(100):
+            vel_estimates.append(self.tm.encoder_estimates.velocity.magnitude)
+            t_points.append(k * interval)
+            time.sleep(interval)
+        self.tm.idle()
+        a, _ = np.polyfit(t_points, vel_estimates, 1)
+        self.assertAlmostEqual(a, ramp_value * frequency, delta=5000)
 
 
 if __name__ == "__main__":

@@ -82,7 +82,7 @@ void CANEP_InitEndpointMap(void)
     CANEP_AddEndpoint(&CAN_SetMotorRL, 0x028);
     CANEP_AddEndpoint(&CAN_GetHallSectorMap, 0x029);
     CANEP_AddEndpoint(&CAN_SetWatchdog, 0x02A);
-    // 0x02B AVAIL
+    CANEP_AddEndpoint(&CAN_GetSetPosVelIncrement, 0x02B);
     // 0x02C AVAIL
     // 0x02D AVAIL
     // 0x02E AVAIL
@@ -622,6 +622,18 @@ uint8_t CAN_SetWatchdog(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
     {
         Watchdog_set_timeout_seconds(timeout_s);
         Watchdog_enable();
+        return CANRP_Write;
+    }
+    return CANRP_NoAction;
+}
+
+uint8_t CAN_GetSetPosVelIncrement(uint8_t buffer[], uint8_t *buffer_len, bool rtr)
+{
+    float inc;
+    memcpy(&inc, &buffer[0], sizeof(float));
+    if (inc >= 0)
+    {
+        Controller_SetVelIncrement(inc);
         return CANRP_Write;
     }
     return CANRP_NoAction;
