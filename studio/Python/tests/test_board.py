@@ -346,6 +346,18 @@ class TestBoard(TMTestCase):
         a, _ = np.polyfit(t_points, vel_estimates, 1)
         self.assertAlmostEqual(a, ramp_value * frequency, delta=5000)
 
+    def test_o_composite_set_get(self):
+        """
+        Test composite setter/getter function
+        """
+        self.reset_and_wait()
+        # Ensure we're idle
+        self.check_state(0)
+        self.try_calibrate()
+        pos_estimate_ref = self.tm.encoder.position_estimate
+        pos_estimate_comp = self.tm.controller.set_pos_vel_setpoints(0, 0)
+        self.assertAlmostEqual(pos_estimate_ref, pos_estimate_comp, delta=200)
+
 
 if __name__ == "__main__":
     unittest.main(failfast=True)
