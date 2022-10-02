@@ -65,7 +65,7 @@ typedef enum
 } traj_planner_errors_flags;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[59])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[60])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -397,6 +397,16 @@ uint8_t avlos_controller_velocity_mode(uint8_t * buffer, uint8_t * buffer_len, A
 * @param buffer_len
 */
 uint8_t avlos_controller_current_mode(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_controller_set_pos_vel_setpoints
+*
+* Set the position and velocity setpoints in one go, and retrieve the position estimate
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_controller_set_pos_vel_setpoints(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_comms_can_rate

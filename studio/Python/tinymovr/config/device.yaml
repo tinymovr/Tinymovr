@@ -189,6 +189,15 @@ remote_attributes:
         caller_name: controller_current_mode
         dtype: void
         arguments: []
+      - name: set_pos_vel_setpoints
+        summary: Set the position and velocity setpoints in one go, and retrieve the position estimate
+        caller_name: controller_set_pos_vel_setpoints
+        dtype: float
+        arguments:
+          - name: pos_setpoint
+            dtype: float
+          - name: vel_setpoint
+            dtype: float
   - name: comms
     remote_attributes:
     - name: can
