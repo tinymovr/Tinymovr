@@ -34,5 +34,6 @@ volatile uint16_t data_num;
 extern void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t cph, uint8_t cpol);
 extern PAC5XXX_RAMFUNC uint32_t ssp_write_one(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t data);
 extern PAC5XXX_RAMFUNC uint32_t ssp_write_multi(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t *data, uint32_t byte_num);
+extern PAC5XXX_RAMFUNC uint16_t ssp_read_one(PAC55XX_SSP_TYPEDEF *ssp_ptr);
 
 #endif

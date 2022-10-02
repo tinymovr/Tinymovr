@@ -374,7 +374,7 @@ for velocity-limited plan moves",
             DataType.UINT8, DataType.UINT8,
             DataType.UINT8, DataType.UINT8,
             DataType.UINT8, DataType.UINT8),
-        "labels": ("s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "current")
+        "labels": ("s0", "s1", "s2", "s3", "s4", "s5", "s6", "current_angle")
     },
     "set_watchdog":
     {

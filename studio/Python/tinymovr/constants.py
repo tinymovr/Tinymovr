@@ -24,6 +24,7 @@ class ErrorIDs(IntEnum):
     EncoderReadingOutOfRange = 9
     InvalidPlannerInput = 10
     PlannerVCruiseOverLimit = 11
+    HallSensorCalibrationFailed = 12
 
 
 error_descriptions = {
@@ -37,5 +38,6 @@ error_descriptions = {
     ErrorIDs.InvalidPolePairs: "Pole pairs calculation did not converge to a valid value",
     ErrorIDs.EncoderReadingOutOfRange: "The encoder angle reading is out of range",
     ErrorIDs.InvalidPlannerInput: "The trajectory planner received invalid input",
-    ErrorIDs.PlannerVCruiseOverLimit: "The computed trajectory planner cruise velocity is over the current velocity limit"
+    ErrorIDs.PlannerVCruiseOverLimit: "The computed trajectory planner cruise velocity is over the current velocity limit",
+    ErrorIDs.HallSensorCalibrationFailed: "Unexpected number of sectors discovered during Hall sensor calibration"
 }    

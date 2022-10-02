@@ -29,7 +29,7 @@ typedef struct
 {
 	uint16_t angle;
     uint8_t sector;
-} HAllState;
+} HallState;
 
 void hall_init(void);
 PAC5XXX_RAMFUNC int16_t hall_get_angle(void);
