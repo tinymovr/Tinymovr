@@ -277,7 +277,7 @@ static inline void set_epos_and_wait(float angle, float I_setpoint)
 {
     struct FloatTriplet modulation_values = {0.0f};
     float pwm_setpoint = (I_setpoint * motor_get_phase_resistance()) / system_get_Vbus();
-    our_clamp(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
+    our_clampc(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
     SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),
         &modulation_values.A, &modulation_values.B, &modulation_values.C);
     gate_driver_set_duty_cycle(&modulation_values);
