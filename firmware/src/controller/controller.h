@@ -113,6 +113,8 @@ PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value);
 
 PAC5XXX_RAMFUNC float controller_get_Vq_setpoint_user_frame(void);
 
+PAC5XXX_RAMFUNC float controller_set_pos_vel_setpoints(float pos_setpoint, float vel_setpoint);
+
 void controller_get_modulation_values(struct FloatTriplet *dc);
 
 float controller_get_pos_gain(void);

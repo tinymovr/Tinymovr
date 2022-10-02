@@ -376,6 +376,13 @@ PAC5XXX_RAMFUNC float controller_get_Vq_setpoint_user_frame(void)
     return state.Vq_setpoint * motor_get_user_direction();
 }
 
+PAC5XXX_RAMFUNC float controller_set_pos_vel_setpoints(float pos_setpoint, float vel_setpoint)
+{
+    controller_set_pos_setpoint_user_frame(pos_setpoint);
+    controller_set_vel_setpoint_user_frame(vel_setpoint);
+    return observer_get_pos_estimate_user_frame();
+}
+
 void controller_get_modulation_values(struct FloatTriplet *dc)
 {
     dc->A = state.modulation_values.A;
