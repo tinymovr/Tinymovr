@@ -123,7 +123,7 @@ void CAN_process_interrupt(void)
         uint8_t can_msg_buffer[8];
         memcpy(can_msg_buffer, &rx_data, data_length);
         uint8_t response_type = callback(can_msg_buffer, &data_length, (uint8_t)rtr);
-        if (AVLOS_RET_READ == response_type)
+        if ((AVLOS_RET_READ == response_type || AVLOS_RET_CALL == response_type) && (data_length > 0))
         {
             state.last_msg_ms = msTicks;
             can_transmit_extended(data_length, rx_id, can_msg_buffer);
