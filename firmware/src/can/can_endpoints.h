@@ -38,6 +38,14 @@ typedef enum
 
 typedef enum
 {
+    CONTROLLER_WARNINGS_NONE = 0,
+    CONTROLLER_WARNINGS_VELOCITY_LIMITED = (1 << 0), 
+    CONTROLLER_WARNINGS_CURRENT_LIMITED = (1 << 1), 
+    CONTROLLER_WARNINGS_MODULATION_LIMITED = (1 << 2)
+} controller_warnings_flags;
+
+typedef enum
+{
     CONTROLLER_ERRORS_NONE = 0,
     CONTROLLER_ERRORS_CURRENT_LIMIT_EXCEEDED = (1 << 0)
 } controller_errors_flags;
@@ -65,7 +73,7 @@ typedef enum
 } traj_planner_errors_flags;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[60])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[61])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -207,6 +215,16 @@ uint8_t avlos_controller_state(uint8_t * buffer, uint8_t * buffer_len, Avlos_Com
 * @param buffer_len
 */
 uint8_t avlos_controller_mode(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_controller_warnings
+*
+* Any controller warnings, as a bitmask
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_controller_warnings(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_controller_errors

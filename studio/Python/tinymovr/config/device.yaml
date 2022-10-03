@@ -78,6 +78,11 @@ remote_attributes:
         getter_name: controller_get_mode
         setter_name: controller_set_mode
         summary: The control mode of the controller.
+      - name: warnings
+        dynamic_value: True
+        flags: [VELOCITY_LIMITED, CURRENT_LIMITED, MODULATION_LIMITED]
+        getter_name: controller_get_warnings
+        summary: Any controller warnings, as a bitmask
       - name: errors
         dynamic_value: True
         flags: [CURRENT_LIMIT_EXCEEDED]

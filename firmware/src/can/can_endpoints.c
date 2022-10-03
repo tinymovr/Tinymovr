@@ -18,8 +18,8 @@
 #include <src/can/can_endpoints.h>
 
 
-uint8_t (*avlos_endpoints[60])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_protocol_hash, &avlos_uid, &avlos_Vbus, &avlos_temp, &avlos_calibrated, &avlos_errors, &avlos_save_config, &avlos_erase_config, &avlos_reset, &avlos_scheduler_total, &avlos_scheduler_busy, &avlos_scheduler_errors, &avlos_controller_state, &avlos_controller_mode, &avlos_controller_errors, &avlos_controller_position_setpoint, &avlos_controller_position_p_gain, &avlos_controller_velocity_setpoint, &avlos_controller_velocity_limit, &avlos_controller_velocity_p_gain, &avlos_controller_velocity_i_gain, &avlos_controller_velocity_deadband, &avlos_controller_current_Iq_setpoint, &avlos_controller_current_Iq_limit, &avlos_controller_current_Iq_estimate, &avlos_controller_current_bandwidth, &avlos_controller_current_Iq_p_gain, &avlos_controller_voltage_Vq_setpoint, &avlos_controller_calibrate, &avlos_controller_idle, &avlos_controller_position_mode, &avlos_controller_velocity_mode, &avlos_controller_current_mode, &avlos_controller_set_pos_vel_setpoints, &avlos_comms_can_rate, &avlos_comms_can_id, &avlos_motor_R, &avlos_motor_L, &avlos_motor_pole_pairs, &avlos_motor_type, &avlos_motor_offset, &avlos_motor_direction, &avlos_motor_calibrated, &avlos_motor_I_cal, &avlos_motor_errors, &avlos_encoder_position_estimate, &avlos_encoder_velocity_estimate, &avlos_encoder_type, &avlos_encoder_bandwidth, &avlos_encoder_calibrated, &avlos_encoder_errors, &avlos_traj_planner_max_accel, &avlos_traj_planner_max_decel, &avlos_traj_planner_max_vel, &avlos_traj_planner_move_to, &avlos_traj_planner_move_to_tlimit, &avlos_traj_planner_errors, &avlos_watchdog_enabled, &avlos_watchdog_triggered, &avlos_watchdog_timeout };
-uint32_t avlos_proto_hash = 2228547474;
+uint8_t (*avlos_endpoints[61])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_protocol_hash, &avlos_uid, &avlos_Vbus, &avlos_temp, &avlos_calibrated, &avlos_errors, &avlos_save_config, &avlos_erase_config, &avlos_reset, &avlos_scheduler_total, &avlos_scheduler_busy, &avlos_scheduler_errors, &avlos_controller_state, &avlos_controller_mode, &avlos_controller_warnings, &avlos_controller_errors, &avlos_controller_position_setpoint, &avlos_controller_position_p_gain, &avlos_controller_velocity_setpoint, &avlos_controller_velocity_limit, &avlos_controller_velocity_p_gain, &avlos_controller_velocity_i_gain, &avlos_controller_velocity_deadband, &avlos_controller_current_Iq_setpoint, &avlos_controller_current_Iq_limit, &avlos_controller_current_Iq_estimate, &avlos_controller_current_bandwidth, &avlos_controller_current_Iq_p_gain, &avlos_controller_voltage_Vq_setpoint, &avlos_controller_calibrate, &avlos_controller_idle, &avlos_controller_position_mode, &avlos_controller_velocity_mode, &avlos_controller_current_mode, &avlos_controller_set_pos_vel_setpoints, &avlos_comms_can_rate, &avlos_comms_can_id, &avlos_motor_R, &avlos_motor_L, &avlos_motor_pole_pairs, &avlos_motor_type, &avlos_motor_offset, &avlos_motor_direction, &avlos_motor_calibrated, &avlos_motor_I_cal, &avlos_motor_errors, &avlos_encoder_position_estimate, &avlos_encoder_velocity_estimate, &avlos_encoder_type, &avlos_encoder_bandwidth, &avlos_encoder_calibrated, &avlos_encoder_errors, &avlos_traj_planner_max_accel, &avlos_traj_planner_max_decel, &avlos_traj_planner_max_vel, &avlos_traj_planner_move_to, &avlos_traj_planner_move_to_tlimit, &avlos_traj_planner_errors, &avlos_watchdog_enabled, &avlos_watchdog_triggered, &avlos_watchdog_timeout };
+uint32_t avlos_proto_hash = 4058790648;
 
 uint32_t _avlos_get_proto_hash(void)
 {
@@ -187,6 +187,18 @@ uint8_t avlos_controller_mode(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comm
         memcpy(&v, buffer, sizeof(v));
         controller_set_mode(v);
         return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_controller_warnings(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+    if (AVLOS_CMD_READ == cmd) {
+        uint8_t v;
+        v = controller_get_warnings();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
     }
     return AVLOS_RET_NOACTION;
 }
@@ -465,7 +477,6 @@ uint8_t avlos_controller_set_pos_vel_setpoints(uint8_t * buffer, uint8_t * buffe
     offset += sizeof(vel_setpoint);
     float ret_val = controller_set_pos_vel_setpoints(pos_setpoint, vel_setpoint);
     memcpy(buffer, &ret_val, sizeof(ret_val));
-    *buffer_len = sizeof(ret_val);
 
     return AVLOS_RET_CALL;
 }
