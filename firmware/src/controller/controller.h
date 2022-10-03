@@ -41,6 +41,7 @@ typedef struct
     // TODO: State.state is very confusing, name appropriately
     ControlState state;
     ControlMode mode;
+    uint8_t warnings;
     uint8_t errors;
     bool is_calibrating;
 
@@ -140,6 +141,7 @@ void controller_set_motion_plan(MotionPlan mp);
 
 PAC5XXX_RAMFUNC void controller_update_I_gains(void);
 
+PAC5XXX_RAMFUNC uint8_t controller_get_warnings(void);
 PAC5XXX_RAMFUNC uint8_t controller_get_errors(void);
 
 ControllerConfig *Controller_GetConfig(void);

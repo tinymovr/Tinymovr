@@ -82,6 +82,7 @@ void Controller_ControlLoop(void)
 {
     while (true)
     {
+        state.warnings = 0;
         const float Iq = controller_get_Iq_estimate();
         if ((Iq > (config.I_limit * I_TRIP_MARGIN)) ||
             (Iq < -(config.I_limit * I_TRIP_MARGIN)))
@@ -110,7 +111,16 @@ void Controller_ControlLoop(void)
         }
         else if (state.state == STATE_CL_CONTROL)
         {
-            CLControlStep();
+            // Check the watchdog and revert to idle if it has timed out
+            if (Watchdog_triggered())
+            {
+                controller_set_state(STATE_IDLE);
+                Watchdog_reset();
+            }
+            else
+            {
+                CLControlStep();
+            }
         }
         else
         {
@@ -122,14 +132,6 @@ void Controller_ControlLoop(void)
 
 PAC5XXX_RAMFUNC void CLControlStep(void)
 {
-    // Check that the watchdog and revert to idle if it has timed out
-    if (Watchdog_triggered())
-    {
-        controller_set_state(STATE_IDLE);
-        Watchdog_reset();
-        return;
-    }
-
     if (state.mode >= CTRL_TRAJECTORY)
     {
         state.t_plan += PWM_PERIOD_S;
@@ -186,17 +188,17 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     }
 
     // Velocity-dependent current limiting
-    const float vel_limit = our_fminf(config.vel_limit, VEL_HARD_LIMIT);
-    if (Controller_LimitVelocity(-vel_limit, vel_limit, vel_estimate, config.vel_gain, &Iq_setpoint) == true)
+    if (Controller_LimitVelocity(-config.vel_limit, config.vel_limit, vel_estimate, config.vel_gain, &Iq_setpoint) == true)
     {
         state.vel_integrator_Iq *= 0.995f;
+        state.warnings |= CONTROLLER_WARNINGS_VELOCITY_LIMITED;
     }
 
     // Absolute current & velocity integrator limiting
-    const float I_limit = our_fminf(config.I_limit, I_HARD_LIMIT);
-    if (our_clampc(&Iq_setpoint, -I_limit, I_limit) == true)
+    if (our_clampc(&Iq_setpoint, -config.I_limit, config.I_limit) == true)
     {
         state.vel_integrator_Iq *= 0.995f;
+        state.warnings |= CONTROLLER_WARNINGS_CURRENT_LIMITED;
     }
 
     const float e_phase = observer_get_epos();
@@ -250,6 +252,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         mod_d *= dq_mod_scale_factor;
         state.Id_integrator_Vd *= I_INTEGRATOR_DECAY_FACTOR;
         state.Iq_integrator_Vq *= I_INTEGRATOR_DECAY_FACTOR;
+        state.warnings |= CONTROLLER_WARNINGS_MODULATION_LIMITED;
     }
 
     // Inverse Park transform
@@ -468,7 +471,7 @@ float controller_get_vel_limit(void)
 
 void controller_set_vel_limit(float limit)
 {
-    if (limit > 0.0f)
+    if ((limit > 0.0f) && (config.vel_limit < VEL_HARD_LIMIT))
     {
         config.vel_limit = limit;
     }
@@ -494,7 +497,7 @@ float controller_get_Iq_limit(void)
 
 void controller_set_Iq_limit(float limit)
 {
-    if (limit > 0.0f)
+    if ((limit > 0.0f) && (limit < I_HARD_LIMIT))
     {
         config.I_limit = limit;
     }
@@ -530,6 +533,11 @@ PAC5XXX_RAMFUNC void controller_update_I_gains(void)
     float plant_pole = motor_get_phase_resistance() / motor_get_phase_inductance();
     config.Iq_integrator_gain = plant_pole * config.I_gain;
     config.Id_integrator_gain = config.Iq_integrator_gain;
+}
+
+PAC5XXX_RAMFUNC uint8_t controller_get_warnings(void)
+{
+    return state.warnings;
 }
 
 PAC5XXX_RAMFUNC uint8_t controller_get_errors(void)
