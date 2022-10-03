@@ -17,6 +17,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 import random
 import time
+import numpy as np
 import statistics as st
 from avlos.unit_field import get_registry
 
