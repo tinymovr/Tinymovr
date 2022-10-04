@@ -132,6 +132,11 @@ remote_attributes:
             setter_name: controller_set_vel_integrator_deadband
             rst_target: integrator-deadband
             summary: The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
+          - name: increment
+            dtype: float
+            getter_name: controller_get_vel_increment
+            setter_name: controller_set_vel_increment
+            summary: Max velocity setpoint increment (ramping) rate. Set to 0 to disable.
       - name: current
         remote_attributes:
           - name: Iq_setpoint
