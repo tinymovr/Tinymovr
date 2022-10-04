@@ -477,7 +477,7 @@ void controller_set_vel_limit(float limit)
     }
 }
 
-void Controller_SetVelIncrement(float increment)
+void controller_set_vel_increment(float increment)
 {
     if (increment >= 0.0f)
     {
@@ -485,7 +485,7 @@ void Controller_SetVelIncrement(float increment)
     }
 }
 
-float Controller_GetVelIncrement(void)
+float controller_get_vel_increment(void)
 {
     return config.vel_increment;
 }

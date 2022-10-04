@@ -134,8 +134,8 @@ float controller_get_vel_limit(void);
 void controller_set_vel_limit(float limit);
 float controller_get_Iq_limit(void);
 void controller_set_Iq_limit(float limit);
-float Controller_GetVelIncrement(void);
-void Controller_SetVelIncrement(float inc);
+float controller_get_vel_increment(void);
+void controller_set_vel_increment(float inc);
 
 void controller_set_motion_plan(MotionPlan mp);
 
