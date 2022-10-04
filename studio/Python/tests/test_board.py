@@ -29,6 +29,8 @@ A = ureg.ampere
 ticks = ureg.ticks
 s = ureg.second
 
+tsleep = 0.18
+
 
 class TestBoard(TMTestCase):
     def test_a_encoder(self):
@@ -89,11 +91,11 @@ class TestBoard(TMTestCase):
 
         for i in range(10):
             self.tm.controller.position.setpoint = i * 1000 * ticks
-            time.sleep(0.2)
+            time.sleep(tsleep)
             self.assertAlmostEqual(
                 i * 1000 * ticks, self.tm.encoder.position_estimate, delta=1000 * ticks
             )
-            time.sleep(0.2)
+            time.sleep(tsleep)
 
     def test_e_velocity_control(self):
         """
@@ -111,25 +113,25 @@ class TestBoard(TMTestCase):
         for i in range(R):
             target = i * 20000 * ticks / s
             self.tm.controller.velocity.setpoint = target
-            time.sleep(0.2)
+            time.sleep(tsleep)
             velocity_pairs.append((target, self.tm.encoder.velocity_estimate))
 
         for i in range(R):
             target = (R - i) * 20000 * ticks / s
             self.tm.controller.velocity.setpoint = target
-            time.sleep(0.2)
+            time.sleep(tsleep)
             velocity_pairs.append((target, self.tm.encoder.velocity_estimate))
 
         for i in range(R):
             target = -i * 20000 * ticks / s
             self.tm.controller.velocity.setpoint = target
-            time.sleep(0.2)
+            time.sleep(tsleep)
             velocity_pairs.append((target, self.tm.encoder.velocity_estimate))
 
         for i in range(R):
             target = (i - R) * 20000 * ticks / s
             self.tm.controller.velocity.setpoint = target
-            time.sleep(0.2)
+            time.sleep(tsleep)
             velocity_pairs.append((target, self.tm.encoder.velocity_estimate))
 
         for target, estimate in velocity_pairs:
@@ -210,7 +212,7 @@ class TestBoard(TMTestCase):
         time.sleep(0.5)
         # Test if idle command works (it should be ignored because we're calibrating)
         self.tm.controller.idle()
-        time.sleep(0.5)
+        time.sleep(0.1)
         self.assertEqual(self.tm.controller.state, 1)
         # Same for closed loop control command
         self.tm.controller.position_mode()
@@ -334,16 +336,16 @@ class TestBoard(TMTestCase):
         # Ensure we're idle
         self.check_state(0)
         self.try_calibrate()
-        self.tm.set_vel_inc(ramp_value)
+        self.tm.controller.velocity.increment = ramp_value
         vel_estimates = []
         t_points = []
-        self.tm.velocity_control()
-        self.tm.set_vel_setpoint(200000)
+        self.tm.controller.velocity_mode()
+        self.tm.controller.velocity.setpoint = 200000
         for k in range(100):
-            vel_estimates.append(self.tm.encoder_estimates.velocity.magnitude)
+            vel_estimates.append(self.tm.encoder.velocity_estimate.magnitude)
             t_points.append(k * interval)
             time.sleep(interval)
-        self.tm.idle()
+        self.tm.controller.idle()
         a, _ = np.polyfit(t_points, vel_estimates, 1)
         self.assertAlmostEqual(a, ramp_value * frequency, delta=5000)
 
