@@ -91,7 +91,7 @@ In addition, if you are in Windows you will need to install GNU make. This is ra
 
     choco install make
 
-Once you have the J-Link adapter wired up and the software installed, you are ready to flash and debug the firmware. To try out a test build from within VSCode select ``Terminal -> Run Task...`` from the menu bar, and select ``Clean and Build Project (Debug)``.
+To try out a test build from within VSCode select ``Terminal -> Run Task...`` from the menu bar, and select ``Clean and Build Project (Debug)``.
 
 .. image:: tasks_list.png
   :width: 800
@@ -103,15 +103,46 @@ Tinymovr implements board revision selection using an input menu with a few pred
   :width: 800
   :alt: Board revision selector
 
-Select the board revision against which you are compiling (R32, R33 or R5) from the list. The build process will start, it usually takes a few tenths of seconds max. After it finishes, you should end up with a ``build/`` directory inside ``firmware/`` and there you should see the files ``tinymovr_fw.elf``, ``tinymovr_fw.hex`` and ``tinymovr_fw.bin``.
+Select the board revision against which you are compiling (R32, R33 or R5) from the list. The build process will start, it usually takes less than half a minute. After it finishes, you should end up with a ``build/`` directory inside ``firmware/`` and there you should see the files ``tinymovr_fw.elf``, ``tinymovr_fw.hex`` and ``tinymovr_fw.bin``.
 
-To flash the firmware, provided your J-Link adapter is connected and drivers properly installed, hit F5. After a while the debug session should start and you should see a screen like below:
+Once you have the J-Link adapter wired up and the software installed, you are ready to flash the firmware and start a debug session. The configuration of Tinymovr offers various launch configurations, which are briefly outlined below.
+
+Rebuild Debug and Start Session
+-------------------------------
+
+This is a convenience configuration that does a clean debug build, flashes it and launches a debug session. After a while the debug session should start and you should see a screen like below:
 
 .. image:: Capture.PNG
   :width: 800
   :alt: Tinymovr firmware debug session using VSCode
 
-Congrats! You are now fully set to start developing for Tinymovr!
+
+Rebuild Release and Flash
+-------------------------
+
+This is a convenience configuration that does a clean release build and flashes it to Tinymovr.
+
+
+Flash Built Binary and Start Session
+------------------------------------
+
+This will flash an already built binary and start a debug session. It assumes a binary already exists in the build/ directory.
+
+
+Flash Built Binary
+------------------
+
+This will flash an already built binary. It assumes a binary already exists in the build/ directory.
+
+Attach to Target
+------------------
+
+This will attach to an already running target.
+
+
+You can also hit F5 to launch the currently selected configuration.
+
+Congrats! You are now fully set to start Tinymovr development!
 
 
 .. _setting-up-eclipse:
