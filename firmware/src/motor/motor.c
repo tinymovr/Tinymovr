@@ -36,6 +36,8 @@ static MotorConfig config = {
 	.phases_swapped = false,
 	.is_gimbal = false};
 
+static MotorState state = {0};
+
 void motor_reset_calibration()
 {
 	config.pole_pairs = 7;
@@ -44,7 +46,7 @@ void motor_reset_calibration()
 	// not a gimbal, otherwise they will not
 	// be recalibrated and will stay at default
 	// values!
-	if (!motor_is_gimbal())
+	if (!motor_get_is_gimbal())
 	{
 		config.phase_resistance = 0.1f;
 		config.phase_inductance = 1e-5f;
@@ -95,13 +97,13 @@ PAC5XXX_RAMFUNC float motor_get_phase_resistance(void)
 
 PAC5XXX_RAMFUNC void motor_set_phase_resistance(float R)
 {
-	if ((R > MIN_PHASE_RESISTANCE) && ((R < MAX_PHASE_RESISTANCE) || motor_is_gimbal()))
+	if ((R > MIN_PHASE_RESISTANCE) && ((R < MAX_PHASE_RESISTANCE) || motor_get_is_gimbal()))
 	{
 		config.phase_resistance = R;
 		config.resistance_calibrated = true;
 		if (config.resistance_calibrated && config.inductance_calibrated)
 		{
-			Controller_UpdateCurrentGains();
+			controller_update_I_gains();
 		}
 	}
 }
@@ -113,32 +115,32 @@ PAC5XXX_RAMFUNC float motor_get_phase_inductance(void)
 
 PAC5XXX_RAMFUNC void motor_set_phase_inductance(float L)
 {
-	if ((L > MIN_PHASE_INDUCTANCE) && ((L < MAX_PHASE_INDUCTANCE) || motor_is_gimbal()))
+	if ((L > MIN_PHASE_INDUCTANCE) && ((L < MAX_PHASE_INDUCTANCE) || motor_get_is_gimbal()))
 	{
 		config.phase_inductance = L;
 		config.inductance_calibrated = true;
 		if (config.resistance_calibrated && config.inductance_calibrated)
 		{
-			Controller_UpdateCurrentGains();
+			controller_update_I_gains();
 		}
 	}
 }
 
 PAC5XXX_RAMFUNC void motor_set_phase_R_and_L(float R, float L)
 {
-	if ((R > MIN_PHASE_RESISTANCE) && ((R < MAX_PHASE_RESISTANCE) || motor_is_gimbal()))
+	if ((R > MIN_PHASE_RESISTANCE) && ((R < MAX_PHASE_RESISTANCE) || motor_get_is_gimbal()))
 	{
 		config.phase_resistance = R;
 		config.resistance_calibrated = true;
 	}
-	if ((L > MIN_PHASE_INDUCTANCE) && ((L < MAX_PHASE_INDUCTANCE) || motor_is_gimbal()))
+	if ((L > MIN_PHASE_INDUCTANCE) && ((L < MAX_PHASE_INDUCTANCE) || motor_get_is_gimbal()))
 	{
 		config.phase_inductance = L;
 		config.inductance_calibrated = true;
 	}
 	if (config.resistance_calibrated && config.inductance_calibrated)
 	{
-		Controller_UpdateCurrentGains();
+		controller_update_I_gains();
 	}
 }
 
@@ -165,12 +167,12 @@ PAC5XXX_RAMFUNC void motor_set_phases_swapped(bool swapped)
 	config.phases_swapped = swapped;
 }
 
-PAC5XXX_RAMFUNC bool motor_is_calibrated(void)
+PAC5XXX_RAMFUNC bool motor_get_calibrated(void)
 {
 	return config.resistance_calibrated && config.inductance_calibrated && config.poles_calibrated;
 }
 
-PAC5XXX_RAMFUNC bool motor_is_gimbal(void)
+PAC5XXX_RAMFUNC bool motor_get_is_gimbal(void)
 {
 	return config.is_gimbal;
 }
@@ -201,6 +203,16 @@ PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir)
 	{
 		config.user_direction = dir;
 	}
+}
+
+PAC5XXX_RAMFUNC uint8_t motor_get_errors(void)
+{
+	return state.errors;
+}
+
+PAC5XXX_RAMFUNC uint8_t *motor_get_error_ptr(void)
+{
+	return &(state.errors);
 }
 
 MotorConfig *motor_get_config(void)

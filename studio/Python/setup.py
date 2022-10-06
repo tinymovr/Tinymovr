@@ -1,4 +1,3 @@
-
 import pathlib
 from setuptools import setup, find_packages
 
@@ -10,39 +9,38 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="tinymovr",
-    version="0.3.16",
+    version="1.0.0",
     author="Yannis Chatzikonstantinou",
     author_email="info@tinymovr.com",
     description="Tinymovr Studio",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/yconst/Tinymovr",
-    packages=find_packages(include=['tinymovr', 'tinymovr.*']),
+    packages=find_packages(include=["tinymovr", "tinymovr.*"]),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires=">=3.8",
     install_requires=[
         "ipython",
         "python-can>=4.0.0.dev0",
-        #"python-can @ git+https://github.com/yconst/python-can.git@develop#egg=python-can-dev",
+        "avlos @ git+https://github.com/tinymovr/avlos.git",
         "pyserial",
+        "pyyaml",
         "docopt",
-        "pynumparser",
         "flatten-dict",
-        "pint"
+        "pint",
     ],
-    extras_require={
-        'plot': ["matplotlib"]
-    },
+    extras_require={"gui": ["pyside2", "pyqtgraph"]},
     entry_points={
         "console_scripts": [
-            "tinymovr=tinymovr.shell:spawn_shell"
+            "tinymovr_cli=tinymovr.cli:spawn",
+            "tinymovr=tinymovr.gui:spawn",
         ],
-        "can.interface": [
-            "insilico=tinymovr.bus:InSilico",
-        ]
-    }
+        # "can.interface": [
+        #     "insilico=tinymovr.bus:InSilico",
+        # ],
+    },
 )

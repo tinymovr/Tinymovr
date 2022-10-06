@@ -36,15 +36,17 @@ static const float max_watchdog_seconds = 0xFFFF * WWDT_CLKDIV / FRCLK_FREQ_HZ;
 
 typedef struct
 {
-    bool enabled;
     bool triggered;
 } TimeoutWatchdog;
 
 void Watchdog_init(void);
 void Watchdog_reset(void);
 bool Watchdog_triggered(void);
+uint16_t Watchdog_get_timeout_cycles(void);
+float Watchdog_get_timeout_seconds(void);
 void Watchdog_set_timeout_cycles(uint16_t cycles);
 void Watchdog_set_timeout_seconds(float s);
-void Watchdog_enable(void);
-void Watchdog_disable(void);
+
+bool Watchdog_get_enabled(void);
+void Watchdog_set_enabled(bool enabled);
 void WWDT_process_interrupt(void);

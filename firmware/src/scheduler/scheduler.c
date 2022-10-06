@@ -25,24 +25,13 @@
 #include <src/encoder/encoder.h>
 #include <src/encoder/ma7xx.h>
 #include <src/observer/observer.h>
-#include "src/watchdog/watchdog.h"
+#include <src/can/can_endpoints.h>
+#include <src/scheduler/scheduler.h>
+#include <src/watchdog/watchdog.h>
 
+volatile uint32_t msTicks = 0;
 
-struct SchedulerState
-{
-	bool adc_interrupt;
-	bool can_interrupt;
-	bool uart_message_interrupt;
-	bool wwdt_interrupt;
-	bool busy;
-
-    uint32_t busy_cycles;
-    uint32_t total_cycles;
-    uint32_t busy_loop_start;
-    uint32_t total_loop_start;
-};
-
-struct SchedulerState state = {0};
+SchedulerState state = {0};
 
 void WaitForControlLoopInterrupt(void)
 {
@@ -60,7 +49,7 @@ void WaitForControlLoopInterrupt(void)
 		{
 			// Handle UART
 			state.uart_message_interrupt = false;
-			UART_ProcessMessage();
+			UART_process_message();
 		}
 		else if (state.wwdt_interrupt)
 		{
@@ -84,9 +73,10 @@ void WaitForControlLoopInterrupt(void)
 	{
 		ma7xx_send_angle_cmd();
 	}
-	ADC_UpdateMeasurements();
-	encoder_update_angle(true);
-	observer_update_estimates();
+	ADC_update();
+	system_update();
+	encoder_update(true);
+	observer_update();
 	// At this point control is returned to main loop.
 }
 
@@ -99,7 +89,7 @@ void ADC_IRQHandler(void)
 	// to the ADC triggering the next
 	if (true == gate_driver_is_enabled() && true == state.busy)
 	{
-		add_error_flag(ERROR_CONTROL_BLOCK_REENTERED);
+		state.errors |= SCHEDULER_ERRORS_CONTROL_BLOCK_REENTERED;
 		// We do not change the control state here, to
 		// avoid any concurrency issues
 	}
@@ -117,6 +107,12 @@ void CAN_IRQHandler(void)
 {
 	pac5xxx_can_int_clear_RI();
 	state.can_interrupt = true;
+}
+
+void SysTick_Handler(void)  /* SysTick interrupt Handler. */
+{                               
+    msTicks = msTicks + 1;  /* See startup file startup_LPC17xx.s for SysTick vector */ 
+    CAN_task();
 }
 
 void UART_ReceiveMessageHandler(void)
@@ -140,4 +136,9 @@ uint32_t Scheduler_GetTotalCycles(void)
 uint32_t Scheduler_GetBusyCycles(void)
 {
     return state.busy_cycles;
+}
+
+PAC5XXX_RAMFUNC uint8_t scheduler_get_errors(void)
+{
+	return state.errors;
 }

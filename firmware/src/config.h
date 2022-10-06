@@ -18,19 +18,16 @@
 #pragma once
 
 // Firmware Version
-#define VERSION_MAJOR (0u)
-#define VERSION_MINOR (8u)
-#define VERSION_PATCH (16u)
-
-// Required Studio version
-#define STUDIO_MIN_VERSION_MAJOR (0u)
-#define STUDIO_MIN_VERSION_MINOR (3u)
-#define STUDIO_MIN_VERSION_PATCH (16u)
+#define VERSION_MAJOR (1u)
+#define VERSION_MINOR (0u)
+#define VERSION_PATCH (0u)
 
 /// TINYMOVR CONFIGURATION OPTIONS ///
 
 #define ACLK_FREQ_HZ                (300000000)
 #define HCLK_FREQ_HZ                (150000000)
+#define CLKREF_FREQ_HZ              (4000000)
+#define FRCLK_FREQ_HZ               CLKREF_FREQ_HZ
 
 // Timer clock divider
 #define TXCTL_PS_DIV                TXCTL_PS_DIV2
@@ -54,7 +51,7 @@
 #define CAL_STAY_LEN          (PWM_FREQ_HZ / 2)
 #define CAL_DIR_LEN           (3 * PWM_FREQ_HZ)
 
-#define CAL_PHASE_TURNS             8
+#define CAL_PHASE_TURNS             (8)
 
 #define CAL_V_GAIN (0.0005f)
 #define CAL_V_INDUCTANCE (2.0f)
@@ -66,7 +63,7 @@
 // UART
 #define UART_ENUM UARTB
 #define UART_REF PAC55XX_UARTB
-#define UART_BAUD_RATE 115200
+#define UART_BAUD_RATE (115200)
 
 #define UART_I_SCALING_FACTOR ( 1000.0f )
 #define ONE_OVER_UART_I_SCALING_FACTOR ( 0.001f )

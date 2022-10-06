@@ -11,23 +11,23 @@ CAN Bus is the primary interface for communicating with Tinymovr. The physical a
 Data rate
 #########
 
-By default, the CAN baud rate is set to 1Mbit/s. This is customizable both through CAN as well as through UART. See :ref:`api-can-config`. Possible values are 125kbit/s, 250kbit/s, 500kbit/s and 1Mbit/s.
+By default, the CAN baud rate is set to 1Mbit/s. This is customizable both through CAN as well as through UART. See :ref:`api-can-rate`. Possible values are 125kbit/s, 250kbit/s, 500kbit/s and 1Mbit/s.
 
 Addressing
 ##########
 
-The 11-bit identifier of the CAN frame is used for device and endpoint identification. The 6 least significant bits of the identifier are reserved for endpoints, and the 5 most significant bits for device identification. This suggests that the total number of addressable endpoints in a single device are 64, and the total number of addressable devices are 32. 
+Tinymovr uses extended CAN frames for communication. The 29-bit identifier of the extended CAN frame is used for device, endpoint and message sequence identification. The 12 least significant bits of the identifier are reserved for endpoint identification, the next 9 for message sequence identification, and the 8 most significant bits, for device identification. The total number of addressable endpoints in a single device are 4096, the number of addressable devices is 256, and a message sequence can include up to 512 messages. 
 
-API
-###
+Protocol
+########
 
-For a detailed description, please see :ref:`api-reference`.
+For a detailed description, please see :ref:`integrating` and :ref:`api-reference`.
 
 
 UART
 ----
 
-As an alternative to CAN Bus, Tinymovr offers UART-based (serial) communication. The protocol is much simpler than can and mainly designed for troubleshooting or testing in the absence of CAN hardware.
+As an alternative to CAN Bus, Tinymovr offers UART-based (serial) communication. The protocol is much simpler than CAN and mainly designed for troubleshooting or testing in the absence of CAN hardware.
 
 .. warning::
    The UART port on Tinymovr is NOT 5V tolerant. Applying 5V voltage will immediately damage the onboard PAC5527 controller. Please use only 3.3V for UART communication.

@@ -19,10 +19,11 @@
 #include <src/system/system.h>
 #include <src/ssp/ssp_func.h>
 #include <src/utils/utils.h>
+#include <src/can/can_endpoints.h>
 #include <src/encoder/ma7xx.h>
 
-static MA7xxConfig config = { 0 };
-static MA7xxState state = { 0 };
+static MA7xxConfig config = {0};
+static MA7xxState state = {0};
 
 #define MAX_ALLOWED_DELTA     (ENCODER_TICKS / 6)
 #define MAX_ALLOWED_DELTA_ADD (MAX_ALLOWED_DELTA + ENCODER_TICKS)
@@ -43,7 +44,12 @@ void ma7xx_init(void)
     ssp_init(PRIMARY_ENCODER_SSP_PORT, SSP_MS_MASTER, 0, 0); // Mode 0
     delay_us(16000); // ensure 16ms sensor startup time as per the datasheet
     ma7xx_send_angle_cmd();
-    ma7xx_update_angle(false);
+    ma7xx_update(false);
+}
+
+PAC5XXX_RAMFUNC uint8_t ma7xx_get_errors(void)
+{
+    return state.errors;
 }
 
 PAC5XXX_RAMFUNC void ma7xx_send_angle_cmd(void)
@@ -65,7 +71,7 @@ PAC5XXX_RAMFUNC int16_t ma7xx_get_angle_rectified(void)
 	return angle + off_interp;
 }
 
-PAC5XXX_RAMFUNC void ma7xx_update_angle(bool check_error)
+PAC5XXX_RAMFUNC void ma7xx_update(bool check_error)
 {
     while (!PRIMARY_ENCODER_SSP_STRUCT->STAT.RNE) {}
     const int16_t angle = (PRIMARY_ENCODER_SSP_STRUCT->DAT.DATA) >> 3;
@@ -77,7 +83,7 @@ PAC5XXX_RAMFUNC void ma7xx_update_angle(bool check_error)
 		     ((delta > MAX_ALLOWED_DELTA_ADD) || (delta < MIN_ALLOWED_DELTA_ADD)) &&
 		     ((delta > MAX_ALLOWED_DELTA_SUB) || (delta < MIN_ALLOWED_DELTA_SUB)) )
 		{
-			add_error_flag(ERROR_ENCODER_READING_UNSTABLE);
+            state.errors |= ENCODER_ERRORS_READING_UNSTABLE;
 		}
     }
     state.angle = angle;
@@ -92,6 +98,11 @@ void ma7xx_clear_rec_table(void)
 void ma7xx_set_rec_calibrated(void)
 {
     config.rec_calibrated = true;
+}
+
+bool ma7xx_rec_is_calibrated(void)
+{
+    return config.rec_calibrated;
 }
 
 int16_t *ma7xx_get_rec_table_ptr(void)

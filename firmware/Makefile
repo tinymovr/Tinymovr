@@ -43,6 +43,7 @@ BASEFLAGS += -mfloat-abi=hard
 BASEFLAGS += -mfpu=fpv4-sp-d16
 BASEFLAGS += -ffunction-sections # generate a separate ELF section for each function in the source file
 BASEFLAGS += -fdata-sections # generate a separate ELF section for each data item in the source file
+BASEFLAGS += -fno-tree-loop-distribute-patterns # disable replacing with calls to builting functions
 BASEFLAGS += -Wall
 BASEFLAGS += -Wlogical-op
 BASEFLAGS += -Waggregate-return
@@ -99,8 +100,8 @@ OBJECTS := $(addprefix $(BUILDDIR)/,$(CSOURCES:%.c=%.o)) $(addprefix $(BUILDDIR)
 all: release
 
 # Debug target
-debug: CFLAGS += -DDEBUG -g2 -O1
-debug: CPPFLAGS += -DDEBUG -g2 -O1
+debug: CFLAGS += -DDEBUG -g1 -O1
+debug: CPPFLAGS += -DDEBUG -g1 -O1
 debug: LDFLAGS += -O1
 debug: OBJECTS += $(BUILDDIR)/bootloader.o
 debug: binary

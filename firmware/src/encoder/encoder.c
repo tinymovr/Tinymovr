@@ -5,8 +5,8 @@
 #include <src/encoder/hall.h>
 #include <src/encoder/encoder.h>
 
-static EncoderConfig config = { 0 };
-static EncoderState state = { 0 };
+static EncoderConfig config = {0};
+static EncoderState state = {0};
 
 void encoder_init(void)
 {
@@ -16,8 +16,10 @@ void encoder_init(void)
 #endif
         ma7xx_init();
         state.current_encoder_type = ENCODER_MA7XX;
+        state.get_error_ptr = &ma7xx_get_errors;
+        state.get_calibrated_ptr = &ma7xx_rec_is_calibrated;
         state.get_angle_ptr = &ma7xx_get_angle_rectified;
-        state.update_angle_ptr = &ma7xx_update_angle;
+        state.update_angle_ptr = &ma7xx_update;
         state.reset_encoder_ptr = &ma7xx_clear_rec_table;
         state.ticks = ENCODER_TICKS;
 #ifdef BOARD_REV_R5
@@ -26,8 +28,10 @@ void encoder_init(void)
     {
         hall_init();
         state.current_encoder_type = ENCODER_HALL;
+        state.get_error_ptr = &hall_get_errors;
+        state.get_calibrated_ptr = &hall_sector_map_is_calibrated;
         state.get_angle_ptr = &hall_get_angle;
-        state.update_angle_ptr = &hall_update_angle;
+        state.update_angle_ptr = &hall_update;
         state.reset_encoder_ptr = &hall_clear_sector_map;
         state.ticks = HALL_SECTORS;
     }
@@ -44,7 +48,7 @@ PAC5XXX_RAMFUNC int16_t encoder_get_angle(void)
     return state.get_angle_ptr();
 }
 
-PAC5XXX_RAMFUNC void encoder_update_angle(bool check_error)
+PAC5XXX_RAMFUNC void encoder_update(bool check_error)
 {
     if (state.update_angle_ptr)
     {
@@ -77,6 +81,11 @@ EncoderType encoder_get_type(void)
     return state.current_encoder_type;
 }
 
+PAC5XXX_RAMFUNC bool encoder_get_calibrated(void)
+{
+    return state.get_calibrated_ptr();
+}
+
 PAC5XXX_RAMFUNC void encoder_set_type(EncoderType enc_type)
 {
 #ifdef BOARD_REV_R5
@@ -91,6 +100,11 @@ PAC5XXX_RAMFUNC void encoder_set_type(EncoderType enc_type)
         config.encoder_type = ENCODER_HALL;
     }
 #endif
+}
+
+PAC5XXX_RAMFUNC uint8_t encoder_get_errors(void)
+{
+    return state.get_error_ptr();
 }
 
 EncoderConfig* encoder_get_config(void)

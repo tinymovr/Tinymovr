@@ -48,7 +48,7 @@ void observer_reset(void)
 	state.vel_estimate = 0;
 }
 
-PAC5XXX_RAMFUNC void observer_update_estimates(void)
+PAC5XXX_RAMFUNC void observer_update(void)
 {
 	const int16_t angle_meas = encoder_get_angle();
 	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;

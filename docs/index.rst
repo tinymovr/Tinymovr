@@ -11,19 +11,27 @@ Welcome to Tinymovr documentation!
    :caption: Contents:
 
    quickstart
+   
    hardware/overview
    hardware/guide
+   
    studio/installation
    studio/usage
-   planner/planner
-   encoders/encoders
-   api/guide
+   
+   protocol/integrating
+   protocol/reference
    interfaces/interfaces
+   
+   encoders/encoders
+   planner/planner
    upgrade/upgrade
    hardware/gimbal
+   
    hardware/canine
+   
    troubleshooting
    control/theory
    develop/guide
+   
    hardware/errata
 
