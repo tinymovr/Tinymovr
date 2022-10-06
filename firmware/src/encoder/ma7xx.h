@@ -19,6 +19,20 @@
 
 #include <src/common.h>
 
+#if defined(BOARD_REV_R3)
+#define PRIMARY_ENCODER_SSP_PORT SSPD
+#define PRIMARY_ENCODER_SSP_STRUCT PAC55XX_SSPD
+#elif defined(BOARD_REV_R5)
+#define PRIMARY_ENCODER_SSP_PORT SSPC
+#define PRIMARY_ENCODER_SSP_STRUCT PAC55XX_SSPC
+#endif
+
+#define MAX_ALLOWED_DELTA     (ENCODER_TICKS / 6)
+#define MAX_ALLOWED_DELTA_ADD (MAX_ALLOWED_DELTA + ENCODER_TICKS)
+#define MAX_ALLOWED_DELTA_SUB (MAX_ALLOWED_DELTA - ENCODER_TICKS)
+#define MIN_ALLOWED_DELTA_ADD (-MAX_ALLOWED_DELTA + ENCODER_TICKS)
+#define MIN_ALLOWED_DELTA_SUB (-MAX_ALLOWED_DELTA - ENCODER_TICKS)
+
 typedef struct
 {
 	bool rec_calibrated;
@@ -34,8 +48,10 @@ typedef struct
 
 // MA702 commands
 typedef enum {
-    MA_CMD_NOP   = 0x0000,
-    MA_CMD_ANGLE = 0x0000
+    MA_CMD_NOP              = 0x0000,
+    MA_CMD_ANGLE            = 0x0000,
+    MA_CMD_WRITE            = 0x8000,
+    MA_CMD_READ             = 0x4000
 } MA702Command;
 
 void ma7xx_init(void);
@@ -52,3 +68,6 @@ bool ma7xx_rec_is_calibrated(void);
 int16_t *ma7xx_get_rec_table_ptr(void);
 MA7xxConfig* ma7xx_get_config(void);
 void ma7xx_restore_config(MA7xxConfig* config_);
+uint16_t ma7xx_write_reg(uint8_t, uint8_t);
+uint16_t ma7xx_write_data(uint16_t);
+uint8_t ma7xx_read_reg(uint8_t);

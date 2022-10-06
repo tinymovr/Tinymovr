@@ -30,7 +30,7 @@ typedef struct
     uint8_t errors;
 	uint16_t angle;
     uint8_t sector;
-} HAllState;
+} HallState;
 
 void hall_init(void);
 

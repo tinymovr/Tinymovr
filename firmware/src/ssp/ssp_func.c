@@ -816,8 +816,7 @@ PAC5XXX_RAMFUNC uint32_t ssp_write_one(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t da
 //==============================================================================
 PAC5XXX_RAMFUNC uint32_t ssp_write_multi(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t *data_p, uint32_t byte_num)
 {
-    uint16_t *data;
-    data = data_p;
+    uint16_t *data = data_p;
 
     uint32_t result = PAC5XXX_OK;
     uint32_t wait_tick = 0;
@@ -843,4 +842,13 @@ PAC5XXX_RAMFUNC uint32_t ssp_write_multi(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t 
     }
 
     return result;
+}
+
+PAC5XXX_RAMFUNC uint16_t ssp_read_one(PAC55XX_SSP_TYPEDEF *ssp_ptr)
+{
+    // Might be worth adding a timeout
+    while (!ssp_ptr->STAT.RNE) {};
+    uint16_t data = (ssp_ptr->DAT.DATA);
+
+    return data;
 }
