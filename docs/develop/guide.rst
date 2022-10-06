@@ -42,6 +42,7 @@ Connection with SWD adapter (e.g. isolator) for R5:
 
 (diagrams made with `Wireviz <https://github.com/formatc1702/WireViz>`_)
 
+
 Setting up the repo
 ###################
 
@@ -76,14 +77,17 @@ Done.
 
 .. _setting-up-vscode:
 
+
 Using VSCode
 ############
 
 VSCode-based Tinymovr development is a cross-platform solution (Linux, Macos and Windows supported) for building, flashing and debugging firmware. As of November 2021, it is the official approach to Tinymovr development.
 
-The Tinymovr repo includes all VSCode settings configured, except for the JLink `serverpath` variable in `launch.json`, which you'll need to update to reflect your system. You will also need to install the `GNU Arm Embedded Toolchain <https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads>`_, and J-Link drivers. 
 
-The required J-Link drivers and software, together with instructions, can be found in the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_, under the download 'Segger J-Link Support'. This download includes a nacessary patch to enable J-Link to work with Qorvo devices. Instructions on how to apply the patch are included.
+Building
+********
+
+You will need to install the `GNU Arm Embedded Toolchain <https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads>`_. 
 
 In addition, if you are in Windows you will need to install GNU make. This is rather easy in Windows 10 or later:
 
@@ -105,7 +109,16 @@ Tinymovr implements board revision selection using an input menu with a few pred
 
 Select the board revision against which you are compiling (R32, R33 or R5) from the list. The build process will start, it usually takes less than half a minute. After it finishes, you should end up with a ``build/`` directory inside ``firmware/`` and there you should see the files ``tinymovr_fw.elf``, ``tinymovr_fw.hex`` and ``tinymovr_fw.bin``.
 
-Once you have the J-Link adapter wired up and the software installed, you are ready to flash the firmware and start a debug session. The configuration of Tinymovr offers various launch configurations, which are briefly outlined below.
+
+Flashing and Debugging
+**********************
+
+Before debugging, make sure the J-Link drivers and software is installed. The drivers and software, together with instructions, can be found in the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_, under the download 'Segger J-Link Support'. This download includes a nacessary patch to enable J-Link to work with Qorvo devices. Instructions on how to apply the patch are included in the download.
+
+The Tinymovr repo includes all VSCode settings configured, except for the JLink `serverpath` variable in `launch.json`, which you'll need to update to reflect your system. Note that there are multiple instances in the file, you'll need to update all of them.
+
+We offer various VSCode launch configurations to suit different development and debugging tasks. These are are briefly outlined below.
+
 
 Rebuild Debug and Start Session
 -------------------------------
@@ -126,13 +139,14 @@ This is a convenience configuration that does a clean release build and flashes 
 Flash Built Binary and Start Session
 ------------------------------------
 
-This will flash an already built binary and start a debug session. It assumes a binary already exists in the build/ directory.
+This will flash an already built binary and start a debug session. It assumes a binary already exists in the ``firmware/build/`` directory.
 
 
 Flash Built Binary
 ------------------
 
-This will flash an already built binary. It assumes a binary already exists in the build/ directory.
+This will flash an already built binary. It assumes a binary already exists in the ``firmware/build/`` directory.
+
 
 Attach to Target
 ------------------
@@ -140,9 +154,9 @@ Attach to Target
 This will attach to an already running target.
 
 
-You can also hit F5 to launch the currently selected configuration.
+Note that the launch configurations can be selected and initiated from the VSCode "Run and Debug" pane. You can also hit ``F5`` to launch the currently selected configuration.
 
-Congrats! You are now fully set to start Tinymovr development!
+Congrats! You are now fully set to start with Tinymovr development!
 
 
 .. _setting-up-eclipse:
@@ -159,6 +173,3 @@ Run the downloaded installer that will install Eclipse and the J-Link utility (v
 Once installation is complete, run Eclipse and import the Tinymovr project. Try building to verify everything is ok. You are now ready to flash and debug using Eclipse.
 
 Please note that for a successful build using Eclipse you will need to ``#define`` in ``config.h`` one of ``BOARD_REV_R32``, ``BOARD_REV_R33`` or ``BOARD_REV_R5`` depending on your board revision.
-
-
-
