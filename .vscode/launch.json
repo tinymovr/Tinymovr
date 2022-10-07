@@ -7,7 +7,7 @@
         {
             "cwd": "${workspaceRoot}",
             "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
-            "name": "Debug Tinymovr",
+            "name": "Rebuild Debug and Start Session",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "jlink",
@@ -19,16 +19,83 @@
             ],
             "runToEntryPoint": "main",
             "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
-            "preLaunchTask": "Build Project (Debug)",
+            "preLaunchTask": "Clean and Build Project (Debug)",
             "windows": {
                 // Update the path below as necessary
                 "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
+            },
+            "linux": {
+                // Update the path below as necessary
+                "serverpath": "/opt/SEGGER/JLink/JLinkGDBServer" 
             }
         },
         {
             "cwd": "${workspaceRoot}",
             "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
-            "name": "Attach to Tinymovr",
+            "name": "Rebuild Release and Flash",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "jlink",
+            "device": "PAC55XX",
+            "interface": "swd",
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
+            "preLaunchTask": "Clean and Build Project (Release)",
+            "windows": {
+                // Update the path below as necessary
+                "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
+            },
+            "linux": {
+                // Update the path below as necessary
+                "serverpath": "/opt/SEGGER/JLink/JLinkGDBServer" 
+            }
+        },
+        {
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
+            "name": "Flash Built Binary and Start Session",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "jlink",
+            "device": "PAC55XX",
+            "interface": "swd",
+            "serverArgs": [
+                // Add any arguments to pass to the JLink GDB server here
+                // "-speed 2000"
+            ],
+            "runToEntryPoint": "main",
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
+            "windows": {
+                // Update the path below as necessary
+                "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
+            },
+            "linux": {
+                // Update the path below as necessary
+                "serverpath": "/opt/SEGGER/JLink/JLinkGDBServer" 
+            }
+        },
+        {
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
+            "name": "Flash Built Binary",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "jlink",
+            "device": "PAC55XX",
+            "interface": "swd",
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
+            "windows": {
+                // Update the path below as necessary
+                "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
+            },
+            "linux": {
+                // Update the path below as necessary
+                "serverpath": "/opt/SEGGER/JLink/JLinkGDBServer" 
+            }
+        },
+        {
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
+            "name": "Attach to Target",
             "request": "attach",
             "type": "cortex-debug",
             "servertype": "jlink",
@@ -42,22 +109,6 @@
             "windows": {
                 // Update the path below as necessary
                 "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
-            }
-        },
-        {
-            "cwd": "${workspaceRoot}",
-            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
-            "name": "Flash Tinymovr Release",
-            "request": "launch",
-            "type": "cortex-debug",
-            "servertype": "jlink",
-            "device": "PAC55XX",
-            "interface": "swd",
-            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
-            "preLaunchTask": "Build Project (Release)",
-            "windows": {
-                // Update the path below as necessary
-                "serverpath": "C:\\Program Files (x86)\\SEGGER\\JLink_V631b\\JLinkGDBServerCL.exe" 
             },
             "linux": {
                 // Update the path below as necessary
