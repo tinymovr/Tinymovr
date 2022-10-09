@@ -13,6 +13,10 @@
             "servertype": "jlink",
             "device": "PAC55XX",
             "interface": "swd",
+            "preLaunchCommands": [
+                // Set JTAG speed in kHz
+                // "monitor speed 1000"
+            ],
             "serverArgs": [
                 // Add any arguments to pass to the JLink GDB server here
                 // "-speed 2000"
@@ -38,6 +42,10 @@
             "servertype": "jlink",
             "device": "PAC55XX",
             "interface": "swd",
+            "preLaunchCommands": [
+                // Set JTAG speed in kHz
+                // "monitor speed 1000"
+            ],
             "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
             "preLaunchTask": "Clean and Build Project (Release)",
             "windows": {
@@ -58,6 +66,10 @@
             "servertype": "jlink",
             "device": "PAC55XX",
             "interface": "swd",
+            "preLaunchCommands": [
+                // Set JTAG speed in kHz
+                // "monitor speed 1000"
+            ],
             "serverArgs": [
                 // Add any arguments to pass to the JLink GDB server here
                 // "-speed 2000"
@@ -82,6 +94,10 @@
             "servertype": "jlink",
             "device": "PAC55XX",
             "interface": "swd",
+            "preLaunchCommands": [
+                // Set JTAG speed in kHz
+                // "monitor speed 1000"
+            ],
             "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
             "windows": {
                 // Update the path below as necessary
@@ -101,11 +117,11 @@
             "servertype": "jlink",
             "device": "PAC55XX",
             "interface": "swd",
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
             "serverArgs": [
                 // Add any arguments to pass to the JLink GDB server here
                 // "-speed 2000"
             ],
-            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
             "windows": {
                 // Update the path below as necessary
                 "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
