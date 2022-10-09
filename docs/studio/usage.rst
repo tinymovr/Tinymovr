@@ -5,27 +5,29 @@ Studio Usage
 Overview
 ########
 
-Tinymovr Studio is an IPython application that enables communication with multiple Tinymovr instances, allowing configuration and control. 
+Tinymovr Studio is a cross-platform GUI application, CLI application, and Python library that offers easy access to all of Tinymovr's functionality.
 
 
-Launching the command line app
-##############################
+Launching the GUI app
+#####################
 
 .. code-block:: console
 
     tinymovr
 
 
-Discovery
-#########
+Launching the CLI app
+#####################
 
-Tinymovr Studio uses a polling mechanism to discover Tinymovr nodes in the CAN network. Upon launching the app, by default the first ten nodes are scanned. The ones that are present are available through the variable handle 'tmx', where x the device index. To specify the scan range, take a look at :ref:`command-line-options`.
+.. code-block:: console
+
+    tinymovr_cli
 
 
 Compatibility
 #############
 
-Tinymovr Studio includes by default a version check to determine compatibility of firmware with studio version. This is performed each time a node is discovered, and prior to initializing the tinymovr object. Compatibility is determined through comparison of versions with minimun requirements embedded in both firmware and studio. If you wish to disable version check (e.g. for backwards compatibility), you can use the ``--no-version-check`` command line argument. Please note that unexpected things can happen if you combine incompatible firmware and studio versions.
+Tinymovr Studio includes by default a checksum comparison to determine protocol compatibility between firmware and studio version. This is performed each time a node is discovered, and prior to initializing the tinymovr object. If you see a compatibility-related message, please upgrade to the latest studio and firmware versions. 
 
 
 Issuing Commands
