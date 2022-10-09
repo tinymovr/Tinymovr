@@ -54,7 +54,7 @@ Example
 
 The figure below shows an example of wiring a hub motor to Tinymovr, using the embedded Hall effect sensors of the motor for commutation. Note that the power and ground are connected to an external 5V power supply. Alternatively, if your Hall effect sensors are compatible with 3.3V input, you can connect the leads to the onboard connectors.
 
-.. image:: hubmotor_diagram.jpg
+.. image:: hubmotor_diagram.png
   :width: 800
   :alt: Wiring diagram for connection of hub motor to Tinymovr
 
