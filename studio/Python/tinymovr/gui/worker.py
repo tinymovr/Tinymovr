@@ -24,7 +24,7 @@ class Worker(QObject):
 
         init_tee(can.Bus(**busparams))
         self.dsc = Discovery(self.node_appeared, self.node_disappeared, self.logger)
-        self.target_dt = 0.02
+        self.target_dt = 0.040
         self.meas_dt = self.target_dt
         self.rt_dt = 0.0
         self.load = 0
