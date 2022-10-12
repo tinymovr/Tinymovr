@@ -9,7 +9,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="tinymovr",
-    version="1.0.0",
+    version="1.0.0.b1",
     author="Yannis Chatzikonstantinou",
     author_email="info@tinymovr.com",
     description="Tinymovr Studio",
