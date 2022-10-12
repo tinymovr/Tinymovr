@@ -4,6 +4,7 @@ import pint
 from PySide2 import QtCore
 from PySide2.QtCore import Signal
 from PySide2.QtWidgets import (
+    QApplication,
     QMainWindow,
     QWidget,
     QFrame,
@@ -76,7 +77,7 @@ class MainWindow(QMainWindow):
         main_widget.setMinimumHeight(600)
         self.setCentralWidget(main_widget)
 
-        pg.setConfigOptions(antialias=True)
+        #pg.setConfigOptions(antialias=True)
         self.graphs_by_id = {}
 
         buses = arguments["--bus"].rsplit(sep=",")
@@ -125,6 +126,7 @@ class MainWindow(QMainWindow):
         """
         graph_widget = pg.PlotWidget(title=attr.full_name)
         pi = graph_widget.getPlotItem()
+        pi.skipFiniteCheck=True
         if attr.unit:
             pi.setLabel(axis="left", text=attr.name, units=f"{attr.unit}")
         else:
@@ -132,7 +134,7 @@ class MainWindow(QMainWindow):
         pi.setLabel(axis="bottom", text="time", units="sec")
         x = []
         y = []
-        data_line = graph_widget.plot(x, y)
+        data_line = graph_widget.plot(x, y, pen=pg.mkPen(width=1.00))
         return {
             "widget": graph_widget,
             "data": {"x": x, "y": y},
@@ -228,13 +230,15 @@ class MainWindow(QMainWindow):
                     x.pop(0)
                     y.pop(0)
                 x.append(time.time() - self.start_time)
-                try:
+                if isinstance(val, pint.Quantity):
                     y.append(val.magnitude)
-                except AttributeError:
+                else:
                     y.append(val)
                 data_line.setData(x, y)
+                #graph_info["widget"].getPlotItem().setXRange(x[0], x[-1])
+                graph_info["widget"].update()
         self.status_label.setText(
-            "Rate: {:.1f}\t Ch. Load: {:.0f}%\t RT: {:.1f}ms".format(
+            "{:.1f}Hz\t CH:{:.0f}%\t RT:{:.1f}ms".format(
                 1 / self.worker.meas_dt,
                 self.worker.load * 100,
                 self.worker.rt_dt * 1000,
