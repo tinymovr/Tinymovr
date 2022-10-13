@@ -73,7 +73,7 @@ typedef enum
 } traj_planner_errors_flags;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[62])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[64])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -365,6 +365,26 @@ uint8_t avlos_controller_current_bandwidth(uint8_t * buffer, uint8_t * buffer_le
 * @param buffer_len
 */
 uint8_t avlos_controller_current_Iq_p_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_controller_current_max_Iq_feedback
+*
+* The max current allowed to be fed back to the power source before flux braking activates.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_controller_current_max_Iq_feedback(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_controller_current_max_Id_dump
+*
+* The max current allowed to be dumped to the motor windings during flux braking. Set to zero to deactivate flux braking.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_controller_current_max_Id_dump(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_controller_voltage_Vq_setpoint
