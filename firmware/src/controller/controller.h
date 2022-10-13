@@ -83,6 +83,9 @@ typedef struct
     float I_k;
     
     float vel_increment;
+
+    float max_Iq_feedback;
+    float max_Id_dump;
 } ControllerConfig;
 
 void Controller_ControlLoop(void);
@@ -136,6 +139,11 @@ float controller_get_Iq_limit(void);
 void controller_set_Iq_limit(float limit);
 float controller_get_vel_increment(void);
 void controller_set_vel_increment(float inc);
+
+float controller_get_max_Iq_feedback(void);
+void controller_set_max_Iq_feedback(float value);
+float controller_get_max_Id_dump(void);
+void controller_set_max_Id_dump(float value);
 
 void controller_set_motion_plan(MotionPlan mp);
 

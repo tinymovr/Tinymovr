@@ -76,7 +76,10 @@ static ControllerConfig config = {
     .Id_integrator_gain = 0.0f,
     .I_k = 0.3f,
 
-    .vel_increment = 100.0f}; // ticks/cycle
+    .vel_increment = 100.0f, // ticks/cycle
+    
+    .max_Iq_feedback = 0.0f,
+    .max_Id_dump = 0.0f}; 
 
 void Controller_ControlLoop(void)
 {
@@ -172,6 +175,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
 
     const float vel_estimate = observer_get_vel_estimate();
     float Iq_setpoint = state.Iq_setpoint;
+    float Id_setpoint = 0;
 
     if (state.mode >= CTRL_VELOCITY)
     {
@@ -199,6 +203,16 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     {
         state.vel_integrator_Iq *= 0.995f;
         state.warnings |= CONTROLLER_WARNINGS_CURRENT_LIMITED;
+    }
+
+    // Flux braking
+    if (config.max_Id_dump > 0 && Iq_setpoint * vel_estimate < 0)
+    {
+        // We are braking, adjust Id setpoint
+        if (fabsf(Iq_setpoint) > config.max_Iq_feedback)
+        {
+            Id_setpoint = our_clamp(Iq_setpoint, -config.max_Id_dump, config.max_Id_dump);
+        }
     }
 
     const float e_phase = observer_get_epos();
@@ -229,7 +243,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         state.Id_meas += config.I_k * (Id - state.Id_meas);
         state.Iq_meas += config.I_k * (Iq - state.Iq_meas);
 
-        const float delta_Id = 0 - state.Id_meas;
+        const float delta_Id = Id_setpoint - state.Id_meas;
         const float delta_Iq = Iq_setpoint - state.Iq_meas;
 
         state.Id_integrator_Vd += delta_Id * PWM_PERIOD_S * config.Id_integrator_gain;
@@ -477,19 +491,6 @@ void controller_set_vel_limit(float limit)
     }
 }
 
-void controller_set_vel_increment(float increment)
-{
-    if (increment >= 0.0f)
-    {
-        config.vel_increment = increment;
-    }
-}
-
-float controller_get_vel_increment(void)
-{
-    return config.vel_increment;
-}
-
 float controller_get_Iq_limit(void)
 {
     return config.I_limit;
@@ -500,6 +501,45 @@ void controller_set_Iq_limit(float limit)
     if ((limit > 0.0f) && (limit < I_HARD_LIMIT))
     {
         config.I_limit = limit;
+    }
+}
+
+float controller_get_vel_increment(void)
+{
+    return config.vel_increment;
+}
+
+void controller_set_vel_increment(float increment)
+{
+    if (increment >= 0.0f)
+    {
+        config.vel_increment = increment;
+    }
+}
+
+float controller_get_max_Iq_feedback(void)
+{
+    return config.max_Iq_feedback;
+}
+
+void controller_set_max_Iq_feedback(float value)
+{
+    if (value >= 0.0f)
+    {
+        config.max_Iq_feedback = value;
+    }
+}
+
+float controller_get_max_Id_dump(void)
+{
+    return config.max_Id_dump;
+}
+
+void controller_set_max_Id_dump(float value)
+{
+    if (value >= 0.0f)
+    {
+        config.max_Id_dump = value;
     }
 }
 
