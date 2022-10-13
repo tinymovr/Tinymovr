@@ -19,7 +19,7 @@ For Tinymovr documentation, please visit the [Tinymovr docs at Readthedocs](http
 
 ### Repository Structure
 
-The master branch of this repository reflects the latest release.
+The master branch of this repository reflects the latest release. Note that atm the master branch only accepts hotfixes. 
 
 Development takes place at the [develop](https://github.com/tinymovr/Tinymovr/tree/develop) branch.
 
