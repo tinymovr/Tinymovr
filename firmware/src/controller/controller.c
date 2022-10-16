@@ -28,7 +28,7 @@
 #include <src/controller/controller.h>
 #include "src/watchdog/watchdog.h"
 
-PAC5XXX_RAMFUNC void CLControlStep(void);
+void CLControlStep(void);
 PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
                                                             float vel_gain, float *I);
 
@@ -53,6 +53,7 @@ static ControllerState state = {
     .vel_setpoint = 0.0f,
     .vel_ramp_setpoint  = 0.0f,
     .Iq_setpoint = 0.0f,
+    .Id_setpoint = 0.0f,
 
     .Vq_setpoint = 0.0f,
 
@@ -135,7 +136,7 @@ void Controller_ControlLoop(void)
     }
 }
 
-PAC5XXX_RAMFUNC void CLControlStep(void)
+ void CLControlStep(void)
 {
     if (state.mode >= CTRL_TRAJECTORY)
     {
@@ -177,7 +178,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
 
     const float vel_estimate = observer_get_vel_estimate();
     float Iq_setpoint = state.Iq_setpoint;
-    float Id_setpoint = 0;
+    float Id_setpoint = state.Id_setpoint;
 
     if (state.mode >= CTRL_VELOCITY)
     {
@@ -211,7 +212,11 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     const float Vbus_voltage = system_get_Vbus();
     if (config.max_Ibrake > 0)
     {
-        Id_setpoint = our_clamp(-state.Ibus_est/Vbus_voltage, 0, config.max_Ibrake);
+        state.Id_setpoint = our_clamp(-state.Ibus_est*Vbus_voltage, 0, config.max_Ibrake);
+    }
+    else
+    {
+        state.Id_setpoint = 0.0f;
     }
 
     const float e_phase = observer_get_epos();
@@ -241,7 +246,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         state.Id_est += config.I_k * (Id - state.Id_est);
         state.Iq_est += config.I_k * (Iq - state.Iq_est);
 
-        const float delta_Id = Id_setpoint - state.Id_est;
+        const float delta_Id = state.Id_setpoint - state.Id_est;
         const float delta_Iq = Iq_setpoint - state.Iq_est;
 
         state.Id_integrator_Vd += delta_Id * PWM_PERIOD_S * config.Id_integrator_gain;
@@ -385,6 +390,11 @@ PAC5XXX_RAMFUNC float controller_get_Iq_setpoint_user_frame(void)
 PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value)
 {
     state.Iq_setpoint = value * motor_get_user_direction();
+}
+
+PAC5XXX_RAMFUNC float controller_get_Id_setpoint_user_frame(void)
+{
+    return state.Id_setpoint;
 }
 
 PAC5XXX_RAMFUNC float controller_get_Vq_setpoint_user_frame(void)
