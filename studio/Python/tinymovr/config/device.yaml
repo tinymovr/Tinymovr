@@ -151,6 +151,12 @@ remote_attributes:
             getter_name: controller_get_Iq_setpoint_user_frame
             setter_name: controller_set_Iq_setpoint_user_frame
             summary: The Iq setpoint.
+          - name: Id_setpoint
+            dtype: float
+            unit: ampere
+            dynamic_value: True
+            getter_name: controller_get_Id_setpoint_user_frame
+            summary: The Id setpoint.
           - name: Iq_limit
             dtype: float
             unit: ampere
