@@ -51,7 +51,7 @@ typedef struct
     float Iq_est;
     float Id_est;
 
-    float Ibus;
+    float Ibus_est;
 
     float pos_setpoint;
     float vel_setpoint;
@@ -86,8 +86,8 @@ typedef struct
     
     float vel_increment;
 
-    float max_Iq_feedback;
-    float max_Id_dump;
+    float max_Ibus_regen;
+    float max_Ibrake;
 } ControllerConfig;
 
 void Controller_ControlLoop(void);
@@ -135,6 +135,8 @@ float controller_get_Iq_gain(void);
 float controller_get_I_bw(void);
 void controller_set_I_bw(float bw);
 
+float controller_get_Ibus_est(void);
+
 float controller_get_vel_limit(void);
 void controller_set_vel_limit(float limit);
 float controller_get_Iq_limit(void);
@@ -142,10 +144,10 @@ void controller_set_Iq_limit(float limit);
 float controller_get_vel_increment(void);
 void controller_set_vel_increment(float inc);
 
-float controller_get_max_Iq_feedback(void);
-void controller_set_max_Iq_feedback(float value);
-float controller_get_max_Id_dump(void);
-void controller_set_max_Id_dump(float value);
+float controller_get_max_Ibus_regen(void);
+void controller_set_max_Ibus_regen(float value);
+float controller_get_max_Ibrake(void);
+void controller_set_max_Ibrake(float value);
 
 void controller_set_motion_plan(MotionPlan mp);
 

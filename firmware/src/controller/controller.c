@@ -47,6 +47,8 @@ static ControllerState state = {
     .Iq_est = 0.0f,
     .Id_est = 0.0f,
 
+    .Ibus_est = 0.0f,
+
     .pos_setpoint = 0.0f,
     .vel_setpoint = 0.0f,
     .vel_ramp_setpoint  = 0.0f,
@@ -78,8 +80,8 @@ static ControllerConfig config = {
 
     .vel_increment = 100.0f, // ticks/cycle
     
-    .max_Iq_feedback = 0.0f,
-    .max_Id_dump = 0.0f}; 
+    .max_Ibus_regen = 0.0f,
+    .max_Ibrake = 0.0f}; 
 
 void Controller_ControlLoop(void)
 {
@@ -206,12 +208,11 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     }
 
     // Flux braking
-    if (config.max_Id_dump > 0 && Iq_setpoint * vel_estimate < 0)
+    if (config.max_Ibrake > 0)
     {
-        // We are braking, adjust Id setpoint
-        if (fabsf(Iq_setpoint) > config.max_Iq_feedback)
+        if (-state.Ibus_est > config.max_Ibus_regen)
         {
-            Id_setpoint = our_clamp(Iq_setpoint, -config.max_Id_dump, config.max_Id_dump);
+            Id_setpoint = our_clamp(state.Ibus_est, -config.max_Ibrake, 0);
         }
     }
 
@@ -256,6 +257,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     
     float mod_q = Vq / VBus;
     float mod_d = Vd / VBus;
+    state.Ibus_est = state.Iq_est * mod_q + state.Id_est * mod_d;
 
     // dq modulation limiter
     const float dq_mod_scale_factor = PWM_LIMIT * fast_inv_sqrt((mod_q * mod_q) + (mod_d * mod_d));
@@ -478,6 +480,11 @@ void controller_set_I_bw(float bw)
     }
 }
 
+float controller_get_Ibus_est(void)
+{
+    return state.Ibus_est;
+}
+
 float controller_get_vel_limit(void)
 {
     return config.vel_limit;
@@ -517,29 +524,29 @@ void controller_set_vel_increment(float increment)
     }
 }
 
-float controller_get_max_Iq_feedback(void)
+float controller_get_max_Ibus_regen(void)
 {
-    return config.max_Iq_feedback;
+    return config.max_Ibus_regen;
 }
 
-void controller_set_max_Iq_feedback(float value)
+void controller_set_max_Ibus_regen(float value)
 {
     if (value >= 0.0f)
     {
-        config.max_Iq_feedback = value;
+        config.max_Ibus_regen = value;
     }
 }
 
-float controller_get_max_Id_dump(void)
+float controller_get_max_Ibrake(void)
 {
-    return config.max_Id_dump;
+    return config.max_Ibrake;
 }
 
-void controller_set_max_Id_dump(float value)
+void controller_set_max_Ibrake(float value)
 {
     if (value >= 0.0f)
     {
-        config.max_Id_dump = value;
+        config.max_Ibrake = value;
     }
 }
 
