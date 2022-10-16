@@ -44,8 +44,8 @@ static ControllerState state = {
     .I_phase_meas = {0.0f, 0.0f, 0.0f},
     .modulation_values = {0.0f, 0.0f, 0.0f},
 
-    .Iq_meas = 0.0f,
-    .Id_meas = 0.0f,
+    .Iq_est = 0.0f,
+    .Id_est = 0.0f,
 
     .pos_setpoint = 0.0f,
     .vel_setpoint = 0.0f,
@@ -240,11 +240,11 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         const float Id = (c_I * Ialpha) + (s_I * Ibeta);
         const float Iq = (c_I * Ibeta) - (s_I * Ialpha);
 
-        state.Id_meas += config.I_k * (Id - state.Id_meas);
-        state.Iq_meas += config.I_k * (Iq - state.Iq_meas);
+        state.Id_est += config.I_k * (Id - state.Id_est);
+        state.Iq_est += config.I_k * (Iq - state.Iq_est);
 
-        const float delta_Id = Id_setpoint - state.Id_meas;
-        const float delta_Iq = Iq_setpoint - state.Iq_meas;
+        const float delta_Id = Id_setpoint - state.Id_est;
+        const float delta_Iq = Iq_setpoint - state.Iq_est;
 
         state.Id_integrator_Vd += delta_Id * PWM_PERIOD_S * config.Id_integrator_gain;
         state.Iq_integrator_Vq += delta_Iq * PWM_PERIOD_S * config.Iq_integrator_gain;
@@ -360,7 +360,7 @@ PAC5XXX_RAMFUNC void controller_set_vel_setpoint_user_frame(float value)
 
 PAC5XXX_RAMFUNC float controller_get_Iq_estimate(void)
 {
-    return state.Iq_meas;
+    return state.Iq_est;
 }
 
 PAC5XXX_RAMFUNC float controller_get_Iq_setpoint(void)
@@ -375,7 +375,7 @@ PAC5XXX_RAMFUNC void controller_set_Iq_setpoint(float value)
 
 PAC5XXX_RAMFUNC float controller_get_Iq_estimate_user_frame(void)
 {
-    return state.Iq_meas * motor_get_user_direction();
+    return state.Iq_est * motor_get_user_direction();
 }
 
 PAC5XXX_RAMFUNC float controller_get_Iq_setpoint_user_frame(void)

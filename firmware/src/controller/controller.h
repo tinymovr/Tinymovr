@@ -48,8 +48,10 @@ typedef struct
     struct FloatTriplet I_phase_meas;
     struct FloatTriplet modulation_values;
 
-    float Iq_meas;
-    float Id_meas;
+    float Iq_est;
+    float Id_est;
+
+    float Ibus;
 
     float pos_setpoint;
     float vel_setpoint;
