@@ -73,7 +73,7 @@ typedef enum
 } traj_planner_errors_flags;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[64])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[65])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -99,12 +99,22 @@ uint8_t avlos_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 /*
 * avlos_Vbus
 *
-* The bus voltage.
+* The measured bus voltage.
 *
 * @param buffer
 * @param buffer_len
 */
 uint8_t avlos_Vbus(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_Ibus
+*
+* The estimated bus current. Only estimates current drawn by motor.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_Ibus(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_temp
@@ -367,24 +377,24 @@ uint8_t avlos_controller_current_bandwidth(uint8_t * buffer, uint8_t * buffer_le
 uint8_t avlos_controller_current_Iq_p_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_controller_current_max_Iq_feedback
+* avlos_controller_current_max_Ibus_regen
 *
 * The max current allowed to be fed back to the power source before flux braking activates.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_controller_current_max_Iq_feedback(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t avlos_controller_current_max_Ibus_regen(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_controller_current_max_Id_dump
+* avlos_controller_current_max_Ibrake
 *
 * The max current allowed to be dumped to the motor windings during flux braking. Set to zero to deactivate flux braking.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_controller_current_max_Id_dump(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t avlos_controller_current_max_Ibrake(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_controller_voltage_Vq_setpoint

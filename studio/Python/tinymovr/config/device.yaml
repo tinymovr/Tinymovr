@@ -15,7 +15,13 @@ remote_attributes:
     unit: volt
     dynamic_value: True
     getter_name: system_get_Vbus
-    summary: The bus voltage.
+    summary: The measured bus voltage.
+  - name: Ibus
+    dtype: float
+    unit: ampere
+    dynamic_value: True
+    getter_name: controller_get_Ibus_est
+    summary: The estimated bus current. Only estimates current drawn by motor.
   - name: temp
     dtype: float
     unit: degC
@@ -166,17 +172,17 @@ remote_attributes:
             dtype: float
             getter_name: controller_get_Iq_gain
             summary: The current controller proportional gain.
-          - name: max_Iq_feedback
+          - name: max_Ibus_regen
             dtype: float
             unit: ampere
-            getter_name: controller_get_max_Iq_feedback
-            setter_name: controller_set_max_Iq_feedback
+            getter_name: controller_get_max_Ibus_regen
+            setter_name: controller_set_max_Ibus_regen
             summary: The max current allowed to be fed back to the power source before flux braking activates.
-          - name: max_Id_dump
+          - name: max_Ibrake
             dtype: float
             unit: ampere
-            getter_name: controller_get_max_Id_dump
-            setter_name: controller_set_max_Id_dump
+            getter_name: controller_get_max_Ibrake
+            setter_name: controller_set_max_Ibrake
             summary: The max current allowed to be dumped to the motor windings during flux braking. Set to zero to deactivate flux braking.
       - name: voltage
         remote_attributes:
