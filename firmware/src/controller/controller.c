@@ -208,18 +208,15 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     }
 
     // Flux braking
+    const float Vbus_voltage = system_get_Vbus();
     if (config.max_Ibrake > 0)
     {
-        if (-state.Ibus_est > config.max_Ibus_regen)
-        {
-            Id_setpoint = our_clamp(state.Ibus_est, -config.max_Ibrake, 0);
-        }
+        Id_setpoint = our_clamp(-state.Ibus_est/Vbus_voltage, 0, config.max_Ibrake);
     }
 
     const float e_phase = observer_get_epos();
     const float c_I = fast_cos(e_phase);
     const float s_I = fast_sin(e_phase);
-    const float VBus = system_get_Vbus();
 
     float Vd;
     float Vq;
@@ -255,8 +252,8 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     }
     state.Vq_setpoint = Vq;
     
-    float mod_q = Vq / VBus;
-    float mod_d = Vd / VBus;
+    float mod_q = Vq / Vbus_voltage;
+    float mod_d = Vd / Vbus_voltage;
     state.Ibus_est = state.Iq_est * mod_q + state.Id_est * mod_d;
 
     // dq modulation limiter
