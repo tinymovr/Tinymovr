@@ -154,7 +154,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     // a bit smoother.
     if (config.vel_increment > 0)
     {
-        state.vel_ramp_setpoint  += our_clamp(state.vel_setpoint - state.vel_ramp_setpoint , -config.vel_increment, config.vel_increment);
+        state.vel_ramp_setpoint  += our_clamp(state.vel_setpoint - state.vel_ramp_setpoint, -config.vel_increment, config.vel_increment);
     }
     else
     {
