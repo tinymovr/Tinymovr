@@ -171,6 +171,7 @@ remote_attributes:
             summary: The Iq estimate.
           - name: bandwidth
             dtype: float
+            unit: rad/s
             getter_name: controller_get_I_bw
             setter_name: controller_set_I_bw
             summary: The current controller bandwidth.
