@@ -362,5 +362,26 @@ class TestBoard(TMTestCase):
         self.assertAlmostEqual(pos_estimate_ref, pos_estimate_comp, delta=200)
 
 
+    def test_p_flux_braking(self):
+        """
+        Test flux braking
+        """
+        self.reset_and_wait()
+        # Ensure we're idle
+        self.check_state(0)
+        self.try_calibrate()
+
+        self.tm.controller.current.max_Ibrake = 10
+        self.tm.controller.velocity_mode()
+        self.tm.controller.velocity.setpoint = 100000
+        time.sleep(1)
+        self.tm.controller.velocity.setpoint = 0
+        time.sleep(0.002)
+        Ibrake = self.tm.Ibus_est
+        time.sleep(0.5)
+        self.tm.controller.current.max_Ibrake = 0
+        self.assertAlmostEqual(Ibrake, -10, delta=5)
+
+
 if __name__ == "__main__":
     unittest.main(failfast=True)
