@@ -22,6 +22,12 @@ remote_attributes:
     dynamic_value: True
     getter_name: controller_get_Ibus_est
     summary: The estimated bus current. Only estimates current drawn by motor.
+  - name: power
+    dtype: float
+    unit: watt
+    dynamic_value: True
+    getter_name: controller_get_power_est
+    summary: The estimated power. Only estimates power drawn by motor.
   - name: temp
     dtype: float
     unit: degC
