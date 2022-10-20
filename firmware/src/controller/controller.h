@@ -52,6 +52,7 @@ typedef struct
     float Id_est;
 
     float Ibus_est;
+    float power_est;
 
     float pos_setpoint;
     float vel_setpoint;
@@ -138,6 +139,7 @@ float controller_get_I_bw(void);
 void controller_set_I_bw(float bw);
 
 float controller_get_Ibus_est(void);
+float controller_get_power_est(void);
 
 float controller_get_vel_limit(void);
 void controller_set_vel_limit(float limit);
