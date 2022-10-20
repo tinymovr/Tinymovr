@@ -1,6 +1,6 @@
 
 name: tm
-version: 1.0.1
+version: 1.0.1.b1
 remote_attributes:
   - name: protocol_hash
     dtype: uint32
