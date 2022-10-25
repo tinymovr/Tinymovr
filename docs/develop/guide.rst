@@ -42,6 +42,8 @@ Connection with SWD adapter (e.g. isolator) for R5:
 
 (diagrams made with `Wireviz <https://github.com/formatc1702/WireViz>`_)
 
+As of Tinymovr 1.0.1, it is no longer necessary to patch the `JLinkDevices.xml` file with the PAC additions, in order for JLinkGDBServer to work properly. Relevant files are included in the repo.
+
 
 Setting up the repo
 ###################

@@ -28,6 +28,7 @@ setup(
         "python-can>=4.0.0.dev0",
         "avlos @ git+https://github.com/tinymovr/avlos.git",
         "pyserial",
+        "pyusb",
         "pyyaml",
         "docopt",
         "flatten-dict",

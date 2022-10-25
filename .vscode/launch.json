@@ -18,7 +18,8 @@
                 // "monitor speed 1000"
             ],
             "serverArgs": [
-                // Add any arguments to pass to the JLink GDB server here
+                "-JLinkDevicesXMLPath",
+                "${workspaceRoot}/firmware/"
                 // "-speed 2000"
             ],
             "runToEntryPoint": "main",
@@ -46,6 +47,10 @@
                 // Set JTAG speed in kHz
                 // "monitor speed 1000"
             ],
+            "serverArgs": [
+                "-JLinkDevicesXMLPath",
+                "${workspaceRoot}/firmware/"
+            ],
             "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
             "preLaunchTask": "Clean and Build Project (Release)",
             "windows": {
@@ -71,7 +76,8 @@
                 // "monitor speed 1000"
             ],
             "serverArgs": [
-                // Add any arguments to pass to the JLink GDB server here
+                "-JLinkDevicesXMLPath",
+                "${workspaceRoot}/firmware/"
                 // "-speed 2000"
             ],
             "runToEntryPoint": "main",
@@ -98,6 +104,10 @@
                 // Set JTAG speed in kHz
                 // "monitor speed 1000"
             ],
+            "serverArgs": [
+                "-JLinkDevicesXMLPath",
+                "${workspaceRoot}/firmware/"
+            ],
             "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
             "windows": {
                 // Update the path below as necessary
@@ -119,7 +129,8 @@
             "interface": "swd",
             "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
             "serverArgs": [
-                // Add any arguments to pass to the JLink GDB server here
+                "-JLinkDevicesXMLPath",
+                "${workspaceRoot}/firmware/"
                 // "-speed 2000"
             ],
             "windows": {
