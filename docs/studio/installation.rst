@@ -4,7 +4,9 @@
 Tinymovr Studio Installation
 ****************************
 
-Tinymovr Studio is a cross-platform GUI application, CLI application, and Python library that offers easy access to all of Tinymovr's functionality.
+Tinymovr Studio is a cross-platform GUI application, CLI application, and Python library that offers easy access to all of Tinymovr's functionality. 
+
+Studio requires Python 3.10 or newer.
 
 Preparation
 ###########
@@ -36,10 +38,10 @@ With Anaconda, create a new environment:
 
 .. code-block:: console
 
-    conda create --name tinymovr python=3.7 -y
+    conda create --name tinymovr python=3.11 -y
     conda activate tinymovr
 
-Alternatively you can use any Python version >= 3.6.
+Alternatively you can use any Python version >= 3.10.
 
 Then simply install and run Tinymovr:
 
