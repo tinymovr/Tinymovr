@@ -9,7 +9,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="tinymovr",
-    version="1.0.1.b1",
+    #version="", #version will be taken from git tag
     author="Yannis Chatzikonstantinou",
     author_email="info@tinymovr.com",
     description="Tinymovr Studio",
@@ -23,6 +23,12 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.8",
+    setuptools_git_versioning={
+        "enabled": True,
+        "dev_template": "{tag}.post{ccount}",
+        "dirty_template": "{tag}.post{ccount}.dirty"
+    },
+    setup_requires=["setuptools-git-versioning<2"],
     install_requires=[
         "ipython",
         "python-can>=4.0.0.dev0",

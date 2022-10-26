@@ -34,7 +34,7 @@ bool nvm_save_config(void)
 	s.observer_config = *Observer_GetConfig();
 	s.controller_config = *Controller_GetConfig();
 	s.can_config = *CAN_get_config();
-	s.version = (VERSION_MAJOR << 16) + (VERSION_MINOR << 8) + VERSION_PATCH;
+	strncat(s.version, GIT_VERSION, sizeof(s.version) - 1);
 	memcpy(data, &s, sizeof(struct NVMStruct));
 	if (STATE_IDLE == controller_get_state())
 	{
@@ -53,7 +53,9 @@ bool nvm_load_config(void)
 	memcpy(&s, (uint8_t *)SETTINGS_PAGE_HEX, sizeof(struct NVMStruct));
 	// TODO: Also validate checksum
 	bool loaded = false;
-	if (s.version == ((VERSION_MAJOR << 16) + (VERSION_MINOR << 8) + VERSION_PATCH))
+	char static_version[16];
+	strncat(static_version, GIT_VERSION, sizeof(static_version) - 1);
+	if (strcmp(s.version, static_version) == 0)
 	{
 		motor_restore_config(&s.motor_config);
 		hall_restore_config(&s.hall_config);
