@@ -21,6 +21,7 @@ ELF := $(BUILDDIR)/tinymovr_fw.elf
 HEX := $(BUILDDIR)/tinymovr_fw.hex
 BIN := $(BUILDDIR)/tinymovr_fw.bin
 OBJDIR = $(BUILDDIR)/obj
+GIT_VERSION := $(shell git describe --abbrev=7 --dirty --always --tags)
 
 # Toolchain
 CC := arm-none-eabi-gcc
@@ -50,6 +51,7 @@ BASEFLAGS += -Waggregate-return
 BASEFLAGS += -Wshadow
 BASEFLAGS += -Wdouble-promotion
 BASEFLAGS += -DBOARD_REV_$(REV)
+BASEFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
 BASEFLAGS += $(INCLUDEFLAGS)
 
 # Compiler flags (c and c++), inherit BASEFLAGS

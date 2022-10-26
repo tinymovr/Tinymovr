@@ -17,11 +17,6 @@
 
 #pragma once
 
-// Firmware Version
-#define VERSION_MAJOR (1u)
-#define VERSION_MINOR (0u)
-#define VERSION_PATCH (0u)
-
 /// TINYMOVR CONFIGURATION OPTIONS ///
 
 #define ACLK_FREQ_HZ                (300000000)

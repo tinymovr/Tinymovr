@@ -36,7 +36,7 @@ struct NVMStruct {
     ObserverConfig observer_config;
     ControllerConfig controller_config;
     CANConfig can_config;
-    uint32_t version;
+    char version[16];
 };
 
 bool nvm_save_config(void);

@@ -9,7 +9,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="tinymovr",
-    version="1.0.0.b1",
+    #version="", #version will be taken from git tag
     author="Yannis Chatzikonstantinou",
     author_email="info@tinymovr.com",
     description="Tinymovr Studio",
@@ -22,9 +22,16 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.8",
+    python_requires=">=3.9",
+    setuptools_git_versioning={
+        "enabled": True,
+        "dev_template": "{tag}+post{ccount}",
+        "dirty_template": "{tag}+post{ccount}_dirty"
+    },
+    setup_requires=["setuptools-git-versioning<2"],
     install_requires=[
         "ipython",
+        "importlib_resources",
         "python-can>=4.0.0.dev0",
         "avlos @ git+https://github.com/tinymovr/avlos.git",
         "pyserial",

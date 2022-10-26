@@ -48,13 +48,17 @@ typedef struct
     struct FloatTriplet I_phase_meas;
     struct FloatTriplet modulation_values;
 
-    float Iq_meas;
-    float Id_meas;
+    float Iq_est;
+    float Id_est;
+
+    float Ibus_est;
+    float power_est;
 
     float pos_setpoint;
     float vel_setpoint;
     float vel_ramp_setpoint;
     float Iq_setpoint;
+    float Id_setpoint;
 
     float Vq_setpoint;
 
@@ -83,6 +87,9 @@ typedef struct
     float I_k;
     
     float vel_increment;
+
+    float max_Ibus_regen;
+    float max_Ibrake;
 } ControllerConfig;
 
 void Controller_ControlLoop(void);
@@ -111,6 +118,7 @@ PAC5XXX_RAMFUNC void controller_set_Iq_setpoint(float value);
 PAC5XXX_RAMFUNC float controller_get_Iq_estimate_user_frame(void);
 PAC5XXX_RAMFUNC float controller_get_Iq_setpoint_user_frame(void);
 PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value);
+PAC5XXX_RAMFUNC float controller_get_Id_setpoint_user_frame(void);
 
 PAC5XXX_RAMFUNC float controller_get_Vq_setpoint_user_frame(void);
 
@@ -130,12 +138,20 @@ float controller_get_Iq_gain(void);
 float controller_get_I_bw(void);
 void controller_set_I_bw(float bw);
 
+float controller_get_Ibus_est(void);
+float controller_get_power_est(void);
+
 float controller_get_vel_limit(void);
 void controller_set_vel_limit(float limit);
 float controller_get_Iq_limit(void);
 void controller_set_Iq_limit(float limit);
 float controller_get_vel_increment(void);
 void controller_set_vel_increment(float inc);
+
+float controller_get_max_Ibus_regen(void);
+void controller_set_max_Ibus_regen(float value);
+float controller_get_max_Ibrake(void);
+void controller_set_max_Ibrake(float value);
 
 void controller_set_motion_plan(MotionPlan mp);
 

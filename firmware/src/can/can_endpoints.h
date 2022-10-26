@@ -73,7 +73,7 @@ typedef enum
 } traj_planner_errors_flags;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[62])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[67])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -99,12 +99,32 @@ uint8_t avlos_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 /*
 * avlos_Vbus
 *
-* The bus voltage.
+* The measured bus voltage.
 *
 * @param buffer
 * @param buffer_len
 */
 uint8_t avlos_Vbus(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_Ibus
+*
+* The estimated bus current. Only estimates current drawn by motor.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_Ibus(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_power
+*
+* The estimated power. Only estimates power drawn by motor.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_power(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_temp
@@ -327,6 +347,16 @@ uint8_t avlos_controller_velocity_increment(uint8_t * buffer, uint8_t * buffer_l
 uint8_t avlos_controller_current_Iq_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
+* avlos_controller_current_Id_setpoint
+*
+* The Id setpoint.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_controller_current_Id_setpoint(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
 * avlos_controller_current_Iq_limit
 *
 * The Iq limit.
@@ -365,6 +395,26 @@ uint8_t avlos_controller_current_bandwidth(uint8_t * buffer, uint8_t * buffer_le
 * @param buffer_len
 */
 uint8_t avlos_controller_current_Iq_p_gain(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_controller_current_max_Ibus_regen
+*
+* The max current allowed to be fed back to the power source before flux braking activates.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_controller_current_max_Ibus_regen(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_controller_current_max_Ibrake
+*
+* The max current allowed to be dumped to the motor windings during flux braking. Set to zero to deactivate flux braking.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_controller_current_max_Ibrake(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_controller_voltage_Vq_setpoint

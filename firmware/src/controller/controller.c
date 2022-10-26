@@ -28,7 +28,7 @@
 #include <src/controller/controller.h>
 #include "src/watchdog/watchdog.h"
 
-PAC5XXX_RAMFUNC void CLControlStep(void);
+void CLControlStep(void);
 PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
                                                             float vel_gain, float *I);
 
@@ -44,13 +44,17 @@ static ControllerState state = {
     .I_phase_meas = {0.0f, 0.0f, 0.0f},
     .modulation_values = {0.0f, 0.0f, 0.0f},
 
-    .Iq_meas = 0.0f,
-    .Id_meas = 0.0f,
+    .Iq_est = 0.0f,
+    .Id_est = 0.0f,
+
+    .Ibus_est = 0.0f,
+    .power_est = 0.0f,
 
     .pos_setpoint = 0.0f,
     .vel_setpoint = 0.0f,
     .vel_ramp_setpoint  = 0.0f,
     .Iq_setpoint = 0.0f,
+    .Id_setpoint = 0.0f,
 
     .Vq_setpoint = 0.0f,
 
@@ -70,13 +74,16 @@ static ControllerConfig config = {
     .vel_gain = 8.0e-5f,
     .vel_integrator_gain = 0.00020f,
     .vel_integrator_deadband = 200.0f,
-    .I_bw = 1000.0,
+    .I_bw = 1500.0,
     .I_gain = 0.0f,
     .Iq_integrator_gain = 0.0f,
     .Id_integrator_gain = 0.0f,
     .I_k = 0.3f,
 
-    .vel_increment = 100.0f}; // ticks/cycle
+    .vel_increment = 100.0f, // ticks/cycle
+    
+    .max_Ibus_regen = 0.0f,
+    .max_Ibrake = 0.0f}; 
 
 void Controller_ControlLoop(void)
 {
@@ -130,7 +137,7 @@ void Controller_ControlLoop(void)
     }
 }
 
-PAC5XXX_RAMFUNC void CLControlStep(void)
+ void CLControlStep(void)
 {
     if (state.mode >= CTRL_TRAJECTORY)
     {
@@ -149,7 +156,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     // a bit smoother.
     if (config.vel_increment > 0)
     {
-        state.vel_ramp_setpoint  += our_clamp(state.vel_setpoint - state.vel_ramp_setpoint , -config.vel_increment, config.vel_increment);
+        state.vel_ramp_setpoint  += our_clamp(state.vel_setpoint - state.vel_ramp_setpoint, -config.vel_increment, config.vel_increment);
     }
     else
     {
@@ -172,6 +179,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
 
     const float vel_estimate = observer_get_vel_estimate();
     float Iq_setpoint = state.Iq_setpoint;
+    float Id_setpoint = state.Id_setpoint;
 
     if (state.mode >= CTRL_VELOCITY)
     {
@@ -201,10 +209,20 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         state.warnings |= CONTROLLER_WARNINGS_CURRENT_LIMITED;
     }
 
+    // Flux braking
+    const float Vbus_voltage = system_get_Vbus();
+    if (config.max_Ibrake > 0)
+    {
+        state.Id_setpoint = our_clamp(-state.Ibus_est*Vbus_voltage, 0, config.max_Ibrake);
+    }
+    else
+    {
+        state.Id_setpoint = 0.0f;
+    }
+
     const float e_phase = observer_get_epos();
     const float c_I = fast_cos(e_phase);
     const float s_I = fast_sin(e_phase);
-    const float VBus = system_get_Vbus();
 
     float Vd;
     float Vq;
@@ -226,11 +244,11 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
         const float Id = (c_I * Ialpha) + (s_I * Ibeta);
         const float Iq = (c_I * Ibeta) - (s_I * Ialpha);
 
-        state.Id_meas += config.I_k * (Id - state.Id_meas);
-        state.Iq_meas += config.I_k * (Iq - state.Iq_meas);
+        state.Id_est += config.I_k * (Id - state.Id_est);
+        state.Iq_est += config.I_k * (Iq - state.Iq_est);
 
-        const float delta_Id = 0 - state.Id_meas;
-        const float delta_Iq = Iq_setpoint - state.Iq_meas;
+        const float delta_Id = state.Id_setpoint - state.Id_est;
+        const float delta_Iq = Iq_setpoint - state.Iq_est;
 
         state.Id_integrator_Vd += delta_Id * PWM_PERIOD_S * config.Id_integrator_gain;
         state.Iq_integrator_Vq += delta_Iq * PWM_PERIOD_S * config.Iq_integrator_gain;
@@ -240,8 +258,10 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     }
     state.Vq_setpoint = Vq;
     
-    float mod_q = Vq / VBus;
-    float mod_d = Vd / VBus;
+    float mod_q = Vq / Vbus_voltage;
+    float mod_d = Vd / Vbus_voltage;
+    state.Ibus_est = state.Iq_est * mod_q + state.Id_est * mod_d;
+    state.power_est = state.Iq_est * Vbus_voltage;
 
     // dq modulation limiter
     const float dq_mod_scale_factor = PWM_LIMIT * fast_inv_sqrt((mod_q * mod_q) + (mod_d * mod_d));
@@ -346,7 +366,7 @@ PAC5XXX_RAMFUNC void controller_set_vel_setpoint_user_frame(float value)
 
 PAC5XXX_RAMFUNC float controller_get_Iq_estimate(void)
 {
-    return state.Iq_meas;
+    return state.Iq_est;
 }
 
 PAC5XXX_RAMFUNC float controller_get_Iq_setpoint(void)
@@ -361,7 +381,7 @@ PAC5XXX_RAMFUNC void controller_set_Iq_setpoint(float value)
 
 PAC5XXX_RAMFUNC float controller_get_Iq_estimate_user_frame(void)
 {
-    return state.Iq_meas * motor_get_user_direction();
+    return state.Iq_est * motor_get_user_direction();
 }
 
 PAC5XXX_RAMFUNC float controller_get_Iq_setpoint_user_frame(void)
@@ -372,6 +392,11 @@ PAC5XXX_RAMFUNC float controller_get_Iq_setpoint_user_frame(void)
 PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value)
 {
     state.Iq_setpoint = value * motor_get_user_direction();
+}
+
+PAC5XXX_RAMFUNC float controller_get_Id_setpoint_user_frame(void)
+{
+    return state.Id_setpoint;
 }
 
 PAC5XXX_RAMFUNC float controller_get_Vq_setpoint_user_frame(void)
@@ -464,6 +489,16 @@ void controller_set_I_bw(float bw)
     }
 }
 
+float controller_get_Ibus_est(void)
+{
+    return state.Ibus_est;
+}
+
+float controller_get_power_est(void)
+{
+    return state.power_est;
+}
+
 float controller_get_vel_limit(void)
 {
     return config.vel_limit;
@@ -477,19 +512,6 @@ void controller_set_vel_limit(float limit)
     }
 }
 
-void controller_set_vel_increment(float increment)
-{
-    if (increment >= 0.0f)
-    {
-        config.vel_increment = increment;
-    }
-}
-
-float controller_get_vel_increment(void)
-{
-    return config.vel_increment;
-}
-
 float controller_get_Iq_limit(void)
 {
     return config.I_limit;
@@ -500,6 +522,45 @@ void controller_set_Iq_limit(float limit)
     if ((limit > 0.0f) && (limit < I_HARD_LIMIT))
     {
         config.I_limit = limit;
+    }
+}
+
+float controller_get_vel_increment(void)
+{
+    return config.vel_increment;
+}
+
+void controller_set_vel_increment(float increment)
+{
+    if (increment >= 0.0f)
+    {
+        config.vel_increment = increment;
+    }
+}
+
+float controller_get_max_Ibus_regen(void)
+{
+    return config.max_Ibus_regen;
+}
+
+void controller_set_max_Ibus_regen(float value)
+{
+    if (value >= 0.0f)
+    {
+        config.max_Ibus_regen = value;
+    }
+}
+
+float controller_get_max_Ibrake(void)
+{
+    return config.max_Ibrake;
+}
+
+void controller_set_max_Ibrake(float value)
+{
+    if (value >= 0.0f)
+    {
+        config.max_Ibrake = value;
     }
 }
 
