@@ -25,8 +25,8 @@ setup(
     python_requires=">=3.9",
     setuptools_git_versioning={
         "enabled": True,
-        "dev_template": "{tag}.post{ccount}",
-        "dirty_template": "{tag}.post{ccount}.dirty"
+        "dev_template": "{tag}+post{ccount}",
+        "dirty_template": "{tag}+post{ccount}_dirty"
     },
     setup_requires=["setuptools-git-versioning<2"],
     install_requires=[
