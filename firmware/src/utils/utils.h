@@ -44,6 +44,7 @@ static inline float our_fabsf(float x)
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#pragma GCC diagnostic ignored "-Wuninitialized"
 static inline float fast_inv_sqrt(float n)
 {
 	long i;
