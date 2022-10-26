@@ -17,7 +17,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 import yaml
 import logging
-import importlib
+from importlib_resources import files
 import can
 
 from avlos.deserializer import deserialize
@@ -26,7 +26,7 @@ from tinymovr.channel import CANChannel
 
 dev_def = None
 
-def_path_str = str(importlib.resources.files("tinymovr").joinpath("config/device.yaml"))
+def_path_str = str(files("tinymovr").joinpath("config/device.yaml"))
 with open(def_path_str) as dev_def_raw:
     dev_def = yaml.safe_load(dev_def_raw)
 

@@ -31,6 +31,7 @@ setup(
     setup_requires=["setuptools-git-versioning<2"],
     install_requires=[
         "ipython",
+        "importlib_resources",
         "python-can>=4.0.0.dev0",
         "avlos @ git+https://github.com/tinymovr/avlos.git",
         "pyserial",
