@@ -373,14 +373,16 @@ class TestBoard(TMTestCase):
 
         self.tm.controller.current.max_Ibrake = 10
         self.tm.controller.velocity_mode()
-        self.tm.controller.velocity.setpoint = 100000
-        time.sleep(1)
+        self.tm.controller.velocity.setpoint = 200000
+        time.sleep(0.4)
         self.tm.controller.velocity.setpoint = 0
-        time.sleep(0.002)
-        Ibrake = self.tm.Ibus_est
+        I_brake_vals = []
+        for _ in range(50):
+            I_brake_vals.append(self.tm.Ibus)
+            time.sleep(0.005)
         time.sleep(0.5)
         self.tm.controller.current.max_Ibrake = 0
-        self.assertAlmostEqual(Ibrake, -10, delta=5)
+        self.assertGreater(min(I_brake_vals), -1*A)
 
 
 if __name__ == "__main__":
