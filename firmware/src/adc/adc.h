@@ -62,6 +62,10 @@ typedef enum
 #elif defined BOARD_REV_R32
 #define SHUNT_SCALING_FACTOR (0.0503f)
 
+// Tinymovr M5 have 50mOhm shunts
+#elif defined BOARD_REV_M5
+#define SHUNT_SCALING_FACTOR (0.002012f)
+
 #endif
 
 // Inverse of sensing multiplier

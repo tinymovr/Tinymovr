@@ -17,13 +17,19 @@
 
 #pragma once
 
+#include <src/common.h>
+
+#if defined BOARD_REV_R32 || BOARD_REV_R33 || defined BOARD_REV_R5
 #define MIN_PHASE_RESISTANCE (0.005f)
 #define MAX_PHASE_RESISTANCE (1.0f)
-
 #define MIN_PHASE_INDUCTANCE (2e-6f)
-#define MAX_PHASE_INDUCTANCE (5000e-6f)
-
-#include "src/common.h"
+#define MAX_PHASE_INDUCTANCE (1e-4f)
+#elif defined BOARD_REV_M5
+#define MIN_PHASE_RESISTANCE (1.0f)
+#define MAX_PHASE_RESISTANCE (20.0f)
+#define MIN_PHASE_INDUCTANCE (1e-5f)
+#define MAX_PHASE_INDUCTANCE (1e-3f)
+#endif
 
 typedef struct
 {

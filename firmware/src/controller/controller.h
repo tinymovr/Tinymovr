@@ -44,29 +44,21 @@ typedef struct
     uint8_t warnings;
     uint8_t errors;
     bool is_calibrating;
-
     struct FloatTriplet I_phase_meas;
     struct FloatTriplet modulation_values;
-
     float Iq_est;
     float Id_est;
-
     float Ibus_est;
     float power_est;
-
     float pos_setpoint;
     float vel_setpoint;
     float vel_ramp_setpoint;
     float Iq_setpoint;
     float Id_setpoint;
-
     float Vq_setpoint;
-
     float vel_integrator_Iq;
-
     float Iq_integrator_Vq;
     float Id_integrator_Vd;
-
     float t_plan;
 } ControllerState;
 
@@ -75,7 +67,6 @@ typedef struct
     float vel_limit;
     float vel_ramp_limit;
     float I_limit;
-
     float pos_gain;
     float vel_gain;
     float vel_integrator_gain;
@@ -85,9 +76,7 @@ typedef struct
     float Iq_integrator_gain;
     float Id_integrator_gain;
     float I_k;
-    
     float vel_increment;
-
     float max_Ibus_regen;
     float max_Ibrake;
 } ControllerConfig;
