@@ -22,10 +22,12 @@
 #include <src/can/can_func.h>
 #include <src/can/can.h>
 
-#if defined(BOARD_REV_R3)
+#if defined BOARD_REV_R3 
 #define CAN_BUS_PINS CAN_PE23
-#elif defined(BOARD_REV_R5)
+#elif defined BOARD_REV_R5
 #define CAN_BUS_PINS CAN_PF67
+#elif defined BOARD_REV_M5
+#define CAN_BUS_PINS CAN_PD56
 #endif
 
 static CANConfig config = {
@@ -61,6 +63,13 @@ void CAN_init(void)
     {
         // No action
     }
+#elif defined(BOARD_REV_M5)
+    PAC55XX_SCC->PDMUXSEL.w &= 0xFFFFFF0F;        // Clear bits to select GPIO function
+    PAC55XX_GPIOD->MODE.P7 = IO_PUSH_PULL_OUTPUT; // GPIO configured as an output
+    PAC55XX_GPIOD->OUT.P7 = 1;                    // Set high to set IO voltage to 3V3
+    PAC55XX_GPIOD->MODE.P4 = IO_PUSH_PULL_OUTPUT; // GPIO configured as an output
+    PAC55XX_GPIOD->OUT.P4 = 0;                    // Set low to force transceiver into normal mode
+
 #endif
 
     can_io_config(CAN_BUS_PINS);
