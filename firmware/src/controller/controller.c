@@ -197,7 +197,6 @@ void Controller_ControlLoop(void)
 
     const float vel_estimate = observer_get_vel_estimate();
     float Iq_setpoint = state.Iq_setpoint;
-    float Id_setpoint = state.Id_setpoint;
 
     if (state.mode >= CTRL_VELOCITY)
     {
