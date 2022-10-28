@@ -64,7 +64,7 @@ typedef enum
 
 // Tinymovr M5 have 50mOhm shunts
 #elif defined BOARD_REV_M5
-#define SHUNT_SCALING_FACTOR (0.002012f)
+#define SHUNT_SCALING_FACTOR (0.001f)
 
 #endif
 
