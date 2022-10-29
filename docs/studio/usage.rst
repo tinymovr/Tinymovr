@@ -21,6 +21,18 @@ Discovery
 
 Tinymovr Studio uses a polling mechanism to discover Tinymovr nodes in the CAN network. Upon launching the app, by default the first ten nodes are scanned. The ones that are present are available through the variable handle 'tmx', where x the device index. To specify the scan range, take a look at :ref:`command-line-options`.
 
+Alternative Adapters/Firmwares
+##############################
+
+By default Tinymovr Studio searches for slcan-compatible CAN bus adapters, which appear as USB Virtual COM Port devices. To specify an alternative device, use the `--bustype` and `--chan` command line arguments. 
+
+For instance, to work with adapters using the `CANine firmware <https://github.com/tinymovr/CANine>`_, launch Tinymovr Studio as follows:
+
+.. code-block:: console
+
+    tinymovr --bustype=canine --chan=canine
+
+Note that you need to have completed `setting up CANine <https://canine.readthedocs.io/en/latest/canine.html#canine-firmware>`_ before issuing the above command to work with CANine.
 
 Compatibility
 #############
