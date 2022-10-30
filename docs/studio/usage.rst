@@ -30,7 +30,7 @@ For instance, to work with adapters using the `CANine firmware <https://github.c
 
 .. code-block:: console
 
-    tinymovr --bustype=canine --chan=canine
+    tinymovr --bustype=canine —chan=0xC1B0
 
 Note that you need to have completed `setting up CANine <https://canine.readthedocs.io/en/latest/canine.html#canine-firmware>`_ before issuing the above command to work with CANine.
 
