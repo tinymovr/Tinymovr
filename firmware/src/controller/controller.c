@@ -65,11 +65,11 @@ static ControllerState state = {
 
     .t_plan = 0.0f};
 
-static ControllerConfig config = {
+#if defined BOARD_REV_R32 || BOARD_REV_R33 || defined BOARD_REV_R5
 
+static ControllerConfig config = {
     .vel_limit = 300000.0f,
     .I_limit = 10.0f,
-
     .pos_gain = 20.0f,
     .vel_gain = 8.0e-5f,
     .vel_integrator_gain = 0.00020f,
@@ -79,11 +79,29 @@ static ControllerConfig config = {
     .Iq_integrator_gain = 0.0f,
     .Id_integrator_gain = 0.0f,
     .I_k = 0.3f,
-
     .vel_increment = 100.0f, // ticks/cycle
-    
     .max_Ibus_regen = 0.0f,
     .max_Ibrake = 0.0f}; 
+
+#elif defined BOARD_REV_M5
+
+static ControllerConfig config = {
+    .vel_limit = 100000.0f,
+    .I_limit = 5.0f,
+    .pos_gain = 20.0f,
+    .vel_gain = 8.0e-5f,
+    .vel_integrator_gain = 0.00020f,
+    .vel_integrator_deadband = 200.0f,
+    .I_bw = 1500.0,
+    .I_gain = 0.0f,
+    .Iq_integrator_gain = 0.0f,
+    .Id_integrator_gain = 0.0f,
+    .I_k = 0.3f,
+    .vel_increment = 100.0f, // ticks/cycle
+    .max_Ibus_regen = 0.0f,
+    .max_Ibrake = 0.0f}; 
+
+#endif
 
 void Controller_ControlLoop(void)
 {
@@ -179,7 +197,6 @@ void Controller_ControlLoop(void)
 
     const float vel_estimate = observer_get_vel_estimate();
     float Iq_setpoint = state.Iq_setpoint;
-    float Id_setpoint = state.Id_setpoint;
 
     if (state.mode >= CTRL_VELOCITY)
     {

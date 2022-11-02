@@ -88,6 +88,8 @@
 #define CAN_PE23
 #elif defined BOARD_REV_R5
 #define CAN_PF67
+#elif defined BOARD_REV_M5
+#define CAN_PD56
 #else
 #error "Board revision incorrect or not defined"
 #endif

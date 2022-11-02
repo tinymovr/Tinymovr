@@ -19,10 +19,12 @@
 #include <src/utils/utils.h>
 #include <src/motor/motor.h>
 
+#if defined BOARD_REV_R32 || BOARD_REV_R33 || defined BOARD_REV_R5
+
 static MotorConfig config = {
 	.pole_pairs = 7u,
-	.phase_resistance = 0.1f,
-	.phase_inductance = 1e-5f,
+	.phase_resistance = MIN_PHASE_RESISTANCE,
+	.phase_inductance = MIN_PHASE_INDUCTANCE,
 
 	.user_offset = 0.0f,
 	.user_direction = 1,
@@ -35,6 +37,27 @@ static MotorConfig config = {
 
 	.phases_swapped = false,
 	.is_gimbal = false};
+
+#elif defined BOARD_REV_M5
+
+static MotorConfig config = {
+	.pole_pairs = 7u,
+	.phase_resistance = MIN_PHASE_RESISTANCE,
+	.phase_inductance = MIN_PHASE_INDUCTANCE,
+
+	.user_offset = 0.0f,
+	.user_direction = 1,
+
+	.I_cal = 2.0f,
+
+	.resistance_calibrated = false,
+	.inductance_calibrated = false,
+	.poles_calibrated = false,
+
+	.phases_swapped = false,
+	.is_gimbal = false};
+
+#endif
 
 static MotorState state = {0};
 
