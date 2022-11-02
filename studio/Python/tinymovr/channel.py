@@ -59,7 +59,6 @@ class CANChannel(BaseChannel):
 
     def recv(self, ep_id, timeout=1.0):
         with self.lock:
-            get_tee().update_once()
             if not self.evt.wait(timeout=timeout):
                 print("missed")
             self.evt.clear()
