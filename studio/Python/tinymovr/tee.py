@@ -49,8 +49,9 @@ class Tee:
     simplify interfacing with CAN bus objects.
     """
 
-    def __init__(self, bus):
+    def __init__(self, bus, timeout):
         self.bus = bus
+        self.timeout = timeout
         self.clients = []
         self.state = TeeState.INIT
         self.update_thread = Thread(target=self.update, daemon=True)
@@ -72,7 +73,7 @@ class Tee:
         Tries to receive a message from the bus object and if successful,
         tests reception of each tee instance in the global index.
         """
-        frame = self.bus.recv()
+        frame = self.bus.recv(timeout=self.timeout)
         if frame:
             for client in self.clients:
                 if client.filter_cb(frame):
@@ -91,13 +92,13 @@ class Tee:
         assert TeeState.STOPPED == self.state
 
 
-def init_tee(bus):
+def init_tee(bus, timeout=0.1):
     """
-    Initializes a tee using a pytho-can bus instance
+    Initializes a tee using a python-can bus instance
     """
     global tee
     assert None == tee
-    tee = Tee(bus)
+    tee = Tee(bus, timeout)
 
 
 def destroy_tee():
