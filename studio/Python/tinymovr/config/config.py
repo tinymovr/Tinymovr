@@ -17,19 +17,15 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 import yaml
 import logging
-import importlib
+from importlib import resources
 import can
 
 from avlos.deserializer import deserialize
 from tinymovr.codec import DataType
 from tinymovr.channel import CANChannel
 
-dev_def = None
-
-def_path_str = str(importlib.resources.files("tinymovr").joinpath("config/device.yaml"))
-with open(def_path_str) as dev_def_raw:
-    dev_def = yaml.safe_load(dev_def_raw)
-
+dev_def_raw = resources.read_text(__package__, "device.yaml")
+dev_def = yaml.safe_load(dev_def_raw)
 
 class ProtocolVersionError(Exception):
     def __init__(self, *args, **kwargs):
