@@ -109,11 +109,11 @@ void CAN_IRQHandler(void)
 	state.can_interrupt = true;
 }
 
-void SysTick_Handler(void)  /* SysTick interrupt Handler. */
-{                               
-    msTicks = msTicks + 1;  /* See startup file startup_LPC17xx.s for SysTick vector */ 
-    CAN_task();
-}
+// void SysTick_Handler(void)  /* SysTick interrupt Handler. */
+// {                               
+//     msTicks = msTicks + 1;  /* See startup file startup_LPC17xx.s for SysTick vector */ 
+//     CAN_task();
+// }
 
 void UART_ReceiveMessageHandler(void)
 {

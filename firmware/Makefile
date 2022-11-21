@@ -82,14 +82,16 @@ HEXFLAGS += -O ihex
 BINFLAGS += -O binary
 
 # Headers
-INCLUDEDIRS := . ./cmsis_core/ ./pac55xx_sdk/ ./pac55xx_sdk/device/ ./pac55xx_sdk/driver/ ./pac55xx_sdk/peripheral/
+INCLUDEDIRS := . ./cmsis_core/ ./pac55xx_sdk/ ./pac55xx_sdk/device/ ./pac55xx_sdk/driver/ ./pac55xx_sdk/peripheral/ ./rtos/
 INCLUDEFLAGS := $(foreach d, $(INCLUDEDIRS), -I$d)
 
 # Source Files
 CSOURCES := $(call rwildcard,./src,*.c)
 CSOURCES += $(call rwildcard,./pac55xx_sdk,*.c)
+CSOURCES += $(call rwildcard,./rtos,*.c)
 CPPSOURCES := $(call rwildcard,./src,*.cpp)
 CPPSOURCES += $(call rwildcard,./pac55xx_sdk,*.cpp)
+CPPSOURCES += $(call rwildcard,./rtos,*.cpp)
 
 # List of object files, with paths
 OBJECTS := $(addprefix $(BUILDDIR)/,$(CSOURCES:%.c=%.o)) $(addprefix $(BUILDDIR)/,$(CPPSOURCES:%.cpp=%.o))
