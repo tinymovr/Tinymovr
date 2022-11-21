@@ -39,12 +39,6 @@
 #define CAL_OFFSET_EN 0x04u
 #define CAL_OFFSET_DIS 0x00u
 
-#define GAINx1 (0x01u << 3)
-#define GAINx2 (0x03u << 3)
-#define GAINx4 (0x01u << 3)
-#define GAINx8 (0x04u << 3)
-#define GAINx16 (0x05u << 3)
-
 #define LP_HP_EN_1us 0x01u
 
 #define LP54_EN 0x04u

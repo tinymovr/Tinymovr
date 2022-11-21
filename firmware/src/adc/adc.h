@@ -49,6 +49,14 @@ typedef enum
 #define MODULE_MISC_BITS_DEFAULT ((HIB_BIT_DEFAULT << 7) + (PBEN_BIT_DEFAULT << 6) + (VREFSET_BIT_DEFAULT << 5) + (CLKOUTEN_BIT_DEFAULT << 4) + (MCUALIVE_BIT_DEFAULT << 3) + (TPBD_BIT_DEFAULT << 2) + (RFU_BIT_DEFAULT << 1) + (ENSIG_BIT_DEFAULT << 0))
 #endif
 
+#define GAINx1                          (0x01 << 3)
+#define GAINx2                          (0x02 << 3)
+#define GAINx4                          (0x03 << 3)
+#define GAINx8                          (0x04 << 3)
+#define GAINx16                         (0x05 << 3)
+#define GAINx32                         (0x06 << 3)
+#define GAINx64                         (0x07 << 3)
+
 // Current sensing multipler defined as follows:
 // meas * ONE_OVER_ADC_RES * VREF / R * ONE_OVER_ADC_GAIN
 
