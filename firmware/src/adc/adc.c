@@ -165,13 +165,13 @@ void ADC_Init(void)
 void ADC_AIO_Init(void)
 {
     // TODO: Verify if Low-side protection has any effect
-    pac5xxx_tile_register_write(ADDR_CFGAIO0, AIO0to5_DIFF_AMP_MODE | GAINx16 | LP_HP_EN_1us);
+    pac5xxx_tile_register_write(ADDR_CFGAIO0, AIO0to5_DIFF_AMP_MODE | ADC_GAIN_VAL | LP_HP_EN_1us);
     pac5xxx_tile_register_write(ADDR_CFGAIO1, HP_DIS_LP_EN_PR1 | OFFSET_EN | CAL_OFFSET_DIS | LP_HP_EN_1us);
 
-    pac5xxx_tile_register_write(ADDR_CFGAIO2, AIO0to5_DIFF_AMP_MODE | GAINx16 | LP_HP_EN_1us);
+    pac5xxx_tile_register_write(ADDR_CFGAIO2, AIO0to5_DIFF_AMP_MODE | ADC_GAIN_VAL | LP_HP_EN_1us);
     pac5xxx_tile_register_write(ADDR_CFGAIO3, HP_DIS_LP_EN_PR1 | OFFSET_EN | CAL_OFFSET_DIS | LP_HP_EN_1us);
 
-    pac5xxx_tile_register_write(ADDR_CFGAIO4, AIO0to5_DIFF_AMP_MODE | GAINx16 | LP_HP_EN_1us);
+    pac5xxx_tile_register_write(ADDR_CFGAIO4, AIO0to5_DIFF_AMP_MODE | ADC_GAIN_VAL | LP_HP_EN_1us);
     pac5xxx_tile_register_write(ADDR_CFGAIO5, HP_DIS_LP_EN_PR1 | OFFSET_EN | CAL_OFFSET_DIS | LP_HP_EN_1us);
 }
 
