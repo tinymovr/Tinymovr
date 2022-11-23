@@ -18,7 +18,7 @@
 #ifndef ADC_ADC_H_
 #define ADC_ADC_H_
 
-#include "src/common.h"
+#include <src/common.h>
 
 #ifdef CAFE_ARCH2
 typedef enum
@@ -86,23 +86,23 @@ typedef enum
 // VBus scaling factor
 #define VBUS_SCALING_FACTOR (0.0128f)
 
-struct ADCState
+typedef struct 
 {
     int16_t temp;
     struct FloatTriplet I_phase_meas;
     struct FloatTriplet I_phase_offset;
-};
+} ADCState;
 
-struct ADCConfig
+typedef struct
 {
     float Iphase_limit;
     float I_filter_k;
     float I_phase_offset_tau;
-};
+} ADCConfig;
 
 void ADC_Init(void);
-PAC5XXX_RAMFUNC int16_t adc_get_mcu_temp(void);
-PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc);
-PAC5XXX_RAMFUNC void ADC_update(void);
+int16_t adc_get_mcu_temp(void);
+void ADC_GetPhaseCurrents(struct FloatTriplet *phc);
+void ADC_update(void);
 
 #endif /* ADC_ADC_H_ */
