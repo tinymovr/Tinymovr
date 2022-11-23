@@ -18,6 +18,7 @@
 #include <math.h>
 #include <string.h>
 #include <src/motor/motor.h>
+#include <src/gatedriver/gatedriver.h>
 #include <src/adc/adc.h>
 
 // Resistor value of diffamp AIO RC filter
@@ -240,19 +241,22 @@ PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc)
 
 PAC5XXX_RAMFUNC void ADC_update(void)
 {
-    // TODO: Try doing below transformations in integer domain
-    const float I_phase_offset_k = PWM_PERIOD_S / config.I_phase_offset_tau;
-    adc.I_phase_offset.A += (((float)PAC55XX_ADC->DTSERES6.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.A) * I_phase_offset_k;
-    adc.I_phase_offset.B += (((float)PAC55XX_ADC->DTSERES8.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.B) * I_phase_offset_k;
-    adc.I_phase_offset.C += (((float)PAC55XX_ADC->DTSERES10.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.C) * I_phase_offset_k;
+    if (true == gate_driver_is_enabled())
+    {
+        // TODO: Try doing below transformations in integer domain
+        const float I_phase_offset_k = PWM_PERIOD_S / config.I_phase_offset_tau;
+        adc.I_phase_offset.A += (((float)PAC55XX_ADC->DTSERES6.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.A) * I_phase_offset_k;
+        adc.I_phase_offset.B += (((float)PAC55XX_ADC->DTSERES8.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.B) * I_phase_offset_k;
+        adc.I_phase_offset.C += (((float)PAC55XX_ADC->DTSERES10.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.C) * I_phase_offset_k;
 
-    const float i_a = (((float)PAC55XX_ADC->DTSERES14.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.A);
-    const float i_b = (((float)PAC55XX_ADC->DTSERES16.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.B);
-    const float i_c = (((float)PAC55XX_ADC->DTSERES18.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.C);
-    adc.I_phase_meas.A = ((1.0f - config.I_filter_k) * i_a) - (config.I_filter_k * (i_b + i_c));
-    adc.I_phase_meas.B = ((1.0f - config.I_filter_k) * i_b) - (config.I_filter_k * (i_a + i_c));
-    adc.I_phase_meas.C = ((1.0f - config.I_filter_k) * i_c) - (config.I_filter_k * (i_a + i_b));
-
+        const float i_a = (((float)PAC55XX_ADC->DTSERES14.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.A);
+        const float i_b = (((float)PAC55XX_ADC->DTSERES16.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.B);
+        const float i_c = (((float)PAC55XX_ADC->DTSERES18.VAL * SHUNT_SCALING_FACTOR) - adc.I_phase_offset.C);
+        adc.I_phase_meas.A = ((1.0f - config.I_filter_k) * i_a) - (config.I_filter_k * (i_b + i_c));
+        adc.I_phase_meas.B = ((1.0f - config.I_filter_k) * i_b) - (config.I_filter_k * (i_a + i_c));
+        adc.I_phase_meas.C = ((1.0f - config.I_filter_k) * i_c) - (config.I_filter_k * (i_a + i_b));
+    }
+    
     // Internal MCU temperature sensor reading at FTTEMP temperature in ADC counts.
     uint16_t TTEMPS = 0;
     memcpy(&TTEMPS, (const size_t *)0x0010041C, sizeof(uint16_t));
