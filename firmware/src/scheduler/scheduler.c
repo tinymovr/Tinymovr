@@ -35,10 +35,10 @@ SchedulerState state = {0};
 
 void WaitForControlLoopInterrupt(void)
 {
-	state.busy_cycles = DWT->CYCCNT - state.busy_loop_start;
+	
 	while (!state.adc_interrupt)
 	{
-		state.busy = false;
+		
 		if (state.can_interrupt)
 		{
 			// Handle CAN
@@ -62,6 +62,8 @@ void WaitForControlLoopInterrupt(void)
 		}
 		else
 		{
+			state.busy = false;
+			state.busy_cycles = DWT->CYCCNT - state.busy_loop_start;
 			// Go back to sleep
 			__DSB();
 			__ISB();
