@@ -42,8 +42,12 @@ void WaitForControlLoopInterrupt(void)
 		if (state.can_interrupt)
 		{
 			// Handle CAN
-			state.can_interrupt = false;
 			CAN_process_interrupt();
+			// Only clear the flag if all messages in the CAN RX buffer have been processed
+			if (PAC55XX_CAN->SR.RBS == 0)
+			{
+				state.can_interrupt = false;
+			}
 		}
 		else if (state.uart_message_interrupt)
 		{

@@ -24,6 +24,8 @@ Connectivity
   :width: 800
   :alt: Tinymovr R5 connectors and pinouts
 
+.. warning::
+   The UART pins in Tinymovr R5.1 have the silkscreen reversed. If you are planning to use UART with R5.1, consult :ref:`r51-erratum-1`. This only affects R5.1 boards.
 
 R3.x
 ****************

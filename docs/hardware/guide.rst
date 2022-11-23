@@ -111,6 +111,8 @@ Connect the CAN bus header to one of the two CAN sockets on the board. It is not
 
 In small setups with few nodes and short wires, it is better to enable just a single termination resistor, either on one Tinymovr board or on the CAN adapter. In setups with many nodes and long cables, you may need to enable termination resistors in both terminal nodes.
 
+.. warning::
+   The UART pins in Tinymovr R5.1 have the silkscreen reversed. If you are planning to use UART with R5.1, consult :ref:`r51-erratum-1`. 
 
 .. _connecting-power:
 

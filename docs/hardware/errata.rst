@@ -24,3 +24,15 @@ The USB Micro connector used in the v1 adapter was unfortunately not very robust
 In addition, avoid exerting lateral forces to the connector (upwards or downwards) as they place stress on the soldered retaining flaps.
 
 Later adapter revisions (aka CANine) use a USB Type C connector and do not have this issue.
+
+
+.. _r51-erratum-1:
+
+Tinymovr R5 UART Silkscreen Reversed
+************************************
+
+The silkscreen next to the UART port on the rear of Tinymovr R5 has the order of pins reversed. The correct pins are provided in the figure below.
+
+.. image:: erratum_R51.png
+  :width: 600
+  :alt: Tinymovr R5 reversed silkscreen on UART port
