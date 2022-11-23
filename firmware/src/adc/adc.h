@@ -77,7 +77,6 @@ typedef enum
 #elif defined BOARD_REV_M5
 #define SHUNT_SCALING_FACTOR (0.008056f)
 #define ADC_GAIN_VAL GAINx2
-
 #endif
 
 // Inverse of sensing multiplier
@@ -85,6 +84,8 @@ typedef enum
 
 // VBus scaling factor
 #define VBUS_SCALING_FACTOR (0.0128f)
+
+#define I_FILTER_K (0.6f)
 
 typedef struct 
 {
@@ -96,7 +97,6 @@ typedef struct
 typedef struct
 {
     float Iphase_limit;
-    float I_filter_k;
     float I_phase_offset_tau;
     float I_phase_offset_k;
 } ADCConfig;

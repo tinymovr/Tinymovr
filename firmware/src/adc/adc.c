@@ -57,7 +57,6 @@ static ADCState adc_state = {0};
 
 static ADCConfig adc_config = {
     .Iphase_limit = 40.0f,
-    .I_filter_k = 0.6f,
     .I_phase_offset_tau = 0.2f,
     .I_phase_offset_k = 0.0f
 };
@@ -250,9 +249,9 @@ PAC5XXX_RAMFUNC void ADC_update(void)
         const float i_a = (((float)PAC55XX_ADC->DTSERES14.VAL * SHUNT_SCALING_FACTOR) - adc_state.I_phase_offset.A);
         const float i_b = (((float)PAC55XX_ADC->DTSERES16.VAL * SHUNT_SCALING_FACTOR) - adc_state.I_phase_offset.B);
         const float i_c = (((float)PAC55XX_ADC->DTSERES18.VAL * SHUNT_SCALING_FACTOR) - adc_state.I_phase_offset.C);
-        adc_state.I_phase_meas.A = ((1.0f - adc_config.I_filter_k) * i_a) - (adc_config.I_filter_k * (i_b + i_c));
-        adc_state.I_phase_meas.B = ((1.0f - adc_config.I_filter_k) * i_b) - (adc_config.I_filter_k * (i_a + i_c));
-        adc_state.I_phase_meas.C = ((1.0f - adc_config.I_filter_k) * i_c) - (adc_config.I_filter_k * (i_a + i_b));
+        adc_state.I_phase_meas.A = ((1.0f - I_FILTER_K) * i_a) - (I_FILTER_K * (i_b + i_c));
+        adc_state.I_phase_meas.B = ((1.0f - I_FILTER_K) * i_b) - (I_FILTER_K * (i_a + i_c));
+        adc_state.I_phase_meas.C = ((1.0f - I_FILTER_K) * i_c) - (I_FILTER_K * (i_a + i_b));
     }
     
     // Internal MCU temperature sensor reading at FTTEMP temperature in ADC counts.
