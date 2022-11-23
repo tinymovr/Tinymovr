@@ -278,7 +278,7 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
     float mod_q = Vq / Vbus_voltage;
     float mod_d = Vd / Vbus_voltage;
     state.Ibus_est = state.Iq_est * mod_q + state.Id_est * mod_d;
-    state.power_est = state.Iq_est * Vbus_voltage;
+    state.power_est = state.Ibus_est * Vbus_voltage;
 
     // dq modulation limiter
     const float dq_mod_scale_factor = PWM_LIMIT * fast_inv_sqrt((mod_q * mod_q) + (mod_d * mod_d));
