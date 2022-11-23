@@ -26,13 +26,13 @@ Launching the CLI app
 Alternative Adapters/Firmwares
 ##############################
 
-By default Tinymovr Studio searches for slcan-compatible CAN bus adapters, which appear as USB Virtual COM Port devices. To specify an alternative device, use the `--bustype` and `--chan` command line arguments. 
+By default Tinymovr Studio searches for slcan-compatible CAN bus adapters, which appear as USB Virtual COM Port devices. To specify an alternative device, use the `--bus` command line argument. 
 
 For instance, to work with adapters using the `CANine firmware <https://github.com/tinymovr/CANine>`_, launch Tinymovr Studio as follows:
 
 .. code-block:: console
 
-    tinymovr --bustype=canine —chan=0xC1B0
+    tinymovr --bus=canine
 
 Note that you need to have completed `setting up CANine <https://canine.readthedocs.io/en/latest/canine.html#canine-firmware>`_ before issuing the above command to work with CANine.
 
