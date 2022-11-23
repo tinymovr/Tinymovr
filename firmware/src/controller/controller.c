@@ -155,7 +155,7 @@ void Controller_ControlLoop(void)
     }
 }
 
- void CLControlStep(void)
+PAC5XXX_RAMFUNC void CLControlStep(void)
 {
     if (state.mode >= CTRL_TRAJECTORY)
     {

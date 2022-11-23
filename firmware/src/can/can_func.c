@@ -169,7 +169,7 @@ void can_baud(CAN_BAUD_TYPE baud)
     }
 }
 
-void can_process_standard(void)
+PAC5XXX_RAMFUNC void can_process_standard(void)
 {
     uint32_t buffer = PAC55XX_CAN->RXBUF; //  read RX buffer, RX buffer bit order same as TX buffer
 
@@ -212,7 +212,7 @@ void can_process_standard(void)
 //  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-void can_process_extended(void)
+PAC5XXX_RAMFUNC void can_process_extended(void)
 {
     uint32_t buffer = PAC55XX_CAN->RXBUF; //  read RX buffer, RX buffer bit order same as TX buffer
 
@@ -244,7 +244,7 @@ void can_process_extended(void)
     }
 }
 
-void can_transmit_standard(uint8_t dataLen, uint16_t id, const uint8_t * data)
+PAC5XXX_RAMFUNC void can_transmit_standard(uint8_t dataLen, uint16_t id, const uint8_t * data)
 {
     while (PAC55XX_CAN->SR.TBS == 0) {};           // wait for TX buffer free
     PAC55XX_CAN->TXBUF = (dataLen << 0)         |  // DLC - Data Length Code
@@ -288,7 +288,7 @@ void can_transmit_standard(uint8_t dataLen, uint16_t id, const uint8_t * data)
 //  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-void can_transmit_extended(uint8_t dataLen, uint32_t id, const uint8_t * data)
+PAC5XXX_RAMFUNC void can_transmit_extended(uint8_t dataLen, uint32_t id, const uint8_t * data)
 {
     while (PAC55XX_CAN->SR.TBS == 0) {};                 // wait for TX buffer free
     PAC55XX_CAN->TXBUF = (dataLen << 0)                | // DLC - Data Length Code
