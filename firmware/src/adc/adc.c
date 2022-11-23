@@ -53,16 +53,18 @@
 void ADC_AIO_Init(void);
 void ADC_DTSE_Init(void);
 
-static ADCState adc_state;
+static ADCState adc_state = {0};
 
 static ADCConfig adc_config = {
     .Iphase_limit = 40.0f,
     .I_filter_k = 0.6f,
-    .I_phase_offset_tau = 0.2f
+    .I_phase_offset_tau = 0.2f,
+    .I_phase_offset_k = 0.0f
 };
 
 void ADC_Init(void)
 {
+    adc_config.I_phase_offset_k = PWM_PERIOD_S / adc_config.I_phase_offset_tau;
     // --- Begin CAFE2 Initialization
 
     // Write all CAFE registers
@@ -241,10 +243,9 @@ PAC5XXX_RAMFUNC void ADC_update(void)
     if (true == gate_driver_is_enabled())
     {
         // TODO: Try doing below transformations in integer domain
-        const float I_phase_offset_k = PWM_PERIOD_S / adc_config.I_phase_offset_tau;
-        adc_state.I_phase_offset.A += (((float)PAC55XX_ADC->DTSERES6.VAL * SHUNT_SCALING_FACTOR) - adc_state.I_phase_offset.A) * I_phase_offset_k;
-        adc_state.I_phase_offset.B += (((float)PAC55XX_ADC->DTSERES8.VAL * SHUNT_SCALING_FACTOR) - adc_state.I_phase_offset.B) * I_phase_offset_k;
-        adc_state.I_phase_offset.C += (((float)PAC55XX_ADC->DTSERES10.VAL * SHUNT_SCALING_FACTOR) - adc_state.I_phase_offset.C) * I_phase_offset_k;
+        adc_state.I_phase_offset.A += (((float)PAC55XX_ADC->DTSERES6.VAL * SHUNT_SCALING_FACTOR) - adc_state.I_phase_offset.A) * adc_config.I_phase_offset_k;
+        adc_state.I_phase_offset.B += (((float)PAC55XX_ADC->DTSERES8.VAL * SHUNT_SCALING_FACTOR) - adc_state.I_phase_offset.B) * adc_config.I_phase_offset_k;
+        adc_state.I_phase_offset.C += (((float)PAC55XX_ADC->DTSERES10.VAL * SHUNT_SCALING_FACTOR) - adc_state.I_phase_offset.C) * adc_config.I_phase_offset_k;
 
         const float i_a = (((float)PAC55XX_ADC->DTSERES14.VAL * SHUNT_SCALING_FACTOR) - adc_state.I_phase_offset.A);
         const float i_b = (((float)PAC55XX_ADC->DTSERES16.VAL * SHUNT_SCALING_FACTOR) - adc_state.I_phase_offset.B);

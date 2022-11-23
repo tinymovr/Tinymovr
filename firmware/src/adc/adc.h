@@ -98,6 +98,7 @@ typedef struct
     float Iphase_limit;
     float I_filter_k;
     float I_phase_offset_tau;
+    float I_phase_offset_k;
 } ADCConfig;
 
 void ADC_Init(void);
