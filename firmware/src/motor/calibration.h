@@ -30,7 +30,7 @@
 #define CAL_V_GAIN            (0.0005f)
 #define CAL_V_INDUCTANCE      (2.0f)
 #elif defined BOARD_REV_M5
-#define CAL_V_GAIN            (0.001f)
+#define CAL_V_GAIN            (0.002f)
 #define CAL_V_INDUCTANCE      (5.0f)
 #endif
 
