@@ -412,13 +412,13 @@ CAN_BAUD_TYPE CAN_IntToBaudType(uint16_t baud)
     return ret;
 }
 
-void ids_from_arbitration(uint32_t arb_id, uint32_t* ep_id, uint32_t* seq_id)
+inline void ids_from_arbitration(uint32_t arb_id, uint32_t* ep_id, uint32_t* seq_id)
 {
     *ep_id = arb_id & CAN_EP_MASK;
     *seq_id = (arb_id & CAN_SEQ_MASK) >> CAN_EP_SIZE;
 }
 
-void arbitration_from_ids(uint32_t* arb_id, uint32_t ep_id, uint32_t seq_id, uint32_t node_id)
+inline void arbitration_from_ids(uint32_t* arb_id, uint32_t ep_id, uint32_t seq_id, uint32_t node_id)
 {
     *arb_id = (ep_id & CAN_EP_MASK) | ((seq_id << CAN_EP_SIZE) & CAN_SEQ_MASK) | ((node_id << (CAN_EP_SIZE + CAN_SEQ_SIZE)) & CAN_DEV_MASK);
 }

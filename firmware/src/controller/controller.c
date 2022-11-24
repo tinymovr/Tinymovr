@@ -29,7 +29,7 @@
 #include "src/watchdog/watchdog.h"
 
 void CLControlStep(void);
-PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
+static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
                                                             float vel_gain, float *I);
 
 static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
