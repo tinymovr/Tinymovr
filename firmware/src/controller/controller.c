@@ -29,7 +29,7 @@
 #include "src/watchdog/watchdog.h"
 
 void CLControlStep(void);
-PAC5XXX_RAMFUNC static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
+static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
                                                             float vel_gain, float *I);
 
 static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
@@ -155,7 +155,7 @@ void Controller_ControlLoop(void)
     }
 }
 
- void CLControlStep(void)
+PAC5XXX_RAMFUNC void CLControlStep(void)
 {
     if (state.mode >= CTRL_TRAJECTORY)
     {
@@ -278,7 +278,7 @@ void Controller_ControlLoop(void)
     float mod_q = Vq / Vbus_voltage;
     float mod_d = Vd / Vbus_voltage;
     state.Ibus_est = state.Iq_est * mod_q + state.Id_est * mod_d;
-    state.power_est = state.Iq_est * Vbus_voltage;
+    state.power_est = state.Ibus_est * Vbus_voltage;
 
     // dq modulation limiter
     const float dq_mod_scale_factor = PWM_LIMIT * fast_inv_sqrt((mod_q * mod_q) + (mod_d * mod_d));

@@ -35,10 +35,10 @@ SchedulerState state = {0};
 
 void WaitForControlLoopInterrupt(void)
 {
-	state.busy_cycles = DWT->CYCCNT - state.busy_loop_start;
+	
 	while (!state.adc_interrupt)
 	{
-		state.busy = false;
+		
 		if (state.can_interrupt)
 		{
 			// Handle CAN
@@ -62,6 +62,8 @@ void WaitForControlLoopInterrupt(void)
 		}
 		else
 		{
+			state.busy = false;
+			state.busy_cycles = DWT->CYCCNT - state.busy_loop_start;
 			// Go back to sleep
 			__DSB();
 			__ISB();
@@ -91,7 +93,7 @@ void ADC_IRQHandler(void)
 	// the control deadline is not missed,
 	// i.e. the previous control loop is complete prior
 	// to the ADC triggering the next
-	if (true == gate_driver_is_enabled() && true == state.busy)
+	if ((gate_driver_is_enabled() == true) && (state.busy == true))
 	{
 		state.errors |= SCHEDULER_ERRORS_CONTROL_BLOCK_REENTERED;
 		// We do not change the control state here, to
@@ -113,9 +115,9 @@ void CAN_IRQHandler(void)
 	state.can_interrupt = true;
 }
 
-void SysTick_Handler(void)  /* SysTick interrupt Handler. */
+void SysTick_Handler(void)
 {                               
-    msTicks = msTicks + 1;  /* See startup file startup_LPC17xx.s for SysTick vector */ 
+    msTicks = msTicks + 1; 
     CAN_task();
 }
 
@@ -132,12 +134,12 @@ void Wdt_IRQHandler(void)
     PAC55XX_WWDT->WWDTFLAG.IF = 1;
 }
 
-uint32_t Scheduler_GetTotalCycles(void)
+PAC5XXX_RAMFUNC uint32_t Scheduler_GetTotalCycles(void)
 {
     return state.total_cycles;
 }
 
-uint32_t Scheduler_GetBusyCycles(void)
+PAC5XXX_RAMFUNC uint32_t Scheduler_GetBusyCycles(void)
 {
     return state.busy_cycles;
 }
