@@ -93,7 +93,7 @@ void ADC_IRQHandler(void)
 	// the control deadline is not missed,
 	// i.e. the previous control loop is complete prior
 	// to the ADC triggering the next
-	if (true == gate_driver_is_enabled() && true == state.busy)
+	if ((gate_driver_is_enabled() == true) && (state.busy == true))
 	{
 		state.errors |= SCHEDULER_ERRORS_CONTROL_BLOCK_REENTERED;
 		// We do not change the control state here, to
@@ -115,9 +115,9 @@ void CAN_IRQHandler(void)
 	state.can_interrupt = true;
 }
 
-void SysTick_Handler(void)  /* SysTick interrupt Handler. */
+void SysTick_Handler(void)
 {                               
-    msTicks = msTicks + 1;  /* See startup file startup_LPC17xx.s for SysTick vector */ 
+    msTicks = msTicks + 1; 
     CAN_task();
 }
 

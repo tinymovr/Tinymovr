@@ -103,8 +103,7 @@ void ADC_Init(void)
     pac5xxx_tile_register_write(ADDR_CFGDRV3, 0x00);
 
     // Configure overcurrent protection
-    uint16_t lpdac_val = adc_config.Iphase_limit * ONE_OVER_SHUNT_SCALING_FACTOR;
-    // Why we need to write 2 bits of a 10-bit value to another register is beyond me...
+    uint16_t lpdac_val = (uint16_t)(adc_config.Iphase_limit * ONE_OVER_SHUNT_SCALING_FACTOR);
     pac5xxx_tile_register_write(ADDR_LPDACH, (lpdac_val >> 2) & 0xFFu); // 8b MSB
     pac5xxx_tile_register_write(ADDR_LPDACL, lpdac_val & 0x03u);        // 2b LSB
 
@@ -239,7 +238,7 @@ PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc)
 
 PAC5XXX_RAMFUNC void ADC_update(void)
 {
-    if (true == gate_driver_is_enabled())
+    if (gate_driver_is_enabled() == true)
     {
         // TODO: Try doing below transformations in integer domain
         adc_state.I_phase_offset.A += (((float)PAC55XX_ADC->DTSERES6.VAL * SHUNT_SCALING_FACTOR) - adc_state.I_phase_offset.A) * adc_config.I_phase_offset_k;
