@@ -56,7 +56,7 @@ void ADC_DTSE_Init(void);
 static ADCState adc_state = {0};
 
 static ADCConfig adc_config = {
-    .Iphase_limit = 40.0f,
+    .Iphase_limit = 60.0f,
     .I_phase_offset_tau = 0.2f,
     .I_phase_offset_k = 0.0f
 };
