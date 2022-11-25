@@ -109,8 +109,8 @@ debug: OBJECTS += $(BUILDDIR)/bootloader.o
 debug: binary
 
 # Upgrade target
-upgrade: CFLAGS += -g0 -O3
-upgrade: CPPFLAGS += -g0 -O3
+upgrade: CFLAGS += -DNDEBUG -g0 -O3
+upgrade: CPPFLAGS += -DNDEBUG -g0 -O3
 upgrade: LDFLAGS += -O3
 upgrade: binary
 
