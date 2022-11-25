@@ -37,4 +37,4 @@ void WaitForControlLoopInterrupt(void);
 uint32_t Scheduler_GetTotalCycles(void);
 uint32_t Scheduler_GetBusyCycles(void);
 
-PAC5XXX_RAMFUNC uint8_t scheduler_get_errors(void);
+uint8_t scheduler_get_errors(void);

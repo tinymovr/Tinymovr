@@ -57,37 +57,37 @@ typedef struct
 
 void motor_reset_calibration(void);
 
-PAC5XXX_RAMFUNC uint8_t motor_get_pole_pairs(void);
-PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad);
-PAC5XXX_RAMFUNC void motor_set_pole_pairs(uint8_t pairs);
+uint8_t motor_get_pole_pairs(void);
+uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad);
+void motor_set_pole_pairs(uint8_t pairs);
 
-PAC5XXX_RAMFUNC float motor_get_phase_resistance(void);
-PAC5XXX_RAMFUNC void motor_set_phase_resistance(float R);
+float motor_get_phase_resistance(void);
+void motor_set_phase_resistance(float R);
 
-PAC5XXX_RAMFUNC float motor_get_phase_inductance(void);
-PAC5XXX_RAMFUNC void motor_set_phase_inductance(float L);
+float motor_get_phase_inductance(void);
+void motor_set_phase_inductance(float L);
 
-PAC5XXX_RAMFUNC void motor_set_phase_R_and_L(float R, float L);
+void motor_set_phase_R_and_L(float R, float L);
 
-PAC5XXX_RAMFUNC float motor_get_I_cal(void);
-PAC5XXX_RAMFUNC void motor_set_I_cal(float I);
+float motor_get_I_cal(void);
+void motor_set_I_cal(float I);
 
-PAC5XXX_RAMFUNC bool motor_phases_swapped(void);
-PAC5XXX_RAMFUNC void motor_set_phases_swapped(bool swapped);
+bool motor_phases_swapped(void);
+void motor_set_phases_swapped(bool swapped);
 
-PAC5XXX_RAMFUNC bool motor_get_calibrated(void);
+bool motor_get_calibrated(void);
 
-PAC5XXX_RAMFUNC bool motor_get_is_gimbal(void);
-PAC5XXX_RAMFUNC void motor_set_is_gimbal(bool gimbal);
+bool motor_get_is_gimbal(void);
+void motor_set_is_gimbal(bool gimbal);
 
-PAC5XXX_RAMFUNC float motor_get_user_offset(void);
-PAC5XXX_RAMFUNC void motor_set_user_offset(float offset);
+float motor_get_user_offset(void);
+void motor_set_user_offset(float offset);
 
-PAC5XXX_RAMFUNC int8_t motor_get_user_direction(void);
-PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir);
+int8_t motor_get_user_direction(void);
+void motor_set_user_direction(int8_t dir);
 
-PAC5XXX_RAMFUNC uint8_t motor_get_errors(void);
-PAC5XXX_RAMFUNC uint8_t *motor_get_error_ptr(void);
+uint8_t motor_get_errors(void);
+uint8_t *motor_get_error_ptr(void);
 
 MotorConfig *motor_get_config(void);
 void motor_restore_config(MotorConfig *config_);

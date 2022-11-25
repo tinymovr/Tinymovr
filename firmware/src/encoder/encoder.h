@@ -49,18 +49,18 @@ typedef struct
 void encoder_init(void);
 void encoder_reset(void);
 
-PAC5XXX_RAMFUNC int16_t encoder_get_angle(void);
-PAC5XXX_RAMFUNC void encoder_update(bool check_error);
+int16_t encoder_get_angle(void);
+void encoder_update(bool check_error);
 
-PAC5XXX_RAMFUNC uint16_t encoder_get_ticks(void);
-PAC5XXX_RAMFUNC float encoder_ticks_to_eangle(void);
+uint16_t encoder_get_ticks(void);
+float encoder_ticks_to_eangle(void);
 
-PAC5XXX_RAMFUNC EncoderType encoder_get_type(void);
+EncoderType encoder_get_type(void);
 void encoder_set_type(EncoderType enc_type);
 
-PAC5XXX_RAMFUNC bool encoder_get_calibrated(void);
+bool encoder_get_calibrated(void);
 
-PAC5XXX_RAMFUNC uint8_t encoder_get_errors(void);
+uint8_t encoder_get_errors(void);
 
 EncoderConfig* encoder_get_config(void);
 void encoder_restore_config(EncoderConfig* config_);

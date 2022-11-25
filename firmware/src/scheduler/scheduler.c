@@ -134,17 +134,17 @@ void Wdt_IRQHandler(void)
     PAC55XX_WWDT->WWDTFLAG.IF = 1;
 }
 
-PAC5XXX_RAMFUNC uint32_t Scheduler_GetTotalCycles(void)
+TM_RAMFUNC uint32_t Scheduler_GetTotalCycles(void)
 {
     return state.total_cycles;
 }
 
-PAC5XXX_RAMFUNC uint32_t Scheduler_GetBusyCycles(void)
+TM_RAMFUNC uint32_t Scheduler_GetBusyCycles(void)
 {
     return state.busy_cycles;
 }
 
-PAC5XXX_RAMFUNC uint8_t scheduler_get_errors(void)
+TM_RAMFUNC uint8_t scheduler_get_errors(void)
 {
 	return state.errors;
 }

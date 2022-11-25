@@ -34,10 +34,10 @@ typedef struct
 
 void hall_init(void);
 
-PAC5XXX_RAMFUNC uint8_t hall_get_errors(void);
-PAC5XXX_RAMFUNC int16_t hall_get_angle(void);
-PAC5XXX_RAMFUNC void hall_update(bool check_error);
-PAC5XXX_RAMFUNC uint8_t hall_get_sector(void);
+uint8_t hall_get_errors(void);
+int16_t hall_get_angle(void);
+void hall_update(bool check_error);
+uint8_t hall_get_sector(void);
 
 void hall_clear_sector_map(void);
 void hall_set_sector_map_calibrated(void);

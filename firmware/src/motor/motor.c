@@ -82,7 +82,7 @@ void motor_reset_calibration()
 	config.phases_swapped = false;
 }
 
-PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad)
+TM_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad)
 {
 	const float mpos_diff = our_fabsf(mpos_end - mpos_start);
 	float mpos_diff_rad = TWOPI * mpos_diff / ticks;
@@ -99,12 +99,12 @@ PAC5XXX_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, 
 	return found;
 }
 
-PAC5XXX_RAMFUNC uint8_t motor_get_pole_pairs(void)
+TM_RAMFUNC uint8_t motor_get_pole_pairs(void)
 {
 	return config.pole_pairs;
 }
 
-PAC5XXX_RAMFUNC void motor_set_pole_pairs(uint8_t pairs)
+TM_RAMFUNC void motor_set_pole_pairs(uint8_t pairs)
 {
 	if (pairs > 1u)
 	{
@@ -113,12 +113,12 @@ PAC5XXX_RAMFUNC void motor_set_pole_pairs(uint8_t pairs)
 	}
 }
 
-PAC5XXX_RAMFUNC float motor_get_phase_resistance(void)
+TM_RAMFUNC float motor_get_phase_resistance(void)
 {
 	return config.phase_resistance;
 }
 
-PAC5XXX_RAMFUNC void motor_set_phase_resistance(float R)
+TM_RAMFUNC void motor_set_phase_resistance(float R)
 {
 	if ((R > MIN_PHASE_RESISTANCE) && ((R < MAX_PHASE_RESISTANCE) || motor_get_is_gimbal()))
 	{
@@ -131,12 +131,12 @@ PAC5XXX_RAMFUNC void motor_set_phase_resistance(float R)
 	}
 }
 
-PAC5XXX_RAMFUNC float motor_get_phase_inductance(void)
+TM_RAMFUNC float motor_get_phase_inductance(void)
 {
 	return config.phase_inductance;
 }
 
-PAC5XXX_RAMFUNC void motor_set_phase_inductance(float L)
+TM_RAMFUNC void motor_set_phase_inductance(float L)
 {
 	if ((L > MIN_PHASE_INDUCTANCE) && ((L < MAX_PHASE_INDUCTANCE) || motor_get_is_gimbal()))
 	{
@@ -149,7 +149,7 @@ PAC5XXX_RAMFUNC void motor_set_phase_inductance(float L)
 	}
 }
 
-PAC5XXX_RAMFUNC void motor_set_phase_R_and_L(float R, float L)
+TM_RAMFUNC void motor_set_phase_R_and_L(float R, float L)
 {
 	if ((R > MIN_PHASE_RESISTANCE) && ((R < MAX_PHASE_RESISTANCE) || motor_get_is_gimbal()))
 	{
@@ -167,12 +167,12 @@ PAC5XXX_RAMFUNC void motor_set_phase_R_and_L(float R, float L)
 	}
 }
 
-PAC5XXX_RAMFUNC float motor_get_I_cal(void)
+TM_RAMFUNC float motor_get_I_cal(void)
 {
 	return config.I_cal;
 }
 
-PAC5XXX_RAMFUNC void motor_set_I_cal(float I)
+TM_RAMFUNC void motor_set_I_cal(float I)
 {
 	if (I > 0)
 	{
@@ -180,47 +180,47 @@ PAC5XXX_RAMFUNC void motor_set_I_cal(float I)
 	}
 }
 
-PAC5XXX_RAMFUNC bool motor_phases_swapped(void)
+TM_RAMFUNC bool motor_phases_swapped(void)
 {
 	return config.phases_swapped;
 }
 
-PAC5XXX_RAMFUNC void motor_set_phases_swapped(bool swapped)
+TM_RAMFUNC void motor_set_phases_swapped(bool swapped)
 {
 	config.phases_swapped = swapped;
 }
 
-PAC5XXX_RAMFUNC bool motor_get_calibrated(void)
+TM_RAMFUNC bool motor_get_calibrated(void)
 {
 	return config.resistance_calibrated && config.inductance_calibrated && config.poles_calibrated;
 }
 
-PAC5XXX_RAMFUNC bool motor_get_is_gimbal(void)
+TM_RAMFUNC bool motor_get_is_gimbal(void)
 {
 	return config.is_gimbal;
 }
 
-PAC5XXX_RAMFUNC void motor_set_is_gimbal(bool gimbal)
+TM_RAMFUNC void motor_set_is_gimbal(bool gimbal)
 {
 	config.is_gimbal = gimbal;
 }
 
-PAC5XXX_RAMFUNC float motor_get_user_offset(void)
+TM_RAMFUNC float motor_get_user_offset(void)
 {
 	return config.user_offset;
 }
 
-PAC5XXX_RAMFUNC void motor_set_user_offset(float offset)
+TM_RAMFUNC void motor_set_user_offset(float offset)
 {
 	config.user_offset = offset;
 }
 
-PAC5XXX_RAMFUNC int8_t motor_get_user_direction(void)
+TM_RAMFUNC int8_t motor_get_user_direction(void)
 {
 	return config.user_direction;
 }
 
-PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir)
+TM_RAMFUNC void motor_set_user_direction(int8_t dir)
 {
 	if ((dir == -1) || (dir == 1))
 	{
@@ -228,12 +228,12 @@ PAC5XXX_RAMFUNC void motor_set_user_direction(int8_t dir)
 	}
 }
 
-PAC5XXX_RAMFUNC uint8_t motor_get_errors(void)
+TM_RAMFUNC uint8_t motor_get_errors(void)
 {
 	return state.errors;
 }
 
-PAC5XXX_RAMFUNC uint8_t *motor_get_error_ptr(void)
+TM_RAMFUNC uint8_t *motor_get_error_ptr(void)
 {
 	return &(state.errors);
 }

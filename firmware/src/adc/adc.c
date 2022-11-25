@@ -216,12 +216,12 @@ void ADC_DTSE_Init(void)
     pac5xxx_dtse_seq_config(18, ADC0, 0, ADC_IRQ0_EN, SEQ_END); // Get result at DTSERES18, Interrupt
 }
 
-PAC5XXX_RAMFUNC int16_t adc_get_mcu_temp(void)
+TM_RAMFUNC int16_t adc_get_mcu_temp(void)
 {
     return adc_state.temp;
 }
 
-PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc)
+TM_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc)
 {
     phc->A = adc_state.I_phase_meas.A;
     if (motor_phases_swapped())
@@ -236,7 +236,7 @@ PAC5XXX_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc)
     }
 }
 
-PAC5XXX_RAMFUNC void ADC_update(void)
+TM_RAMFUNC void ADC_update(void)
 {
     if (gate_driver_is_enabled() == true)
     {

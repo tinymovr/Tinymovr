@@ -29,26 +29,26 @@ struct GateDriver_
 };
 
 void GateDriver_Init(void);
-PAC5XXX_RAMFUNC void gate_driver_enable(void);
-PAC5XXX_RAMFUNC void gate_driver_disable(void);
-PAC5XXX_RAMFUNC bool gate_driver_is_enabled(void);
-PAC5XXX_RAMFUNC void gate_driver_set_duty_cycle(struct FloatTriplet *dc);
+void gate_driver_enable(void);
+void gate_driver_disable(void);
+bool gate_driver_is_enabled(void);
+void gate_driver_set_duty_cycle(struct FloatTriplet *dc);
 
 
 //=============================================
 // Motor Driver Duty Cycle Macro Functions
 //=============================================
-PAC5XXX_RAMFUNC static inline void m1_u_set_duty(float duty)
+static inline void m1_u_set_duty(float duty)
 {
     uint16_t val = ((uint16_t)(duty * (timer_freq_hz/PWM_FREQ_HZ) )) >>1;
     PAC55XX_TIMERA->CCTR4.CTR = val;
 }
-PAC5XXX_RAMFUNC static inline void m1_v_set_duty(float duty)
+static inline void m1_v_set_duty(float duty)
 {
     uint16_t val = ((uint16_t)(duty * (timer_freq_hz/PWM_FREQ_HZ) )) >>1;
     PAC55XX_TIMERA->CCTR5.CTR = val;
 }
-PAC5XXX_RAMFUNC static inline void m1_w_set_duty(float duty)
+static inline void m1_w_set_duty(float duty)
 {
     uint16_t val = ((uint16_t)(duty * (timer_freq_hz/PWM_FREQ_HZ) )) >>1;
     PAC55XX_TIMERA->CCTR6.CTR = val;

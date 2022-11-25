@@ -34,22 +34,22 @@ void ma7xx_init(void)
     ma7xx_update(false);
 }
 
-PAC5XXX_RAMFUNC uint8_t ma7xx_get_errors(void)
+TM_RAMFUNC uint8_t ma7xx_get_errors(void)
 {
     return state.errors;
 }
 
-PAC5XXX_RAMFUNC void ma7xx_send_angle_cmd(void)
+TM_RAMFUNC void ma7xx_send_angle_cmd(void)
 {
 	ssp_write_one(PRIMARY_ENCODER_SSP_STRUCT, MA_CMD_ANGLE);
 }
 
-PAC5XXX_RAMFUNC int16_t ma7xx_get_angle_raw(void)
+TM_RAMFUNC int16_t ma7xx_get_angle_raw(void)
 {
     return state.angle;
 }
 
-PAC5XXX_RAMFUNC int16_t ma7xx_get_angle_rectified(void)
+TM_RAMFUNC int16_t ma7xx_get_angle_rectified(void)
 {
     const int16_t angle = state.angle;
     const int16_t off_1 = config.rec_table[angle>>ECN_BITS];
@@ -58,7 +58,7 @@ PAC5XXX_RAMFUNC int16_t ma7xx_get_angle_rectified(void)
 	return angle + off_interp;
 }
 
-PAC5XXX_RAMFUNC void ma7xx_update(bool check_error)
+TM_RAMFUNC void ma7xx_update(bool check_error)
 {
     const int16_t angle = ssp_read_one(PRIMARY_ENCODER_SSP_STRUCT) >> 3;
 

@@ -98,7 +98,7 @@ void system_init(void)
     SysTick_Config(150000); // TODO: Use var
 }
 
-PAC5XXX_RAMFUNC void system_update(void)
+TM_RAMFUNC void system_update(void)
 {
     state.Vbus += config.Vbus_D * (((float)PAC55XX_ADC->DTSERES4.VAL) * VBUS_SCALING_FACTOR - state.Vbus);
     if (state.Vbus < VBUS_LOW_THRESHOLD)
@@ -113,22 +113,22 @@ void system_reset(void)
                                 pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
 }
 
-PAC5XXX_RAMFUNC float system_get_Vbus(void)
+TM_RAMFUNC float system_get_Vbus(void)
 {
     return state.Vbus;
 }
 
-PAC5XXX_RAMFUNC bool system_get_calibrated(void)
+TM_RAMFUNC bool system_get_calibrated(void)
 {
     return motor_get_calibrated() & encoder_get_calibrated();
 }
 
-PAC5XXX_RAMFUNC uint8_t system_get_errors(void)
+TM_RAMFUNC uint8_t system_get_errors(void)
 {
     return state.errors;
 }
 
-PAC5XXX_RAMFUNC bool errors_exist(void)
+TM_RAMFUNC bool errors_exist(void)
 {
     return (controller_get_errors() | 
             encoder_get_errors() | 

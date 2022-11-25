@@ -16,24 +16,24 @@ void hall_init(void)
     pac5xxx_tile_register_write(ADDR_CFGAIO9, AIO6789_IO_MODE | AIO_INPUT);
 }
 
-PAC5XXX_RAMFUNC uint8_t hall_get_errors(void)
+TM_RAMFUNC uint8_t hall_get_errors(void)
 {
     return state.errors;
 }
 
-PAC5XXX_RAMFUNC int16_t hall_get_angle(void)
+TM_RAMFUNC int16_t hall_get_angle(void)
 {
     return state.angle;
 }
 
-PAC5XXX_RAMFUNC void hall_update(bool check_error)
+TM_RAMFUNC void hall_update(bool check_error)
 {
     const uint8_t sector = (pac5xxx_tile_register_read(ADDR_DINSIG1) >> 1) & 0x07;
     state.sector = sector;
     state.angle = config.sector_map[state.sector];
 }
 
-PAC5XXX_RAMFUNC uint8_t hall_get_sector(void)
+TM_RAMFUNC uint8_t hall_get_sector(void)
 {
     return state.sector;
 }

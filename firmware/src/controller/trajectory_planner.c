@@ -1,4 +1,5 @@
 
+#include <src/common.h>
 #include <src/system/system.h>
 #include <src/controller/controller.h>
 #include <src/can/can_endpoints.h>
@@ -281,12 +282,12 @@ bool planner_set_deltat_dec(float deltat_dec)
 	return false;
 }
 
-PAC5XXX_RAMFUNC uint8_t planner_get_errors(void)
+TM_RAMFUNC uint8_t planner_get_errors(void)
 {
 	return state.errors;
 }
 
-PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan)
+TM_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan)
 {
 	// We assume that t is zero at the start of trajectory
 	bool response = true;
