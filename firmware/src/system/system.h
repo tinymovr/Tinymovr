@@ -18,7 +18,7 @@
 #ifndef SYSTEM_SYSTEM_H_
 #define SYSTEM_SYSTEM_H_
 
-#include "src/common.h"
+#include <src/common.h>
 #define CLKREF_FREQ_HZ              (4000000)
 #define FRCLK_FREQ_HZ               CLKREF_FREQ_HZ
 
@@ -33,17 +33,17 @@ typedef struct {
 } SystemConfig;
 
 void system_init(void);
-PAC5XXX_RAMFUNC void system_update(void);
+void system_update(void);
 void system_reset(void);
 
-PAC5XXX_RAMFUNC inline uint32_t system_get_uid(void)
+inline uint32_t system_get_uid(void)
 {
     return PAC55XX_INFO1->UNIQUEID[0] ^ PAC55XX_INFO1->UNIQUEID[1] ^ PAC55XX_INFO1->UNIQUEID[2];
 }
 
-PAC5XXX_RAMFUNC float system_get_Vbus(void);
-PAC5XXX_RAMFUNC bool system_get_calibrated(void);
-PAC5XXX_RAMFUNC uint8_t system_get_errors(void);
-PAC5XXX_RAMFUNC bool errors_exist(void);
+float system_get_Vbus(void);
+bool system_get_calibrated(void);
+uint8_t system_get_errors(void);
+bool errors_exist(void);
 
 #endif /* SYSTEM_SYSTEM_H_ */

@@ -155,7 +155,7 @@ void Controller_ControlLoop(void)
     }
 }
 
-PAC5XXX_RAMFUNC void CLControlStep(void)
+TM_RAMFUNC void CLControlStep(void)
 {
     if (state.mode >= CTRL_TRAJECTORY)
     {
@@ -302,12 +302,12 @@ PAC5XXX_RAMFUNC void CLControlStep(void)
 }
 
 
-PAC5XXX_RAMFUNC ControlState controller_get_state(void)
+TM_RAMFUNC ControlState controller_get_state(void)
 {
     return state.state;
 }
 
-PAC5XXX_RAMFUNC void controller_set_state(ControlState new_state)
+TM_RAMFUNC void controller_set_state(ControlState new_state)
 {
     if ((new_state != state.state) && (false == state.is_calibrating))
     {
@@ -331,12 +331,12 @@ PAC5XXX_RAMFUNC void controller_set_state(ControlState new_state)
     }
 }
 
-PAC5XXX_RAMFUNC ControlMode controller_get_mode(void)
+TM_RAMFUNC ControlMode controller_get_mode(void)
 {
     return state.mode;
 }
 
-PAC5XXX_RAMFUNC void controller_set_mode(ControlMode new_mode)
+TM_RAMFUNC void controller_set_mode(ControlMode new_mode)
 {
     if (new_mode != state.mode)
     {
@@ -359,69 +359,69 @@ PAC5XXX_RAMFUNC void controller_set_mode(ControlMode new_mode)
     }
 }
 
-PAC5XXX_RAMFUNC float controller_get_pos_setpoint_user_frame(void)
+TM_RAMFUNC float controller_get_pos_setpoint_user_frame(void)
 {
     return (state.pos_setpoint - motor_get_user_offset()) * motor_get_user_direction();
 }
 
-PAC5XXX_RAMFUNC void controller_set_pos_setpoint_user_frame(float value)
+TM_RAMFUNC void controller_set_pos_setpoint_user_frame(float value)
 {
     // direction is either 1 or -1 so we can multiply instead of divide
     state.pos_setpoint = value * motor_get_user_direction() + motor_get_user_offset();
 }
 
-PAC5XXX_RAMFUNC float controller_get_vel_setpoint_user_frame(void)
+TM_RAMFUNC float controller_get_vel_setpoint_user_frame(void)
 {
     return state.vel_setpoint * motor_get_user_direction();
 }
 
-PAC5XXX_RAMFUNC void controller_set_vel_setpoint_user_frame(float value)
+TM_RAMFUNC void controller_set_vel_setpoint_user_frame(float value)
 {
     // direction is either 1 or -1 so we can multiply instead of divide
     state.vel_setpoint = value * motor_get_user_direction();
 }
 
-PAC5XXX_RAMFUNC float controller_get_Iq_estimate(void)
+TM_RAMFUNC float controller_get_Iq_estimate(void)
 {
     return state.Iq_est;
 }
 
-PAC5XXX_RAMFUNC float controller_get_Iq_setpoint(void)
+TM_RAMFUNC float controller_get_Iq_setpoint(void)
 {
     return state.Iq_setpoint;
 }
 
-PAC5XXX_RAMFUNC void controller_set_Iq_setpoint(float value)
+TM_RAMFUNC void controller_set_Iq_setpoint(float value)
 {
     state.Iq_setpoint = value;
 }
 
-PAC5XXX_RAMFUNC float controller_get_Iq_estimate_user_frame(void)
+TM_RAMFUNC float controller_get_Iq_estimate_user_frame(void)
 {
     return state.Iq_est * motor_get_user_direction();
 }
 
-PAC5XXX_RAMFUNC float controller_get_Iq_setpoint_user_frame(void)
+TM_RAMFUNC float controller_get_Iq_setpoint_user_frame(void)
 {
     return state.Iq_setpoint * motor_get_user_direction();
 }
 
-PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value)
+TM_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value)
 {
     state.Iq_setpoint = value * motor_get_user_direction();
 }
 
-PAC5XXX_RAMFUNC float controller_get_Id_setpoint_user_frame(void)
+TM_RAMFUNC float controller_get_Id_setpoint_user_frame(void)
 {
     return state.Id_setpoint;
 }
 
-PAC5XXX_RAMFUNC float controller_get_Vq_setpoint_user_frame(void)
+TM_RAMFUNC float controller_get_Vq_setpoint_user_frame(void)
 {
     return state.Vq_setpoint * motor_get_user_direction();
 }
 
-PAC5XXX_RAMFUNC float controller_set_pos_vel_setpoints(float pos_setpoint, float vel_setpoint)
+TM_RAMFUNC float controller_set_pos_vel_setpoints(float pos_setpoint, float vel_setpoint)
 {
     controller_set_pos_setpoint_user_frame(pos_setpoint);
     controller_set_vel_setpoint_user_frame(vel_setpoint);
@@ -605,7 +605,7 @@ static inline bool Controller_LimitVelocity(float min_limit, float max_limit, fl
     return our_clampc(I, Imin, Imax);
 }
 
-PAC5XXX_RAMFUNC void controller_update_I_gains(void)
+TM_RAMFUNC void controller_update_I_gains(void)
 {
     config.I_gain = config.I_bw * motor_get_phase_inductance();
     float plant_pole = motor_get_phase_resistance() / motor_get_phase_inductance();
@@ -613,12 +613,12 @@ PAC5XXX_RAMFUNC void controller_update_I_gains(void)
     config.Id_integrator_gain = config.Iq_integrator_gain;
 }
 
-PAC5XXX_RAMFUNC uint8_t controller_get_warnings(void)
+TM_RAMFUNC uint8_t controller_get_warnings(void)
 {
     return state.warnings;
 }
 
-PAC5XXX_RAMFUNC uint8_t controller_get_errors(void)
+TM_RAMFUNC uint8_t controller_get_errors(void)
 {
     return state.errors;
 }

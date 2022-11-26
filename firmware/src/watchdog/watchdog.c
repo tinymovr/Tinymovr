@@ -46,12 +46,12 @@ void Watchdog_init(void)
     Watchdog_set_timeout_cycles(wwdt_freq);
 }
 
-PAC5XXX_RAMFUNC bool Watchdog_triggered(void)
+TM_RAMFUNC bool Watchdog_triggered(void)
 {
     return watchdog.triggered;
 }
 
-PAC5XXX_RAMFUNC void Watchdog_reset(void)
+TM_RAMFUNC void Watchdog_reset(void)
 {
     watchdog.triggered = false;
     PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_WRITE_AVALABLE;

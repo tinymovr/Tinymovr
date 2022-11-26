@@ -152,7 +152,7 @@ void CAN_restore_config(CANConfig *config_)
     config = *config_;
 }
 
-PAC5XXX_RAMFUNC void CAN_task(void) {
+TM_RAMFUNC void CAN_task(void) {
     // Transmit heartbeat
     const uint32_t msg_diff = msTicks - state.last_msg_ms;
     if (msg_diff >= config.heartbeat_period && PAC55XX_CAN->SR.TBS != 0)

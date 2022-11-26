@@ -56,11 +56,11 @@ typedef enum {
 
 void ma7xx_init(void);
 
-PAC5XXX_RAMFUNC uint8_t ma7xx_get_errors(void);
-PAC5XXX_RAMFUNC void ma7xx_send_angle_cmd(void);
-PAC5XXX_RAMFUNC int16_t ma7xx_get_angle_raw(void);
-PAC5XXX_RAMFUNC int16_t ma7xx_get_angle_rectified(void);
-PAC5XXX_RAMFUNC void ma7xx_update(bool check_error);
+uint8_t ma7xx_get_errors(void);
+void ma7xx_send_angle_cmd(void);
+int16_t ma7xx_get_angle_raw(void);
+int16_t ma7xx_get_angle_rectified(void);
+void ma7xx_update(bool check_error);
 
 void ma7xx_clear_rec_table(void);
 void ma7xx_set_rec_calibrated(void);

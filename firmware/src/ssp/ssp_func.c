@@ -776,7 +776,7 @@ void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t cph, uint8_t cpol)
 ///     others: Some error occurs.
 ///
 //==============================================================================
-PAC5XXX_RAMFUNC uint32_t ssp_write_one(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t data)
+TM_RAMFUNC uint32_t ssp_write_one(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t data)
 {
     uint32_t result = PAC5XXX_OK;
     uint32_t wait_tick = 0;
@@ -814,7 +814,7 @@ PAC5XXX_RAMFUNC uint32_t ssp_write_one(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t da
 ///     others: Some error occurs.
 ///
 //==============================================================================
-PAC5XXX_RAMFUNC uint32_t ssp_write_multi(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t *data_p, uint32_t byte_num)
+TM_RAMFUNC uint32_t ssp_write_multi(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t *data_p, uint32_t byte_num)
 {
     uint16_t *data = data_p;
 
@@ -844,7 +844,7 @@ PAC5XXX_RAMFUNC uint32_t ssp_write_multi(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t 
     return result;
 }
 
-PAC5XXX_RAMFUNC uint16_t ssp_read_one(PAC55XX_SSP_TYPEDEF *ssp_ptr)
+TM_RAMFUNC uint16_t ssp_read_one(PAC55XX_SSP_TYPEDEF *ssp_ptr)
 {
     // Might be worth adding a timeout
     while (!ssp_ptr->STAT.RNE) {};

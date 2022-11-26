@@ -73,8 +73,8 @@ bool planner_set_deltat_tot(float deltat_tot);
 float planner_get_deltat_dec(void);
 bool planner_set_deltat_dec(float deltat_dec);
 
-PAC5XXX_RAMFUNC uint8_t planner_get_errors(void);
+uint8_t planner_get_errors(void);
 
-PAC5XXX_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan);
+bool planner_evaluate(float t, MotionPlan *plan);
 
 #endif /* CONTROLLER_TRAJECTORY_PLANNER_H_ */

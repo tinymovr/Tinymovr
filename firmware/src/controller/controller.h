@@ -83,11 +83,11 @@ typedef struct
 
 void Controller_ControlLoop(void);
 
-PAC5XXX_RAMFUNC ControlState controller_get_state(void);
-PAC5XXX_RAMFUNC void controller_set_state(ControlState new_state);
+ControlState controller_get_state(void);
+void controller_set_state(ControlState new_state);
 
-PAC5XXX_RAMFUNC ControlMode controller_get_mode(void);
-PAC5XXX_RAMFUNC void controller_set_mode(ControlMode mode);
+ControlMode controller_get_mode(void);
+void controller_set_mode(ControlMode mode);
 
 inline void controller_calibrate(void) {controller_set_state(STATE_CALIBRATE);}
 inline void controller_idle(void) {controller_set_state(STATE_IDLE);}
@@ -95,23 +95,23 @@ inline void controller_position_mode(void) {controller_set_mode(CTRL_POSITION);c
 inline void controller_velocity_mode(void) {controller_set_mode(CTRL_VELOCITY);controller_set_state(STATE_CL_CONTROL);}
 inline void controller_current_mode(void) {controller_set_mode(CTRL_CURRENT);controller_set_state(STATE_CL_CONTROL);}
 
-PAC5XXX_RAMFUNC float controller_get_pos_setpoint_user_frame(void);
-PAC5XXX_RAMFUNC void controller_set_pos_setpoint_user_frame(float value);
-PAC5XXX_RAMFUNC float controller_get_vel_setpoint_user_frame(void);
-PAC5XXX_RAMFUNC void controller_set_vel_setpoint_user_frame(float value);
+float controller_get_pos_setpoint_user_frame(void);
+void controller_set_pos_setpoint_user_frame(float value);
+float controller_get_vel_setpoint_user_frame(void);
+void controller_set_vel_setpoint_user_frame(float value);
 
-PAC5XXX_RAMFUNC float controller_get_Iq_estimate(void);
-PAC5XXX_RAMFUNC float controller_get_Iq_setpoint(void);
-PAC5XXX_RAMFUNC void controller_set_Iq_setpoint(float value);
+float controller_get_Iq_estimate(void);
+float controller_get_Iq_setpoint(void);
+void controller_set_Iq_setpoint(float value);
 
-PAC5XXX_RAMFUNC float controller_get_Iq_estimate_user_frame(void);
-PAC5XXX_RAMFUNC float controller_get_Iq_setpoint_user_frame(void);
-PAC5XXX_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value);
-PAC5XXX_RAMFUNC float controller_get_Id_setpoint_user_frame(void);
+float controller_get_Iq_estimate_user_frame(void);
+float controller_get_Iq_setpoint_user_frame(void);
+void controller_set_Iq_setpoint_user_frame(float value);
+float controller_get_Id_setpoint_user_frame(void);
 
-PAC5XXX_RAMFUNC float controller_get_Vq_setpoint_user_frame(void);
+float controller_get_Vq_setpoint_user_frame(void);
 
-PAC5XXX_RAMFUNC float controller_set_pos_vel_setpoints(float pos_setpoint, float vel_setpoint);
+float controller_set_pos_vel_setpoints(float pos_setpoint, float vel_setpoint);
 
 void controller_get_modulation_values(struct FloatTriplet *dc);
 
@@ -144,10 +144,10 @@ void controller_set_max_Ibrake(float value);
 
 void controller_set_motion_plan(MotionPlan mp);
 
-PAC5XXX_RAMFUNC void controller_update_I_gains(void);
+void controller_update_I_gains(void);
 
-PAC5XXX_RAMFUNC uint8_t controller_get_warnings(void);
-PAC5XXX_RAMFUNC uint8_t controller_get_errors(void);
+uint8_t controller_get_warnings(void);
+uint8_t controller_get_errors(void);
 
 ControllerConfig *Controller_GetConfig(void);
 void Controller_RestoreConfig(ControllerConfig *config_);

@@ -43,15 +43,15 @@ typedef struct
 void observer_init(void);
 void observer_reset(void);
 
-PAC5XXX_RAMFUNC void observer_update(void);
-PAC5XXX_RAMFUNC float observer_get_pos_estimate(void);
-PAC5XXX_RAMFUNC float observer_get_diff(float target);
-PAC5XXX_RAMFUNC float observer_get_vel_estimate(void);
-PAC5XXX_RAMFUNC float observer_get_epos(void);
-PAC5XXX_RAMFUNC float observer_get_evel(void);
+void observer_update(void);
+float observer_get_pos_estimate(void);
+float observer_get_diff(float target);
+float observer_get_vel_estimate(void);
+float observer_get_epos(void);
+float observer_get_evel(void);
 
-PAC5XXX_RAMFUNC float observer_get_pos_estimate_user_frame(void);
-PAC5XXX_RAMFUNC float observer_get_vel_estimate_user_frame(void);
+float observer_get_pos_estimate_user_frame(void);
+float observer_get_vel_estimate_user_frame(void);
 
 float observer_get_bw(void);
 void observer_set_bw(float bw);

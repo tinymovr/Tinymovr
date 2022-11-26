@@ -62,6 +62,14 @@
 #define PAC5XXX_ERROR 1
 #endif
 
+#if defined(DEBUG)
+#define TM_RAMFUNC
+#elif defined (NDEBUG)
+#define TM_RAMFUNC PAC5XXX_RAMFUNC
+#else
+#error "Unknown debug configuration"
+#endif
+
 #define PI (3.141592f)
 #define TWOPI (6.283185f)
 #define INVTWOPI (0.159155f)

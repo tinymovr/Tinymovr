@@ -43,12 +43,12 @@ void encoder_reset(void)
     state.reset_encoder_ptr();
 }
 
-PAC5XXX_RAMFUNC int16_t encoder_get_angle(void)
+TM_RAMFUNC int16_t encoder_get_angle(void)
 {
     return state.get_angle_ptr();
 }
 
-PAC5XXX_RAMFUNC void encoder_update(bool check_error)
+TM_RAMFUNC void encoder_update(bool check_error)
 {
     if (state.update_angle_ptr)
     {
@@ -56,12 +56,12 @@ PAC5XXX_RAMFUNC void encoder_update(bool check_error)
     }
 }
 
-PAC5XXX_RAMFUNC uint16_t encoder_get_ticks(void)
+TM_RAMFUNC uint16_t encoder_get_ticks(void)
 {
     return state.ticks;
 }
 
-PAC5XXX_RAMFUNC float encoder_ticks_to_eangle()
+TM_RAMFUNC float encoder_ticks_to_eangle()
 {
 #ifdef BOARD_REV_R5
     // We need to derive this during call, because the motor pole pairs
@@ -81,12 +81,12 @@ EncoderType encoder_get_type(void)
     return state.current_encoder_type;
 }
 
-PAC5XXX_RAMFUNC bool encoder_get_calibrated(void)
+TM_RAMFUNC bool encoder_get_calibrated(void)
 {
     return state.get_calibrated_ptr();
 }
 
-PAC5XXX_RAMFUNC void encoder_set_type(EncoderType enc_type)
+TM_RAMFUNC void encoder_set_type(EncoderType enc_type)
 {
 #ifdef BOARD_REV_R5
     if (ENCODER_MA7XX == enc_type)
@@ -102,7 +102,7 @@ PAC5XXX_RAMFUNC void encoder_set_type(EncoderType enc_type)
 #endif
 }
 
-PAC5XXX_RAMFUNC uint8_t encoder_get_errors(void)
+TM_RAMFUNC uint8_t encoder_get_errors(void)
 {
     return state.get_error_ptr();
 }

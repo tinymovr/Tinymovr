@@ -102,15 +102,15 @@ OBJECTS := $(addprefix $(BUILDDIR)/,$(CSOURCES:%.c=%.o)) $(addprefix $(BUILDDIR)
 all: release
 
 # Debug target
-debug: CFLAGS += -DDEBUG -g1 -O1
-debug: CPPFLAGS += -DDEBUG -g1 -O1
+debug: CFLAGS += -DDEBUG -g2 -O1
+debug: CPPFLAGS += -DDEBUG -g2 -O1
 debug: LDFLAGS += -O1
 debug: OBJECTS += $(BUILDDIR)/bootloader.o
 debug: binary
 
 # Upgrade target
-upgrade: CFLAGS += -g0 -O3
-upgrade: CPPFLAGS += -g0 -O3
+upgrade: CFLAGS += -DNDEBUG -g0 -O3
+upgrade: CPPFLAGS += -DNDEBUG -g0 -O3
 upgrade: LDFLAGS += -O3
 upgrade: binary
 
