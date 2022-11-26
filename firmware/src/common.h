@@ -66,6 +66,7 @@
 #define TM_RAMFUNC
 #elif defined (NDEBUG)
 #define TM_RAMFUNC PAC5XXX_RAMFUNC
+// We'll also define PAC5XXX_DRIVER_TILE_RAM in the Makefile
 #else
 #error "Unknown debug configuration"
 #endif

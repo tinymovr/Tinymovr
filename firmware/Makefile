@@ -109,8 +109,8 @@ debug: OBJECTS += $(BUILDDIR)/bootloader.o
 debug: binary
 
 # Upgrade target
-upgrade: CFLAGS += -DNDEBUG -g0 -O3
-upgrade: CPPFLAGS += -DNDEBUG -g0 -O3
+upgrade: CFLAGS += -DNDEBUG -DPAC5XXX_DRIVER_TILE_RAM -DPAC5XXX_DRIVER_SOCBRIDGE_RAM -g0 -O3
+upgrade: CPPFLAGS += -DNDEBUG -DPAC5XXX_DRIVER_TILE_RAM -DPAC5XXX_DRIVER_SOCBRIDGE_RAM -g0 -O3
 upgrade: LDFLAGS += -O3
 upgrade: binary
 
