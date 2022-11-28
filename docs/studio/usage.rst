@@ -2,22 +2,31 @@
 Studio Usage
 ************
 
-Overview
-########
+.. |cli| raw:: html
+
+   <span style="padding:3px 10px;margin: 10px auto; background:#85dff1; border-radius: 12px; font-family: sans-serif; font-size: 14px;">CLI</span>
+
+.. |gui| raw:: html
+
+   <span style="padding:3px 10px;margin: 10px auto; background:#85f1df; border-radius: 12px; font-family: sans-serif; font-size: 14px;">GUI</span>
+
 
 Tinymovr Studio is a cross-platform GUI application, CLI application, and Python library that offers easy access to all of Tinymovr's functionality.
 
+This documentation page includes examples both for the |gui| as well as the |cli| apps. 
 
-Launching the GUI app
-#####################
+
+Launching Studio
+################
+
+|gui|
 
 .. code-block:: console
 
     tinymovr
 
 
-Launching the CLI app
-#####################
+|cli|
 
 .. code-block:: console
 
@@ -30,9 +39,18 @@ By default Tinymovr Studio searches for slcan-compatible CAN bus adapters, which
 
 For instance, to work with adapters using the `CANine firmware <https://github.com/tinymovr/CANine>`_, launch Tinymovr Studio as follows:
 
+|gui|
+
 .. code-block:: console
 
     tinymovr --bus=canine
+
+
+|cli|
+
+.. code-block:: console
+
+    tinymovr_cli --bus=canine
 
 Note that you need to have completed `setting up CANine <https://canine.readthedocs.io/en/latest/canine.html#canine-firmware>`_ before issuing the above command to work with CANine.
 
@@ -42,8 +60,10 @@ Compatibility
 Tinymovr Studio includes by default a checksum comparison to determine protocol compatibility between firmware and studio version. This is performed each time a node is discovered, and prior to initializing the tinymovr object. If you see a compatibility-related message, please upgrade to the latest studio and firmware versions. 
 
 
-Issuing Commands
-################
+Issuing Commands in CLI
+#######################
+
+|cli|
 
 You can read/write variables and issue commands using the respective Tinymovr handle, e.g.:
 
@@ -67,7 +87,9 @@ In order for multiple Tinymovr instances to coexist in the same CAN network, the
 
 1. Connect a single Tinymovr to the bus and launch Studio. The board will be assigned the default ID, 1, and will be accessible as tm1.
 
-2. Issue the id change
+2. |gui| Change the ID
+
+2. |cli| Change the ID
 
 .. code-block:: python
 
@@ -75,9 +97,11 @@ In order for multiple Tinymovr instances to coexist in the same CAN network, the
 
 where x is the desired ID. You can assign IDs in the range 1-1024.
 
-3. Relaunch Studio
+3. Relaunch Studio. The board will be discovered with the new ID.
 
-4. The board will be discovered with the new ID. Save configuration.
+4. |gui| Save configuration.
+
+4. |cli| Save configuration.
 
 .. code-block:: python
 
@@ -100,9 +124,17 @@ The --bus option specifies a CAN bus type to use.
 
 Example:
 
+|gui|
+
 .. code-block:: console
 
-    tinymovr --bus=socketcan
+    tinymovr --bus=canine
+
+|cli|
+
+.. code-block:: console
+
+    tinymovr_cli --bus=canine
 
 All interfaces offered by python-can are supported.
 
@@ -114,9 +146,17 @@ The --chan options specifies a channel to use, optionally together with the --bu
 
 Example:
 
+|gui|
+
 .. code-block:: console
 
-    tinymovr --bustype=socketcan --chan=CAN0
+    tinymovr --bus=socketcan --chan=CAN0
+
+|cli|
+
+.. code-block:: console
+
+    tinymovr_cli --bus=socketcan --chan=CAN0
 
 By default, Tinymovr Studio will use slcan as the interface, and will search for CANAble/CANtact-type devices with slcan firmware. Such is the CANine adapter supplied with Tinymovr Servo Kits.
 
@@ -126,7 +166,19 @@ Units
 
 Tinymovr Studio introduced physical units and quantities since v0.3.0. Units are introduced through the `Pint <https://pypi.org/project/Pint/>`_ package. Using units you will see all values that you query associated with a unit, which forms a physical quantity.
 
-With units, you can do the following:
+|gui|
+
+In the GUI, units are displayed by default in any quantity that supports them. For instance:
+
+
+
+You can set any quantity supporting units by specifying the desired compatible unit next to the quantity you want to set. For instance, to set the position setpoint:
+
+
+
+|cli|
+
+In the CLI, units are displayed whenever a quantity that supports them is printed:
 
 .. code-block:: python
 
@@ -177,7 +229,15 @@ Socketcan & Linux
 
 You can use a socketcan-enabled CAN adapter with Tinymovr Studio. The CANine adapter supplied with Tinymovr Servo Kits supports Socketcan natively with the alternative Candlelight Firmware. To connect to a Socketcan device, run Studio as follows:
 
+|gui|
+
 .. code-block:: console
 
     tinymovr --bustype=socketcan --chan=CAN0
+
+|cli|
+
+.. code-block:: console
+
+    tinymovr_cli --bustype=socketcan --chan=CAN0
 
