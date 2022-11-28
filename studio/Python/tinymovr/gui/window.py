@@ -14,6 +14,7 @@ from PySide2.QtWidgets import (
     QLabel,
     QTreeWidget,
     QTreeWidgetItem,
+    QPushButton
 )
 import pyqtgraph as pg
 from tinymovr.constants import app_name
@@ -42,7 +43,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(app_name)
         self.tree_widget = QTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
-        self.tree_widget.itemDoubleClicked.connect(self.double_click)
+        #self.tree_widget.itemDoubleClicked.connect(self.double_click)
         self.tree_widget.setHeaderLabels(["Attribute", "Value"])
 
         self.status_label = QLabel()
@@ -179,8 +180,11 @@ class MainWindow(QMainWindow):
                 }
             except AttributeError:
                 # Must be a RemoteFunction then
+                button = QPushButton("Call")
                 widget._tm_function = node
-                widget.setIcon(1, load_icon("call.png"))
+                button._tm_function = node
+                self.tree_widget.setItemWidget(widget, 1, button)
+                button.clicked.connect(self.function_call_clicked)
         return widget
 
     @QtCore.Slot()
@@ -246,7 +250,7 @@ class MainWindow(QMainWindow):
         )
 
     @QtCore.Slot()
-    def double_click(self, item, column):
+    def function_call_clicked(self, item, column):
         if 1 == column:
             if (
                 hasattr(item, "_tm_attribute")
