@@ -1,5 +1,6 @@
 
 import time
+import functools
 import pint
 from PySide2 import QtCore
 from PySide2.QtCore import Signal
@@ -149,10 +150,19 @@ class MainWindow(QMainWindow):
         """
         self.attribute_widgets_by_id = {}
         self.tree_widget.clear()
+        all_items = []
         for name, node in tms_by_id.items():
-            self.tree_widget.addTopLevelItem(
-                self.parse_node(node, name)
-            )
+            widget, items_list = self.parse_node(node, name)
+            self.tree_widget.addTopLevelItem(widget)
+            all_items.extend(items_list)
+        for item in all_items:
+            if hasattr(item, "_tm_function"):
+                button = QPushButton("")
+                button._tm_function = item._tm_function
+                button.setStyleSheet("background-color: #ededef; border-radius: 4px; margin: 0 0 1px 0; ")
+                button.setIcon(load_icon("call.png"))
+                self.tree_widget.setItemWidget(item, 1, button)
+                button.clicked.connect(functools.partial(self.function_call_clicked, item._tm_function))
         header = self.tree_widget.header()
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
         header.setStretchLastSection(False)
@@ -160,12 +170,13 @@ class MainWindow(QMainWindow):
     def parse_node(self, node, name):
         widget = QTreeWidgetItem([name, 0, ""])
         widget._orig_flags = widget.flags()
+        all_items = []
         try:
             # Let's assume it's a RemoteNode
             for attr_name, attr in node.remote_attributes.items():
-                widget.addChild(
-                    self.parse_node(attr, attr_name)
-                )
+                items, items_list = self.parse_node(attr, attr_name)
+                widget.addChild(items)
+                all_items.extend(items_list)
         except AttributeError:
             # Maybe a RemoteAttribute
             try:
@@ -178,14 +189,12 @@ class MainWindow(QMainWindow):
                     "node": node,
                     "widget": widget,
                 }
+                all_items.append(widget)
             except AttributeError:
                 # Must be a RemoteFunction then
-                button = QPushButton("Call")
                 widget._tm_function = node
-                button._tm_function = node
-                self.tree_widget.setItemWidget(widget, 1, button)
-                button.clicked.connect(self.function_call_clicked)
-        return widget
+                all_items.append(widget)
+        return widget, all_items
 
     @QtCore.Slot()
     def item_changed(self, item):
@@ -250,19 +259,5 @@ class MainWindow(QMainWindow):
         )
 
     @QtCore.Slot()
-    def function_call_clicked(self, item, column):
-        if 1 == column:
-            if (
-                hasattr(item, "_tm_attribute")
-                and hasattr(item._tm_attribute, "setter_name")
-                and None != item._tm_attribute.setter_name
-            ):
-                item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
-                item._editing = True
-            else:
-                try:
-                    item._tm_function()
-                except AttributeError:
-                    pass
-        elif int(item._orig_flags) != int(item.flags()):
-            item.setFlags(item._orig_flags)
+    def function_call_clicked(self, f):
+        f()
