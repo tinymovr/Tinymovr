@@ -92,12 +92,15 @@ class Worker(QObject):
         node.name = node_name
         node.include_base_name = True
         self.dynamic_attrs = self.get_dynamic_attrs(self.tms_by_id)
-        self.regen.emit(self.tms_by_id)
+        self.force_regen()
 
     def node_disappeared(self, name):
         node_name = "{}{}".format(base_node_name, name)
         del self.tms_by_id[node_name]
         self.dynamic_attrs = self.get_dynamic_attrs(self.tms_by_id)
+        self.force_regen()
+
+    def force_regen(self):
         self.regen.emit(self.tms_by_id)
 
     @QtCore.Slot(dict)

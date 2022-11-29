@@ -1,4 +1,3 @@
-
 import time
 import functools
 import pint
@@ -15,7 +14,7 @@ from PySide2.QtWidgets import (
     QLabel,
     QTreeWidget,
     QTreeWidgetItem,
-    QPushButton
+    QPushButton,
 )
 import pyqtgraph as pg
 from tinymovr.constants import app_name
@@ -44,7 +43,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(app_name)
         self.tree_widget = QTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
-        #self.tree_widget.itemDoubleClicked.connect(self.double_click)
+        # self.tree_widget.itemDoubleClicked.connect(self.double_click)
         self.tree_widget.setHeaderLabels(["Attribute", "Value"])
 
         self.status_label = QLabel()
@@ -79,7 +78,7 @@ class MainWindow(QMainWindow):
         main_widget.setMinimumHeight(600)
         self.setCentralWidget(main_widget)
 
-        #pg.setConfigOptions(antialias=True)
+        # pg.setConfigOptions(antialias=True)
         self.graphs_by_id = {}
 
         buses = arguments["--bus"].rsplit(sep=",")
@@ -90,11 +89,7 @@ class MainWindow(QMainWindow):
             params = get_bus_config(buses)
             params["bitrate"] = bitrate
         else:
-            params = {
-                "bustype": buses[0],
-                "channel": channel,
-                "bitrate": bitrate
-            }
+            params = {"bustype": buses[0], "channel": channel, "bitrate": bitrate}
 
         self.thread = QtCore.QThread()
         self.worker = Worker(params, self.logger)
@@ -128,7 +123,7 @@ class MainWindow(QMainWindow):
         """
         graph_widget = pg.PlotWidget(title=attr.full_name)
         pi = graph_widget.getPlotItem()
-        pi.skipFiniteCheck=True
+        pi.skipFiniteCheck = True
         if attr.unit:
             pi.setLabel(axis="left", text=attr.name, units=f"{attr.unit}")
         else:
@@ -159,10 +154,14 @@ class MainWindow(QMainWindow):
             if hasattr(item, "_tm_function"):
                 button = QPushButton("")
                 button._tm_function = item._tm_function
-                button.setStyleSheet("background-color: #ededef; border-radius: 4px; margin: 0 0 1px 0; ")
+                button.setStyleSheet(
+                    "background-color: #ededef; border-radius: 4px; margin: 0 0 1px 0; "
+                )
                 button.setIcon(load_icon("call.png"))
                 self.tree_widget.setItemWidget(item, 1, button)
-                button.clicked.connect(functools.partial(self.function_call_clicked, item._tm_function))
+                button.clicked.connect(
+                    functools.partial(self.function_call_clicked, item._tm_function)
+                )
         header = self.tree_widget.header()
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
         header.setStretchLastSection(False)
@@ -248,7 +247,7 @@ class MainWindow(QMainWindow):
                 else:
                     y.append(val)
                 data_line.setData(x, y)
-                #graph_info["widget"].getPlotItem().setXRange(x[0], x[-1])
+                # graph_info["widget"].getPlotItem().setXRange(x[0], x[-1])
                 graph_info["widget"].update()
         self.status_label.setText(
             "{:.1f}Hz\t CH:{:.0f}%\t RT:{:.1f}ms".format(
@@ -261,3 +260,9 @@ class MainWindow(QMainWindow):
     @QtCore.Slot()
     def function_call_clicked(self, f):
         f()
+        try:
+            if f.meta["reload_data"]:
+                time.sleep(0.1)
+                self.worker.force_regen()
+        except KeyError:
+            pass
