@@ -63,11 +63,17 @@ class Worker(QObject):
         for attr in self.active_attrs:
             vals[attr.full_name] = self.get_value_meas(attr)
         start_time = time.time()
+        self.dynamic_attrs.sort(
+            key=lambda attr: self.dynamic_attrs_last_update[attr.full_name]
+            if attr.full_name in self.dynamic_attrs_last_update
+            else 0
+        )
         for attr in self.dynamic_attrs:
-            try:
-                t = self.dynamic_attrs_last_update[attr.full_name]
-            except KeyError:
-                t = 0
+            t = (
+                self.dynamic_attrs_last_update[attr.full_name]
+                if attr.full_name in self.dynamic_attrs_last_update
+                else 0
+            )
             if (attr.full_name not in vals) and (
                 start_time - t > self.dynamic_attrs_update_period
             ):
