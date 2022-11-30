@@ -43,7 +43,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(app_name)
         self.tree_widget = QTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
-        # self.tree_widget.itemDoubleClicked.connect(self.double_click)
+        self.tree_widget.itemDoubleClicked.connect(self.double_click)
         self.tree_widget.setHeaderLabels(["Attribute", "Value"])
 
         self.status_label = QLabel()
@@ -264,3 +264,16 @@ class MainWindow(QMainWindow):
                 self.worker.force_regen()
         except KeyError:
             pass
+
+    @QtCore.Slot()
+    def double_click(self, item, column):
+        if (
+            column == 1
+            and hasattr(item, "_tm_attribute")
+            and hasattr(item._tm_attribute, "setter_name")
+            and item._tm_attribute.setter_name != None
+        ):
+            item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+            item._editing = True
+        elif int(item._orig_flags) != int(item.flags()):
+            item.setFlags(item._orig_flags)
