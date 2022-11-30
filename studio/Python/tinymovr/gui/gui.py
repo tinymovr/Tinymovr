@@ -15,7 +15,7 @@ import sys
 import pkg_resources
 from docopt import docopt
 from PySide2.QtWidgets import QApplication
-from tinymovr.gui import MainWindow
+from tinymovr.gui import MainWindow, app_stylesheet
 from tinymovr.constants import app_name
 
 
@@ -44,6 +44,7 @@ def spawn():
     version = pkg_resources.require("tinymovr")[0].version
     arguments = docopt(__doc__, version=app_name + " " + str(version))
     app = QApplication(sys.argv)
+    app.setStyleSheet(app_stylesheet)
     w = MainWindow(app, arguments)
     w.show()
     sys.exit(app.exec_())

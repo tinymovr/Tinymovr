@@ -21,7 +21,7 @@ from tinymovr.constants import app_name
 from tinymovr.channel import ResponseError as ChannelResponseError
 from tinymovr.config import get_bus_config, configure_logging
 from avlos import get_registry
-from tinymovr.gui import Worker, format_value, load_icon, QButton_style
+from tinymovr.gui import Worker, format_value, load_icon
 
 
 class MainWindow(QMainWindow):
@@ -154,7 +154,6 @@ class MainWindow(QMainWindow):
             if hasattr(item, "_tm_function"):
                 button = QPushButton("")
                 button._tm_function = item._tm_function
-                button.setStyleSheet(QButton_style)
                 button.setIcon(load_icon("call.png"))
                 self.tree_widget.setItemWidget(item, 1, button)
                 button.clicked.connect(
