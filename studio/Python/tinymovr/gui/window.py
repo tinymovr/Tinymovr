@@ -132,7 +132,8 @@ class MainWindow(QMainWindow):
         pi.setLabel(axis="bottom", text="time", units="sec")
         x = []
         y = []
-        data_line = graph_widget.plot(x, y, pen=pg.mkPen(width=1.00))
+        data_line = pg.PlotCurveItem(x, y, pen=pg.mkPen(width=1.00))
+        graph_widget.addItem(data_line)
         return {
             "widget": graph_widget,
             "data": {"x": x, "y": y},
