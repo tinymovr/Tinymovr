@@ -4,6 +4,22 @@ import pint
 from PySide2 import QtGui
 
 
+QButton_style = """
+QPushButton {
+    background-color: #ededef;
+    border-radius: 4px; 
+    margin: 0 0 1px 0;
+}
+QPushButton:pressed {
+    background-color: #cdcdcf;
+    border-style: inset;
+}
+QPushButton:hover:!pressed
+{
+  background-color: #eaeaec;
+}
+"""
+
 def format_value(value, include_unit=True):
     if isinstance(value, enum.IntFlag):
         return str(value) if value > 0 else "(no flags)"
