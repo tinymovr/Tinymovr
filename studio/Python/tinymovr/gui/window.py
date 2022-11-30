@@ -1,5 +1,5 @@
-
 import time
+import functools
 import pint
 from PySide2 import QtCore
 from PySide2.QtCore import Signal
@@ -14,6 +14,7 @@ from PySide2.QtWidgets import (
     QLabel,
     QTreeWidget,
     QTreeWidgetItem,
+    QPushButton,
 )
 import pyqtgraph as pg
 from tinymovr.constants import app_name
@@ -64,7 +65,7 @@ class MainWindow(QMainWindow):
         self.right_layout.setSpacing(0)
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_frame.setLayout(self.right_layout)
-        self.right_frame.setMinimumWidth(820)
+        #self.right_frame.setMinimumWidth(820)
 
         main_layout = QHBoxLayout()
         main_layout.addWidget(self.left_frame)
@@ -77,7 +78,7 @@ class MainWindow(QMainWindow):
         main_widget.setMinimumHeight(600)
         self.setCentralWidget(main_widget)
 
-        #pg.setConfigOptions(antialias=True)
+        # pg.setConfigOptions(antialias=True)
         self.graphs_by_id = {}
 
         buses = arguments["--bus"].rsplit(sep=",")
@@ -88,11 +89,7 @@ class MainWindow(QMainWindow):
             params = get_bus_config(buses)
             params["bitrate"] = bitrate
         else:
-            params = {
-                "bustype": buses[0],
-                "channel": channel,
-                "bitrate": bitrate
-            }
+            params = {"bustype": buses[0], "channel": channel, "bitrate": bitrate}
 
         self.thread = QtCore.QThread()
         self.worker = Worker(params, self.logger)
@@ -125,8 +122,9 @@ class MainWindow(QMainWindow):
         object and related data container.
         """
         graph_widget = pg.PlotWidget(title=attr.full_name)
+        graph_widget.setMinimumWidth(800)
         pi = graph_widget.getPlotItem()
-        pi.skipFiniteCheck=True
+        pi.skipFiniteCheck = True
         if attr.unit:
             pi.setLabel(axis="left", text=attr.name, units=f"{attr.unit}")
         else:
@@ -134,7 +132,8 @@ class MainWindow(QMainWindow):
         pi.setLabel(axis="bottom", text="time", units="sec")
         x = []
         y = []
-        data_line = graph_widget.plot(x, y, pen=pg.mkPen(width=1.00))
+        data_line = pg.PlotCurveItem(x, y, pen=pg.mkPen(width=1.00))
+        graph_widget.addItem(data_line)
         return {
             "widget": graph_widget,
             "data": {"x": x, "y": y},
@@ -148,10 +147,20 @@ class MainWindow(QMainWindow):
         """
         self.attribute_widgets_by_id = {}
         self.tree_widget.clear()
+        all_items = []
         for name, node in tms_by_id.items():
-            self.tree_widget.addTopLevelItem(
-                self.parse_node(node, name)
-            )
+            widget, items_list = self.parse_node(node, name)
+            self.tree_widget.addTopLevelItem(widget)
+            all_items.extend(items_list)
+        for item in all_items:
+            if hasattr(item, "_tm_function"):
+                button = QPushButton("")
+                button._tm_function = item._tm_function
+                button.setIcon(load_icon("call.png"))
+                self.tree_widget.setItemWidget(item, 1, button)
+                button.clicked.connect(
+                    functools.partial(self.function_call_clicked, item._tm_function)
+                )
         header = self.tree_widget.header()
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
         header.setStretchLastSection(False)
@@ -159,12 +168,13 @@ class MainWindow(QMainWindow):
     def parse_node(self, node, name):
         widget = QTreeWidgetItem([name, 0, ""])
         widget._orig_flags = widget.flags()
+        all_items = []
         try:
             # Let's assume it's a RemoteNode
             for attr_name, attr in node.remote_attributes.items():
-                widget.addChild(
-                    self.parse_node(attr, attr_name)
-                )
+                items, items_list = self.parse_node(attr, attr_name)
+                widget.addChild(items)
+                all_items.extend(items_list)
         except AttributeError:
             # Maybe a RemoteAttribute
             try:
@@ -177,11 +187,12 @@ class MainWindow(QMainWindow):
                     "node": node,
                     "widget": widget,
                 }
+                all_items.append(widget)
             except AttributeError:
                 # Must be a RemoteFunction then
                 widget._tm_function = node
-                widget.setIcon(1, load_icon("call.png"))
-        return widget
+                all_items.append(widget)
+        return widget, all_items
 
     @QtCore.Slot()
     def item_changed(self, item):
@@ -235,7 +246,7 @@ class MainWindow(QMainWindow):
                 else:
                     y.append(val)
                 data_line.setData(x, y)
-                #graph_info["widget"].getPlotItem().setXRange(x[0], x[-1])
+                # graph_info["widget"].getPlotItem().setXRange(x[0], x[-1])
                 graph_info["widget"].update()
         self.status_label.setText(
             "{:.1f}Hz\t CH:{:.0f}%\t RT:{:.1f}ms".format(
@@ -246,19 +257,24 @@ class MainWindow(QMainWindow):
         )
 
     @QtCore.Slot()
+    def function_call_clicked(self, f):
+        f()
+        try:
+            if f.meta["reload_data"]:
+                time.sleep(0.1)
+                self.worker.force_regen()
+        except KeyError:
+            pass
+
+    @QtCore.Slot()
     def double_click(self, item, column):
-        if 1 == column:
-            if (
-                hasattr(item, "_tm_attribute")
-                and hasattr(item._tm_attribute, "setter_name")
-                and None != item._tm_attribute.setter_name
-            ):
-                item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
-                item._editing = True
-            else:
-                try:
-                    item._tm_function()
-                except AttributeError:
-                    pass
+        if (
+            column == 1
+            and hasattr(item, "_tm_attribute")
+            and hasattr(item._tm_attribute, "setter_name")
+            and item._tm_attribute.setter_name != None
+        ):
+            item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+            item._editing = True
         elif int(item._orig_flags) != int(item.flags()):
             item.setFlags(item._orig_flags)
