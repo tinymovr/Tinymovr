@@ -65,7 +65,7 @@ class MainWindow(QMainWindow):
         self.right_layout.setSpacing(0)
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_frame.setLayout(self.right_layout)
-        self.right_frame.setMinimumWidth(820)
+        #self.right_frame.setMinimumWidth(820)
 
         main_layout = QHBoxLayout()
         main_layout.addWidget(self.left_frame)
@@ -122,6 +122,7 @@ class MainWindow(QMainWindow):
         object and related data container.
         """
         graph_widget = pg.PlotWidget(title=attr.full_name)
+        graph_widget.setMinimumWidth(800)
         pi = graph_widget.getPlotItem()
         pi.skipFiniteCheck = True
         if attr.unit:
