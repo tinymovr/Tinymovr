@@ -27,6 +27,7 @@ bool nvm_save_config(void)
 {
 	bool commited = false;
 	uint8_t data[sizeof(struct NVMStruct)];
+	s.adc_config = *ADC_get_config();
 	s.motor_config = *motor_get_config();
 	s.hall_config = *hall_get_config();
 	s.ma7xx_config = *ma7xx_get_config();
@@ -57,6 +58,7 @@ bool nvm_load_config(void)
 	strlcpy(static_version, GIT_VERSION, sizeof(static_version));
 	if (strcmp(s.version, static_version) == 0)
 	{
+		ADC_restore_config(&s.adc_config);
 		motor_restore_config(&s.motor_config);
 		hall_restore_config(&s.hall_config);
 		ma7xx_restore_config(&s.ma7xx_config);
