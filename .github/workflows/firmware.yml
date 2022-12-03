@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   check-and-build-fw:
-    runs-on: 'ubuntu-20.04'
+    runs-on: 'ubuntu-22.04'
     strategy:
       matrix:
         board-revision: [R32, R33, R5]
