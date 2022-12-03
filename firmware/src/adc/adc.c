@@ -254,7 +254,7 @@ TM_RAMFUNC void ADC_update(void)
         adc_state.I_phase_meas.B = ((1.0f - I_FILTER_K) * i_b) - (I_FILTER_K * (i_a + i_c));
         adc_state.I_phase_meas.C = ((1.0f - I_FILTER_K) * i_c) - (I_FILTER_K * (i_a + i_b));
 
-        default:
+        default: break;
     }
     
     // Internal MCU temperature sensor reading at FTTEMP temperature in ADC counts.
