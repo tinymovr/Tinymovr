@@ -13,35 +13,35 @@ remote_attributes:
   - name: Vbus
     dtype: float
     unit: volt
-    dynamic_value: True
+    meta: {dynamic: True}
     getter_name: system_get_Vbus
     summary: The measured bus voltage.
   - name: Ibus
     dtype: float
     unit: ampere
-    dynamic_value: True
+    meta: {dynamic: True}
     getter_name: controller_get_Ibus_est
     summary: The estimated bus current. Only estimates current drawn by motor.
   - name: power
     dtype: float
     unit: watt
-    dynamic_value: True
+    meta: {dynamic: True}
     getter_name: controller_get_power_est
     summary: The estimated power. Only estimates power drawn by motor.
   - name: temp
     dtype: float
     unit: degC
-    dynamic_value: True
+    meta: {dynamic: True}
     getter_name: adc_get_mcu_temp
     summary: The internal temperature of the PAC55xx MCU.
   - name: calibrated
     dtype: bool
-    dynamic_value: True
+    meta: {dynamic: True}
     getter_name: system_get_calibrated
     summary: Whether the system has been calibrated.
   - name: errors
     flags: [UNDERVOLTAGE, DRIVER_FAULT]
-    dynamic_value: True
+    meta: {dynamic: True}
     getter_name: system_get_errors
     summary: Any system errors, as a bitmask
   - name: save_config
@@ -54,49 +54,51 @@ remote_attributes:
     caller_name: nvm_erase
     dtype: void
     arguments: []
+    meta: {reload_data: True}
   - name: reset
     summary: Reset the device.
     caller_name: system_reset
     dtype: void
     arguments: []
+    meta: {reload_data: True}
   - name: scheduler
     remote_attributes:
       - name: total
         dtype: uint32
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: Scheduler_GetTotalCycles
         summary: Total processor cycles in a single PWM cycle.
       - name: busy
         dtype: uint32
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: Scheduler_GetBusyCycles
         summary: Busy processor cycles in a single PWM cycle.
       - name: errors
         flags: [CONTROL_BLOCK_REENTERED]
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: controller_get_errors
         summary: Any scheduler errors, as a bitmask
   - name: controller
     remote_attributes:
       - name: state
         dtype: uint8
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: controller_get_state
         setter_name: controller_set_state
         summary: The state of the controller.
       - name: mode
         dtype: uint8
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: controller_get_mode
         setter_name: controller_set_mode
         summary: The control mode of the controller.
       - name: warnings
-        dynamic_value: True
+        meta: {dynamic: True}
         flags: [VELOCITY_LIMITED, CURRENT_LIMITED, MODULATION_LIMITED]
         getter_name: controller_get_warnings
         summary: Any controller warnings, as a bitmask
       - name: errors
-        dynamic_value: True
+        meta: {dynamic: True}
         flags: [CURRENT_LIMIT_EXCEEDED]
         getter_name: controller_get_errors
         summary: Any controller errors, as a bitmask
@@ -160,7 +162,7 @@ remote_attributes:
           - name: Id_setpoint
             dtype: float
             unit: ampere
-            dynamic_value: True
+            meta: {dynamic: True}
             getter_name: controller_get_Id_setpoint_user_frame
             summary: The Id setpoint.
           - name: Iq_limit
@@ -172,7 +174,7 @@ remote_attributes:
           - name: Iq_estimate
             dtype: float
             unit: ampere
-            dynamic_value: True
+            meta: {dynamic: True}
             getter_name: controller_get_Iq_estimate_user_frame
             summary: The Iq estimate.
           - name: bandwidth
@@ -202,7 +204,7 @@ remote_attributes:
           - name: Vq_setpoint
             dtype: float
             unit: volt
-            dynamic_value: True
+            meta: {dynamic: True}
             getter_name: controller_get_Vq_setpoint_user_frame
             summary: The Vq setpoint.
       - name: calibrate
@@ -259,20 +261,20 @@ remote_attributes:
       - name: R
         dtype: float
         unit: ohm
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: motor_get_phase_resistance
         setter_name: motor_set_phase_resistance
         summary: The motor Resistance value.
       - name: L
         dtype: float
         unit: henry
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: motor_get_phase_inductance
         setter_name: motor_set_phase_inductance
         summary: The motor Inductance value.
       - name: pole_pairs
         dtype: uint8
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: motor_get_pole_pairs
         setter_name: motor_set_pole_pairs
         summary: The motor pole pair count.
@@ -294,7 +296,7 @@ remote_attributes:
         summary: User-defined direction of the motor.
       - name: calibrated
         dtype: bool
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: motor_get_calibrated
         summary: Whether the motor has been calibrated.
       - name: I_cal
@@ -305,7 +307,7 @@ remote_attributes:
         summary: The calibration current.
       - name: errors
         flags: [PHASE_RESISTANCE_OUT_OF_RANGE, PHASE_INDUCTANCE_OUT_OF_RANGE,INVALID_POLE_PAIRS]
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: motor_get_errors
         summary: Any motor/calibration errors, as a bitmask
       # - name: phase_currents
@@ -330,13 +332,13 @@ remote_attributes:
       - name: position_estimate
         dtype: float
         unit: ticks
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: observer_get_pos_estimate
         summary: The filtered encoder position estimate.
       - name: velocity_estimate
         dtype: float
         unit: ticks/second
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: observer_get_vel_estimate
         summary: The filtered encoder velocity estimate.
       - name: type
@@ -353,12 +355,12 @@ remote_attributes:
         summary: The encoder observer bandwidth.
       - name: calibrated
         dtype: bool
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: encoder_get_calibrated
         summary: Whether the encoder has been calibrated.
       - name: errors
         flags: [CALIBRATION_FAILED, READING_UNSTABLE]
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: encoder_get_errors
         summary: Any encoder errors, as a bitmask
   - name: traj_planner
@@ -408,7 +410,7 @@ remote_attributes:
         summary: Whether the watchdog is enabled or not.
       - name: triggered
         dtype: bool
-        dynamic_value: True
+        meta: {dynamic: True}
         getter_name: Watchdog_triggered
         summary: Whether the watchdog has been triggered or not.
       - name: timeout
