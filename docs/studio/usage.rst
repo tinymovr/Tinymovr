@@ -25,12 +25,19 @@ Launching Studio
 
     tinymovr
 
+.. image:: gui_plot.png
+  :width: 680
+  :alt: Tinymovr Studio GUI with plot
 
 |cli|
 
 .. code-block:: console
 
     tinymovr_cli
+
+.. image:: cli.png
+  :width: 680
+  :alt: Tinymovr Studio CLI
 
 Alternative Adapters/Firmwares
 ##############################
@@ -89,6 +96,10 @@ In order for multiple Tinymovr instances to coexist in the same CAN network, the
 
 2. |gui| Change the ID
 
+.. image:: change_id.png
+  :width: 300
+  :alt: Change CAN bus node ID using the GUI
+
 2. |cli| Change the ID
 
 .. code-block:: python
@@ -100,6 +111,10 @@ where x is the desired ID. You can assign IDs in the range 1-1024.
 3. Relaunch Studio. The board will be discovered with the new ID.
 
 4. |gui| Save configuration.
+
+.. image:: save_config.png
+  :width: 300
+  :alt: Save configuration using the GUI
 
 4. |cli| Save configuration.
 
@@ -170,11 +185,11 @@ Tinymovr Studio introduced physical units and quantities since v0.3.0. Units are
 
 In the GUI, units are displayed by default in any quantity that supports them. For instance:
 
-
+.. image:: gui_command.png
+  :width: 300
+  :alt: Change CAN bus node ID using the GUI
 
 You can set any quantity supporting units by specifying the desired compatible unit next to the quantity you want to set. For instance, to set the position setpoint:
-
-
 
 |cli|
 
