@@ -4,15 +4,16 @@ This unit test suite tests the Watchdog functionality.
 import time
 import math
 
-from tinymovr.units import get_registry
+from avlos.unit_field import get_registry
 
 import unittest
 from tests import TMTestCase
 
 ureg = get_registry()
+A = ureg.ampere
 ticks = ureg.ticks
 s = ureg.second
-
+tsleep = 0.18
 
 class TestWatchdog(TMTestCase):
     def test_watchdog(self):
@@ -21,14 +22,21 @@ class TestWatchdog(TMTestCase):
         """
         self.check_state(0)
         self.try_calibrate()
-        self.tm.position_control()
+        
+        self.tm.watchdog.enabled = True
+        self.assertEqual(self.tm.watchdog.enabled, True)
+        self.tm.watchdog.timeout = 1.0 * s
+        self.assertEqual(self.tm.watchdog.timeout, 1.0 * s)
+        self.tm.controller.position_mode()
         self.check_state(2)
-        self.tm.set_watchdog(1, 1)
         for i in range(500):
-            self.tm.set_pos_setpoint(math.sin(i * 0.05) * 16384)
-            time.sleep(0.02)
+            self.tm.controller.position.setpoint = math.sin(i * 0.05) * 16384
+            self.assertEqual(self.tm.watchdog.triggered, False)
+            time.sleep(0.01)
         self.check_state(2)
-        time.sleep(1.5)
+        time.sleep(2.0)
+        # Watchdog should be triggered
+        #self.assertEqual(self.tm.watchdog.triggered, True)
         # Watchdog should have switched controller to idle
         self.check_state(0)
 

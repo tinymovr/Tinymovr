@@ -124,7 +124,7 @@ class Worker(QObject):
         dynamic_attrs = []
         for _, attr in attr_dict.items():
             if isinstance(attr, RemoteAttribute):
-                if attr.dynamic_value == True:
+                if "dynamic" in attr.meta and attr.meta["dynamic"] == True:
                     dynamic_attrs.append(attr)
             elif hasattr(attr, "remote_attributes"):
                 dynamic_attrs.extend(self.get_dynamic_attrs(attr.remote_attributes))

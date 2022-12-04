@@ -18,11 +18,11 @@
 #include "pac5xxx_gpio.h"
 #include "pac5xxx_can.h"
 
-#define CAN_EP_SIZE 6
+#define CAN_EP_SIZE 12
 #define CAN_EP_MASK ((1 << CAN_EP_SIZE) - 1)
-#define CAN_SEQ_SIZE 6
+#define CAN_SEQ_SIZE 9
 #define CAN_SEQ_MASK (((1 << CAN_SEQ_SIZE) - 1) << CAN_EP_SIZE)
-#define CAN_DEV_SIZE 6
+#define CAN_DEV_SIZE 8
 #define CAN_DEV_MASK (((1 << CAN_DEV_SIZE) - 1) << (CAN_EP_SIZE + CAN_SEQ_SIZE))
 
 // #define CAN_SJW_1tq             ((uint8_t)0x00)     /*!< 1 time quantum */

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <src/adc/adc.h>
 #include <src/motor/motor.h>
 #include <src/encoder/hall.h>
 #include <src/encoder/ma7xx.h>
@@ -29,6 +30,7 @@
 #define SETTINGS_PAGE_HEX (0x0001E000)
 
 struct NVMStruct {
+    ADCConfig adc_config;
     MotorConfig motor_config;
     HallConfig hall_config;
     MA7xxConfig ma7xx_config;

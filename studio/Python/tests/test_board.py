@@ -28,7 +28,6 @@ ureg = get_registry()
 A = ureg.ampere
 ticks = ureg.ticks
 s = ureg.second
-
 tsleep = 0.18
 
 
@@ -358,9 +357,8 @@ class TestBoard(TMTestCase):
         self.check_state(0)
         self.try_calibrate()
         pos_estimate_ref = self.tm.encoder.position_estimate
-        pos_estimate_comp = self.tm.controller.set_pos_vel_setpoints(0, 0)
-        self.assertAlmostEqual(pos_estimate_ref, pos_estimate_comp, delta=200)
-
+        pos_estimate_comp = self.tm.controller.set_pos_vel_setpoints(0, 0) * ticks
+        self.assertAlmostEqual(pos_estimate_ref, pos_estimate_comp, delta=200*ticks)
 
     def test_p_flux_braking(self):
         """
@@ -382,7 +380,7 @@ class TestBoard(TMTestCase):
             time.sleep(0.005)
         time.sleep(0.5)
         self.tm.controller.current.max_Ibrake = 0
-        self.assertGreater(min(I_brake_vals), -1*A)
+        self.assertGreater(min(I_brake_vals), -1 * A)
 
 
 if __name__ == "__main__":

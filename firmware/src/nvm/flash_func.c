@@ -75,10 +75,8 @@ TM_RAMFUNC void flash_erase_key(uint32_t key)
 /// @retval  None
 ///
 //==============================================================================
-#ifdef __ICCARM__                   // For IAR C Compiler, "optimize=high..." causes insertion of function calls to FLASH, which must not occur
-    _Pragma("optimize=medium")
-#elif defined(__GNUC__)
-    __attribute__((optimize("Os"))) // For GCC C Compiler, "optimize("O3") causes insertion of function calls to FLASH, which must not occur
+#if defined(__GNUC__)
+    __attribute__((optimize("-fno-tree-loop-distribute-patterns")))
 #endif
 TM_RAMFUNC void flash_write(uint8_t *p_dest, uint8_t *p_src, uint32_t size_bytes)
 {

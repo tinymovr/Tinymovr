@@ -91,11 +91,11 @@ typedef struct
 {
     int16_t temp;
     struct FloatTriplet I_phase_meas;
-    struct FloatTriplet I_phase_offset;
 } ADCState;
 
 typedef struct
 {
+    struct FloatTriplet I_phase_offset;
     float Iphase_limit;
     float I_phase_offset_tau;
     float I_phase_offset_k;
@@ -105,5 +105,8 @@ void ADC_Init(void);
 int16_t adc_get_mcu_temp(void);
 void ADC_GetPhaseCurrents(struct FloatTriplet *phc);
 void ADC_update(void);
+
+ADCConfig *ADC_get_config(void);
+void ADC_restore_config(ADCConfig *config_);
 
 #endif /* ADC_ADC_H_ */
