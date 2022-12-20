@@ -6,6 +6,9 @@ from PySide2.QtCore import Signal
 from PySide2.QtWidgets import (
     QApplication,
     QMainWindow,
+    QMenu,
+    QMenuBar,
+    QAction,
     QWidget,
     QFrame,
     QHBoxLayout,
@@ -41,6 +44,38 @@ class MainWindow(QMainWindow):
         self.attribute_widgets_by_id = {}
 
         self.setWindowTitle(app_name)
+
+        # Create a menu bar
+        self.menu_bar = QMenuBar()
+        
+        # Create menus
+        self.file_menu = QMenu("File")
+        self.edit_menu = QMenu("Edit")
+        self.view_menu = QMenu("View")
+
+        # Create menu items (actions)
+        self.export_action = QAction("Export Config...", self)
+        self.import_action = QAction("Import Config", self)
+        self.quit_action = QAction("Quit", self)
+
+        self.export_action.triggered.connect(self.on_export)
+        self.import_action.triggered.connect(self.on_import)
+        self.quit_action.triggered.connect(self.on_quit)
+
+        # Add actions to menus
+        self.file_menu.addAction(self.export_action)
+        self.file_menu.addAction(self.import_action)
+        self.file_menu.addSeparator()
+        self.file_menu.addAction(self.quit_action)
+
+        # Add menus to menu bar
+        self.menu_bar.addMenu(self.file_menu)
+        self.menu_bar.addMenu(self.edit_menu)
+        self.menu_bar.addMenu(self.view_menu)
+
+        self.setMenuBar(self.menu_bar)
+
+        # Setup the tree widget
         self.tree_widget = QTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
         self.tree_widget.itemDoubleClicked.connect(self.double_click)
@@ -65,7 +100,7 @@ class MainWindow(QMainWindow):
         self.right_layout.setSpacing(0)
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_frame.setLayout(self.right_layout)
-        #self.right_frame.setMinimumWidth(820)
+        # self.right_frame.setMinimumWidth(820)
 
         main_layout = QHBoxLayout()
         main_layout.addWidget(self.left_frame)
@@ -278,3 +313,13 @@ class MainWindow(QMainWindow):
             item._editing = True
         elif int(item._orig_flags) != int(item.flags()):
             item.setFlags(item._orig_flags)
+
+    def on_export(self):
+        pass
+
+    def on_import(self):
+        pass
+
+    def on_quit(self):
+        # Abouttoquit is called as a result of below
+        QApplication.instance().quit()
