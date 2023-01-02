@@ -8,7 +8,6 @@ remote_attributes:
     summary: The Avlos protocol hash.
   - name: uid
     dtype: uint32
-    meta: {export: True}
     getter_name: system_get_uid
     summary: The unique device ID, unique to each PAC55xx chip produced.
   - name: Vbus
@@ -193,7 +192,6 @@ remote_attributes:
             summary: The current controller bandwidth.
           - name: Iq_p_gain
             dtype: float
-            meta: {export: True}
             getter_name: controller_get_Iq_gain
             summary: The current controller proportional gain.
           - name: max_Ibus_regen
@@ -214,7 +212,7 @@ remote_attributes:
           - name: Vq_setpoint
             dtype: float
             unit: volt
-            meta: {dynamic: True, export: True}
+            meta: {dynamic: True}
             getter_name: controller_get_Vq_setpoint_user_frame
             summary: The Vq setpoint.
       - name: calibrate
