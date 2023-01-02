@@ -76,9 +76,9 @@ TM_RAMFUNC void flash_erase_key(uint32_t key)
 ///
 //==============================================================================
 #if defined(__GNUC__)
-    __attribute__((optimize("-fno-tree-loop-distribute-patterns")))
+    __attribute__((optimize("-O0")))
 #endif
-TM_RAMFUNC void flash_write(uint8_t *p_dest, uint8_t *p_src, uint32_t size_bytes)
+PAC5XXX_RAMFUNC void flash_write(uint8_t *p_dest, uint8_t *p_src, uint32_t size_bytes)
 {
     // The memory controller requires all flash writes to start on a 16-byte boundary and consist of 16 bytes in size
     // If the desired amount to be written is less than 16 bytes, this code writes the other bytes as 0xFF to preserve the contents.
