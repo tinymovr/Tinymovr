@@ -10,6 +10,7 @@ jobs:
         board-revision: [R32, R33, R5]
     steps:
     - uses: actions/checkout@v2
+    - uses: carlosperate/arm-none-eabi-gcc-action@v1
 
     - name: Set up Python 3.10
       uses: actions/setup-python@v2
