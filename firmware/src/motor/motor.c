@@ -48,7 +48,7 @@ static MotorConfig config = {
 	.user_offset = 0.0f,
 	.user_direction = 1,
 
-	.I_cal = 2.0f,
+	.I_cal = 1.2f,
 
 	.resistance_calibrated = false,
 	.inductance_calibrated = false,
