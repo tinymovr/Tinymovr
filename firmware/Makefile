@@ -72,7 +72,6 @@ CPPFLAGS += $(COMPILEFLAGS)
 LDFLAGS += $(BASEFLAGS)
 LDFLAGS += -Tpac55xx.ld
 LDFLAGS += -nostartfiles
-LDFLAGS += -specs=nosys.specs
 LDFLAGS += -Xlinker --gc-sections # optimize function and data sections produced during compile...
 # LDFLAGS += -Xlinker --print-gc-sections # ... and print relevant info
 LDFLAGS += -Xlinker -Map="$(BUILDDIR)/tinymovr.map"

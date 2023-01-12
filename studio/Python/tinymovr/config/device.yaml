@@ -112,6 +112,7 @@ remote_attributes:
             summary: The position setpoint.
           - name: p_gain
             dtype: float
+            meta: {export: True}
             getter_name: controller_get_pos_gain
             setter_name: controller_set_pos_gain
             summary: The proportional gain of the position controller.
@@ -126,28 +127,33 @@ remote_attributes:
           - name: limit
             dtype: float
             unit: tick/sec
+            meta: {export: True}
             getter_name: controller_get_vel_limit
             setter_name: controller_set_vel_limit
             summary: The velocity limit.
           - name: p_gain
             dtype: float
+            meta: {export: True}
             getter_name: controller_get_vel_gain
             setter_name: controller_set_vel_gain
             summary: The proportional gain of the velocity controller.
           - name: i_gain
             dtype: float
+            meta: {export: True}
             getter_name: controller_get_vel_integrator_gain
             setter_name: controller_set_vel_integrator_gain
             summary: The integral gain of the velocity controller.
           - name: deadband
             dtype: float
             unit: tick
+            meta: {export: True}
             getter_name: controller_get_vel_integrator_deadband
             setter_name: controller_set_vel_integrator_deadband
             rst_target: integrator-deadband
             summary: The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
           - name: increment
             dtype: float
+            meta: {export: True}
             getter_name: controller_get_vel_increment
             setter_name: controller_set_vel_increment
             summary: Max velocity setpoint increment (ramping) rate. Set to 0 to disable.
@@ -180,6 +186,7 @@ remote_attributes:
           - name: bandwidth
             dtype: float
             unit: rad/s
+            meta: {export: True}
             getter_name: controller_get_I_bw
             setter_name: controller_set_I_bw
             summary: The current controller bandwidth.
@@ -196,6 +203,7 @@ remote_attributes:
           - name: max_Ibrake
             dtype: float
             unit: ampere
+            meta: {export: True}
             getter_name: controller_get_max_Ibrake
             setter_name: controller_set_max_Ibrake
             summary: The max current allowed to be dumped to the motor windings during flux braking. Set to zero to deactivate flux braking.
@@ -247,12 +255,14 @@ remote_attributes:
       remote_attributes:
       - name: rate
         dtype: uint32
+        meta: {export: True}
         getter_name: CAN_get_kbit_rate
         setter_name: CAN_set_kbit_rate
         rst_target: api-can-rate
         summary: The baud rate of the CAN interface.
       - name: id
         dtype: uint32
+        meta: {export: True}
         getter_name: CAN_get_ID
         setter_name: CAN_set_ID
         summary: The ID of the CAN interface.
@@ -261,36 +271,39 @@ remote_attributes:
       - name: R
         dtype: float
         unit: ohm
-        meta: {dynamic: True}
+        meta: {dynamic: True, export: True}
         getter_name: motor_get_phase_resistance
         setter_name: motor_set_phase_resistance
         summary: The motor Resistance value.
       - name: L
         dtype: float
         unit: henry
-        meta: {dynamic: True}
+        meta: {dynamic: True, export: True}
         getter_name: motor_get_phase_inductance
         setter_name: motor_set_phase_inductance
         summary: The motor Inductance value.
       - name: pole_pairs
         dtype: uint8
-        meta: {dynamic: True}
+        meta: {dynamic: True, export: True}
         getter_name: motor_get_pole_pairs
         setter_name: motor_set_pole_pairs
         summary: The motor pole pair count.
       - name: type
         #values: [HIGH_CURRENT, GIMBAL]
         dtype: uint8
+        meta: {export: True}
         getter_name: motor_get_is_gimbal
         setter_name: motor_set_is_gimbal
         summary: The type of the motor. Either high current or gimbal.
       - name: offset
         dtype: float
+        meta: {export: True}
         getter_name: motor_get_user_offset
         setter_name: motor_set_user_offset
         summary: User-defined offset of the motor.
       - name: direction
         dtype: int8
+        meta: {export: True}
         getter_name: motor_get_user_direction
         setter_name: motor_set_user_direction
         summary: User-defined direction of the motor.
@@ -302,6 +315,7 @@ remote_attributes:
       - name: I_cal
         dtype: float
         unit: ampere
+        meta: {export: True}
         getter_name: motor_get_I_cal
         setter_name: motor_set_I_cal
         summary: The calibration current.
@@ -344,12 +358,14 @@ remote_attributes:
       - name: type
         #values: [INTERNAL, HALL]
         dtype: uint8
+        meta: {export: True}
         getter_name: encoder_get_type
         setter_name: encoder_set_type
         summary: The encoder type. Either INTERNAL or HALL.
       - name: bandwidth
         dtype: float
         unit: rad/s
+        meta: {export: True}
         getter_name: observer_get_bw
         setter_name: observer_set_bw
         summary: The encoder observer bandwidth.
@@ -368,18 +384,21 @@ remote_attributes:
       - name: max_accel
         dtype: float
         unit: ticks/s
+        meta: {export: True}
         getter_name: planner_get_max_accel
         setter_name: planner_set_max_accel
         summary: The trajectory planner max acceleration.
       - name: max_decel
         dtype: float
         unit: ticks/second/second
+        meta: {export: True}
         getter_name: planner_get_max_decel
         setter_name: planner_set_max_decel
         summary: The trajectory planner max deceleration.
       - name: max_vel
         dtype: float
         unit: ticks/second
+        meta: {export: True}
         getter_name: planner_get_max_vel
         setter_name: planner_set_max_vel
         summary: The trajectory planner max cruise velocity.
@@ -416,6 +435,7 @@ remote_attributes:
       - name: timeout
         dtype: float
         unit: s
+        meta: {export: True}
         getter_name: Watchdog_get_timeout_seconds
         setter_name: Watchdog_set_timeout_seconds
         summary: The watchdog timeout period.

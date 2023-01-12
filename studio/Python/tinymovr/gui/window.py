@@ -1,11 +1,33 @@
+"""
+Tinymovr GUI Window
+Copyright Ioannis Chatzikonstantinou 2020-2022
+
+The GUI Window class that subclasses QMainWindow
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>.
+"""
+
 import time
 import functools
+from contextlib import suppress
 import pint
+import json
 from PySide2 import QtCore
 from PySide2.QtCore import Signal
 from PySide2.QtWidgets import (
     QApplication,
     QMainWindow,
+    QMenu,
+    QMenuBar,
+    QAction,
     QWidget,
     QFrame,
     QHBoxLayout,
@@ -21,7 +43,15 @@ from tinymovr.constants import app_name
 from tinymovr.channel import ResponseError as ChannelResponseError
 from tinymovr.config import get_bus_config, configure_logging
 from avlos import get_registry
-from tinymovr.gui import Worker, format_value, load_icon
+from avlos.json_codec import AvlosEncoder
+from tinymovr.gui import (
+    Worker,
+    format_value,
+    load_icon,
+    display_warning,
+    display_file_open_dialog,
+    display_file_save_dialog,
+)
 
 
 class MainWindow(QMainWindow):
@@ -41,6 +71,28 @@ class MainWindow(QMainWindow):
         self.attribute_widgets_by_id = {}
 
         self.setWindowTitle(app_name)
+
+        # Create a menu bar, menus and actions
+        self.menu_bar = QMenuBar()
+
+        self.file_menu = QMenu("File")
+        # self.edit_menu = QMenu("Edit")
+        # self.view_menu = QMenu("View")
+
+        self.export_action = QAction("Export Config...", self)
+        self.import_action = QAction("Import Config", self)
+        self.export_action.triggered.connect(self.on_export)
+        self.import_action.triggered.connect(self.on_import)
+        self.file_menu.addAction(self.export_action)
+        self.file_menu.addAction(self.import_action)
+
+        self.menu_bar.addMenu(self.file_menu)
+        # self.menu_bar.addMenu(self.edit_menu)
+        # self.menu_bar.addMenu(self.view_menu)
+
+        self.setMenuBar(self.menu_bar)
+
+        # Setup the tree widget
         self.tree_widget = QTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
         self.tree_widget.itemDoubleClicked.connect(self.double_click)
@@ -65,7 +117,7 @@ class MainWindow(QMainWindow):
         self.right_layout.setSpacing(0)
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_frame.setLayout(self.right_layout)
-        #self.right_frame.setMinimumWidth(820)
+        # self.right_frame.setMinimumWidth(820)
 
         main_layout = QHBoxLayout()
         main_layout.addWidget(self.left_frame)
@@ -278,3 +330,46 @@ class MainWindow(QMainWindow):
             item._editing = True
         elif int(item._orig_flags) != int(item.flags()):
             item.setFlags(item._orig_flags)
+
+    def on_export(self):
+        selected_items = self.tree_widget.selectedItems()
+        if len(selected_items) == 0:
+            display_warning(
+                "Invalid Selection",
+                "No Tinymovr nodes selected.\nSelect a single node to export its configuration",
+            )
+        elif len(selected_items) > 1:
+            display_warning(
+                "Invalid Selection",
+                "Multiple Tinymovr nodes selected.\nSelect a single node to export its configuration",
+            )
+        else:
+            root_node = selected_items[0]._tm_attribute.root
+            values_object = root_node.export_values()
+            json_data = json.dumps(values_object, cls=AvlosEncoder)
+            file_path = display_file_save_dialog()
+            with suppress(FileNotFoundError):
+                with open(file_path, "w") as file:
+                    file.write(json_data)
+
+    def on_import(self):
+        selected_items = self.tree_widget.selectedItems()
+        if len(selected_items) == 0:
+            display_warning(
+                "Invalid Selection",
+                "No Tinymovr nodes selected.\nSelect a single node to import a configuration",
+            )
+        elif len(selected_items) > 1:
+            display_warning(
+                "Invalid Selection",
+                "Multiple Tinymovr nodes selected.\nSelect a single node to import a configuration",
+            )
+        else:
+            root_node = selected_items[0]._tm_attribute.root
+            file_path = display_file_open_dialog()
+            with suppress(FileNotFoundError):
+                with open(file_path, "r") as file:
+                    values_object = json.load(file)
+                    root_node.import_values(values_object)
+                    time.sleep(0.1)
+                    self.worker.force_regen()

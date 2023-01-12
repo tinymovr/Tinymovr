@@ -19,7 +19,7 @@
 #include <src/utils/utils.h>
 #include <src/motor/motor.h>
 
-#if defined BOARD_REV_R32 || BOARD_REV_R33 || defined BOARD_REV_R5
+#if defined BOARD_REV_R32 || defined BOARD_REV_R33 || defined BOARD_REV_R5
 
 static MotorConfig config = {
 	.pole_pairs = 7u,
@@ -48,7 +48,7 @@ static MotorConfig config = {
 	.user_offset = 0.0f,
 	.user_direction = 1,
 
-	.I_cal = 2.0f,
+	.I_cal = 1.2f,
 
 	.resistance_calibrated = false,
 	.inductance_calibrated = false,
