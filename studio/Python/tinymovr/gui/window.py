@@ -17,6 +17,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 import time
 import functools
+from contextlib import suppress
 import pint
 import json
 from PySide2 import QtCore
@@ -347,11 +348,9 @@ class MainWindow(QMainWindow):
             values_object = root_node.export_values()
             json_data = json.dumps(values_object, cls=AvlosEncoder)
             file_path = display_file_save_dialog()
-            try:
+            with suppress(FileNotFoundError):
                 with open(file_path, "w") as file:
                     file.write(json_data)
-            except FileNotFoundError:
-                pass
 
     def on_import(self):
         selected_items = self.tree_widget.selectedItems()
@@ -368,8 +367,9 @@ class MainWindow(QMainWindow):
         else:
             root_node = selected_items[0]._tm_attribute.root
             file_path = display_file_open_dialog()
-            with open(file_path, "r") as file:
-                values_object = json.load(file)
-                root_node.import_values(values_object)
-                time.sleep(0.1)
-                self.worker.force_regen()
+            with suppress(FileNotFoundError):
+                with open(file_path, "r") as file:
+                    values_object = json.load(file)
+                    root_node.import_values(values_object)
+                    time.sleep(0.1)
+                    self.worker.force_regen()
