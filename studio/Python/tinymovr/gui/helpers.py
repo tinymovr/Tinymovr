@@ -1,3 +1,4 @@
+import time
 import os
 import enum
 import pint
@@ -180,3 +181,20 @@ def magnitude_of(val):
     if isinstance(val, pint.Quantity):
         return val.magnitude
     return val
+
+
+class TimedGetter:
+
+    def __init__(self, error_handler):
+        self.error_handler = error_handler
+        self.dt = 0
+
+    def get_value(self, getter):
+        try:
+            get_start_time = time.time()
+            val = getter()
+            get_dt = time.time() - get_start_time
+            self.dt = self.dt * 0.99 + get_dt * 0.01
+            return val
+        except Exception as e:
+            self.error_handler(e)
