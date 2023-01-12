@@ -275,7 +275,7 @@ class MainWindow(QMainWindow):
             "{:.1f}Hz\t CH:{:.0f}%\t RT:{:.1f}ms".format(
                 1 / self.worker.meas_dt,
                 self.worker.load * 100,
-                self.worker.rt_dt * 1000,
+                self.worker.timed_getter.dt * 1000,
             )
         )
 
