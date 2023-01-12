@@ -1,8 +1,26 @@
+"""
+Tinymovr GUI Helpers
+Copyright Ioannis Chatzikonstantinou 2020-2022
+
+Various GUI helper functions
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>.
+"""
+
 import time
 import os
 import enum
 import pint
 from PySide2 import QtGui
+from PySide2.QtWidgets import QMessageBox, QFileDialog
 
 
 app_stylesheet = """
@@ -156,6 +174,7 @@ app_stylesheet = """
     }
 """
 
+
 def format_value(value, include_unit=True):
     if isinstance(value, enum.IntFlag):
         return str(value) if value > 0 else "(no flags)"
@@ -198,3 +217,31 @@ class TimedGetter:
             return val
         except Exception as e:
             self.error_handler(e)
+
+
+def display_warning(title, text):
+    msg_box = QMessageBox()
+    msg_box.setIcon(QMessageBox.Warning)
+    msg_box.setText(text)
+    msg_box.setWindowTitle(title)
+    msg_box.exec_()
+
+
+def display_file_open_dialog():
+    # Get the default documents directory
+    documents_dir = os.path.expanduser("~/Documents")
+    # Display the file save dialog
+    file_name, _ = QFileDialog.getOpenFileName(
+        None, "Select JSON File", "", "JSON Files (*.json)"
+    )
+    return file_name
+
+
+def display_file_save_dialog():
+    # Get the default documents directory
+    documents_dir = os.path.expanduser("~/Documents")
+    # Display the file save dialog
+    file_name, _ = QFileDialog.getSaveFileName(
+        None, "Save JSON File", documents_dir, "JSON Files (*.json)"
+    )
+    return file_name
