@@ -1,10 +1,9 @@
 import time
-import functools
+from functools import partial
 import pint
 from PySide2 import QtCore
 from PySide2.QtCore import Signal
 from PySide2.QtWidgets import (
-    QApplication,
     QMainWindow,
     QWidget,
     QFrame,
@@ -65,7 +64,6 @@ class MainWindow(QMainWindow):
         self.right_layout.setSpacing(0)
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_frame.setLayout(self.right_layout)
-        # self.right_frame.setMinimumWidth(820)
 
         main_layout = QHBoxLayout()
         main_layout.addWidget(self.left_frame)
@@ -85,7 +83,7 @@ class MainWindow(QMainWindow):
         channel = arguments["--chan"]
         bitrate = int(arguments["--bitrate"])
 
-        if not channel:
+        if channel == None:
             params = get_bus_config(buses)
             params["bitrate"] = bitrate
         else:
@@ -130,15 +128,10 @@ class MainWindow(QMainWindow):
         else:
             pi.setLabel(axis="left", text=attr.name)
         pi.setLabel(axis="bottom", text="time", units="sec")
-        x = []
-        y = []
-        data_line = pg.PlotCurveItem(x, y, pen=pg.mkPen(width=1.00))
+        data = {"x": [], "y": []}
+        data_line = pg.PlotCurveItem(data["x"], data["y"], pen=pg.mkPen(width=1.00))
         graph_widget.addItem(data_line)
-        return {
-            "widget": graph_widget,
-            "data": {"x": x, "y": y},
-            "data_line": data_line,
-        }
+        return {"widget": graph_widget, "data": data, "data_line": data_line}
 
     @QtCore.Slot()
     def regen_tree(self, tms_by_id):
@@ -158,9 +151,7 @@ class MainWindow(QMainWindow):
                 button._tm_function = item._tm_function
                 button.setIcon(load_icon("call.png"))
                 self.tree_widget.setItemWidget(item, 1, button)
-                button.clicked.connect(
-                    functools.partial(self.function_call_clicked, item._tm_function)
-                )
+                button.clicked.connect(partial(self.f_call_clicked, item._tm_function))
         header = self.tree_widget.header()
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
         header.setStretchLastSection(False)
@@ -218,7 +209,6 @@ class MainWindow(QMainWindow):
             self.attr_widgets_by_id[attr_name]["widget"].setText(1, format_value(val))
             if attr_name in self.graphs_by_id:
                 graph_info = self.graphs_by_id[attr_name]
-                data_line = graph_info["data_line"]
                 x = graph_info["data"]["x"]
                 y = graph_info["data"]["y"]
                 if len(x) >= 200:
@@ -226,7 +216,7 @@ class MainWindow(QMainWindow):
                     y.pop(0)
                 x.append(time.time() - self.start_time)
                 y.append(magnitude_of(val))
-                data_line.setData(x, y)
+                graph_info["data_line"].setData(x, y)
                 graph_info["widget"].update()
         self.status_label.setText(
             "{:.1f}Hz\t CH:{:.0f}%\t RT:{:.1f}ms".format(
@@ -237,7 +227,7 @@ class MainWindow(QMainWindow):
         )
 
     @QtCore.Slot()
-    def function_call_clicked(self, f):
+    def f_call_clicked(self, f):
         f()
         if "reload_data" in f.meta and f.meta["reload_data"]:
             time.sleep(0.1)
