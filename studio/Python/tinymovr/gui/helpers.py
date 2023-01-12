@@ -174,3 +174,9 @@ def load_icon(fname_icon):
     icon.addPixmap(pixmap, QtGui.QIcon.Normal)
     icon.addPixmap(pixmap, QtGui.QIcon.Disabled)
     return icon
+
+
+def magnitude_of(val):
+    if isinstance(val, pint.Quantity):
+        return val.magnitude
+    return val

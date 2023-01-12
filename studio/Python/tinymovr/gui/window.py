@@ -21,7 +21,7 @@ from tinymovr.constants import app_name
 from tinymovr.channel import ResponseError as ChannelResponseError
 from tinymovr.config import get_bus_config, configure_logging
 from avlos import get_registry
-from tinymovr.gui import Worker, format_value, load_icon
+from tinymovr.gui import Worker, format_value, load_icon, magnitude_of
 
 
 class MainWindow(QMainWindow):
@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
         self.logger = configure_logging()
         bitrate = int(arguments["--bitrate"])
 
-        self.attribute_widgets_by_id = {}
+        self.attr_widgets_by_id = {}
 
         self.setWindowTitle(app_name)
         self.tree_widget = QTreeWidget()
@@ -65,7 +65,7 @@ class MainWindow(QMainWindow):
         self.right_layout.setSpacing(0)
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_frame.setLayout(self.right_layout)
-        #self.right_frame.setMinimumWidth(820)
+        # self.right_frame.setMinimumWidth(820)
 
         main_layout = QHBoxLayout()
         main_layout.addWidget(self.left_frame)
@@ -145,7 +145,7 @@ class MainWindow(QMainWindow):
         """
         Regenerate the attribute tree
         """
-        self.attribute_widgets_by_id = {}
+        self.attr_widgets_by_id = {}
         self.tree_widget.clear()
         all_items = []
         for name, node in tms_by_id.items():
@@ -169,69 +169,53 @@ class MainWindow(QMainWindow):
         widget = QTreeWidgetItem([name, 0, ""])
         widget._orig_flags = widget.flags()
         all_items = []
-        try:
-            # Let's assume it's a RemoteNode
+        if hasattr(node, "remote_attributes"):
             for attr_name, attr in node.remote_attributes.items():
                 items, items_list = self.parse_node(attr, attr_name)
                 widget.addChild(items)
                 all_items.extend(items_list)
-        except AttributeError:
-            # Maybe a RemoteAttribute
-            try:
-                val = node.get_value()
-                widget.setText(1, format_value(val))
-                widget.setCheckState(0, QtCore.Qt.Unchecked)
-                widget._tm_attribute = node
-                widget._editing = False
-                self.attribute_widgets_by_id[node.full_name] = {
-                    "node": node,
-                    "widget": widget,
-                }
-                all_items.append(widget)
-            except AttributeError:
-                # Must be a RemoteFunction then
-                widget._tm_function = node
-                all_items.append(widget)
+        elif hasattr(node, "get_value"):
+            val = node.get_value()
+            widget.setText(1, format_value(val))
+            widget.setCheckState(0, QtCore.Qt.Unchecked)
+            widget._tm_attribute = node
+            widget._editing = False
+            self.attr_widgets_by_id[node.full_name] = {
+                "node": node,
+                "widget": widget,
+            }
+            all_items.append(widget)
+        elif hasattr(node, "__call__"):
+            widget._tm_function = node
+            all_items.append(widget)
         return widget, all_items
 
     @QtCore.Slot()
     def item_changed(self, item):
+        # Value changed
         if item._editing:
-            # Value changed
             item._editing = False
-            val = item.text(1)
-            try:
-                item._tm_attribute.set_value(get_registry()(val))
-            except pint.PintError:
-                try:
-                    item._tm_attribute.set_value(float(val))
-                except ValueError:
-                    # Show pop up dialog
-                    pass
+            item._tm_attribute.set_value(get_registry()(item.text(1)))
             item.setText(1, format_value(item._tm_attribute.get_value()))
 
         # Checkbox changed
-        enabled = item.checkState(0) == QtCore.Qt.Checked
-        try:
+        if hasattr(item, "_tm_attribute"):
             attr = item._tm_attribute
-        except AttributeError:
-            return
-        attr_name = attr.full_name
-        self.TreeItemCheckedSignal.emit({"attr": attr, "enabled": enabled})
-        if enabled and attr_name not in self.graphs_by_id:
-            graph = self.make_graph(attr)
-            self.graphs_by_id[attr_name] = graph
-            self.right_layout.addWidget(graph["widget"])
-        elif not enabled and attr_name in self.graphs_by_id:
-            self.graphs_by_id[attr_name]["widget"].deleteLater()
-            del self.graphs_by_id[attr_name]
+            attr_name = attr.full_name
+            enabled = item.checkState(0) == QtCore.Qt.Checked
+            self.TreeItemCheckedSignal.emit({"attr": attr, "enabled": enabled})
+            if enabled and attr_name not in self.graphs_by_id:
+                graph = self.make_graph(attr)
+                self.graphs_by_id[attr_name] = graph
+                self.right_layout.addWidget(graph["widget"])
+            elif not enabled and attr_name in self.graphs_by_id:
+                self.graphs_by_id[attr_name]["widget"].deleteLater()
+                del self.graphs_by_id[attr_name]
 
     @QtCore.Slot()
     def update_attrs(self, data):
         for attr_name, val in data.items():
-            self.attribute_widgets_by_id[attr_name]["widget"].setText(
-                1, format_value(val)
-            )
+            self.attr_widgets_by_id[attr_name]["widget"].setText(1, format_value(val))
             if attr_name in self.graphs_by_id:
                 graph_info = self.graphs_by_id[attr_name]
                 data_line = graph_info["data_line"]
@@ -241,12 +225,8 @@ class MainWindow(QMainWindow):
                     x.pop(0)
                     y.pop(0)
                 x.append(time.time() - self.start_time)
-                if isinstance(val, pint.Quantity):
-                    y.append(val.magnitude)
-                else:
-                    y.append(val)
+                y.append(magnitude_of(val))
                 data_line.setData(x, y)
-                # graph_info["widget"].getPlotItem().setXRange(x[0], x[-1])
                 graph_info["widget"].update()
         self.status_label.setText(
             "{:.1f}Hz\t CH:{:.0f}%\t RT:{:.1f}ms".format(
@@ -259,12 +239,9 @@ class MainWindow(QMainWindow):
     @QtCore.Slot()
     def function_call_clicked(self, f):
         f()
-        try:
-            if f.meta["reload_data"]:
-                time.sleep(0.1)
-                self.worker.force_regen()
-        except KeyError:
-            pass
+        if "reload_data" in f.meta and f.meta["reload_data"]:
+            time.sleep(0.1)
+            self.worker.force_regen()
 
     @QtCore.Slot()
     def double_click(self, item, column):
