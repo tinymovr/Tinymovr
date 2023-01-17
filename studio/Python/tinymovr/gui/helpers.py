@@ -266,3 +266,18 @@ def display_file_save_dialog():
         None, "Save JSON File", documents_dir, "JSON Files (*.json)"
     )
     return file_name
+
+def check_selected_items(selected_items):
+    if len(selected_items) == 0:
+        display_warning(
+            "Invalid Selection",
+            "No Tinymovr nodes selected.\nSelect a single node",
+        )
+        return False
+    elif len(selected_items) > 1:
+        display_warning(
+            "Invalid Selection",
+            "Multiple Tinymovr nodes selected.\nSelect a single node",
+        )
+        return False
+    return True

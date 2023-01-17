@@ -6,7 +6,8 @@ from tinymovr.gui.helpers import (
     display_file_open_dialog,
     display_file_save_dialog,
     magnitude_of,
-    TimedGetter
+    TimedGetter,
+    check_selected_items
 )
 from tinymovr.gui.worker import Worker
 from tinymovr.gui.window import MainWindow

@@ -50,7 +50,8 @@ from tinymovr.gui import (
     display_warning,
     display_file_open_dialog,
     display_file_save_dialog,
-    magnitude_of
+    magnitude_of,
+    check_selected_items,
 )
 
 
@@ -201,7 +202,6 @@ class MainWindow(QMainWindow):
         for item in all_items:
             if hasattr(item, "_tm_function"):
                 button = QPushButton("")
-                button._tm_function = item._tm_function
                 button.setIcon(load_icon("call.png"))
                 self.tree_widget.setItemWidget(item, 1, button)
                 button.clicked.connect(partial(self.f_call_clicked, item._tm_function))
@@ -219,8 +219,7 @@ class MainWindow(QMainWindow):
                 widget.addChild(items)
                 all_items.extend(items_list)
         elif hasattr(node, "get_value"):
-            val = node.get_value()
-            widget.setText(1, format_value(val))
+            widget.setText(1, format_value(node.get_value()))
             widget.setCheckState(0, QtCore.Qt.Unchecked)
             widget._tm_attribute = node
             widget._editing = False
@@ -301,43 +300,21 @@ class MainWindow(QMainWindow):
 
     def on_export(self):
         selected_items = self.tree_widget.selectedItems()
-        if len(selected_items) == 0:
-            display_warning(
-                "Invalid Selection",
-                "No Tinymovr nodes selected.\nSelect a single node to export its configuration",
-            )
-        elif len(selected_items) > 1:
-            display_warning(
-                "Invalid Selection",
-                "Multiple Tinymovr nodes selected.\nSelect a single node to export its configuration",
-            )
-        else:
+        if check_selected_items(selected_items):
             root_node = selected_items[0]._tm_attribute.root
             values_object = root_node.export_values()
             json_data = json.dumps(values_object, cls=AvlosEncoder)
             file_path = display_file_save_dialog()
-            with suppress(FileNotFoundError):
-                with open(file_path, "w") as file:
-                    file.write(json_data)
+            with suppress(FileNotFoundError), open(file_path, "w") as file:
+                file.write(json_data)
 
     def on_import(self):
         selected_items = self.tree_widget.selectedItems()
-        if len(selected_items) == 0:
-            display_warning(
-                "Invalid Selection",
-                "No Tinymovr nodes selected.\nSelect a single node to import a configuration",
-            )
-        elif len(selected_items) > 1:
-            display_warning(
-                "Invalid Selection",
-                "Multiple Tinymovr nodes selected.\nSelect a single node to import a configuration",
-            )
-        else:
+        if check_selected_items(selected_items):
             root_node = selected_items[0]._tm_attribute.root
             file_path = display_file_open_dialog()
-            with suppress(FileNotFoundError):
-                with open(file_path, "r") as file:
-                    values_object = json.load(file)
-                    root_node.import_values(values_object)
-                    time.sleep(0.1)
-                    self.worker.force_regen()
+            with suppress(FileNotFoundError), open(file_path, "r") as file:
+                values_object = json.load(file)
+                root_node.import_values(values_object)
+                time.sleep(0.1)
+                self.worker.force_regen()
