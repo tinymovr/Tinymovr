@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import time
 import os
 import enum
 import pint
@@ -175,6 +176,10 @@ app_stylesheet = """
 
 
 def format_value(value, include_unit=True):
+    """
+    Format a numeric value according to its
+    type and return the formatted string
+    """
     if isinstance(value, enum.IntFlag):
         return str(value) if value > 0 else "(no flags)"
     if not include_unit and isinstance(value, pint.Quantity):
@@ -185,6 +190,10 @@ def format_value(value, include_unit=True):
 
 
 def load_icon(fname_icon):
+    """
+    Load an image from a file and return it
+    as a QIcon
+    """
     path_this_dir = os.path.dirname(os.path.abspath(__file__))
     path_icons = os.path.join(path_this_dir, "..", "..", "resources", "icons")
     path_icon = os.path.join(path_icons, fname_icon)
@@ -195,7 +204,41 @@ def load_icon(fname_icon):
     return icon
 
 
+def magnitude_of(val):
+    """
+    Extract the magnitude of a pint Quantity
+    and return it, or return the value itself
+    otherwise
+    """
+    if isinstance(val, pint.Quantity):
+        return val.magnitude
+    return val
+
+
+class TimedGetter:
+    """
+    An interface class that maintains timing
+    information for the getter function
+    """
+    def __init__(self, error_handler):
+        self.error_handler = error_handler
+        self.dt = 0
+
+    def get_value(self, getter):
+        try:
+            get_start_time = time.time()
+            val = getter()
+            get_dt = time.time() - get_start_time
+            self.dt = self.dt * 0.99 + get_dt * 0.01
+            return val
+        except Exception as e:
+            self.error_handler(e)
+
+
 def display_warning(title, text):
+    """
+    Display a pop up message with a warning
+    """
     msg_box = QMessageBox()
     msg_box.setIcon(QMessageBox.Warning)
     msg_box.setText(text)
@@ -204,9 +247,10 @@ def display_warning(title, text):
 
 
 def display_file_open_dialog():
-    # Get the default documents directory
+    """
+    Display the file open dialog
+    """
     documents_dir = os.path.expanduser("~/Documents")
-    # Display the file save dialog
     file_name, _ = QFileDialog.getOpenFileName(
         None, "Select JSON File", "", "JSON Files (*.json)"
     )
@@ -214,10 +258,26 @@ def display_file_open_dialog():
 
 
 def display_file_save_dialog():
-    # Get the default documents directory
+    """
+    Display the file save dialog
+    """
     documents_dir = os.path.expanduser("~/Documents")
-    # Display the file save dialog
     file_name, _ = QFileDialog.getSaveFileName(
         None, "Save JSON File", documents_dir, "JSON Files (*.json)"
     )
     return file_name
+
+def check_selected_items(selected_items):
+    if len(selected_items) == 0:
+        display_warning(
+            "Invalid Selection",
+            "No Tinymovr nodes selected.\nSelect a single node",
+        )
+        return False
+    elif len(selected_items) > 1:
+        display_warning(
+            "Invalid Selection",
+            "Multiple Tinymovr nodes selected.\nSelect a single node",
+        )
+        return False
+    return True

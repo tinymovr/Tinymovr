@@ -16,14 +16,13 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import time
-import functools
+from functools import partial
 from contextlib import suppress
 import pint
 import json
 from PySide2 import QtCore
 from PySide2.QtCore import Signal
 from PySide2.QtWidgets import (
-    QApplication,
     QMainWindow,
     QMenu,
     QMenuBar,
@@ -51,6 +50,8 @@ from tinymovr.gui import (
     display_warning,
     display_file_open_dialog,
     display_file_save_dialog,
+    magnitude_of,
+    check_selected_items,
 )
 
 
@@ -68,7 +69,7 @@ class MainWindow(QMainWindow):
         self.logger = configure_logging()
         bitrate = int(arguments["--bitrate"])
 
-        self.attribute_widgets_by_id = {}
+        self.attr_widgets_by_id = {}
 
         self.setWindowTitle(app_name)
 
@@ -117,7 +118,6 @@ class MainWindow(QMainWindow):
         self.right_layout.setSpacing(0)
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_frame.setLayout(self.right_layout)
-        # self.right_frame.setMinimumWidth(820)
 
         main_layout = QHBoxLayout()
         main_layout.addWidget(self.left_frame)
@@ -137,7 +137,7 @@ class MainWindow(QMainWindow):
         channel = arguments["--chan"]
         bitrate = int(arguments["--bitrate"])
 
-        if not channel:
+        if channel == None:
             params = get_bus_config(buses)
             params["bitrate"] = bitrate
         else:
@@ -182,22 +182,17 @@ class MainWindow(QMainWindow):
         else:
             pi.setLabel(axis="left", text=attr.name)
         pi.setLabel(axis="bottom", text="time", units="sec")
-        x = []
-        y = []
-        data_line = pg.PlotCurveItem(x, y, pen=pg.mkPen(width=1.00))
+        data = {"x": [], "y": []}
+        data_line = pg.PlotCurveItem(data["x"], data["y"], pen=pg.mkPen(width=1.00))
         graph_widget.addItem(data_line)
-        return {
-            "widget": graph_widget,
-            "data": {"x": x, "y": y},
-            "data_line": data_line,
-        }
+        return {"widget": graph_widget, "data": data, "data_line": data_line}
 
     @QtCore.Slot()
     def regen_tree(self, tms_by_id):
         """
         Regenerate the attribute tree
         """
-        self.attribute_widgets_by_id = {}
+        self.attr_widgets_by_id = {}
         self.tree_widget.clear()
         all_items = []
         for name, node in tms_by_id.items():
@@ -207,12 +202,9 @@ class MainWindow(QMainWindow):
         for item in all_items:
             if hasattr(item, "_tm_function"):
                 button = QPushButton("")
-                button._tm_function = item._tm_function
                 button.setIcon(load_icon("call.png"))
                 self.tree_widget.setItemWidget(item, 1, button)
-                button.clicked.connect(
-                    functools.partial(self.function_call_clicked, item._tm_function)
-                )
+                button.clicked.connect(partial(self.f_call_clicked, item._tm_function))
         header = self.tree_widget.header()
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
         header.setStretchLastSection(False)
@@ -221,102 +213,77 @@ class MainWindow(QMainWindow):
         widget = QTreeWidgetItem([name, 0, ""])
         widget._orig_flags = widget.flags()
         all_items = []
-        try:
-            # Let's assume it's a RemoteNode
+        if hasattr(node, "remote_attributes"):
             for attr_name, attr in node.remote_attributes.items():
                 items, items_list = self.parse_node(attr, attr_name)
                 widget.addChild(items)
                 all_items.extend(items_list)
-        except AttributeError:
-            # Maybe a RemoteAttribute
-            try:
-                val = node.get_value()
-                widget.setText(1, format_value(val))
-                widget.setCheckState(0, QtCore.Qt.Unchecked)
-                widget._tm_attribute = node
-                widget._editing = False
-                self.attribute_widgets_by_id[node.full_name] = {
-                    "node": node,
-                    "widget": widget,
-                }
-                all_items.append(widget)
-            except AttributeError:
-                # Must be a RemoteFunction then
-                widget._tm_function = node
-                all_items.append(widget)
+        elif hasattr(node, "get_value"):
+            widget.setText(1, format_value(node.get_value()))
+            widget.setCheckState(0, QtCore.Qt.Unchecked)
+            widget._tm_attribute = node
+            widget._editing = False
+            self.attr_widgets_by_id[node.full_name] = {
+                "node": node,
+                "widget": widget,
+            }
+            all_items.append(widget)
+        elif hasattr(node, "__call__"):
+            widget._tm_function = node
+            all_items.append(widget)
         return widget, all_items
 
     @QtCore.Slot()
     def item_changed(self, item):
+        # Value changed
         if item._editing:
-            # Value changed
             item._editing = False
-            val = item.text(1)
-            try:
-                item._tm_attribute.set_value(get_registry()(val))
-            except pint.PintError:
-                try:
-                    item._tm_attribute.set_value(float(val))
-                except ValueError:
-                    # Show pop up dialog
-                    pass
+            item._tm_attribute.set_value(get_registry()(item.text(1)))
             item.setText(1, format_value(item._tm_attribute.get_value()))
 
         # Checkbox changed
-        enabled = item.checkState(0) == QtCore.Qt.Checked
-        try:
+        if hasattr(item, "_tm_attribute"):
             attr = item._tm_attribute
-        except AttributeError:
-            return
-        attr_name = attr.full_name
-        self.TreeItemCheckedSignal.emit({"attr": attr, "enabled": enabled})
-        if enabled and attr_name not in self.graphs_by_id:
-            graph = self.make_graph(attr)
-            self.graphs_by_id[attr_name] = graph
-            self.right_layout.addWidget(graph["widget"])
-        elif not enabled and attr_name in self.graphs_by_id:
-            self.graphs_by_id[attr_name]["widget"].deleteLater()
-            del self.graphs_by_id[attr_name]
+            attr_name = attr.full_name
+            enabled = item.checkState(0) == QtCore.Qt.Checked
+            self.TreeItemCheckedSignal.emit({"attr": attr, "enabled": enabled})
+            if enabled and attr_name not in self.graphs_by_id:
+                graph = self.make_graph(attr)
+                self.graphs_by_id[attr_name] = graph
+                self.right_layout.addWidget(graph["widget"])
+            elif not enabled and attr_name in self.graphs_by_id:
+                self.graphs_by_id[attr_name]["widget"].deleteLater()
+                del self.graphs_by_id[attr_name]
 
     @QtCore.Slot()
     def update_attrs(self, data):
         for attr_name, val in data.items():
-            self.attribute_widgets_by_id[attr_name]["widget"].setText(
-                1, format_value(val)
-            )
+            self.attr_widgets_by_id[attr_name]["widget"].setText(1, format_value(val))
             if attr_name in self.graphs_by_id:
                 graph_info = self.graphs_by_id[attr_name]
-                data_line = graph_info["data_line"]
                 x = graph_info["data"]["x"]
                 y = graph_info["data"]["y"]
                 if len(x) >= 200:
                     x.pop(0)
                     y.pop(0)
                 x.append(time.time() - self.start_time)
-                if isinstance(val, pint.Quantity):
-                    y.append(val.magnitude)
-                else:
-                    y.append(val)
-                data_line.setData(x, y)
-                # graph_info["widget"].getPlotItem().setXRange(x[0], x[-1])
+                y.append(magnitude_of(val))
+                graph_info["data_line"].setData(x, y)
                 graph_info["widget"].update()
         self.status_label.setText(
             "{:.1f}Hz\t CH:{:.0f}%\t RT:{:.1f}ms".format(
                 1 / self.worker.meas_dt,
                 self.worker.load * 100,
-                self.worker.rt_dt * 1000,
+                self.worker.timed_getter.dt * 1000,
             )
         )
 
     @QtCore.Slot()
-    def function_call_clicked(self, f):
+    def f_call_clicked(self, f):
         f()
-        try:
-            if f.meta["reload_data"]:
-                time.sleep(0.1)
-                self.worker.force_regen()
-        except KeyError:
-            pass
+        if "reload_data" in f.meta and f.meta["reload_data"]:
+            time.sleep(0.1)
+            self.worker.force_regen()
 
     @QtCore.Slot()
     def double_click(self, item, column):
@@ -333,43 +300,21 @@ class MainWindow(QMainWindow):
 
     def on_export(self):
         selected_items = self.tree_widget.selectedItems()
-        if len(selected_items) == 0:
-            display_warning(
-                "Invalid Selection",
-                "No Tinymovr nodes selected.\nSelect a single node to export its configuration",
-            )
-        elif len(selected_items) > 1:
-            display_warning(
-                "Invalid Selection",
-                "Multiple Tinymovr nodes selected.\nSelect a single node to export its configuration",
-            )
-        else:
+        if check_selected_items(selected_items):
             root_node = selected_items[0]._tm_attribute.root
             values_object = root_node.export_values()
             json_data = json.dumps(values_object, cls=AvlosEncoder)
             file_path = display_file_save_dialog()
-            with suppress(FileNotFoundError):
-                with open(file_path, "w") as file:
-                    file.write(json_data)
+            with suppress(FileNotFoundError), open(file_path, "w") as file:
+                file.write(json_data)
 
     def on_import(self):
         selected_items = self.tree_widget.selectedItems()
-        if len(selected_items) == 0:
-            display_warning(
-                "Invalid Selection",
-                "No Tinymovr nodes selected.\nSelect a single node to import a configuration",
-            )
-        elif len(selected_items) > 1:
-            display_warning(
-                "Invalid Selection",
-                "Multiple Tinymovr nodes selected.\nSelect a single node to import a configuration",
-            )
-        else:
+        if check_selected_items(selected_items):
             root_node = selected_items[0]._tm_attribute.root
             file_path = display_file_open_dialog()
-            with suppress(FileNotFoundError):
-                with open(file_path, "r") as file:
-                    values_object = json.load(file)
-                    root_node.import_values(values_object)
-                    time.sleep(0.1)
-                    self.worker.force_regen()
+            with suppress(FileNotFoundError), open(file_path, "r") as file:
+                values_object = json.load(file)
+                root_node.import_values(values_object)
+                time.sleep(0.1)
+                self.worker.force_regen()
