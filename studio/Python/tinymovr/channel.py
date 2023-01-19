@@ -1,6 +1,6 @@
 """
 Tinymovr CAN Channel Module
-Copyright Ioannis Chatzikonstantinou 2020-2022
+Copyright Ioannis Chatzikonstantinou 2020-2023
 
 Implements a CAN bus communications channel
 

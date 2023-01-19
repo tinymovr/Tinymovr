@@ -1,6 +1,6 @@
 """
 Tinymovr Trajectory Planner Tests
-Copyright Ioannis Chatzikonstantinou 2020-2022
+Copyright Ioannis Chatzikonstantinou 2020-2023
 
 Tests the functionality of the Tinymovr trajectory planner.
 

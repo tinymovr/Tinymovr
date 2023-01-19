@@ -1,6 +1,6 @@
 """
 Tinymovr Constants
-Copyright Ioannis Chatzikonstantinou 2020-2022
+Copyright Ioannis Chatzikonstantinou 2020-2023
 
 Defines various constants used throughout Tinymovr Studio
 

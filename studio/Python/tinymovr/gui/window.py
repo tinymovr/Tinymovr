@@ -1,6 +1,6 @@
 """
 Tinymovr GUI Window
-Copyright Ioannis Chatzikonstantinou 2020-2022
+Copyright Ioannis Chatzikonstantinou 2020-2023
 
 The GUI Window class that subclasses QMainWindow
 
