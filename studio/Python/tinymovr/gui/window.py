@@ -194,6 +194,7 @@ class MainWindow(QMainWindow):
         """
         self.attr_widgets_by_id = {}
         self.tree_widget.clear()
+        self.tree_widget.setEnabled(False)
         all_items = []
         for name, node in tms_by_id.items():
             widget, items_list = self.parse_node(node, name)
@@ -208,6 +209,7 @@ class MainWindow(QMainWindow):
         header = self.tree_widget.header()
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
         header.setStretchLastSection(False)
+        self.tree_widget.setEnabled(True)
 
     def parse_node(self, node, name):
         widget = QTreeWidgetItem([name, 0, ""])
