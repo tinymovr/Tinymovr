@@ -1,6 +1,6 @@
 """
 Tinymovr Board Config Tests
-Copyright Ioannis Chatzikonstantinou 2020-2022
+Copyright Ioannis Chatzikonstantinou 2020-2023
 
 Tests saving and loading Tinymovr configuration to/from NVRAM.
 

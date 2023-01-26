@@ -1,6 +1,6 @@
 """
 Tinymovr Simulation Tests
-Copyright Ioannis Chatzikonstantinou 2020-2022
+Copyright Ioannis Chatzikonstantinou 2020-2023
 
 Tests functionality of the Tinymovr Studio using a simulated Tinymovr device.
 

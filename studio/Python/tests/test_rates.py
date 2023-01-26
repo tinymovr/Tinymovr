@@ -1,6 +1,6 @@
 """
 Tinymovr Message Rate Tests
-Copyright Ioannis Chatzikonstantinou 2020-2022
+Copyright Ioannis Chatzikonstantinou 2020-2023
 
 Tests the rate of CAN messages on the bus.
 

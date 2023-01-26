@@ -1,6 +1,6 @@
 """
 Tinymovr Basic Board Tests
-Copyright Ioannis Chatzikonstantinou 2020-2022
+Copyright Ioannis Chatzikonstantinou 2020-2023
 
 Tests basic functionality of Tinymovr boards.
 

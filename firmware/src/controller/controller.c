@@ -1,7 +1,7 @@
 
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
-//  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
+//  * Copyright (c) 2020-2023 Ioannis Chatzikonstantinou.
 //  *
 //  * This program is free software: you can redistribute it and/or modify
 //  * it under the terms of the GNU General Public License as published by

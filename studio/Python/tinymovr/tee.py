@@ -1,6 +1,6 @@
 """
 Tinymovr Tee Module
-Copyright Ioannis Chatzikonstantinou 2020-2022
+Copyright Ioannis Chatzikonstantinou 2020-2023
 
 Implements a Tee class to distribute incoming traffic according to rules
 

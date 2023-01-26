@@ -1,6 +1,6 @@
 """
 Tinymovr Codecs Module
-Copyright Ioannis Chatzikonstantinou 2020-2022
+Copyright Ioannis Chatzikonstantinou 2020-2023
 
 Implements codecs for various datatypes.
 

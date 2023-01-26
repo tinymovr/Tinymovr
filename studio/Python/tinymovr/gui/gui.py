@@ -21,7 +21,7 @@ from tinymovr.constants import app_name
 
 """
 Tinymovr Studio GUI
-Copyright Ioannis Chatzikonstantinou 2020-2022
+Copyright Ioannis Chatzikonstantinou 2020-2023
 
 The graphical user interface of Tinymovr Studio
 
