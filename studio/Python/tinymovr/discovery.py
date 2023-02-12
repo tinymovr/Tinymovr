@@ -36,11 +36,8 @@ class Discovery:
         self.disappeared_cb = disappeared_cb
         self.lost_timeout = lost_timeout
 
-        self.active_nodes = {}
-        self.update_stamps = {}
-        self.pending_nodes = set()
-        self.incompatible_nodes = set()
-
+        self.reset()
+        
         get_tee().add(
             lambda msg: HEARTBEAT_BASE == msg.arbitration_id & HEARTBEAT_BASE,
             self._recv_cb,
@@ -73,3 +70,9 @@ class Discovery:
                 self.logger.error(e)
                 self.incompatible_nodes.add(node_id)
             self.pending_nodes.remove(node_id)
+
+    def reset(self):
+        self.active_nodes = {}
+        self.update_stamps = {}
+        self.pending_nodes = set()
+        self.incompatible_nodes = set()
