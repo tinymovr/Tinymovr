@@ -262,7 +262,7 @@ remote_attributes:
         summary: The baud rate of the CAN interface.
       - name: id
         dtype: uint32
-        meta: {export: True}
+        meta: {export: True, reload_data: True}
         getter_name: CAN_get_ID
         setter_name: CAN_set_ID
         summary: The ID of the CAN interface.

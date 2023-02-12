@@ -19,7 +19,7 @@ import time
 import os
 import enum
 import pint
-from PySide2 import QtGui
+from PySide2 import QtGui, QtCore
 from PySide2.QtWidgets import QMessageBox, QFileDialog
 
 
@@ -215,11 +215,20 @@ def magnitude_of(val):
     return val
 
 
+def hold_sema(sema):
+    sema.acquire()
+    try:
+        yield
+    finally:
+        sema.release()
+
+
 class TimedGetter:
     """
     An interface class that maintains timing
     information for the getter function
     """
+
     def __init__(self, error_handler):
         self.error_handler = error_handler
         self.dt = 0
@@ -266,6 +275,7 @@ def display_file_save_dialog():
         None, "Save JSON File", documents_dir, "JSON Files (*.json)"
     )
     return file_name
+
 
 def check_selected_items(selected_items):
     if len(selected_items) == 0:
