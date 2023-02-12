@@ -167,11 +167,11 @@ class MainWindow(QMainWindow):
         else:
             raise e
 
-    def make_graph(self, attr):
+    def add_graph_for_attr(self, attr):
         """
         Create a new pyqtgraph object, for the passed
-        attribute. Return a dictionary containing the
-        object and related data container.
+        attribute. Add a dictionary containing the
+        object and related data container to the local index.
         """
         graph_widget = pg.PlotWidget(title=attr.full_name)
         graph_widget.setMinimumWidth(800)
@@ -185,13 +185,15 @@ class MainWindow(QMainWindow):
         data = {"x": [], "y": []}
         data_line = pg.PlotCurveItem(data["x"], data["y"], pen=pg.mkPen(width=1.00))
         graph_widget.addItem(data_line)
-        return {"widget": graph_widget, "data": data, "data_line": data_line}
+        self.graphs_by_id[attr.full_name] = {"widget": graph_widget, "data": data, "data_line": data_line}
+        self.right_layout.addWidget(graph_widget)
 
     @QtCore.Slot()
     def regen_tree(self, tms_by_id):
         """
         Regenerate the attribute tree
         """
+        self.delete_graphs()
         self.attr_widgets_by_id = {}
         self.tree_widget.clear()
         self.tree_widget.setEnabled(False)
@@ -240,8 +242,13 @@ class MainWindow(QMainWindow):
         # Value changed
         if item._editing:
             item._editing = False
-            item._tm_attribute.set_value(get_registry()(item.text(1)))
-            item.setText(1, format_value(item._tm_attribute.get_value()))
+            attr = item._tm_attribute
+            attr.set_value(get_registry()(item.text(1)))
+            if "reload_data" in attr.meta and attr.meta["reload_data"]:
+                self.worker.reset()
+                return
+            else:
+                item.setText(1, format_value(attr.get_value()))
 
         # Checkbox changed
         if hasattr(item, "_tm_attribute"):
@@ -250,12 +257,9 @@ class MainWindow(QMainWindow):
             enabled = item.checkState(0) == QtCore.Qt.Checked
             self.TreeItemCheckedSignal.emit({"attr": attr, "enabled": enabled})
             if enabled and attr_name not in self.graphs_by_id:
-                graph = self.make_graph(attr)
-                self.graphs_by_id[attr_name] = graph
-                self.right_layout.addWidget(graph["widget"])
+                self.add_graph_for_attr(attr)
             elif not enabled and attr_name in self.graphs_by_id:
-                self.graphs_by_id[attr_name]["widget"].deleteLater()
-                del self.graphs_by_id[attr_name]
+                self.delete_graph_by_attr_name(attr_name)
 
     @QtCore.Slot()
     def update_attrs(self, data):
@@ -284,8 +288,7 @@ class MainWindow(QMainWindow):
     def f_call_clicked(self, f):
         f()
         if "reload_data" in f.meta and f.meta["reload_data"]:
-            time.sleep(0.1)
-            self.worker.force_regen()
+            self.worker.reset()
 
     @QtCore.Slot()
     def double_click(self, item, column):
@@ -320,3 +323,11 @@ class MainWindow(QMainWindow):
                 root_node.import_values(values_object)
                 time.sleep(0.1)
                 self.worker.force_regen()
+
+    def delete_graph_by_attr_name(self, attr_name):
+        self.graphs_by_id[attr_name]["widget"].deleteLater()
+        del self.graphs_by_id[attr_name]
+
+    def delete_graphs(self):
+        for attr_name in list(self.graphs_by_id.keys()):
+            self.delete_graph_by_attr_name(attr_name)

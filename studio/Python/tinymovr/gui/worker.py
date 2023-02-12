@@ -40,19 +40,24 @@ class Worker(QObject):
     def __init__(self, busparams, logger):
         super().__init__()
         self.logger = logger
+        self.sema = QtCore.QSemaphore(1)
 
         init_tee(can.Bus(**busparams))
+        self.init_containers();
         self.dsc = Discovery(self.node_appeared, self.node_disappeared, self.logger)
         self.target_dt = 0.040
         self.meas_dt = self.target_dt
         self.timed_getter = TimedGetter(lambda e: self.handle_error.emit(e))
         self.load = 0
+        
+        self.dynamic_attrs_update_period = 0.5  # sec
+        self.running = True
+    
+    def init_containers(self):
         self.active_attrs = set()
         self.dynamic_attrs = []
         self.tms_by_id = {}
         self.dynamic_attrs_last_update = {}
-        self.dynamic_attrs_update_period = 0.5  # sec
-        self.running = True
 
     def run(self):
         while self.running:
@@ -117,6 +122,11 @@ class Worker(QObject):
 
     def force_regen(self):
         self.regen.emit(self.tms_by_id)
+
+    def reset(self):
+        self.init_containers()
+        self.dsc.reset()
+        self.force_regen()
 
     @QtCore.Slot(dict)
     def update_active_attrs(self, d):
