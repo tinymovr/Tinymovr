@@ -150,7 +150,7 @@ class MainWindow(QMainWindow):
         self.worker.moveToThread(self.thread)
         self.worker.handle_error.connect(self.handle_worker_error)
         self.worker.regen.connect(self.regen_tree)
-        self.worker.update_attrs.connect(self.update_attrs)
+        self.worker.update_attrs.connect(self.attrs_updated)
         app.aboutToQuit.connect(self.about_to_quit)
         self.thread.start()
 
@@ -227,6 +227,7 @@ class MainWindow(QMainWindow):
             widget.setCheckState(0, QtCore.Qt.Unchecked)
             widget._tm_attribute = node
             widget._editing = False
+            widget._checked = False
             self.attr_widgets_by_id[node.full_name] = {
                 "node": node,
                 "widget": widget,
@@ -254,15 +255,18 @@ class MainWindow(QMainWindow):
         if hasattr(item, "_tm_attribute"):
             attr = item._tm_attribute
             attr_name = attr.full_name
-            enabled = item.checkState(0) == QtCore.Qt.Checked
-            self.TreeItemCheckedSignal.emit({"attr": attr, "enabled": enabled})
-            if enabled and attr_name not in self.graphs_by_id:
-                self.add_graph_for_attr(attr)
-            elif not enabled and attr_name in self.graphs_by_id:
-                self.delete_graph_by_attr_name(attr_name)
+            checked = item.checkState(0) == QtCore.Qt.Checked
+            if checked != item._checked:
+                item._checked = checked
+                print("enb")
+                self.TreeItemCheckedSignal.emit({"attr": attr, "checked": checked})
+                if checked and attr_name not in self.graphs_by_id:
+                    self.add_graph_for_attr(attr)
+                elif not checked and attr_name in self.graphs_by_id:
+                    self.delete_graph_by_attr_name(attr_name)
 
     @QtCore.Slot()
-    def update_attrs(self, data):
+    def attrs_updated(self, data):
         for attr_name, val in data.items():
             self.attr_widgets_by_id[attr_name]["widget"].setText(1, format_value(val))
             if attr_name in self.graphs_by_id:
