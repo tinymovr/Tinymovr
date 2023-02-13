@@ -40,10 +40,12 @@ class Worker(QObject):
     def __init__(self, busparams, logger):
         super().__init__()
         self.logger = logger
-        self.sema = QtCore.QSemaphore(1)
+        self.mutx = QtCore.QMutex()
 
         init_tee(can.Bus(**busparams))
+
         self.init_containers();
+
         self.dsc = Discovery(self.node_appeared, self.node_disappeared, self.logger)
         self.target_dt = 0.040
         self.meas_dt = self.target_dt
@@ -62,10 +64,12 @@ class Worker(QObject):
     def run(self):
         while self.running:
             start_time = time.time()
+            self.mutx.lock()
             last_updated = self.get_attr_values()
             if len(last_updated) > 0:
                 self.update_attrs.emit(last_updated)
             QApplication.processEvents()
+            self.mutx.unlock()
             busy_dt = time.time() - start_time
             if busy_dt < self.target_dt:
                 self.load = self.load * 0.99 + busy_dt / self.target_dt * 0.01
@@ -124,13 +128,15 @@ class Worker(QObject):
         self.regen.emit(self.tms_by_id)
 
     def reset(self):
-        self.init_containers()
+        self.mutx.lock()
         self.dsc.reset()
+        self.init_containers()
         self.force_regen()
+        self.mutx.unlock()
 
     @QtCore.Slot(dict)
     def update_active_attrs(self, d):
-        if d["enabled"] == True:
+        if d["checked"] == True:
             self.active_attrs.add(d["attr"])
         else:
             self.active_attrs.discard(d["attr"])
