@@ -250,6 +250,7 @@ class RateLimitedCaller:
     A class that limits the rate of calls to a passed
     function f
     """
+
     def __init__(self, f, rate):
         self.f = f
         self.rate = rate
@@ -270,10 +271,8 @@ class RateLimitedCaller:
         self.f(*args, **kwargs)
         self.busy_dt = time.time() - start_time
 
-    def repeat(self, *args, **kwargs):
-        while not self.stop:
-            self.call(*args, **kwargs)
-
+    def __call__(self, *args, **kwargs):
+        self.call(self, *args, **kwargs)
 
 
 def display_warning(title, text):
@@ -323,6 +322,7 @@ def check_selected_items(selected_items):
         )
         return False
     return True
+
 
 def get_dynamic_attrs(attr_dict):
     """

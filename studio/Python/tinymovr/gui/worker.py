@@ -24,7 +24,7 @@ from PySide2.QtCore import QObject
 from PySide2.QtWidgets import (
     QApplication,
 )
-from tinymovr.gui import TimedGetter, RateLimitedCaller, get_dynamic_attrs
+from tinymovr.gui import TimedGetter, RateLimitedFunction, get_dynamic_attrs
 from tinymovr.tee import init_tee, destroy_tee
 from tinymovr.discovery import Discovery
 from tinymovr.constants import base_node_name
@@ -44,7 +44,7 @@ class Worker(QObject):
         self.init_containers()
         self.dsc = Discovery(self.node_appeared, self.node_disappeared, self.logger)
         self.timed_getter = TimedGetter(lambda e: self.handle_error.emit(e))
-        self.rate_limited_caller = RateLimitedCaller(self.update, 0.040)
+        self.rate_limited_f = RateLimitedFunction(self.update, 0.040)
         self.running = True
 
     def init_containers(self):
@@ -55,7 +55,7 @@ class Worker(QObject):
 
     def run(self):
         while self.running:
-            self.rate_limited_caller.call()  # calls update()
+            self.rate_limited_f()  # calls update()
         destroy_tee()
 
     def update(self):

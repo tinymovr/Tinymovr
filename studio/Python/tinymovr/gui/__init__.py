@@ -8,7 +8,7 @@ from tinymovr.gui.helpers import (
     magnitude_of,
     hold_sema,
     TimedGetter,
-    RateLimitedCaller,
+    RateLimitedFunction,
     check_selected_items,
     get_dynamic_attrs
 )
