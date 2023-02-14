@@ -77,8 +77,6 @@ class MainWindow(QMainWindow):
         self.menu_bar = QMenuBar()
 
         self.file_menu = QMenu("File")
-        # self.edit_menu = QMenu("Edit")
-        # self.view_menu = QMenu("View")
 
         self.export_action = QAction("Export Config...", self)
         self.import_action = QAction("Import Config", self)
@@ -88,9 +86,6 @@ class MainWindow(QMainWindow):
         self.file_menu.addAction(self.import_action)
 
         self.menu_bar.addMenu(self.file_menu)
-        # self.menu_bar.addMenu(self.edit_menu)
-        # self.menu_bar.addMenu(self.view_menu)
-
         self.setMenuBar(self.menu_bar)
 
         # Setup the tree widget
@@ -185,7 +180,11 @@ class MainWindow(QMainWindow):
         data = {"x": [], "y": []}
         data_line = pg.PlotCurveItem(data["x"], data["y"], pen=pg.mkPen(width=1.00))
         graph_widget.addItem(data_line)
-        self.graphs_by_id[attr.full_name] = {"widget": graph_widget, "data": data, "data_line": data_line}
+        self.graphs_by_id[attr.full_name] = {
+            "widget": graph_widget,
+            "data": data,
+            "data_line": data_line,
+        }
         self.right_layout.addWidget(graph_widget)
 
     @QtCore.Slot()
@@ -258,7 +257,6 @@ class MainWindow(QMainWindow):
             checked = item.checkState(0) == QtCore.Qt.Checked
             if checked != item._checked:
                 item._checked = checked
-                print("enb")
                 self.TreeItemCheckedSignal.emit({"attr": attr, "checked": checked})
                 if checked and attr_name not in self.graphs_by_id:
                     self.add_graph_for_attr(attr)
@@ -282,8 +280,8 @@ class MainWindow(QMainWindow):
                 graph_info["widget"].update()
         self.status_label.setText(
             "{:.1f}Hz\t CH:{:.0f}%\t RT:{:.1f}ms".format(
-                1 / self.worker.meas_dt,
-                self.worker.load * 100,
+                1 / self.worker.rate_limited_caller.meas_dt,
+                self.worker.rate_limited_caller.load * 100,
                 self.worker.timed_getter.dt * 1000,
             )
         )
