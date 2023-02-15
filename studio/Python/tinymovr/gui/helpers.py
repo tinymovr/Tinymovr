@@ -245,14 +245,14 @@ class TimedGetter:
             self.error_handler(e)
 
 
-class RateLimitedCaller:
+class RateLimitedFunction:
     """
     A class that limits the rate of calls to a passed
     function f
     """
 
-    def __init__(self, f, rate):
-        self.f = f
+    def __init__(self, func, rate):
+        self.func = func
         self.rate = rate
         self.busy_dt = 0
         self.meas_dt = 0
@@ -268,7 +268,7 @@ class RateLimitedCaller:
             self.load = 1
             self.meas_dt = self.busy_dt
         start_time = time.time()
-        self.f(*args, **kwargs)
+        self.func()
         self.busy_dt = time.time() - start_time
 
     def __call__(self, *args, **kwargs):

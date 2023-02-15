@@ -44,7 +44,7 @@ class Worker(QObject):
         self.init_containers()
         self.dsc = Discovery(self.node_appeared, self.node_disappeared, self.logger)
         self.timed_getter = TimedGetter(lambda e: self.handle_error.emit(e))
-        self.rate_limited_f = RateLimitedFunction(self.update, 0.040)
+        self.rate_limited_f = RateLimitedFunction(lambda: self.update(), 0.040)
         self.running = True
 
     def init_containers(self):

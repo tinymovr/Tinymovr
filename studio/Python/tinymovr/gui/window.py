@@ -280,8 +280,8 @@ class MainWindow(QMainWindow):
                 graph_info["widget"].update()
         self.status_label.setText(
             "{:.1f}Hz\t CH:{:.0f}%\t RT:{:.1f}ms".format(
-                1 / self.worker.rate_limited_caller.meas_dt,
-                self.worker.rate_limited_caller.load * 100,
+                1 / self.worker.rate_limited_f.meas_dt,
+                self.worker.rate_limited_f.load * 100,
                 self.worker.timed_getter.dt * 1000,
             )
         )
