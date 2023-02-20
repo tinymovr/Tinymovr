@@ -216,6 +216,38 @@ Example
 .. code-block:: shell
 
     .W15000
+    
+.Y
+==
+
+Get/set position gain.
+
+Example
+
+.. code-block:: shell
+
+    .Y
+    25
+
+.. code-block:: shell
+
+    .Y25
+    
+.F
+==
+
+Get/set velocity gain (x0.000001).
+
+Example
+
+.. code-block:: shell
+
+    .F
+    20
+
+.. code-block:: shell
+
+    .F20
 
 .G
 ==
