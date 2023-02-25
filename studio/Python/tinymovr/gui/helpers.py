@@ -21,6 +21,7 @@ import enum
 import pint
 from PySide2 import QtGui, QtCore
 from PySide2.QtWidgets import QMessageBox, QFileDialog
+from avlos.definitions import RemoteAttribute
 
 
 app_stylesheet = """
@@ -244,6 +245,36 @@ class TimedGetter:
             self.error_handler(e)
 
 
+class RateLimitedFunction:
+    """
+    A class that limits the rate of calls to a passed
+    function f
+    """
+
+    def __init__(self, func, rate):
+        self.func = func
+        self.rate = rate
+        self.busy_dt = 0
+        self.meas_dt = 0
+        self.load = 0
+        self.stop = False
+
+    def call(self, *args, **kwargs):
+        if self.busy_dt > 0 and self.busy_dt < self.rate:
+            self.load = self.load * 0.99 + self.busy_dt / self.rate * 0.01
+            time.sleep(self.rate - self.busy_dt)
+            self.meas_dt = self.rate
+        else:
+            self.load = 1
+            self.meas_dt = self.busy_dt
+        start_time = time.time()
+        self.func()
+        self.busy_dt = time.time() - start_time
+
+    def __call__(self, *args, **kwargs):
+        self.call(self, *args, **kwargs)
+
+
 def display_warning(title, text):
     """
     Display a pop up message with a warning
@@ -291,3 +322,17 @@ def check_selected_items(selected_items):
         )
         return False
     return True
+
+
+def get_dynamic_attrs(attr_dict):
+    """
+    Get the attributes that are marked as dynamic in the spec.
+    """
+    dynamic_attrs = []
+    for _, attr in attr_dict.items():
+        if isinstance(attr, RemoteAttribute):
+            if "dynamic" in attr.meta and attr.meta["dynamic"] == True:
+                dynamic_attrs.append(attr)
+        elif hasattr(attr, "remote_attributes"):
+            dynamic_attrs.extend(get_dynamic_attrs(attr.remote_attributes))
+    return dynamic_attrs
