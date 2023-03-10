@@ -7,7 +7,7 @@
 
 This repository holds the open source firmware, client library, hardware designs and documentation source.
 
-**Note**
+> **Note**
 This is the latest stable version of the Tinymovr Firmware and Studio app. For the legacy 0.x.x version, check out the [legacy branch](https://github.com/tinymovr/Tinymovr/tree/attic/legacy).
 
 **[Documentation@Readthedocs](https://tinymovr.readthedocs.io)**
