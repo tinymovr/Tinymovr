@@ -1,21 +1,15 @@
 ![FW Check Build](https://github.com/yconst/tinymovr/workflows/Tinymovr%20Firmware%20Check%2FBuild/badge.svg)
 
-Firmware for the Tinymovr R3 platform (PAC5527).
+Firmware for the Tinymovr R3, R5 and M5 platforms (PAC5527).
 
-### Supported Environments
+## Getting Help
 
-This project can be imported in Eclipse. The Qorvo-supplied Eclipse distribution is recommended. Full debug capabilities are available. This is the officially supported development environment.
+Please visit the [Discussions Page](https://github.com/tinymovr/Tinymovr/discussions) and the [Discord Server](https://discord.gg/vNvmpfthug) to ask any questions. If you are unable to find an answer to your question, you are welcome to [start a new discussion](https://github.com/tinymovr/Tinymovr/discussions/new/choose) or ask away at [our Discord server](https://discord.gg/vNvmpfthug).
 
-It is possible to build the project using make and gcc, however this configuration is outdated and should be avoided. In particular, this generated a non-bootloader enabled binary and may brick your board.
+If you would like to propose a feature or think you have found a bug, [open a new issue](https://github.com/tinymovr/Tinymovr/issues/new).
 
+### More information
 
-### Programming
+[Website and Store](https://tinymovr.com)
 
-You can program Tinymovr using the bootloader through UART or using a Segger J-Link probe. Different Eclipse configurations are needed for each option. Please refer to ActiveFlashLight documentation included with Qorvo Bootloaded package for more information.
-
-
-### Debugging
-
-You will need a Segger J-Link adapter to debug the Tinymovr board. Instructions on how to connect the adapter can be found in the Tinymovr documentation.
-
-Unfortunately original J-Link adapters are quite expensive. A more affordable option is the J-Link EDU adapter at around $60 or the J-Link EDU mini adapter at around $20. In addition, there are J-Link clones that can be purchased for very low prices on ebay or Aliexpress. However, reliability of these clones is not guaranteed.
+[Documentation](https://tinymovr.readthedocs.io)
