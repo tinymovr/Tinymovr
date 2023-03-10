@@ -7,6 +7,9 @@
 
 This repository holds the open source firmware, client library, hardware designs and documentation source.
 
+**Note**
+This is the latest stable version of the Tinymovr Firmware and Studio app. For the legacy 0.x.x version, check out the [legacy branch](https://github.com/tinymovr/Tinymovr/tree/attic/legacy).
+
 **[Documentation@Readthedocs](https://tinymovr.readthedocs.io)**
 
 ## Getting Started
@@ -15,17 +18,14 @@ Please visit the [Quick Start Guide](https://tinymovr.readthedocs.io/en/latest/q
 
 ## Getting Help
 
-Please visit the [Discussions Page](https://github.com/tinymovr/Tinymovr/discussions) and the [Discord Server](https://discord.gg/vNvmpfthug) to ask any questions. If you are unable to find an answer to your question, you are welcome to start a new discussion or ask away at Discord.
+Please visit the [Discussions Page](https://github.com/tinymovr/Tinymovr/discussions) and the [Discord Server](https://discord.gg/vNvmpfthug) to ask any questions. If you are unable to find an answer to your question, you are welcome to [start a new discussion](https://github.com/tinymovr/Tinymovr/discussions/new/choose) or ask away at [our Discord server](https://discord.gg/vNvmpfthug).
 
-If you would like to propose a feature or think you have found a bug, please open a new issue.
+If you would like to propose a feature or think you have found a bug, [open a new issue](https://github.com/tinymovr/Tinymovr/issues/new).
 
 ### Repository Structure
 
-The master branch of this repository reflects the latest release.
-
-Development takes place at the [develop](https://github.com/tinymovr/Tinymovr/tree/develop) branch.
-
-We try to follow [A successful Git branching model](https://nvie.com/posts/a-successful-git-branching-model/) as much as possible.
+**Note**
+The `main` branch of this repository reflects the latest release. Development takes place at the [develop branch](https://github.com/tinymovr/Tinymovr/tree/develop).
 
 The repository is organized as follows:
 
@@ -39,11 +39,11 @@ The repository is organized as follows:
 
 ### Branching Model
 
-The master branch reflects the latest release.
+The `main` branch reflects the latest release.
 
 Features are merged into the [develop](https://github.com/tinymovr/Tinymovr/tree/develop) branch.
 
-Hotfixes are merged directly into master, resulting in a new release.
+Hotfixes are merged directly into `main`, resulting in a new release.
 
 We try to follow [A successful Git branching model](https://nvie.com/posts/a-successful-git-branching-model/) as much as possible, but within reason.
 
@@ -64,6 +64,8 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 [Tinymovr Website and Store](https://tinymovr.com)
 
 [Blog](https://tinymovr.com/blogs/news)
+
+[Discord server](https://discord.gg/vNvmpfthug)
 
 [Project page on Hackaday](https://hackaday.io/project/168650-tinymovr-motor-controller)
 
