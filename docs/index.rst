@@ -6,6 +6,9 @@
 Welcome to Tinymovr documentation!
 ========================================
 
+.. note::
+   This is the documentation for the latest stable version of the Tinymovr Firmware and Studio app. For the legacy 0.x.x documentation, check out the [legacy docs](https://tinymovr.readthedocs.io/en/attic-legacy/).
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
