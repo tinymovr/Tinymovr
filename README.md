@@ -1,10 +1,7 @@
-![FW Check Build](https://github.com/yconst/tinymovr/workflows/Tinymovr%20Firmware%20Check%2FBuild/badge.svg)
-![Studio Lint Test](https://github.com/yconst/tinymovr/workflows/Tinymovr%20Studio%20Lint%2FTest/badge.svg)
-![Docs Build](https://github.com/yconst/tinymovr/workflows/Tinymovr%20Docs%20Build/badge.svg)
 
 > **Warning**
 >
-> This is the legacy 0.x.x version of the Tinymovr Firmware and Studio app. For the the latest stable version, check out the [main branch](https://github.com/tinymovr/Tinymovr/).
+> You are browsing the legacy 0.x.x version of the Tinymovr Firmware and Studio app. For the the latest stable version, check out the [main branch](https://github.com/tinymovr/Tinymovr/).
 
 ## Tinymovr Motor Controller
 
