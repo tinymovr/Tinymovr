@@ -1,6 +1,10 @@
 ![Studio Lint Test](https://github.com/yconst/tinymovr/workflows/Tinymovr%20Studio%20Lint%2FTest/badge.svg)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+> **Warning**
+>
+> This is the legacy 0.x.x version of the Tinymovr Firmware and Studio app. For the the latest stable version, check out the [main branch](https://github.com/tinymovr/Tinymovr/).
+
 ## Tinymovr Studio Python
 
 This is the Python client library and application that allows easy interfacing with the Tinymovr motor control board.

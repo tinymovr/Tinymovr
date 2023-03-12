@@ -2,16 +2,15 @@
 ![Studio Lint Test](https://github.com/yconst/tinymovr/workflows/Tinymovr%20Studio%20Lint%2FTest/badge.svg)
 ![Docs Build](https://github.com/yconst/tinymovr/workflows/Tinymovr%20Docs%20Build/badge.svg)
 
+> **Warning**
+>
+> This is the legacy 0.x.x version of the Tinymovr Firmware and Studio app. For the the latest stable version, check out the [main branch](https://github.com/tinymovr/Tinymovr/).
+
 ## Tinymovr Motor Controller
 
 This is the main repository for Tinymovr Motor Controller.
 
 Tinymovr is an affordable motor controller for precise control of 3-phase brushless motors. Tinymovr is highly integrated incorporating an advanced MCU (Qorvo PAC5527), compact power stage, integrated absolute angle encoder (MPS MA702) and CAN and UART connectivity. 
-
-### Note
-
-The master branch of this repository represents the state of art of development, and it may contain bugs.
-For a stable version, especially if you are starting with the project, please consider [installing Tinymovr Studio from PyPI](https://tinymovr.readthedocs.io/en/latest/studio/installation.html)
 
 ### Documentation
 

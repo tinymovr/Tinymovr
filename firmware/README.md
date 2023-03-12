@@ -1,5 +1,9 @@
 ![FW Check Build](https://github.com/yconst/tinymovr/workflows/Tinymovr%20Firmware%20Check%2FBuild/badge.svg)
 
+> **Warning**
+>
+> This is the legacy 0.x.x version of the Tinymovr Firmware and Studio app. For the the latest stable version, check out the [main branch](https://github.com/tinymovr/Tinymovr/).
+
 Firmware for the Tinymovr R3 platform (PAC5527).
 
 ### Supported Environments
