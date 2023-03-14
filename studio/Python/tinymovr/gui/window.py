@@ -18,7 +18,6 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 import time
 from functools import partial
 from contextlib import suppress
-import pint
 import json
 from PySide2 import QtCore
 from PySide2.QtCore import Signal
@@ -47,7 +46,6 @@ from tinymovr.gui import (
     Worker,
     format_value,
     load_icon,
-    display_warning,
     display_file_open_dialog,
     display_file_save_dialog,
     magnitude_of,
@@ -69,7 +67,10 @@ class MainWindow(QMainWindow):
         self.logger = configure_logging()
         bitrate = int(arguments["--bitrate"])
 
+        self.mutx = QtCore.QMutex()
+
         self.attr_widgets_by_id = {}
+        self.graphs_by_id = {}
 
         self.setWindowTitle(app_name)
 
@@ -124,9 +125,6 @@ class MainWindow(QMainWindow):
         main_widget.setLayout(main_layout)
         main_widget.setMinimumHeight(600)
         self.setCentralWidget(main_widget)
-
-        # pg.setConfigOptions(antialias=True)
-        self.graphs_by_id = {}
 
         buses = arguments["--bus"].rsplit(sep=",")
         channel = arguments["--chan"]
@@ -192,6 +190,7 @@ class MainWindow(QMainWindow):
         """
         Regenerate the attribute tree
         """
+        self.mutx.lock()
         self.delete_graphs()
         self.attr_widgets_by_id = {}
         self.tree_widget.clear()
@@ -211,6 +210,7 @@ class MainWindow(QMainWindow):
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
         header.setStretchLastSection(False)
         self.tree_widget.setEnabled(True)
+        self.mutx.unlock()
 
     def parse_node(self, node, name):
         widget = QTreeWidgetItem([name, 0, ""])
