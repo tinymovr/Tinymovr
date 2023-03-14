@@ -57,14 +57,14 @@ class Worker(QObject):
 
     def force_regen(self):
         self.mutx.lock()
-        self.regen.emit(self.tms_by_id)
+        self.regen.emit(dict(self.tms_by_id))
         self.mutx.unlock()
 
     def reset(self):
         self.mutx.lock()
         self.dsc.reset()
         self._init_containers()
-        self.regen.emit(self.tms_by_id)
+        self.regen.emit(dict(self.tms_by_id))
         self.mutx.unlock()
 
     @QtCore.Slot(dict)
@@ -117,7 +117,7 @@ class Worker(QObject):
         node.name = node_name
         node.include_base_name = True
         self.dynamic_attrs = get_dynamic_attrs(self.tms_by_id)
-        self.regen.emit(self.tms_by_id)
+        self.regen.emit(dict(self.tms_by_id))
         self.mutx.unlock()
 
     def _node_disappeared(self, name):
@@ -125,5 +125,5 @@ class Worker(QObject):
         node_name = "{}{}".format(base_node_name, name)
         del self.tms_by_id[node_name]
         self.dynamic_attrs = get_dynamic_attrs(self.tms_by_id)
-        self.regen.emit(self.tms_by_id)
+        self.regen.emit(dict(self.tms_by_id))
         self.mutx.unlock()

@@ -67,8 +67,6 @@ class MainWindow(QMainWindow):
         self.logger = configure_logging()
         bitrate = int(arguments["--bitrate"])
 
-        self.mutx = QtCore.QMutex()
-
         self.attr_widgets_by_id = {}
         self.graphs_by_id = {}
 
@@ -190,7 +188,6 @@ class MainWindow(QMainWindow):
         """
         Regenerate the attribute tree
         """
-        self.mutx.lock()
         self.delete_graphs()
         self.attr_widgets_by_id = {}
         self.tree_widget.clear()
@@ -210,7 +207,6 @@ class MainWindow(QMainWindow):
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
         header.setStretchLastSection(False)
         self.tree_widget.setEnabled(True)
-        self.mutx.unlock()
 
     def parse_node(self, node, name):
         widget = QTreeWidgetItem([name, 0, ""])
@@ -280,8 +276,8 @@ class MainWindow(QMainWindow):
                 graph_info["widget"].update()
         self.status_label.setText(
             "{:.1f}Hz\t CH:{:.0f}%\t RT:{:.1f}ms".format(
-                1 / self.worker.rate_limited_f.meas_dt,
-                self.worker.rate_limited_f.load * 100,
+                1 / self.worker._rate_limited_update.meas_dt,
+                self.worker._rate_limited_update.load * 100,
                 self.worker.timed_getter.dt * 1000,
             )
         )
