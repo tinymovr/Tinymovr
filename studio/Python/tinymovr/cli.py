@@ -57,11 +57,7 @@ def spawn():
         params = get_bus_config(buses)
         params["bitrate"] = bitrate
     else:
-        params = {
-            "bustype": buses[0],
-            "channel": channel,
-            "bitrate": bitrate
-        }
+        params = {"bustype": buses[0], "channel": channel, "bitrate": bitrate}
 
     tms = {}
     user_ns = {}

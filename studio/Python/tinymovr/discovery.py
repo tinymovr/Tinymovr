@@ -17,7 +17,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import time
-from threading import Thread
+from threading import Thread, Event
 from tinymovr.channel import ResponseError
 from tinymovr.tee import get_tee
 from tinymovr.constants import HEARTBEAT_BASE
@@ -35,13 +35,22 @@ class Discovery:
         self.appeared_cb = appeared_cb
         self.disappeared_cb = disappeared_cb
         self.lost_timeout = lost_timeout
+        self.queued_nodes = []
+        self.thread = Thread(target=self._runner, daemon=True)
+        self.evt = Event()
 
         self.reset()
-        
+
         get_tee().add(
             lambda msg: HEARTBEAT_BASE == msg.arbitration_id & HEARTBEAT_BASE,
             self._recv_cb,
         )
+
+    def reset(self):
+        self.active_nodes = {}
+        self.update_stamps = {}
+        self.pending_nodes = set()
+        self.incompatible_nodes = set()
 
     def _recv_cb(self, frame):
         """
@@ -60,10 +69,7 @@ class Discovery:
                 node = create_device_with_hash_msg(frame)
                 self.active_nodes[node_id] = node
                 self.update_stamps[node_id] = now
-                self.thread = Thread(
-                    target=self.appeared_cb, args=(node, node_id), daemon=True
-                )
-                self.thread.start()
+                self._append_to_queue((node, node_id))
             except ResponseError as e:
                 self.logger.error(e)
             except ProtocolVersionError as e:
@@ -71,8 +77,20 @@ class Discovery:
                 self.incompatible_nodes.add(node_id)
             self.pending_nodes.remove(node_id)
 
-    def reset(self):
-        self.active_nodes = {}
-        self.update_stamps = {}
-        self.pending_nodes = set()
-        self.incompatible_nodes = set()
+    def _append_to_queue(self, node_info):
+        """
+        Appends a node to the queued nodes list
+        """
+        self.queued_nodes.append(node_info)
+        self.evt.set()
+
+    def _runner(self):
+        """
+        Asynchronously processes queued nodes
+        """
+        while True:
+            self.evt.wait()
+            try:
+                self.appeared_cb(self.queued_nodes.pop())
+            except IndexError:
+                self.evt.clear()
