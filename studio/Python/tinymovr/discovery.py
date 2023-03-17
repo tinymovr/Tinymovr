@@ -38,6 +38,7 @@ class Discovery:
         self.queued_nodes = []
         self.thread = Thread(target=self._runner, daemon=True)
         self.evt = Event()
+        self.thread.start()
 
         self.reset()
 
@@ -91,6 +92,6 @@ class Discovery:
         while True:
             self.evt.wait()
             try:
-                self.appeared_cb(self.queued_nodes.pop())
+                self.appeared_cb(*(self.queued_nodes.pop()))
             except IndexError:
                 self.evt.clear()
