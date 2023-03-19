@@ -18,7 +18,6 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 import time
 from functools import partial
 from contextlib import suppress
-import pint
 import json
 from PySide2 import QtCore
 from PySide2.QtCore import Signal
@@ -47,7 +46,6 @@ from tinymovr.gui import (
     Worker,
     format_value,
     load_icon,
-    display_warning,
     display_file_open_dialog,
     display_file_save_dialog,
     magnitude_of,
@@ -70,6 +68,7 @@ class MainWindow(QMainWindow):
         bitrate = int(arguments["--bitrate"])
 
         self.attr_widgets_by_id = {}
+        self.graphs_by_id = {}
 
         self.setWindowTitle(app_name)
 
@@ -124,9 +123,6 @@ class MainWindow(QMainWindow):
         main_widget.setLayout(main_layout)
         main_widget.setMinimumHeight(600)
         self.setCentralWidget(main_widget)
-
-        # pg.setConfigOptions(antialias=True)
-        self.graphs_by_id = {}
 
         buses = arguments["--bus"].rsplit(sep=",")
         channel = arguments["--chan"]
@@ -280,8 +276,8 @@ class MainWindow(QMainWindow):
                 graph_info["widget"].update()
         self.status_label.setText(
             "{:.1f}Hz\t CH:{:.0f}%\t RT:{:.1f}ms".format(
-                1 / self.worker.rate_limited_f.meas_dt,
-                self.worker.rate_limited_f.load * 100,
+                1 / self.worker._rate_limited_update.meas_dt,
+                self.worker._rate_limited_update.load * 100,
                 self.worker.timed_getter.dt * 1000,
             )
         )

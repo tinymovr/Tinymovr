@@ -17,7 +17,6 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import time
-from tracemalloc import start
 import can
 from PySide2 import QtCore
 from PySide2.QtCore import QObject
@@ -41,36 +40,41 @@ class Worker(QObject):
         self.logger = logger
         self.mutx = QtCore.QMutex()
         init_tee(can.Bus(**busparams))
-        self.init_containers()
-        self.dsc = Discovery(self.node_appeared, self.node_disappeared, self.logger)
+        self._init_containers()
+        self.dsc = Discovery(self._node_appeared, self._node_disappeared, self.logger)
         self.timed_getter = TimedGetter(lambda e: self.handle_error.emit(e))
-        self.rate_limited_f = RateLimitedFunction(lambda: self.update(), 0.040)
+        self._rate_limited_update = RateLimitedFunction(lambda: self._update(), 0.040)
         self.running = True
-
-    def init_containers(self):
-        self.active_attrs = set()
-        self.dynamic_attrs = []
-        self.tms_by_id = {}
-        self.dynamic_attrs_last_update = {}
 
     def run(self):
         while self.running:
-            self.rate_limited_f()  # calls update()
+            self._rate_limited_update()  # calls update()
         destroy_tee()
-
-    def update(self):
-        self.mutx.lock()
-        last_updated = self.get_attr_values()
-        if len(last_updated) > 0:
-            self.update_attrs.emit(last_updated)
-        self.mutx.unlock()
-        QApplication.processEvents()
 
     @QtCore.Slot()
     def stop(self):
         self.running = False
 
-    def get_attr_values(self):
+    def force_regen(self):
+        self.mutx.lock()
+        self.regen.emit(dict(self.tms_by_id))
+        self.mutx.unlock()
+
+    def reset(self):
+        self.mutx.lock()
+        self.dsc.reset()
+        self._init_containers()
+        self.regen.emit(dict(self.tms_by_id))
+        self.mutx.unlock()
+
+    @QtCore.Slot(dict)
+    def update_active_attrs(self, d):
+        if d["checked"] == True:
+            self.active_attrs.add(d["attr"])
+        else:
+            self.active_attrs.discard(d["attr"])
+
+    def _get_attr_values(self):
         vals = {}
         for attr in self.active_attrs:
             vals[attr.full_name] = self.timed_getter.get_value(attr.get_value)
@@ -92,34 +96,34 @@ class Worker(QObject):
                 break
         return vals
 
-    def node_appeared(self, node, name):
+    def _init_containers(self):
+        self.active_attrs = set()
+        self.dynamic_attrs = []
+        self.tms_by_id = {}
+        self.dynamic_attrs_last_update = {}
+
+    def _update(self):
+        self.mutx.lock()
+        last_updated = self._get_attr_values()
+        if len(last_updated) > 0:
+            self.update_attrs.emit(last_updated)
+        self.mutx.unlock()
+        QApplication.processEvents()
+
+    def _node_appeared(self, node, name):
+        self.mutx.lock()
         node_name = "{}{}".format(base_node_name, name)
         self.tms_by_id[node_name] = node
         node.name = node_name
         node.include_base_name = True
         self.dynamic_attrs = get_dynamic_attrs(self.tms_by_id)
-        self.force_regen()
+        self.regen.emit(dict(self.tms_by_id))
+        self.mutx.unlock()
 
-    def node_disappeared(self, name):
+    def _node_disappeared(self, name):
+        self.mutx.lock()
         node_name = "{}{}".format(base_node_name, name)
         del self.tms_by_id[node_name]
         self.dynamic_attrs = get_dynamic_attrs(self.tms_by_id)
-        self.force_regen()
-
-    def force_regen(self):
-        self.regen.emit(self.tms_by_id)
-
-    def reset(self):
-        self.mutx.lock()
-        self.dsc.reset()
-        self.init_containers()
-        self.force_regen()
+        self.regen.emit(dict(self.tms_by_id))
         self.mutx.unlock()
-
-    @QtCore.Slot(dict)
-    def update_active_attrs(self, d):
-        if d["checked"] == True:
-            self.active_attrs.add(d["attr"])
-        else:
-            self.active_attrs.discard(d["attr"])
-
