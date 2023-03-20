@@ -50,7 +50,7 @@ Alternatuvely, using the units interface:
 
 .. code-block:: python
 
-    >>>tm1.motor.type = 1
+    >>>tm1.motor.type = 1 # gimbal type
     >>>tm1.motor.R = 5 * Ohm
     >>>tm1.motor.L = 2e-3 * Henry
     >>>tm1.motor.I_cal = 0.5 * Amps
@@ -59,9 +59,9 @@ Control that the settings are correct:
 
 .. code-block:: python
     
-    >>>tm1.motor.
+    >>>tm1.motor
 
-You can now calibrate the motor:
+Ensure the values above are correct. You can now calibrate the motor:
 
 .. code-block:: python
     
