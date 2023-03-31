@@ -45,8 +45,8 @@ Connection with SWD adapter (e.g. isolator) for R5:
 As of Tinymovr 1.0.1, it is no longer necessary to patch the `JLinkDevices.xml` file with the PAC additions, in order for JLinkGDBServer to work properly. Relevant files are included in the repo.
 
 
-Setting up the repo
-###################
+Setting up
+##########
 
 First, clone the Tinymovr repo:
 
@@ -62,7 +62,7 @@ The file comes in a zipped installer exe (!), which all it does is extract the c
 
     cp -r <pac55xx_sdk_location> <tinymovr_location>/firmware/
 
-Now you have the required PAC SDK almost ready. As a final step, there is a small patch that you will need to apply in the pac55xx_sdk directory. It is suggested to use the `Python patch package <https://pypi.org/project/patch/>`_, which is cross-platform. If you do not have the package, install using pip:
+Now you have the required PAC SDK almost ready. There is a small patch that you will need to apply in the pac55xx_sdk directory. It is suggested to use the `Python patch package <https://pypi.org/project/patch/>`_, which is cross-platform. If you do not have the package, install using pip:
 
 .. code-block:: console
 
@@ -75,7 +75,13 @@ Then:
     cd <tinymovr_location>/firmware
     python3 -m patch sdk_patch.patch
 
-Done.
+As a final step, install the `GNU Arm Embedded Toolchain <https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads>`_. 
+
+If you are in Windows you will also need to install GNU make. This is rather easy in Windows 10 or later:
+
+.. code-block:: console
+
+    choco install make
 
 .. _setting-up-vscode:
 
@@ -88,14 +94,6 @@ VSCode-based Tinymovr development is a cross-platform solution (Linux, Macos and
 
 Building
 ********
-
-You will need to install the `GNU Arm Embedded Toolchain <https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads>`_. 
-
-In addition, if you are in Windows you will need to install GNU make. This is rather easy in Windows 10 or later:
-
-.. code-block:: console
-
-    choco install make
 
 To try out a test build from within VSCode select ``Terminal -> Run Task...`` from the menu bar, and select ``Clean and Build Project (Debug)``.
 
@@ -166,12 +164,5 @@ Congrats! You are now fully set to start with Tinymovr development!
 Using Eclipse
 ##################
 
-Eclipse is the legacy method of developing Tinymovr firmware and is no longer actively supported. Consider switching to VSCode-based development instead.
+Eclipse is no longer supported. Consider :ref:`setting-up-vscode` instead.
 
-You will need the Qorvo-supplied Eclipse distribution, which is Windows-compatible. Download from the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_.
-
-Run the downloaded installer that will install Eclipse and the J-Link utility (ver. 6.31) for you.
-
-Once installation is complete, run Eclipse and import the Tinymovr project. Try building to verify everything is ok. You are now ready to flash and debug using Eclipse.
-
-Please note that for a successful build using Eclipse you will need to ``#define`` in ``config.h`` one of ``BOARD_REV_R32``, ``BOARD_REV_R33`` or ``BOARD_REV_R5`` depending on your board revision.

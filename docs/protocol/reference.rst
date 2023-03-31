@@ -17,6 +17,8 @@ Type: uint32
 The Avlos protocol hash.
 
 
+
+
 uid
 -------------------------------------------------------------------
 
@@ -25,6 +27,8 @@ Type: uint32
 
 
 The unique device ID, unique to each PAC55xx chip produced.
+
+
 
 
 Vbus
@@ -37,6 +41,8 @@ Units: volt
 The measured bus voltage.
 
 
+
+
 Ibus
 -------------------------------------------------------------------
 
@@ -45,6 +51,8 @@ Type: float
 Units: ampere
 
 The estimated bus current. Only estimates current drawn by motor.
+
+
 
 
 power
@@ -57,6 +65,8 @@ Units: watt
 The estimated power. Only estimates power drawn by motor.
 
 
+
+
 temp
 -------------------------------------------------------------------
 
@@ -65,6 +75,8 @@ Type: float
 Units: degree_Celsius
 
 The internal temperature of the PAC55xx MCU.
+
+
 
 
 calibrated
@@ -77,6 +89,8 @@ Type: bool
 Whether the system has been calibrated.
 
 
+
+
 errors
 -------------------------------------------------------------------
 
@@ -85,6 +99,10 @@ Type: uint8
 
 
 Any system errors, as a bitmask
+
+Flags: 
+- UNDERVOLTAGE
+- DRIVER_FAULT
 
 
 save_config() -> void
@@ -127,6 +145,8 @@ Type: uint32
 Total processor cycles in a single PWM cycle.
 
 
+
+
 scheduler.busy
 -------------------------------------------------------------------
 
@@ -137,6 +157,8 @@ Type: uint32
 Busy processor cycles in a single PWM cycle.
 
 
+
+
 scheduler.errors
 -------------------------------------------------------------------
 
@@ -145,6 +167,9 @@ Type: uint8
 
 
 Any scheduler errors, as a bitmask
+
+Flags: 
+- CONTROL_BLOCK_REENTERED
 
 
 controller.state
@@ -157,6 +182,8 @@ Type: uint8
 The state of the controller.
 
 
+
+
 controller.mode
 -------------------------------------------------------------------
 
@@ -165,6 +192,8 @@ Type: uint8
 
 
 The control mode of the controller.
+
+
 
 
 controller.warnings
@@ -176,6 +205,11 @@ Type: uint8
 
 Any controller warnings, as a bitmask
 
+Flags: 
+- VELOCITY_LIMITED
+- CURRENT_LIMITED
+- MODULATION_LIMITED
+
 
 controller.errors
 -------------------------------------------------------------------
@@ -185,6 +219,9 @@ Type: uint8
 
 
 Any controller errors, as a bitmask
+
+Flags: 
+- CURRENT_LIMIT_EXCEEDED
 
 
 controller.position.setpoint
@@ -197,6 +234,8 @@ Units: tick
 The position setpoint.
 
 
+
+
 controller.position.p_gain
 -------------------------------------------------------------------
 
@@ -205,6 +244,8 @@ Type: float
 
 
 The proportional gain of the position controller.
+
+
 
 
 controller.velocity.setpoint
@@ -217,6 +258,8 @@ Units: tick / second
 The velocity setpoint.
 
 
+
+
 controller.velocity.limit
 -------------------------------------------------------------------
 
@@ -225,6 +268,8 @@ Type: float
 Units: tick / second
 
 The velocity limit.
+
+
 
 
 controller.velocity.p_gain
@@ -237,6 +282,8 @@ Type: float
 The proportional gain of the velocity controller.
 
 
+
+
 controller.velocity.i_gain
 -------------------------------------------------------------------
 
@@ -245,6 +292,8 @@ Type: float
 
 
 The integral gain of the velocity controller.
+
+
 
 
 .. _integrator-deadband:
@@ -259,6 +308,8 @@ Units: tick
 The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
 
 
+
+
 controller.velocity.increment
 -------------------------------------------------------------------
 
@@ -267,6 +318,8 @@ Type: float
 
 
 Max velocity setpoint increment (ramping) rate. Set to 0 to disable.
+
+
 
 
 controller.current.Iq_setpoint
@@ -279,6 +332,8 @@ Units: ampere
 The Iq setpoint.
 
 
+
+
 controller.current.Id_setpoint
 -------------------------------------------------------------------
 
@@ -287,6 +342,8 @@ Type: float
 Units: ampere
 
 The Id setpoint.
+
+
 
 
 controller.current.Iq_limit
@@ -299,6 +356,8 @@ Units: ampere
 The Iq limit.
 
 
+
+
 controller.current.Iq_estimate
 -------------------------------------------------------------------
 
@@ -307,6 +366,8 @@ Type: float
 Units: ampere
 
 The Iq estimate.
+
+
 
 
 controller.current.bandwidth
@@ -319,6 +380,8 @@ Units: radian / second
 The current controller bandwidth.
 
 
+
+
 controller.current.Iq_p_gain
 -------------------------------------------------------------------
 
@@ -327,6 +390,8 @@ Type: float
 
 
 The current controller proportional gain.
+
+
 
 
 controller.current.max_Ibus_regen
@@ -339,6 +404,8 @@ Units: ampere
 The max current allowed to be fed back to the power source before flux braking activates.
 
 
+
+
 controller.current.max_Ibrake
 -------------------------------------------------------------------
 
@@ -349,6 +416,8 @@ Units: ampere
 The max current allowed to be dumped to the motor windings during flux braking. Set to zero to deactivate flux braking.
 
 
+
+
 controller.voltage.Vq_setpoint
 -------------------------------------------------------------------
 
@@ -357,6 +426,8 @@ Type: float
 Units: volt
 
 The Vq setpoint.
+
+
 
 
 calibrate() -> void
@@ -431,6 +502,8 @@ Type: uint32
 The baud rate of the CAN interface.
 
 
+
+
 comms.can.id
 -------------------------------------------------------------------
 
@@ -439,6 +512,8 @@ Type: uint32
 
 
 The ID of the CAN interface.
+
+
 
 
 motor.R
@@ -451,6 +526,8 @@ Units: ohm
 The motor Resistance value.
 
 
+
+
 motor.L
 -------------------------------------------------------------------
 
@@ -459,6 +536,8 @@ Type: float
 Units: henry
 
 The motor Inductance value.
+
+
 
 
 motor.pole_pairs
@@ -471,6 +550,8 @@ Type: uint8
 The motor pole pair count.
 
 
+
+
 motor.type
 -------------------------------------------------------------------
 
@@ -479,6 +560,8 @@ Type: uint8
 
 
 The type of the motor. Either high current or gimbal.
+
+
 
 
 motor.offset
@@ -491,6 +574,8 @@ Type: float
 User-defined offset of the motor.
 
 
+
+
 motor.direction
 -------------------------------------------------------------------
 
@@ -499,6 +584,8 @@ Type: int8
 
 
 User-defined direction of the motor.
+
+
 
 
 motor.calibrated
@@ -511,6 +598,8 @@ Type: bool
 Whether the motor has been calibrated.
 
 
+
+
 motor.I_cal
 -------------------------------------------------------------------
 
@@ -521,6 +610,8 @@ Units: ampere
 The calibration current.
 
 
+
+
 motor.errors
 -------------------------------------------------------------------
 
@@ -529,6 +620,11 @@ Type: uint8
 
 
 Any motor/calibration errors, as a bitmask
+
+Flags: 
+- PHASE_RESISTANCE_OUT_OF_RANGE
+- PHASE_INDUCTANCE_OUT_OF_RANGE
+- INVALID_POLE_PAIRS
 
 
 encoder.position_estimate
@@ -541,6 +637,8 @@ Units: tick
 The filtered encoder position estimate.
 
 
+
+
 encoder.velocity_estimate
 -------------------------------------------------------------------
 
@@ -549,6 +647,8 @@ Type: float
 Units: tick / second
 
 The filtered encoder velocity estimate.
+
+
 
 
 encoder.type
@@ -561,6 +661,8 @@ Type: uint8
 The encoder type. Either INTERNAL or HALL.
 
 
+
+
 encoder.bandwidth
 -------------------------------------------------------------------
 
@@ -569,6 +671,8 @@ Type: float
 Units: radian / second
 
 The encoder observer bandwidth.
+
+
 
 
 encoder.calibrated
@@ -581,6 +685,8 @@ Type: bool
 Whether the encoder has been calibrated.
 
 
+
+
 encoder.errors
 -------------------------------------------------------------------
 
@@ -589,6 +695,10 @@ Type: uint8
 
 
 Any encoder errors, as a bitmask
+
+Flags: 
+- CALIBRATION_FAILED
+- READING_UNSTABLE
 
 
 traj_planner.max_accel
@@ -601,6 +711,8 @@ Units: tick / second
 The trajectory planner max acceleration.
 
 
+
+
 traj_planner.max_decel
 -------------------------------------------------------------------
 
@@ -611,6 +723,8 @@ Units: tick / second ** 2
 The trajectory planner max deceleration.
 
 
+
+
 traj_planner.max_vel
 -------------------------------------------------------------------
 
@@ -619,6 +733,8 @@ Type: float
 Units: tick / second
 
 The trajectory planner max cruise velocity.
+
+
 
 
 move_to(pos_setpoint) -> void
@@ -650,6 +766,10 @@ Type: uint8
 
 Any errors in the trajectory planner, as a bitmask
 
+Flags: 
+- INVALID_INPUT
+- VCRUISE_OVER_LIMIT
+
 
 watchdog.enabled
 -------------------------------------------------------------------
@@ -659,6 +779,8 @@ Type: bool
 
 
 Whether the watchdog is enabled or not.
+
+
 
 
 watchdog.triggered
@@ -671,6 +793,8 @@ Type: bool
 Whether the watchdog has been triggered or not.
 
 
+
+
 watchdog.timeout
 -------------------------------------------------------------------
 
@@ -679,5 +803,7 @@ Type: float
 Units: second
 
 The watchdog timeout period.
+
+
 
 
