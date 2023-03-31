@@ -49,8 +49,9 @@ setup(
     install_requires=[
         "ipython",
         "importlib_resources",
-        "python-can>=4.0.0.dev0",
-        "avlos @ git+https://github.com/tinymovr/avlos.git",
+        "python-can",
+        "python-can-canine",
+        "avlos",
         "pyserial",
         "pyusb",
         "pyyaml",
@@ -63,9 +64,6 @@ setup(
         "console_scripts": [
             "tinymovr_cli=tinymovr.cli:spawn",
             "tinymovr=tinymovr.gui:spawn",
-        ],
-        # "can.interface": [
-        #     "insilico=tinymovr.bus:InSilico",
-        # ],
+        ]
     },
 )
