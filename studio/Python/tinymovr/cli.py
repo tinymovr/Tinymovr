@@ -12,6 +12,7 @@ Options:
 """
 
 import can
+from canine.canine import CANineBus
 import pkg_resources
 import IPython
 from traitlets.config import Config

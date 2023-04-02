@@ -18,6 +18,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 import time
 import can
+from canine.canine import CANineBus
 from PySide2 import QtCore
 from PySide2.QtCore import QObject
 from PySide2.QtWidgets import (
