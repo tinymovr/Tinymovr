@@ -26,7 +26,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="tinymovr",
-    #version="", #version will be taken from git tag
+    # version="", #version will be taken from git tag
     author="Yannis Chatzikonstantinou",
     author_email="info@tinymovr.com",
     description="Tinymovr Studio",
@@ -43,7 +43,7 @@ setup(
     setuptools_git_versioning={
         "enabled": True,
         "dev_template": "{tag}+post{ccount}",
-        "dirty_template": "{tag}+post{ccount}_dirty"
+        "dirty_template": "{tag}+post{ccount}_dirty",
     },
     setup_requires=["setuptools-git-versioning<2"],
     install_requires=[
