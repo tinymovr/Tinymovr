@@ -60,7 +60,7 @@ void USARTB_IRQHandler(void)
         uart_tx_byte_idx++;
 
         // Terminate transmission upon newline or transmit overflow
-        if ((uart_tx_msg[uart_tx_byte_idx - 1u] == UART_NEWLINE) ||
+        if ((uart_tx_msg[uart_tx_byte_idx - 1u] == UART_LINEFEED) ||
                 (uart_tx_byte_idx > UART_BYTE_LIMIT))
         {
             // Disable transmit interrupt
@@ -82,7 +82,7 @@ void USARTB_IRQHandler(void)
         {
             uart_rx_buf[uart_rx_byte_idx] = data;
             if ((rx_msg_type == MSG_TYPE_ASCII) &&
-                (uart_rx_buf[uart_rx_byte_idx] == UART_NEWLINE))
+                (uart_rx_buf[uart_rx_byte_idx] == UART_LINEFEED))
             {
                 uart_rx_msg_len = uart_rx_byte_idx + 1u;
                 memcpy(&uart_rx_msg, &uart_rx_buf, uart_rx_msg_len);

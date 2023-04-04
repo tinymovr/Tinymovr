@@ -244,7 +244,7 @@ void UART_SendInt32(int32_t val)
     {
         if (uart_tx_msg[i] == '\0')
         {
-            uart_tx_msg[i] = UART_NEWLINE;
+            uart_tx_msg[i] = UART_LINEFEED;
             break;
         }
     }
