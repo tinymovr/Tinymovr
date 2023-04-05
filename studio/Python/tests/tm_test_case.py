@@ -28,11 +28,9 @@ import unittest
 class TMTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        if os.name == 'nt':
-            bustype, channel = "slcan", guess_slcan()
-        else:
-            bustype, channel = get_bus_config(["socketcan"])
-        cls.can_bus = can.Bus(bustype=bustype, channel=channel, bitrate=1000000)
+        params = get_bus_config(["canine", "slcan"])
+        params["bitrate"] = 1000000
+        cls.can_bus = can.Bus(**params)
         init_tee(cls.can_bus)
         cls.tm = create_device(node_id=1)
         cls.reset_and_wait()
