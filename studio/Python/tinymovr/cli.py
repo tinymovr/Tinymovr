@@ -6,7 +6,7 @@ Usage:
     tinymovr_cli --version
 
 Options:
-    --bus=<bus>  One or more interfaces to use, first available is used [default: socketcan,slcan].
+    --bus=<bus>  One or more interfaces to use, first available is used [default: canine,slcan].
     --chan=<chan>  The bus device "channel".
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
