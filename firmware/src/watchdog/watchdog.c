@@ -21,7 +21,6 @@
 #include "src/common.h"
 
 static TimeoutWatchdog watchdog = {
-    .enabled = false,
     .triggered = false
 };
 
@@ -47,12 +46,12 @@ void Watchdog_init(void)
     Watchdog_set_timeout_cycles(wwdt_freq);
 }
 
-PAC5XXX_RAMFUNC bool Watchdog_triggered(void)
+TM_RAMFUNC bool Watchdog_triggered(void)
 {
     return watchdog.triggered;
 }
 
-PAC5XXX_RAMFUNC void Watchdog_reset(void)
+TM_RAMFUNC void Watchdog_reset(void)
 {
     watchdog.triggered = false;
     PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_WRITE_AVALABLE;
@@ -60,6 +59,17 @@ PAC5XXX_RAMFUNC void Watchdog_reset(void)
     PAC55XX_WWDT->WWDTCLEAR = 1;
 
 }
+
+uint16_t Watchdog_get_timeout_cycles(void)
+{
+    return PAC55XX_WWDT->WWDTCDCTL.CDV;
+}
+
+float Watchdog_get_timeout_seconds(void)
+{
+    return ((float)(PAC55XX_WWDT->WWDTCDCTL.CDV)) / wwdt_freq;
+}
+
 
 void Watchdog_set_timeout_cycles(uint16_t cycles)
 {
@@ -83,26 +93,28 @@ void Watchdog_set_timeout_seconds(float seconds)
     Watchdog_set_timeout_cycles(cycles);
 }
 
-void Watchdog_enable(void)
+bool Watchdog_get_enabled(void)
 {
-    watchdog.triggered = false;
-    watchdog.enabled = true;
-
-    PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_WRITE_AVALABLE;
-    // The WWDTCTR is automatically reset on enabling
-    PAC55XX_WWDT->WWDTCTL.EN = 1;
-    // Enable WWDT interrupt in the NVIC
-    NVIC_EnableIRQ(Wdt_IRQn);
+    return (bool)(PAC55XX_WWDT->WWDTCTL.EN);
 }
 
-void Watchdog_disable(void)
+void Watchdog_set_enabled(bool enabled)
 {
     PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_WRITE_AVALABLE;
-    PAC55XX_WWDT->WWDTCTL.EN = 0;
-    // Disable WWDT interrupt in the NVIC - crashes without this
-    NVIC_DisableIRQ(Wdt_IRQn);
-    watchdog.enabled = false;
-    
+    if (enabled)
+    {
+         watchdog.triggered = false;
+        // The WWDTCTR is automatically reset on enabling
+        PAC55XX_WWDT->WWDTCTL.EN = 1;
+        // Enable WWDT interrupt in the NVIC
+        NVIC_EnableIRQ(Wdt_IRQn);
+    }
+    else
+    {
+        PAC55XX_WWDT->WWDTCTL.EN = 0;
+        // Disable WWDT interrupt in the NVIC - crashes without this
+        NVIC_DisableIRQ(Wdt_IRQn);
+    }    
 }
 
 void WWDT_process_interrupt(void)

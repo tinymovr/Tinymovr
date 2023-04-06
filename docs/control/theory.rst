@@ -58,8 +58,6 @@ Position mode
 
 This is the most versatile mode, it accepts a position setpoint, and additional velocity and current feedforward terms.
 
-You can send these 3 setpoints as a single CAN frame when using the `set_pos_setpoint` endpoint.
-
 You can tune separately each gain of the loop.
 
 **P_p**: The gain of the position proportional term

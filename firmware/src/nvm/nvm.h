@@ -1,7 +1,7 @@
 
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
-//  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
+//  * Copyright (c) 2020-2023 Ioannis Chatzikonstantinou.
 //  * 
 //  * This program is free software: you can redistribute it and/or modify  
 //  * it under the terms of the GNU General Public License as published by  
@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <src/adc/adc.h>
 #include <src/motor/motor.h>
 #include <src/encoder/hall.h>
 #include <src/encoder/ma7xx.h>
@@ -29,6 +30,7 @@
 #define SETTINGS_PAGE_HEX (0x0001E000)
 
 struct NVMStruct {
+    ADCConfig adc_config;
     MotorConfig motor_config;
     HallConfig hall_config;
     MA7xxConfig ma7xx_config;
@@ -36,7 +38,7 @@ struct NVMStruct {
     ObserverConfig observer_config;
     ControllerConfig controller_config;
     CANConfig can_config;
-    uint32_t version;
+    char version[16];
 };
 
 bool nvm_save_config(void);

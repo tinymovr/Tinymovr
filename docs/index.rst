@@ -6,24 +6,35 @@
 Welcome to Tinymovr documentation!
 ========================================
 
+.. note::
+   This is the documentation for the latest stable version of the Tinymovr Firmware and Studio app. For the legacy 0.x.x documentation, check out the [legacy docs](https://tinymovr.readthedocs.io/en/attic-legacy/).
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    quickstart
+   
    hardware/overview
    hardware/guide
+   
    studio/installation
    studio/usage
-   planner/planner
-   encoders/encoders
-   api/guide
+   
+   protocol/integrating
+   protocol/reference
    interfaces/interfaces
+   
+   encoders/encoders
+   planner/planner
    upgrade/upgrade
    hardware/gimbal
+   
    hardware/canine
+   
    troubleshooting
    control/theory
    develop/guide
+   
    hardware/errata
 

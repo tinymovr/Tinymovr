@@ -1,65 +1,93 @@
 """
-This unit test suite tests functionality
-of Tinymovr boards.
+Tinymovr Base Test Class
+Copyright Ioannis Chatzikonstantinou 2020-2023
+
+Implements convenience functionality.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>.
 """
-import random
+
+import os
 import time
 import can
 
-import tinymovr
-from tinymovr import Tinymovr
-from tinymovr.iface import IFace
-from tinymovr.iface.can_bus import CANBus, guess_channel
-from tinymovr.units import get_registry
+from tinymovr import init_tee, destroy_tee
+from tinymovr.config import get_bus_config, create_device
 
 import unittest
-
-bustype = "slcan"
 
 
 class TMTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        channel = guess_channel(bustype_hint=bustype)
-        cls.can_bus: can.Bus = can.Bus(
-            bustype=bustype, channel=channel, bitrate=1000000
-        )
-        iface: IFace = CANBus(cls.can_bus)
-        cls.tm = Tinymovr(node_id=1, iface=iface)
+        params = get_bus_config(["canine", "slcan"])
+        params["bitrate"] = 1000000
+        cls.can_bus = can.Bus(**params)
+        init_tee(cls.can_bus)
+        cls.tm = create_device(node_id=1)
         cls.reset_and_wait()
 
     def tearDown(self):
-        self.tm.idle()
+        self.tm.controller.idle()
 
     @classmethod
     def tearDownClass(cls):
         cls.tm.reset()
+        destroy_tee()
         cls.can_bus.shutdown()
 
     @classmethod
-    def reset_and_wait(cls, timeout=3):
+    def reset_and_wait(cls, timeout=0.5):
         cls.tm.reset()
         time.sleep(timeout)
 
     def try_calibrate(self, force=False, *args, **kwargs):
-        motor_config = self.tm.motor_config
-        if True == force or (motor_config.flags == 0 or motor_config.flags == 2):
-            self.tm.calibrate()
+        if True == force or not self.tm.calibrated:
+            self.tm.controller.calibrate()
             self.wait_for_calibration(*args, **kwargs)
-            motor_config = self.tm.motor_config
-            self.assertTrue(motor_config.flags == 1 or motor_config.flags == 3)
+            self.assertTrue(self.tm.calibrated)
 
     def wait_for_calibration(self, check_interval=0.05):
         for _ in range(1000):
-            if self.tm.state.state == 0:
+            if self.tm.controller.state == 0:
                 break
             time.sleep(check_interval)
-        self.assertEqual(self.tm.state.state, 0)
+        self.assertEqual(self.tm.controller.state, 0)
 
     def check_state(self, target_state, target_error=None):
-        state = self.tm.state
-        if target_error and state.errors:
-            self.assertIn(target_error, state.errors)
+        errors = self.tm.errors
+        if target_error and errors:
+            self.assertGreater(errors & target_error.bitmask, 0)
         else:
-            self.assertFalse(state.errors)
-        self.assertEqual(state.state, target_state)
+            self.assertEqual(errors, 0)
+        self.assertEqual(self.tm.controller.state, target_state)
+
+
+# TODO: This is temporary, should be removed when
+# slcan autodiscovery is merged in python-can
+import serial
+from serial.tools import list_ports
+import logging
+
+
+def guess_slcan():
+    device_strings = ("canable", "cantact")
+    ports = []
+    for p in serial.tools.list_ports.comports():
+        desc_lower: str = p.description.lower()
+        if any([s in desc_lower for s in device_strings]):
+            ports.append(p.device)
+    if not ports:
+        raise IOError("Could not autodiscover CAN channel")
+    if len(ports) > 1:
+        logging.warning("Multiple channels discovered - using the first")
+
+    return ports[0]

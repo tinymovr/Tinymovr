@@ -4,7 +4,7 @@
 //  * 
 //  *  *except* for the function "SVM()", which is Copyright (c) 2016-2018 Oskar Weigl
 //  * 
-//  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
+//  * Copyright (c) 2020-2023 Ioannis Chatzikonstantinou.
 //  * 
 //  * This program is free software: you can redistribute it and/or modify  
 //  * it under the terms of the GNU General Public License as published by  
@@ -44,6 +44,7 @@ static inline float our_fabsf(float x)
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#pragma GCC diagnostic ignored "-Wuninitialized"
 static inline float fast_inv_sqrt(float n)
 {
 	long i;

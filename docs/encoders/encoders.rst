@@ -20,7 +20,8 @@ The onboard sensor is enabled by default, so no special configuration is necessa
 
 .. code-block:: python
 
-    tm1.set_encoder_config(0, 1500) # encoder type, bandwidth
+    tm1.encoder.type = 1
+    tm1.encoder.bandwidth = 1500
     tm1.save_config()
     tm1.reset() # encoder change is applied after reset
 
@@ -48,6 +49,15 @@ Note the U, V and W pins. These need to be connected to the respective pins of t
 .. note::
   Tinymovr supplies 3.3V on the AUX power supply pin. If your sensor uses 5V, or if it needs more than 50mA, you'll need to provide power externally, e.g. through a dedicated buck converter. 
 
+Example
+=======
+
+The figure below shows an example of wiring a hub motor to Tinymovr, using the embedded Hall effect sensors of the motor for commutation. Note that the power and ground are connected to an external 5V power supply. Alternatively, if your Hall effect sensors are compatible with 3.3V input, you can connect the leads to the onboard connectors.
+
+.. image:: hubmotor_diagram.png
+  :width: 800
+  :alt: Wiring diagram for connection of hub motor to Tinymovr
+
 Configuration
 -------------
 
@@ -55,7 +65,8 @@ As a first step you need to configure the sensor type and observer bandwidth.
 
 .. code-block:: python
 
-    tm1.set_encoder_config(1, 100) # encoder type, bandwidth
+    tm1.encoder.type = 1
+    tm1.encoder.bandwidth = 100
 
 This sets the encoder type to Hall effect sensor, and the encoder bandwidth to 100. 
 
@@ -63,7 +74,7 @@ Next, you need to set the motor configuration:
 
 .. code-block:: python
 
-    tm1.set_motor_config(0, 15, 4) # motor type, pole pairs, calibration current
+    tm1.motor.pole_pairs = 15
     tm1.save_config()
     tm1.reset() # encoder change is applied after reset
     
@@ -75,9 +86,10 @@ Because of this vast change in resolution (almost 2 orders of magnitude), the ga
 
 .. code-block:: python
 
-    tm1.set_gains(5, 0.07) # position gain, velocity gain
+    tm1.controller.position.p_gain = 5
+    tm1.controller.velocity.p_gain = 0.07
 
-The values above are just an example using a 15 pp hoverboard motor. For your own motor, you need to determine these experimentally. In position control mode, start by raising the default velocity gain until your motor experiences oscillations. The back up by a factor of two, and repeat the same for velocity control. This simple tuning heuristic does not result in an optimal configuration but the gains are workable.
+The values above are just an example using a 15 pp hoverboard motor. For your own motor, you need to determine these experimentally. In position control mode, start by raising the default velocity gain until your motor experiences oscillations. The back up by a factor of two, and repeat the same for position control. This simple tuning heuristic does not result in an optimal configuration but the gains are workable.
 
 Last step is motor/encoder calibration:
 
@@ -89,7 +101,8 @@ After calibration finishes, you should be able to control the motor:
 
 .. code-block:: python
 
-    tm1.velocity_control()
-    tm1.set_vel_setpoint(100) # around 60 rpm for a 15 pp motor
+    tm1.controller.velocity_mode()
+    tm1.controller.velocity.setpoint = 100 # around 60 rpm for a 15 pp motor
 
 The motor should now move at a constant velocity.
+

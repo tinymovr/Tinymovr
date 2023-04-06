@@ -7,18 +7,27 @@
         {
             "cwd": "${workspaceRoot}",
             "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
-            "name": "Debug Tinymovr",
+            "name": "Rebuild Debug and Start Session",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "jlink",
             "device": "PAC55XX",
             "interface": "swd",
+            "preLaunchCommands": [
+                // Set JTAG speed in kHz
+                "monitor speed 1000"
+            ],
+            "serverArgs": [
+                "-JLinkDevicesXMLPath",
+                "${workspaceRoot}/firmware/"
+                // "-speed 2000"
+            ],
             "runToEntryPoint": "main",
             "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
-            "preLaunchTask": "Build Project (Debug)",
+            "preLaunchTask": "Clean and Build Project (Debug)",
             "windows": {
                 // Update the path below as necessary
-                "serverpath": "C:\\Program Files (x86)\\SEGGER\\JLink_V631b\\JLinkGDBServerCL.exe" 
+                "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
             },
             "linux": {
                 // Update the path below as necessary
@@ -28,17 +37,105 @@
         {
             "cwd": "${workspaceRoot}",
             "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
-            "name": "Flash Tinymovr Release",
+            "name": "Rebuild Release and Flash",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "jlink",
             "device": "PAC55XX",
             "interface": "swd",
+            "preLaunchCommands": [
+                // Set JTAG speed in kHz
+                "monitor speed 1000"
+            ],
+            "serverArgs": [
+                "-JLinkDevicesXMLPath",
+                "${workspaceRoot}/firmware/"
+            ],
             "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
-            "preLaunchTask": "Build Project (Release)",
+            "preLaunchTask": "Clean and Build Project (Release)",
             "windows": {
                 // Update the path below as necessary
-                "serverpath": "C:\\Program Files (x86)\\SEGGER\\JLink_V631b\\JLinkGDBServerCL.exe" 
+                "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
+            },
+            "linux": {
+                // Update the path below as necessary
+                "serverpath": "/opt/SEGGER/JLink/JLinkGDBServer" 
+            }
+        },
+        {
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
+            "name": "Flash Built Binary and Start Session",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "jlink",
+            "device": "PAC55XX",
+            "interface": "swd",
+            "preLaunchCommands": [
+                // Set JTAG speed in kHz
+                "monitor speed 1000"
+            ],
+            "serverArgs": [
+                "-JLinkDevicesXMLPath",
+                "${workspaceRoot}/firmware/"
+                // "-speed 2000"
+            ],
+            "runToEntryPoint": "main",
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
+            "windows": {
+                // Update the path below as necessary
+                "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
+            },
+            "linux": {
+                // Update the path below as necessary
+                "serverpath": "/opt/SEGGER/JLink/JLinkGDBServer" 
+            }
+        },
+        {
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
+            "name": "Flash Built Binary",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "jlink",
+            "device": "PAC55XX",
+            "interface": "swd",
+            "preLaunchCommands": [
+                // Set JTAG speed in kHz
+                "monitor speed 1000"
+            ],
+            "serverArgs": [
+                "-JLinkDevicesXMLPath",
+                "${workspaceRoot}/firmware/"
+            ],
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
+            "windows": {
+                // Update the path below as necessary
+                "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
+            },
+            "linux": {
+                // Update the path below as necessary
+                "serverpath": "/opt/SEGGER/JLink/JLinkGDBServer" 
+            }
+        },
+        {
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
+            "name": "Attach to Target",
+            "request": "attach",
+            "type": "cortex-debug",
+            "servertype": "jlink",
+            "device": "PAC55XX",
+            "interface": "swd",
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
+            "serverArgs": [
+                "-JLinkDevicesXMLPath",
+                "${workspaceRoot}/firmware/"
+                // "-speed 2000"
+            ],
+            "windows": {
+                // Update the path below as necessary
+                "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
             },
             "linux": {
                 // Update the path below as necessary

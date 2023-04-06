@@ -21,6 +21,7 @@ ELF := $(BUILDDIR)/tinymovr_fw.elf
 HEX := $(BUILDDIR)/tinymovr_fw.hex
 BIN := $(BUILDDIR)/tinymovr_fw.bin
 OBJDIR = $(BUILDDIR)/obj
+GIT_VERSION := $(shell git describe --abbrev=7 --dirty --always --tags)
 
 # Toolchain
 CC := arm-none-eabi-gcc
@@ -50,6 +51,7 @@ BASEFLAGS += -Waggregate-return
 BASEFLAGS += -Wshadow
 BASEFLAGS += -Wdouble-promotion
 BASEFLAGS += -DBOARD_REV_$(REV)
+BASEFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
 BASEFLAGS += $(INCLUDEFLAGS)
 
 # Compiler flags (c and c++), inherit BASEFLAGS
@@ -70,7 +72,6 @@ CPPFLAGS += $(COMPILEFLAGS)
 LDFLAGS += $(BASEFLAGS)
 LDFLAGS += -Tpac55xx.ld
 LDFLAGS += -nostartfiles
-LDFLAGS += -specs=nosys.specs
 LDFLAGS += -Xlinker --gc-sections # optimize function and data sections produced during compile...
 # LDFLAGS += -Xlinker --print-gc-sections # ... and print relevant info
 LDFLAGS += -Xlinker -Map="$(BUILDDIR)/tinymovr.map"
@@ -100,15 +101,15 @@ OBJECTS := $(addprefix $(BUILDDIR)/,$(CSOURCES:%.c=%.o)) $(addprefix $(BUILDDIR)
 all: release
 
 # Debug target
-debug: CFLAGS += -DDEBUG -g1 -O1
-debug: CPPFLAGS += -DDEBUG -g1 -O1
+debug: CFLAGS += -DDEBUG -g2 -O1
+debug: CPPFLAGS += -DDEBUG -g2 -O1
 debug: LDFLAGS += -O1
 debug: OBJECTS += $(BUILDDIR)/bootloader.o
 debug: binary
 
 # Upgrade target
-upgrade: CFLAGS += -g0 -O3
-upgrade: CPPFLAGS += -g0 -O3
+upgrade: CFLAGS += -DNDEBUG -DPAC5XXX_DRIVER_TILE_RAM -DPAC5XXX_DRIVER_SOCBRIDGE_RAM -g0 -O3
+upgrade: CPPFLAGS += -DNDEBUG -DPAC5XXX_DRIVER_TILE_RAM -DPAC5XXX_DRIVER_SOCBRIDGE_RAM -g0 -O3
 upgrade: LDFLAGS += -O3
 upgrade: binary
 

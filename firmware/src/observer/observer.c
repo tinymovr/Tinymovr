@@ -1,7 +1,7 @@
 
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
-//  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
+//  * Copyright (c) 2020-2023 Ioannis Chatzikonstantinou.
 //  * 
 //  * This program is free software: you can redistribute it and/or modify  
 //  * it under the terms of the GNU General Public License as published by  
@@ -48,7 +48,7 @@ void observer_reset(void)
 	state.vel_estimate = 0;
 }
 
-PAC5XXX_RAMFUNC void observer_update_estimates(void)
+TM_RAMFUNC void observer_update(void)
 {
 	const int16_t angle_meas = encoder_get_angle();
 	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;
@@ -92,25 +92,25 @@ void observer_set_bw(float bw)
     }
 }
 
-PAC5XXX_RAMFUNC float observer_get_pos_estimate(void)
+TM_RAMFUNC float observer_get_pos_estimate(void)
 {
 	const float primary = state.encoder_ticks * state.pos_sector;
 	return primary + state.pos_estimate_wrapped;
 }
 
-PAC5XXX_RAMFUNC float observer_get_diff(float target)
+TM_RAMFUNC float observer_get_diff(float target)
 {
 	const float primary = state.encoder_ticks * state.pos_sector;
 	const float diff_sector = target - primary;
 	return diff_sector - state.pos_estimate_wrapped;
 }
 
-PAC5XXX_RAMFUNC float observer_get_vel_estimate(void)
+TM_RAMFUNC float observer_get_vel_estimate(void)
 {
 	return state.vel_estimate;
 }
 
-PAC5XXX_RAMFUNC float observer_get_epos(void)
+TM_RAMFUNC float observer_get_epos(void)
 {
 	if (ENCODER_MA7XX == state.encoder_type)
 	{
@@ -119,7 +119,7 @@ PAC5XXX_RAMFUNC float observer_get_epos(void)
 	return state.pos_estimate_wrapped * twopi_by_hall_sectors;
 }
 
-PAC5XXX_RAMFUNC float observer_get_evel(void)
+TM_RAMFUNC float observer_get_evel(void)
 {
 	if (ENCODER_MA7XX == state.encoder_type)
 	{
@@ -128,12 +128,12 @@ PAC5XXX_RAMFUNC float observer_get_evel(void)
 	return state.vel_estimate * twopi_by_hall_sectors;
 }
 
-PAC5XXX_RAMFUNC float observer_get_pos_estimate_user_frame(void)
+TM_RAMFUNC float observer_get_pos_estimate_user_frame(void)
 {
 	return (observer_get_pos_estimate() - motor_get_user_offset()) * motor_get_user_direction();
 }
 
-PAC5XXX_RAMFUNC float observer_get_vel_estimate_user_frame(void)
+TM_RAMFUNC float observer_get_vel_estimate_user_frame(void)
 {
 	return state.vel_estimate * motor_get_user_direction();
 }

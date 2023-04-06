@@ -4,5 +4,15 @@
         "random": "c",
         "limits": "c",
         "common.h": "c"
-    }
+    },
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./studio/Python/tests",
+        "-p",
+        "test_*.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true,
+    "python.formatting.provider": "black"
 }

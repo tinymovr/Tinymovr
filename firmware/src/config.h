@@ -1,7 +1,7 @@
 
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
-//  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
+//  * Copyright (c) 2020-2023 Ioannis Chatzikonstantinou.
 //  * 
 //  * This program is free software: you can redistribute it and/or modify  
 //  * it under the terms of the GNU General Public License as published by  
@@ -17,20 +17,12 @@
 
 #pragma once
 
-// Firmware Version
-#define VERSION_MAJOR (0u)
-#define VERSION_MINOR (8u)
-#define VERSION_PATCH (18u)
-
-// Required Studio version
-#define STUDIO_MIN_VERSION_MAJOR (0u)
-#define STUDIO_MIN_VERSION_MINOR (3u)
-#define STUDIO_MIN_VERSION_PATCH (17u)
-
 /// TINYMOVR CONFIGURATION OPTIONS ///
 
 #define ACLK_FREQ_HZ                (300000000)
 #define HCLK_FREQ_HZ                (150000000)
+#define CLKREF_FREQ_HZ              (4000000)
+#define FRCLK_FREQ_HZ               CLKREF_FREQ_HZ
 
 // Timer clock divider
 #define TXCTL_PS_DIV                TXCTL_PS_DIV2
@@ -47,18 +39,6 @@
 #define I_HARD_LIMIT                (60.0f)    // A
 #define VEL_INTEGRATOR_THRESHOLD    (2000.0f) // ticks/s
 
-// Calibration
-#define CAL_R_LEN             (2 * PWM_FREQ_HZ)
-#define CAL_L_LEN             (1 * PWM_FREQ_HZ)
-#define CAL_OFFSET_LEN        (1 * PWM_FREQ_HZ)
-#define CAL_STAY_LEN          (PWM_FREQ_HZ / 2)
-#define CAL_DIR_LEN           (3 * PWM_FREQ_HZ)
-
-#define CAL_PHASE_TURNS             8
-
-#define CAL_V_GAIN (0.0005f)
-#define CAL_V_INDUCTANCE (2.0f)
-
 // Encoder rectification lookup table size
 #define ECN_BITS (6)
 #define ECN_SIZE (2 << ECN_BITS)
@@ -66,7 +46,7 @@
 // UART
 #define UART_ENUM UARTB
 #define UART_REF PAC55XX_UARTB
-#define UART_BAUD_RATE 115200
+#define UART_BAUD_RATE (115200)
 
 #define UART_I_SCALING_FACTOR ( 1000.0f )
 #define ONE_OVER_UART_I_SCALING_FACTOR ( 0.001f )

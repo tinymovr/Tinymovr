@@ -29,17 +29,19 @@ To enable gimbal mode, set the motor configuration as follows:
 
 .. code-block:: python
 
-    >>>tm1.set_motor_config(1, pole_pairs, calibration_current)
-
-    >>>tm1.set_motor_RL(motor_resistance, motor_inductance)
-
-Please note that by default the motor_resistance field is in Ohms, the motor_inductance field is in Henries, and the calibration current in Amps. The pole pairs need not be the correct number, as it will be discovered during calibration. You can leave it at the default 7.
+    >>>tm1.motor.type = 1 # gimbal type
+    >>>tm1.motor.R = {motor_resistance}
+    >>>tm1.motor.L = {motor_inductance}
+    >>>tm1.motor.I_cal = {calibration_current}
 
 Example
 
 .. code-block:: python
-    
-    >>>tmx.set_motor_config(1, 7, 0.5)
+
+    >>>tm1.motor.type = 1
+    >>>tm1.motor.R = 5
+    >>>tm1.motor.L = 2e-3
+    >>>tm1.motor.I_cal = 0.5
 
      >>>tmx.set_motor_RL(5, 0.002)
 
@@ -47,27 +49,31 @@ This specifies a motor with 5 Ohms resistance, 2 Millihenries inductance and 0.5
 Alternatuvely, using the units interface:
 
 .. code-block:: python
-    
-    >>>tmx.set_motor_config(1, 7, 0.5 * Amps)
 
-    >>>tmx.set_motor_config(5 * Ohm, 0.002 * Henry)
+    >>>tm1.motor.type = 1 # gimbal type
+    >>>tm1.motor.R = 5 * Ohm
+    >>>tm1.motor.L = 2e-3 * Henry
+    >>>tm1.motor.I_cal = 0.5 * Amps
 
 Control that the settings are correct:
 
 .. code-block:: python
     
-    >>>tmx.motor_config
-    {"flags": 2, "pole_pairs": 7, "I_cal": 0.5}
+    >>>tm1.motor
 
-    >>>tmx.motor_RL
-    {"R": 5, "L": 0.002}
-
-You can now calibrate the motor. Calibration will bypass resistance and inductance measurement, and will only calculate pole pairs, offset and direction. After calibration you should see the correct number of pole pairs, and a value of `3` in the `flags` field of motor_config:
+Ensure the values above are correct. You can now calibrate the motor:
 
 .. code-block:: python
     
-    >>>tmx.motor_config
-    {"flags": 3, "pole_pairs": 11, "I_cal": 0.5}
+    >>>tm1.controller.calibrate()
+
+Because the motor is set as gimbal, calibration will bypass resistance and inductance measurement, and will only calculate pole pairs, offset and direction. After calibration `tmx.motor.calibrated` should return true:
+
+.. code-block:: python
+    
+    >>>tm1.motor.calibrated
+    True
+
 
 Controlling the Motor
 ---------------------

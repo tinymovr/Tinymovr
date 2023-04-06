@@ -4,12 +4,13 @@ on: [push]
 
 jobs:
   check-and-build-fw:
-    runs-on: 'ubuntu-20.04'
+    runs-on: 'ubuntu-22.04'
     strategy:
       matrix:
-        board-revision: [R32, R33, R5]
+        board-revision: [R32, R33, R5, M5]
     steps:
     - uses: actions/checkout@v2
+    - uses: carlosperate/arm-none-eabi-gcc-action@v1
 
     - name: Set up Python 3.10
       uses: actions/setup-python@v2
@@ -25,11 +26,6 @@ jobs:
     - name: Run cppcheck on Tinymovr
       run: cppcheck --force --addon=cert --error-exitcode=1 -isrc/rtt -isrc/utils -isrc/nvm -isrc/uart -isrc/can src
       working-directory: firmware
-
-    - name: Install gcc-arm-none-eabi
-      run: |
-        sudo apt install gcc-arm-none-eabi
-        arm-none-eabi-gcc --version
 
     - name: Clone Qorvo deps
       uses: actions/checkout@v2

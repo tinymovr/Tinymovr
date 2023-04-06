@@ -1,4 +1,20 @@
 
+//  * This file is part of the Tinymovr-Firmware distribution
+//  * (https://github.com/yconst/tinymovr-firmware).
+//  * Copyright (c) 2020-2023 Ioannis Chatzikonstantinou.
+//  *
+//  * This program is free software: you can redistribute it and/or modify
+//  * it under the terms of the GNU General Public License as published by
+//  * the Free Software Foundation, version 3.
+//  *
+//  * This program is distributed in the hope that it will be useful, but
+//  * WITHOUT ANY WARRANTY; without even the implied warranty of
+//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//  * General Public License for more details.
+//  *
+//  * You should have received a copy of the GNU General Public License
+//  * along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 #include <string.h>
 #include <src/common.h>
 #include "src/uart/uart_func.h"
@@ -44,7 +60,7 @@ void USARTB_IRQHandler(void)
         uart_tx_byte_idx++;
 
         // Terminate transmission upon newline or transmit overflow
-        if ((uart_tx_msg[uart_tx_byte_idx - 1u] == UART_NEWLINE) ||
+        if ((uart_tx_msg[uart_tx_byte_idx - 1u] == UART_LINEFEED) ||
                 (uart_tx_byte_idx > UART_BYTE_LIMIT))
         {
             // Disable transmit interrupt
@@ -66,7 +82,7 @@ void USARTB_IRQHandler(void)
         {
             uart_rx_buf[uart_rx_byte_idx] = data;
             if ((rx_msg_type == MSG_TYPE_ASCII) &&
-                (uart_rx_buf[uart_rx_byte_idx] == UART_NEWLINE))
+                (uart_rx_buf[uart_rx_byte_idx] == UART_LINEFEED))
             {
                 uart_rx_msg_len = uart_rx_byte_idx + 1u;
                 memcpy(&uart_rx_msg, &uart_rx_buf, uart_rx_msg_len);

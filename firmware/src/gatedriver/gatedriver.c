@@ -1,7 +1,7 @@
 
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
-//  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
+//  * Copyright (c) 2020-2023 Ioannis Chatzikonstantinou.
 //  * 
 //  * This program is free software: you can redistribute it and/or modify  
 //  * it under the terms of the GNU General Public License as published by  
@@ -26,7 +26,7 @@ struct GateDriver_ gateDriver =
 
 void GateDriver_Init(void) {}
 
-PAC5XXX_RAMFUNC void gate_driver_enable(void)
+TM_RAMFUNC void gate_driver_enable(void)
 {
     // Select PWMA peripheral for Port B
     PAC55XX_SCC->PBMUXSEL.w =  0x01110111;
@@ -50,7 +50,7 @@ PAC5XXX_RAMFUNC void gate_driver_enable(void)
     gateDriver.state = GATEDRIVER_ENABLED;
 }
 
-PAC5XXX_RAMFUNC void gate_driver_disable(void)
+TM_RAMFUNC void gate_driver_disable(void)
 {
     // Disable driver manager and verify active - need to enable even in PAC5210 to get ENHS pin to work
     pac5xxx_tile_register_write(ADDR_ENDRV, 0);
@@ -69,12 +69,12 @@ PAC5XXX_RAMFUNC void gate_driver_disable(void)
     gateDriver.state = GATEDRIVER_DISABLED;
 }
 
-PAC5XXX_RAMFUNC bool gate_driver_is_enabled(void)
+TM_RAMFUNC bool gate_driver_is_enabled(void)
 {
     return (GATEDRIVER_ENABLED == gateDriver.state);
 }
 
-PAC5XXX_RAMFUNC void gate_driver_set_duty_cycle(struct FloatTriplet *dutycycles)
+TM_RAMFUNC void gate_driver_set_duty_cycle(struct FloatTriplet *dutycycles)
 {
 	m1_u_set_duty(dutycycles->A);
 	if (motor_phases_swapped())

@@ -1,18 +1,18 @@
 
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
-//  * Copyright (c) 2020 Ioannis Chatzikonstantinou.
-//  * 
-//  * This program is free software: you can redistribute it and/or modify  
-//  * it under the terms of the GNU General Public License as published by  
+//  * Copyright (c) 2020-2023 Ioannis Chatzikonstantinou.
+//  *
+//  * This program is free software: you can redistribute it and/or modify
+//  * it under the terms of the GNU General Public License as published by
 //  * the Free Software Foundation, version 3.
 //  *
-//  * This program is distributed in the hope that it will be useful, but 
-//  * WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  * This program is distributed in the hope that it will be useful, but
+//  * WITHOUT ANY WARRANTY; without even the implied warranty of
+//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  * General Public License for more details.
 //  *
-//  * You should have received a copy of the GNU General Public License 
+//  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <string.h>
@@ -27,6 +27,7 @@ bool nvm_save_config(void)
 {
 	bool commited = false;
 	uint8_t data[sizeof(struct NVMStruct)];
+	s.adc_config = *ADC_get_config();
 	s.motor_config = *motor_get_config();
 	s.hall_config = *hall_get_config();
 	s.ma7xx_config = *ma7xx_get_config();
@@ -34,11 +35,11 @@ bool nvm_save_config(void)
 	s.observer_config = *Observer_GetConfig();
 	s.controller_config = *Controller_GetConfig();
 	s.can_config = *CAN_get_config();
-	s.version = (VERSION_MAJOR << 16) + (VERSION_MINOR << 8) + VERSION_PATCH;
+	strlcpy(s.version, GIT_VERSION, sizeof(s.version));
 	memcpy(data, &s, sizeof(struct NVMStruct));
-	if (STATE_IDLE == Controller_GetState())
+	if (STATE_IDLE == controller_get_state())
 	{
-		uint8_t* dataBuffer = data;
+		uint8_t *dataBuffer = data;
 		__disable_irq();
 		flash_erase_page(SETTINGS_PAGE);
 		flash_write((uint8_t *)SETTINGS_PAGE_HEX, dataBuffer, sizeof(struct NVMStruct));
@@ -53,8 +54,11 @@ bool nvm_load_config(void)
 	memcpy(&s, (uint8_t *)SETTINGS_PAGE_HEX, sizeof(struct NVMStruct));
 	// TODO: Also validate checksum
 	bool loaded = false;
-	if (s.version == ((VERSION_MAJOR << 16) + (VERSION_MINOR << 8) + VERSION_PATCH))
+	char static_version[16];
+	strlcpy(static_version, GIT_VERSION, sizeof(static_version));
+	if (strcmp(s.version, static_version) == 0)
 	{
+		ADC_restore_config(&s.adc_config);
 		motor_restore_config(&s.motor_config);
 		hall_restore_config(&s.hall_config);
 		ma7xx_restore_config(&s.ma7xx_config);
@@ -69,7 +73,7 @@ bool nvm_load_config(void)
 
 void nvm_erase(void)
 {
-	if (STATE_IDLE == Controller_GetState())
+	if (STATE_IDLE == controller_get_state())
 	{
 		flash_erase_page(SETTINGS_PAGE);
 		system_reset();
