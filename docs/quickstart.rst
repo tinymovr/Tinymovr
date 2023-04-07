@@ -18,7 +18,11 @@ Before proceeding to the next steps, ensure your Tinymovr is powered up.
 Installing and Launching Studio
 ###############################
 
-Tinymovr can be installed using pip. Python 3.6 or greater is required.
+Tinymovr can be installed using pip. Python 3.10 or greater is required.
+
+.. note::
+   We recommend installing Tinymovr in a virtual environment. `Here is a quick tutorial on how to setup a virtual environment using Conda <https://conda.io/projects/conda/en/latest/user-guide/getting-started.html#managing-environments>`_.
+
 
 .. code-block:: console
 
@@ -45,56 +49,27 @@ You may also need to append a directory to your PATH variable:
     echo 'export PATH="/home/pi/.local/bin:$PATH"' >> ~/.bashrc
     source ~/.bashrc
 
-Now you should be able to run Tinymovr Studio:
+Now you should be able to run the Tinymovr CLI:
 
 .. code-block:: console
 
-    tinymovr
+    tinymovr_cli
 
-Checking Functionality and Calibrating
-######################################
+Calibrating using the Studio GUI
+################################
 
-.. code-block:: python
+The Tinymovr Studio GUI offers an overview of the device internals as a tree structure. You can inspect the various values to ensure they are as expected.
 
-    tm1.device_info
+The Tinymovr Servo Kit motor and encoder are already calibrated. If you have your own setup, or if you experience problems with prior calibration, you'll need to go through the following brief calibration procedure.
 
-IPython should display an array of device-related information.
-
-If using a Tinymovr Servo Kit/Tinymovr Dev Kit, the motor and encoder should have been already calibrated. If you have your own setup, or if you experience problems with prior calibration, you'll need to go through the following brief calibration procedure.
-
-.. note::
-   After issuing the command below, the motor will spin. Ensure the rotor is free of obstructions or loads, and the motor is firmly fixed.
-
-.. code-block:: python
-
-    tm1.calibrate()
+In Tinymovr Studio, navigate to `tmx->controller`. Press the `Calibrate` button. Note that after pressing this button, the motor will spin. Ensure the rotor is free of obstructions or loads, and the motor is firmly fixed.
 
 Follow the on-screen prompts. The motor will produce an audible beep and rotate in one direction.
-Your Tinymovr is now ready for operation. You can view information about the attached motor as follows:
+Your Tinymovr is now ready for operation. Navigate to `tmx->motor`. This will reveal identified motor parameters, namely: phase resistance, phase inductance, number of pole pairs and encoder ticks.
 
-.. code-block:: python
+Testing Position Control using the Studio GUI
+#############################################
 
-    tm1.motor_config
+Navigate back to `tmx->controller`. Press the `Position` button. Note that after pressing the button, the motor will hold position and may spin. The motor should now be actively holding it's position. Try moving it by hand and you should feel resistance.
 
-This will reveal identified motor parameters, namely: phase resistance, phase inductance, number of pole pairs and encoder ticks.
-
-Testing Position Control Mode
-#############################
-
-.. note::
-   After issuing the command below, the motor will hold position and may spin.
-
-.. code-block:: python
-
-    tm1.position_control()
-
-The motor should now be actively holding it's position. Try moving it by hand and you should feel resistance.
-
-Now try to command a new position:
-
-.. code-block:: python
-
-    tm1.set_pos_setpoint(0)
-    tm1.set_pos_setpoint(8000)
-
-The motor should jump to the commanded positions.
+To command a new position, navigate to `tmx->controller->position`, and double-click on the `setpoint` value. Type in a new position followed by Enter. The motor should jump to the commanded position.
