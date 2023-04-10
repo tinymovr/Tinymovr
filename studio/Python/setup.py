@@ -51,6 +51,7 @@ setup(
         "importlib_resources",
         "python-can",
         "python-can-canine",
+        "python-can-slcan_disco",
         "avlos",
         "pyserial",
         "pyusb",
