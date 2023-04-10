@@ -1,0 +1,3 @@
+include README.md
+include resources/icons/call.png
+include tinymovr/config/device.yaml
