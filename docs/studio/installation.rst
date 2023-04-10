@@ -16,14 +16,23 @@ If using Windows with a CANtact-compatible CAN Bus adapter, such as CANine, you 
 Using pip
 #########
 
-This is the most straightforward method to install Tinymovr studio and have access to hardware.
+This is the most straightforward method to install Tinymovr studio and have access to hardware. The following command will install Tinymovr with the dependencies required for the Qt-based Tinymovr Studio GUI:
+
+.. code-block:: console
+
+    pip3 install 'tinymovr[GUI]'
+
+If you don't plan to use the GUI, you can skip installing some dependencies using the following installation command instead:
 
 .. code-block:: console
 
     pip3 install tinymovr
+
+.. code-block:: console
+
     tinymovr
 
-You should now be looking at the Tinymovr Qt-based GUI. Alternatively, to start the IPython-based Command Line Interface (CLI):
+You should now be looking at the Tinymovr GUI. Alternatively, to start the IPython-based Command Line Interface (CLI):
 
 .. code-block:: console
 

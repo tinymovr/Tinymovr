@@ -26,10 +26,10 @@ Tinymovr can be installed using pip. Python 3.10 or greater is required.
 
 .. code-block:: console
 
-    pip3 install tinymovr
+    pip3 install 'tinymovr[GUI]'
     tinymovr
 
-You should now be looking at the Tinymovr Studio IPython interface.
+You should now be looking at the Tinymovr Studio GUI interface.
 
 Installing on Raspberry Pi
 ##########################
