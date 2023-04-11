@@ -14,7 +14,7 @@ Options:
 import sys
 import pkg_resources
 from docopt import docopt
-from PySide2.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication
 from tinymovr.gui import MainWindow, app_stylesheet
 from tinymovr.constants import app_name
 

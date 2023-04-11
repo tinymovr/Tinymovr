@@ -61,7 +61,7 @@ setup(
         "flatten-dict",
         "pint",
     ],
-    extras_require={"gui": ["pyside2", "pyqtgraph"]},
+    extras_require={"gui": ["pyside6", "pyqtgraph"]},
     entry_points={
         "console_scripts": [
             "tinymovr_cli=tinymovr.cli:spawn",
