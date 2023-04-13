@@ -56,7 +56,7 @@ Then simply install and run Tinymovr:
 
 .. code-block:: console
 
-    pip install tinymovr
+    pip install 'tinymovr[GUI]'
     tinymovr
 
 Using git clone
