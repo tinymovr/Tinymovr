@@ -19,13 +19,12 @@ import time
 from functools import partial
 from contextlib import suppress
 import json
-from PySide2 import QtCore
-from PySide2.QtCore import Signal
-from PySide2.QtWidgets import (
+from PySide6 import QtCore
+from PySide6.QtCore import Signal
+from PySide6.QtWidgets import (
     QMainWindow,
     QMenu,
     QMenuBar,
-    QAction,
     QWidget,
     QFrame,
     QHBoxLayout,
@@ -36,6 +35,7 @@ from PySide2.QtWidgets import (
     QTreeWidgetItem,
     QPushButton,
 )
+from PySide6.QtGui import QAction
 import pyqtgraph as pg
 from tinymovr.constants import app_name
 from tinymovr.channel import ResponseError as ChannelResponseError

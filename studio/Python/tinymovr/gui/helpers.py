@@ -19,8 +19,8 @@ import time
 import os
 import enum
 import pint
-from PySide2 import QtGui, QtCore
-from PySide2.QtWidgets import QMessageBox, QFileDialog
+from PySide6 import QtGui, QtCore
+from PySide6.QtWidgets import QMessageBox, QFileDialog
 from avlos.definitions import RemoteAttribute
 
 

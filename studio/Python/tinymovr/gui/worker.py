@@ -19,9 +19,9 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 import time
 import can
 from canine import CANineBus
-from PySide2 import QtCore
-from PySide2.QtCore import QObject
-from PySide2.QtWidgets import (
+from PySide6 import QtCore
+from PySide6.QtCore import QObject
+from PySide6.QtWidgets import (
     QApplication,
 )
 from tinymovr.gui import TimedGetter, RateLimitedFunction, get_dynamic_attrs
