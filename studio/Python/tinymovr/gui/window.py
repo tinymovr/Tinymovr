@@ -31,7 +31,6 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHeaderView,
     QLabel,
-    QTreeWidget,
     QTreeWidgetItem,
     QPushButton,
 )
@@ -44,6 +43,7 @@ from avlos import get_registry
 from avlos.json_codec import AvlosEncoder
 from tinymovr.gui import (
     Worker,
+    OurQTreeWidget,
     format_value,
     load_icon,
     display_file_open_dialog,
@@ -88,7 +88,7 @@ class MainWindow(QMainWindow):
         self.setMenuBar(self.menu_bar)
 
         # Setup the tree widget
-        self.tree_widget = QTreeWidget()
+        self.tree_widget = OurQTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
         self.tree_widget.itemDoubleClicked.connect(self.double_click)
         self.tree_widget.setHeaderLabels(["Attribute", "Value"])
