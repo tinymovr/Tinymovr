@@ -36,9 +36,6 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-# https://www.loekvandenouweland.com/content/pyside2-big-sur-does-not-show-window.html
-import os
-os.environ['QT_MAC_WANTS_LAYER'] = '1'
 
 def spawn():
     version = pkg_resources.require("tinymovr")[0].version
