@@ -298,7 +298,7 @@ class MainWindow(QMainWindow):
         ):
             item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
             item._editing = True
-        elif int(item._orig_flags) != int(item.flags()):
+        elif item._orig_flags != item.flags():
             item.setFlags(item._orig_flags)
 
     def on_export(self):
