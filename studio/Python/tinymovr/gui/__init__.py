@@ -9,6 +9,7 @@ from tinymovr.gui.helpers import (
     hold_sema,
     TimedGetter,
     RateLimitedFunction,
+    OurQTreeWidget,
     check_selected_items,
     get_dynamic_attrs
 )

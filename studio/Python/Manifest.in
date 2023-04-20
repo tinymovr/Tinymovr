@@ -1,3 +1,5 @@
 include README.md
-include resources/icons/call.png
+include tinymovr/resources/icons/call.png
+include tinymovr/resources/icons/empty.png
+include tinymovr/resources/icons/empty@2x.png
 include tinymovr/config/device.yaml

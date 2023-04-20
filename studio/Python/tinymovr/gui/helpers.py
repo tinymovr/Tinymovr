@@ -19,9 +19,10 @@ import time
 import os
 import enum
 import pint
-from PySide6 import QtGui, QtCore
-from PySide6.QtWidgets import QMessageBox, QFileDialog
+from PySide6 import QtGui
+from PySide6.QtWidgets import QMessageBox, QFileDialog, QTreeWidget
 from avlos.definitions import RemoteAttribute
+import tinymovr
 
 
 app_stylesheet = """
@@ -176,6 +177,24 @@ app_stylesheet = """
 """
 
 
+class OurQTreeWidget(QTreeWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.placeholder_image = load_pixmap("empty.png")
+
+    def paintEvent(self, event):
+        if self.topLevelItemCount() == 0:
+            painter = QtGui.QPainter(self.viewport())
+            painter.setOpacity(0.5)  # Adjust the opacity of the placeholder image
+            painter.drawPixmap(
+                (self.viewport().width() - self.placeholder_image.width()) / 2,
+                (self.viewport().height() - self.placeholder_image.height()) / 2,
+                self.placeholder_image,
+            )
+        else:
+            super().paintEvent(event)
+
+
 def format_value(value, include_unit=True):
     """
     Format a numeric value according to its
@@ -190,15 +209,21 @@ def format_value(value, include_unit=True):
     return str(value)
 
 
+def load_pixmap(fname_pixmap):
+    """
+    Load an image from a file and return it as a QPixmap
+    """
+    file_path = os.path.join(
+        os.path.dirname(tinymovr.__file__), "resources", "icons", fname_pixmap
+    )
+    return QtGui.QPixmap(file_path)
+
+
 def load_icon(fname_icon):
     """
-    Load an image from a file and return it
-    as a QIcon
+    Load an image from a file and return it as a QIcon
     """
-    path_this_dir = os.path.dirname(os.path.abspath(__file__))
-    path_icons = os.path.join(path_this_dir, "..", "..", "resources", "icons")
-    path_icon = os.path.join(path_icons, fname_icon)
-    pixmap = QtGui.QPixmap(path_icon)
+    pixmap = load_pixmap(fname_icon)
     icon = QtGui.QIcon()
     icon.addPixmap(pixmap, QtGui.QIcon.Normal)
     icon.addPixmap(pixmap, QtGui.QIcon.Disabled)

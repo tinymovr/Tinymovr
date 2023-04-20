@@ -83,7 +83,6 @@ def spawn():
     print("Listening for nodes...")
 
     c = Config()
-    c.InteractiveShellApp.gui = "tk"
     c.TerminalIPythonApp.display_banner = False
     IPython.start_ipython(argv=[], config=c, user_ns=user_ns)
     logger.debug("Exiting...")
