@@ -34,7 +34,7 @@ bool planner_move_to_tlimit(float p_target)
 {
 	bool response = false;
 	MotionPlan motion_plan = {0};
-	if (!errors_exist() && planner_prepare_plan_tlimit(p_target, config.deltat_tot, config.deltat_acc, config.deltat_dec, &motion_plan))
+	if (!errors_exist() && planner_prepare_plan_tlimit(p_target, config.deltat_total, config.deltat_accel, config.deltat_decel, &motion_plan))
 	{
 		controller_set_motion_plan(motion_plan);
 		controller_set_mode(CTRL_TRAJECTORY);
@@ -253,46 +253,46 @@ float planner_get_max_vel(void)
 	return config.max_vel;
 }
 
-float planner_get_deltat_acc(void)
+float planner_get_deltat_accel(void)
 {
-	return config.deltat_acc;
+	return config.deltat_accel;
 }
 
-bool planner_set_deltat_acc(float deltat_acc)
+bool planner_set_deltat_accel(float deltat_accel)
 {
-	if (deltat_acc > 0)
+	if (deltat_accel > 0)
 	{
-		config.deltat_acc = deltat_acc;
+		config.deltat_accel = deltat_accel;
 		return true;
 	}
 	return false;
 }
 
-float planner_get_deltat_tot(void)
+float planner_get_deltat_total(void)
 {
-	return config.deltat_tot;
+	return config.deltat_total;
 }
 
-bool planner_set_deltat_tot(float deltat_tot)
+bool planner_set_deltat_total(float deltat_total)
 {
-	if (deltat_tot > 0)
+	if (deltat_total > 0)
 	{
-		config.deltat_tot = deltat_tot;
+		config.deltat_total = deltat_total;
 		return true;
 	}
 	return false;
 }
 
-float planner_get_deltat_dec(void)
+float planner_get_deltat_decel(void)
 {
-	return config.deltat_dec;
+	return config.deltat_decel;
 }
 
-bool planner_set_deltat_dec(float deltat_dec)
+bool planner_set_deltat_decel(float deltat_decel)
 {
-	if (deltat_dec > 0)
+	if (deltat_decel > 0)
 	{
-		config.deltat_dec = deltat_dec;
+		config.deltat_decel = deltat_decel;
 		return true;
 	}
 	return false;
