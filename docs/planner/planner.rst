@@ -17,8 +17,8 @@ Before using the planner, the desired acceleration, deceleration and max velocit
 
 .. code-block:: python
 
-    tm1.traj_planner.max_acc = {max_acceleration} # ticks/sec^2
-    tm1.traj_planner.max_dec = {max_deceleration} # ticks/sec^2
+    tm1.traj_planner.max_accel = {max_acceleration} # ticks/sec^2
+    tm1.traj_planner.max_decel = {max_deceleration} # ticks/sec^2
     tm1.traj_planner.max_vel = {mac_velocity} # ticks/sec
 
 Once you set the desired acceleration and deceleration parameters, they do not need to be re-set -- they are stored in RAM. However, upon device restart they need to be re-set, as they are not stored in non-volatile memory. Once the parameters are set, you can execute a plan to a target position:
@@ -31,8 +31,8 @@ As an example, a trajectory is defined and executed as follows:
 
 .. code-block:: python
 
-    tm1.traj_planner.max_acc = 20000
-    tm1.traj_planner.max_dec = 20000
+    tm1.traj_planner.max_accel = 20000
+    tm1.traj_planner.max_decel = 20000
     tm1.traj_planner.max_vel = 80000
     tm1.traj_planner.move_to(100000)
 
