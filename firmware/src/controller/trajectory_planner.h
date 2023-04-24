@@ -24,9 +24,9 @@ typedef struct {
 	float max_accel;
 	float max_decel;
 	float max_vel;
-    float deltat_acc;
-    float deltat_tot;
-    float deltat_dec;
+    float deltat_accel;
+    float deltat_total;
+    float deltat_decel;
 } PlannerConfig;
 
 typedef struct {
@@ -41,11 +41,11 @@ typedef struct
     // computation during trajectory evaluation.
 	float p_0;
     float p_target;
-    float deltat_acc;
+    float deltat_accel;
     float t_acc_cruise;
     float deltat_cruise;
     float t_cruise_dec;
-    float deltat_dec;
+    float deltat_decel;
     float t_end;
     float v_0;
     float v_cruise;
@@ -58,7 +58,7 @@ typedef struct
 
 bool planner_move_to_tlimit(float p_target);
 bool planner_move_to_vlimit(float p_targetl);
-bool planner_prepare_plan_tlimit(float p_target, float deltat_tot, float deltat_acc, float deltat_dec, MotionPlan *plan);
+bool planner_prepare_plan_tlimit(float p_target, float deltat_total, float deltat_accel, float deltat_decel, MotionPlan *plan);
 bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float d_max, MotionPlan *plan);
 bool planner_set_max_accel(float max_accel);
 bool planner_set_max_decel(float max_decel);

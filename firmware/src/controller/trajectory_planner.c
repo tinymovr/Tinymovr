@@ -56,14 +56,14 @@ bool planner_move_to_vlimit(float p_target)
 	return response;
 }
 
-bool planner_prepare_plan_tlimit(float p_target, float deltat_tot, float deltat_acc, float deltat_dec, MotionPlan *plan)
+bool planner_prepare_plan_tlimit(float p_target, float deltat_total, float deltat_accel, float deltat_decel, MotionPlan *plan)
 {
 	float p_0 = controller_get_pos_setpoint_user_frame();
 	float S = p_target - p_0;
 	float v_0 = controller_get_vel_setpoint_user_frame();
-	float deltat_cruise = deltat_tot - deltat_acc - deltat_dec;
-	float v_cruise = (S - 0.5f * deltat_acc * v_0) / (0.5f * deltat_acc + deltat_cruise + 0.5f * deltat_dec);
-	if (deltat_tot < 0 || deltat_acc < 0 || deltat_dec < 0 || deltat_cruise < 0.0f)
+	float deltat_cruise = deltat_total - deltat_accel - deltat_decel;
+	float v_cruise = (S - 0.5f * deltat_accel * v_0) / (0.5f * deltat_accel + deltat_cruise + 0.5f * deltat_decel);
+	if (deltat_total < 0 || deltat_accel < 0 || deltat_decel < 0 || deltat_cruise < 0.0f)
 	{
 		state.errors |= TRAJ_PLANNER_ERRORS_INVALID_INPUT;
 		return false;
@@ -77,23 +77,23 @@ bool planner_prepare_plan_tlimit(float p_target, float deltat_tot, float deltat_
 	{
 		return false;
 	}
-	float acc = (v_cruise - v_0) / deltat_acc;
-	float dec = v_cruise / deltat_dec;
+	float acc = (v_cruise - v_0) / deltat_accel;
+	float dec = v_cruise / deltat_decel;
 	// Assign everything
 	plan->p_0 = p_0;
 	plan->p_target = p_target;
-	plan->deltat_acc = deltat_acc;
-	plan->t_acc_cruise = deltat_acc;
+	plan->deltat_accel = deltat_accel;
+	plan->t_acc_cruise = deltat_accel;
 	plan->deltat_cruise = deltat_cruise;
-	plan->t_cruise_dec = deltat_acc + deltat_cruise;
-	plan->deltat_dec = deltat_dec;
-	plan->t_end = deltat_acc + deltat_cruise + deltat_dec;
+	plan->t_cruise_dec = deltat_accel + deltat_cruise;
+	plan->deltat_decel = deltat_decel;
+	plan->t_end = deltat_accel + deltat_cruise + deltat_decel;
 	plan->v_0 = v_0;
 	plan->v_cruise = v_cruise;
 	// plan->v_target = 0;
 	plan->acc = acc;
 	plan->dec = dec;
-	plan->p_acc_cruise = plan->p_0 + v_0 * deltat_acc + 0.5f * acc * deltat_acc * deltat_acc;
+	plan->p_acc_cruise = plan->p_0 + v_0 * deltat_accel + 0.5f * acc * deltat_accel * deltat_accel;
 	plan->p_cruise_dec = plan->p_acc_cruise + v_cruise * deltat_cruise;
 	return true;
 }
@@ -112,13 +112,13 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 	if (v_0 * v_0 > our_fabsf(2 * d_max * S))
 	{
 		const float sign_fs = v_0 >= 0 ? 1.0f : -1.0f;
-		const float deltat_dec = sign_fs * v_0 / d_max;
+		const float deltat_decel = sign_fs * v_0 / d_max;
 		const float dec = sign_fs * d_max;
-		const float p_target_fullstop = p_0 + v_0 * deltat_dec - 0.5f * dec * deltat_dec * deltat_dec;
+		const float p_target_fullstop = p_0 + v_0 * deltat_decel - 0.5f * dec * deltat_decel * deltat_decel;
 
 		plan->p_0 = p_0;
-		plan->deltat_dec = deltat_dec;
-		plan->t_end = deltat_dec;
+		plan->deltat_decel = deltat_decel;
+		plan->t_end = deltat_decel;
 		plan->v_0 = v_0;
 		plan->v_cruise = v_0;
 		// plan->v_target = 0;
@@ -135,8 +135,8 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 	//	{
 	//		plan->p_0 = p_0;
 	//		plan->p_target = p_target;
-	//		plan->deltat_dec = v_0 > 0? v_0/d_max : -v_0/d_max;
-	//		plan->t_end = plan->deltat_dec;
+	//		plan->deltat_decel = v_0 > 0? v_0/d_max : -v_0/d_max;
+	//		plan->t_end = plan->deltat_decel;
 	//		plan->v_0 = v_0;
 	//		plan->v_cruise = v_0;
 	//		//plan->v_target = 0;
@@ -151,20 +151,20 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 		const float acc = sign * a_max;
 		const float dec = sign * d_max;
 		const float v_reached = sign * fast_sqrt((2 * a_max * d_max * our_fabsf(S) + d_max * v_0 * v_0) / (a_max + d_max));
-		const float deltat_acc = (v_reached - v_0) / acc;
-		const float deltat_dec = v_reached / dec;
-		const float t_end = deltat_acc + deltat_dec;
-		const float p_acc_cruise = p_0 + v_0 * deltat_acc + 0.5f * acc * deltat_acc * deltat_acc;
+		const float deltat_accel = (v_reached - v_0) / acc;
+		const float deltat_decel = v_reached / dec;
+		const float t_end = deltat_accel + deltat_decel;
+		const float p_acc_cruise = p_0 + v_0 * deltat_accel + 0.5f * acc * deltat_accel * deltat_accel;
 
 		plan->p_0 = p_0;
 		plan->p_target = p_target;
 		plan->acc = acc;
 		plan->dec = dec;
 		plan->v_cruise = v_reached;
-		plan->deltat_acc = deltat_acc;
-		plan->deltat_dec = deltat_dec;
-		plan->t_acc_cruise = deltat_acc;
-		plan->t_cruise_dec = deltat_acc;
+		plan->deltat_accel = deltat_accel;
+		plan->deltat_decel = deltat_decel;
+		plan->t_acc_cruise = deltat_accel;
+		plan->t_cruise_dec = deltat_accel;
 		plan->t_end = t_end;
 		plan->v_0 = v_0;
 		// plan->v_target = 0;
@@ -178,14 +178,14 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 		const float acc = sign * a_max;
 		const float dec = sign * d_max;
 		const float v_cruise = sign * v_max;
-		const float deltat_acc = (v_cruise - v_0) / acc;
-		const float deltat_dec = (sign * v_max) / dec;
+		const float deltat_accel = (v_cruise - v_0) / acc;
+		const float deltat_decel = (sign * v_max) / dec;
 		const float S_vmax = (v_max * v_max - v_0 * v_0) / (2 * a_max) + (v_max * v_max) / (2 * d_max);
 		const float deltat_cruise = (S - sign * S_vmax) / v_cruise;
-		const float t_acc_cruise = deltat_acc;
-		const float t_cruise_dec = deltat_acc + deltat_cruise;
-		const float t_end = t_cruise_dec + deltat_dec;
-		const float p_acc_cruise = p_0 + v_0 * deltat_acc + 0.5f * acc * deltat_acc * deltat_acc;
+		const float t_acc_cruise = deltat_accel;
+		const float t_cruise_dec = deltat_accel + deltat_cruise;
+		const float t_end = t_cruise_dec + deltat_decel;
+		const float p_acc_cruise = p_0 + v_0 * deltat_accel + 0.5f * acc * deltat_accel * deltat_accel;
 		const float p_cruise_dec = p_acc_cruise + v_cruise * deltat_cruise;
 
 		plan->p_0 = p_0;
@@ -193,8 +193,8 @@ bool planner_prepare_plan_vlimit(float p_target, float v_max, float a_max, float
 		plan->acc = acc;
 		plan->dec = dec;
 		plan->v_cruise = v_cruise;
-		plan->deltat_acc = deltat_acc;
-		plan->deltat_dec = deltat_dec;
+		plan->deltat_accel = deltat_accel;
+		plan->deltat_decel = deltat_decel;
 		plan->deltat_cruise = deltat_cruise;
 		plan->t_acc_cruise = t_acc_cruise;
 		plan->t_cruise_dec = t_cruise_dec;
