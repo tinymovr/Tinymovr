@@ -21,9 +21,10 @@ Here below is an example using the API from Python scripts and controlling hardw
 
 .. code-block:: python
 
+    from tinymovr.tee import init_tee
     from tinymovr.config import get_bus_config, create_device
 
-    bus = get_bus_config(["socketcan"])
+    init_tee(get_bus_config(["socketcan"]))
     tm = create_device(node_id=1, bus=bus)
 
     tm.calibrate()
