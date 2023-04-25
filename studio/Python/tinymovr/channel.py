@@ -59,8 +59,7 @@ class CANChannel(BaseChannel):
 
     def recv(self, ep_id, timeout=1.0):
         with self.lock:
-            if not self.evt.wait(timeout=timeout):
-                print("missed")
+            self.evt.wait(timeout=timeout)
             self.evt.clear()
             frame_id = arbitration_from_ids(ep_id, 0, self.node_id)
             index = 0
