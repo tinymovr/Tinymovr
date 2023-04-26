@@ -51,6 +51,7 @@ class Tee:
 
     def __init__(self, bus, timeout):
         self.bus = bus
+        self.flush_rx_buffer()
         self.timeout = timeout
         self.clients = []
         self.state = TeeState.INIT
@@ -90,6 +91,13 @@ class Tee:
         while TeeState.STOPPING == self.state:
             time.sleep(0.01)
         assert TeeState.STOPPED == self.state
+
+    def flush_rx_buffer(self):
+        """
+        Flush the RX buffer of a bus
+        """
+        while self.bus.recv():
+            pass
 
 
 def init_tee(bus, timeout=0.1):
