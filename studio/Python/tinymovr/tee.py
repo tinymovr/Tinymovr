@@ -99,6 +99,7 @@ def init_tee(bus, timeout=0.1):
     global tee
     assert None == tee
     tee = Tee(bus, timeout)
+    return tee
 
 
 def destroy_tee():
