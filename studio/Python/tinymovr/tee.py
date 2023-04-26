@@ -92,12 +92,13 @@ class Tee:
             time.sleep(0.01)
         assert TeeState.STOPPED == self.state
 
-    def flush_rx_buffer(self):
+    def flush_rx_buffer(self, trials=100):
         """
         Flush the RX buffer of a bus
         """
-        while self.bus.recv():
-            pass
+        for i in range(trials):
+            if not self.bus.recv():
+                return
 
 
 def init_tee(bus, timeout=0.1):
