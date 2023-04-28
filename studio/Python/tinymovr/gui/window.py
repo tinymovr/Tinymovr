@@ -16,6 +16,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import time
+import pkg_resources
 from functools import partial
 from contextlib import suppress
 import json
@@ -33,6 +34,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QTreeWidgetItem,
     QPushButton,
+    QMessageBox
 )
 from PySide6.QtGui import QAction
 import pyqtgraph as pg
@@ -76,15 +78,20 @@ class MainWindow(QMainWindow):
         self.menu_bar = QMenuBar()
 
         self.file_menu = QMenu("File")
+        self.help_menu = QMenu("Help")
 
         self.export_action = QAction("Export Config...", self)
         self.import_action = QAction("Import Config", self)
+        self.about_action = QAction("About", self)
         self.export_action.triggered.connect(self.on_export)
         self.import_action.triggered.connect(self.on_import)
+        self.about_action.triggered.connect(self.show_about_box)
         self.file_menu.addAction(self.export_action)
         self.file_menu.addAction(self.import_action)
+        self.help_menu.addAction(self.about_action)
 
         self.menu_bar.addMenu(self.file_menu)
+        self.menu_bar.addMenu(self.help_menu)
         self.setMenuBar(self.menu_bar)
 
         # Setup the tree widget
@@ -329,3 +336,9 @@ class MainWindow(QMainWindow):
     def delete_graphs(self):
         for attr_name in list(self.graphs_by_id.keys()):
             self.delete_graph_by_attr_name(attr_name)
+
+    def show_about_box(self):
+        version_str = (pkg_resources.require("tinymovr")[0].version)
+        app_str = "{} {}".format(app_name, version_str)
+        QMessageBox.about(self, "About Tinymovr", "{}\nhttps://tinymovr.com\n\nCat Sleeping Icon by Denis Sazhin from Noun Project".format(app_str))
+
