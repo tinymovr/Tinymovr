@@ -75,6 +75,6 @@ bool planner_set_deltat_decel(float deltat_decel);
 
 uint8_t planner_get_errors(void);
 
-bool planner_evaluate(float t, MotionPlan *plan);
+bool traj_planner_evaluate(float t, MotionPlan *plan);
 
 #endif /* CONTROLLER_TRAJECTORY_PLANNER_H_ */

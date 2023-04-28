@@ -303,7 +303,7 @@ TM_RAMFUNC uint8_t planner_get_errors(void)
 	return state.errors;
 }
 
-TM_RAMFUNC bool planner_evaluate(float t, MotionPlan *plan)
+TM_RAMFUNC bool traj_planner_evaluate(float t, MotionPlan *plan)
 {
 	// We assume that t is zero at the start of trajectory
 	bool response = true;
