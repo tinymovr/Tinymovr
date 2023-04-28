@@ -34,7 +34,7 @@ with open(def_path_str) as dev_def_raw:
 class ProtocolVersionError(Exception):
     def __init__(self, version_str, *args, **kwargs):
         msg = (
-            "Incompatible protocol versions (hash mismatch)."
+            "Incompatible protocol versions (hash mismatch). "
             "Firmware is compatible with Studio version {}".format(version_str)
         )
         super().__init__(msg, *args, **kwargs)
@@ -82,7 +82,10 @@ def create_device_with_hash_msg(heartbeat_msg):
     node = deserialize(dev_def)
     hash, *_ = chan.serializer.deserialize(heartbeat_msg.data[:4], DataType.UINT32)
     if node.hash_uint32 != hash:  # hash_uint32 is local, hash is remote
-        raise ProtocolVersionError("".join(heartbeat_msg.data[4:]))
+        version_str = "".join(heartbeat_msg.data[4:])
+        if not version_str.strip():
+            version_str = "1.3.1"
+        raise ProtocolVersionError(version_str)
     node._channel = chan
     return node
 
