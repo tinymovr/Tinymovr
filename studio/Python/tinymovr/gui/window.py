@@ -281,9 +281,14 @@ class MainWindow(QMainWindow):
                 y.append(magnitude_of(val))
                 graph_info["data_line"].setData(x, y)
                 graph_info["widget"].update()
+        meas_dt = self.worker._rate_limited_update.meas_dt
+        if meas_dt == 0:
+            meas_dt_str = "-"
+        else:
+            meas_dt_str = "{:.1f}Hz".format(meas_dt)
         self.status_label.setText(
-            "{:.1f}Hz\t CH:{:.0f}%\t RT:{:.1f}ms".format(
-                1 / self.worker._rate_limited_update.meas_dt,
+            "{}\t CH:{:.0f}%\t RT:{:.1f}ms".format(
+                meas_dt_str,
                 self.worker._rate_limited_update.load * 100,
                 self.worker.timed_getter.dt * 1000,
             )
