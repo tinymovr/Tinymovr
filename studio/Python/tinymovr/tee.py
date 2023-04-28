@@ -97,7 +97,7 @@ class Tee:
         Flush the RX buffer of a bus
         """
         for i in range(trials):
-            if not self.bus.recv():
+            if not self.bus.recv(timeout=0.001):
                 return
 
 
