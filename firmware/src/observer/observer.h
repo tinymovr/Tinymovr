@@ -56,7 +56,7 @@ float observer_get_vel_estimate_user_frame(void);
 float observer_get_bw(void);
 void observer_set_bw(float bw);
 
-ObserverConfig* Observer_GetConfig(void);
-void Observer_RestoreConfig(ObserverConfig* config_);
+ObserverConfig* observer_get_config(void);
+void observer_restore_config(ObserverConfig* config_);
 
 #endif /* OBSERVER_OBSERVER_H_ */

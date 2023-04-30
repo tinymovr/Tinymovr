@@ -138,12 +138,12 @@ TM_RAMFUNC float observer_get_vel_estimate_user_frame(void)
 	return state.vel_estimate * motor_get_user_direction();
 }
 
-ObserverConfig* Observer_GetConfig(void)
+ObserverConfig* observer_get_config(void)
 {
 	return &config;
 }
 
-void Observer_RestoreConfig(ObserverConfig* config_)
+void observer_restore_config(ObserverConfig* config_)
 {
 	config = *config_;
 }

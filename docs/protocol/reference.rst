@@ -708,7 +708,7 @@ ID: 58
 Type: float
 Units: tick / second
 
-The trajectory planner max acceleration.
+The max allowed acceleration of the generated trajectory.
 
 
 
@@ -720,7 +720,7 @@ ID: 59
 Type: float
 Units: tick / second ** 2
 
-The trajectory planner max deceleration.
+The max allowed deceleration of the generated trajectory.
 
 
 
@@ -732,7 +732,43 @@ ID: 60
 Type: float
 Units: tick / second
 
-The trajectory planner max cruise velocity.
+The max allowed cruise velocity of the generated trajectory.
+
+
+
+
+traj_planner.t_accel
+-------------------------------------------------------------------
+
+ID: 61
+Type: float
+Units: second
+
+In time mode, the acceleration time of the generated trajectory.
+
+
+
+
+traj_planner.t_decel
+-------------------------------------------------------------------
+
+ID: 62
+Type: float
+Units: second
+
+In time mode, the deceleration time of the generated trajectory.
+
+
+
+
+traj_planner.t_total
+-------------------------------------------------------------------
+
+ID: 63
+Type: float
+Units: second
+
+In time mode, the total time of the generated trajectory.
 
 
 
@@ -740,7 +776,7 @@ The trajectory planner max cruise velocity.
 move_to(pos_setpoint) -> void
 -------------------------------------------------------------------
 
-ID: 61
+ID: 64
 Return Type: void
 
 
@@ -750,7 +786,7 @@ Move to target position respecting velocity and acceleration limits.
 move_to_tlimit(pos_setpoint) -> void
 -------------------------------------------------------------------
 
-ID: 62
+ID: 65
 Return Type: void
 
 
@@ -760,7 +796,7 @@ Move to target position respecting time limits for each sector.
 traj_planner.errors
 -------------------------------------------------------------------
 
-ID: 63
+ID: 66
 Type: uint8
 
 
@@ -774,7 +810,7 @@ Flags:
 watchdog.enabled
 -------------------------------------------------------------------
 
-ID: 64
+ID: 67
 Type: bool
 
 
@@ -786,7 +822,7 @@ Whether the watchdog is enabled or not.
 watchdog.triggered
 -------------------------------------------------------------------
 
-ID: 65
+ID: 68
 Type: bool
 
 
@@ -798,7 +834,7 @@ Whether the watchdog has been triggered or not.
 watchdog.timeout
 -------------------------------------------------------------------
 
-ID: 66
+ID: 69
 Type: float
 Units: second
 

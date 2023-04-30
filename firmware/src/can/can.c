@@ -131,6 +131,7 @@ void CAN_process_interrupt(void)
         uint8_t (*callback)(uint8_t buffer[], uint8_t * buffer_length, Avlos_Command cmd) = avlos_endpoints[can_ep_id];
         uint8_t can_msg_buffer[8];
         memcpy(can_msg_buffer, &rx_data, data_length);
+        data_length = 0;
         uint8_t response_type = callback(can_msg_buffer, &data_length, (uint8_t)rtr);
         if ((AVLOS_RET_READ == response_type || AVLOS_RET_CALL == response_type) && (data_length > 0))
         {

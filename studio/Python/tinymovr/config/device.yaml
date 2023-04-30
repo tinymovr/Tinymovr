@@ -387,21 +387,42 @@ remote_attributes:
         meta: {export: True}
         getter_name: planner_get_max_accel
         setter_name: planner_set_max_accel
-        summary: The trajectory planner max acceleration.
+        summary: The max allowed acceleration of the generated trajectory.
       - name: max_decel
         dtype: float
         unit: ticks/second/second
         meta: {export: True}
         getter_name: planner_get_max_decel
         setter_name: planner_set_max_decel
-        summary: The trajectory planner max deceleration.
+        summary: The max allowed deceleration of the generated trajectory.
       - name: max_vel
         dtype: float
         unit: ticks/second
         meta: {export: True}
         getter_name: planner_get_max_vel
         setter_name: planner_set_max_vel
-        summary: The trajectory planner max cruise velocity.
+        summary: The max allowed cruise velocity of the generated trajectory.
+      - name: t_accel
+        dtype: float
+        unit: second
+        meta: {export: True}
+        getter_name: planner_get_deltat_accel
+        setter_name: planner_set_deltat_accel
+        summary: In time mode, the acceleration time of the generated trajectory.
+      - name: t_decel
+        dtype: float
+        unit: second
+        meta: {export: True}
+        getter_name: planner_get_deltat_decel
+        setter_name: planner_set_deltat_decel
+        summary: In time mode, the deceleration time of the generated trajectory.
+      - name: t_total
+        dtype: float
+        unit: second
+        meta: {export: True}
+        getter_name: planner_get_deltat_total
+        setter_name: planner_set_deltat_total
+        summary: In time mode, the total time of the generated trajectory.
       - name: move_to
         summary: Move to target position respecting velocity and acceleration limits.
         caller_name: planner_move_to_vlimit
