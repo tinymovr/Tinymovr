@@ -73,7 +73,7 @@ typedef enum
 } traj_planner_errors_flags;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[67])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[70])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -659,7 +659,7 @@ uint8_t avlos_encoder_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comma
 /*
 * avlos_traj_planner_max_accel
 *
-* The trajectory planner max acceleration.
+* The max allowed acceleration of the generated trajectory.
 *
 * @param buffer
 * @param buffer_len
@@ -669,7 +669,7 @@ uint8_t avlos_traj_planner_max_accel(uint8_t * buffer, uint8_t * buffer_len, Avl
 /*
 * avlos_traj_planner_max_decel
 *
-* The trajectory planner max deceleration.
+* The max allowed deceleration of the generated trajectory.
 *
 * @param buffer
 * @param buffer_len
@@ -679,12 +679,42 @@ uint8_t avlos_traj_planner_max_decel(uint8_t * buffer, uint8_t * buffer_len, Avl
 /*
 * avlos_traj_planner_max_vel
 *
-* The trajectory planner max cruise velocity.
+* The max allowed cruise velocity of the generated trajectory.
 *
 * @param buffer
 * @param buffer_len
 */
 uint8_t avlos_traj_planner_max_vel(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_traj_planner_t_accel
+*
+* In time mode, the acceleration time of the generated trajectory.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_traj_planner_t_accel(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_traj_planner_t_decel
+*
+* In time mode, the deceleration time of the generated trajectory.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_traj_planner_t_decel(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_traj_planner_t_total
+*
+* In time mode, the total time of the generated trajectory.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_traj_planner_t_total(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_traj_planner_move_to
