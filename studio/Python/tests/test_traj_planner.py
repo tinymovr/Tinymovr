@@ -66,6 +66,28 @@ class TestTrajPlanner(TMTestCase):
         self.tm.traj_planner.move_to(self.tm.controller.position.setpoint)
         time.sleep(4)
 
+    def test_traj_planner_tlimit(self):
+        """
+        Test trajectory planner with time limits
+        """
+        self.check_state(0)
+        self.try_calibrate()
+        self.tm.controller.position_mode()
+        self.check_state(2)
+
+        time.sleep(1)
+
+        self.tm.traj_planner.max_vel = 200000
+        self.tm.traj_planner.t_accel = 1
+        self.tm.traj_planner.t_decel = 1
+        self.tm.traj_planner.t_total = 3
+
+        for _ in range(5):
+            self.tm.traj_planner.move_to_tlimit(random.randrange(-100000, 100000))
+            time.sleep(0.6)
+
+        self.tm.traj_planner.move_to_tlimit(self.tm.controller.position.setpoint)
+        time.sleep(4)
 
 if __name__ == "__main__":
     unittest.main(failfast=True)
