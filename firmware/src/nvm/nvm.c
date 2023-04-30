@@ -35,6 +35,7 @@ bool nvm_save_config(void)
 	s.observer_config = *Observer_GetConfig();
 	s.controller_config = *Controller_GetConfig();
 	s.can_config = *CAN_get_config();
+	s.traj_planner_config = *traj_planner_get_config();
 	strlcpy(s.version, GIT_VERSION, sizeof(s.version));
 	memcpy(data, &s, sizeof(struct NVMStruct));
 	if (STATE_IDLE == controller_get_state())
@@ -66,6 +67,7 @@ bool nvm_load_config(void)
 		Observer_RestoreConfig(&s.observer_config);
 		Controller_RestoreConfig(&s.controller_config);
 		CAN_restore_config(&s.can_config);
+		traj_planner_restore_config(&s.traj_planner_config);
 		loaded = true;
 	}
 	return loaded;
