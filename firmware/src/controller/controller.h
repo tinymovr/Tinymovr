@@ -149,7 +149,7 @@ void controller_update_I_gains(void);
 uint8_t controller_get_warnings(void);
 uint8_t controller_get_errors(void);
 
-ControllerConfig *Controller_GetConfig(void);
-void Controller_RestoreConfig(ControllerConfig *config_);
+ControllerConfig *controller_get_config(void);
+void controller_restore_config(ControllerConfig *config_);
 
 #endif /* CONTROLLER_CONTROLLER_H_ */

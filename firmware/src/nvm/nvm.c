@@ -32,8 +32,8 @@ bool nvm_save_config(void)
 	s.hall_config = *hall_get_config();
 	s.ma7xx_config = *ma7xx_get_config();
 	s.encoder_config = *encoder_get_config();
-	s.observer_config = *Observer_GetConfig();
-	s.controller_config = *Controller_GetConfig();
+	s.observer_config = *observer_get_config();
+	s.controller_config = *controller_get_config();
 	s.can_config = *CAN_get_config();
 	s.traj_planner_config = *traj_planner_get_config();
 	strlcpy(s.version, GIT_VERSION, sizeof(s.version));
@@ -64,8 +64,8 @@ bool nvm_load_config(void)
 		hall_restore_config(&s.hall_config);
 		ma7xx_restore_config(&s.ma7xx_config);
 		encoder_restore_config(&s.encoder_config);
-		Observer_RestoreConfig(&s.observer_config);
-		Controller_RestoreConfig(&s.controller_config);
+		observer_restore_config(&s.observer_config);
+		controller_restore_config(&s.controller_config);
 		CAN_restore_config(&s.can_config);
 		traj_planner_restore_config(&s.traj_planner_config);
 		loaded = true;
