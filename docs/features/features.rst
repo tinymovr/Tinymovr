@@ -1,7 +1,10 @@
+Features
+________
+
 Trajectory Planner
 ##################
 
-Since firmware version 0.8.8 (studio 0.3.8), Tinymovr can use a trapezoidal trajectory planner to generate acceleration- and velocity-limited trajectories, as well as time-limited trajectories for multi-axis synchronization. The planner executes at the motor control rate, which at the moment equals the PWM rate of 20kHz.
+The trajectory planner can generate acceleration- and velocity-limited trajectories, as well as time-limited trajectories for multi-axis synchronization. The planner executes at the motor control rate for smooth trajectory interpolation.
 
 Trapezoidal Trajectories
 ************************
@@ -67,4 +70,34 @@ Time-limited trajectories are useful for synchronizing the acceleration, cruise 
     tm2.traj_planner.move_to_tlimit(5000)
     tm3.traj_planner.move_to_tlimit(200000)
 
-This will generate one trajectory for each controller, which will start and end simultaneously. 
+This will generate one trajectory for each controller, which will start and stop at the same time. 
+
+Homing
+######
+
+The homing feature enables sensorless homing, endpoint identification and retraction. The homing feature relies on detecting the mechanical resistance when an endpoint is reached. During homing the position error is continuously monitored. Upon exceeding a preset threshold for more than a preset time duration, the motor is considered blocked, and the endpoint found. 
+
+Configuration
+*************
+
+Because the homing planner relies on mechanical resistance of the structure, it is important to correctly setup, otherwise the sensing performance can be compromised, and even damage to the structure can occur.
+
+There are six parameters in total that control the homing behavior:
+
+* `tmx.homing.velocity`: The homing velocity setpoint
+* `tmx.homing.max_homing_t`: The maximum time Tinymovr is allowed to home before aborting
+* `tmx.homing.block_vel`: The estimated velocity below which the motor is considered blocked
+* `tmx.homing.block_dpos`: The estimated position error above which the motor is considered blocked
+* `tmx.homing.block_t`: The max time beyond which the endpoint is considered found
+* `tmx.homing.retract_dist`: The retraction distance the motor travels after the endpoint has been found
+
+The torque applied while the motor is blocked, until `block_t` time passes is the maximum allowed torque, as defined in the controller settings.
+
+Operation
+*********
+
+Following proper configuration, the homing operation is initiated as follows:
+
+.. code-block:: python
+
+    tm1.homing.home()
