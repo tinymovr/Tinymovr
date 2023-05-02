@@ -24,7 +24,9 @@ Before using the planner, the desired acceleration, deceleration and max velocit
     tm1.traj_planner.max_decel = {max_deceleration} # ticks/sec^2
     tm1.traj_planner.max_vel = {mac_velocity} # ticks/sec
 
-Once you set the desired acceleration and deceleration parameters, they do not need to be re-set -- they are stored in RAM. However, upon device restart they need to be re-set, as they are not stored in non-volatile memory. Once the parameters are set, you can execute a plan to a target position:
+Once you set the desired acceleration and deceleration parameters, they do not need to be re-set. The parameters can be saved in NVRAM using `tmx.save_config()`.
+
+Once the parameters are set, you can execute a plan to a target position:
 
 .. code-block:: python
 
