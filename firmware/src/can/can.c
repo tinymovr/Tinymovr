@@ -131,6 +131,7 @@ void CAN_process_interrupt(void)
         uint8_t (*callback)(uint8_t buffer[], uint8_t * buffer_length, Avlos_Command cmd) = avlos_endpoints[can_ep_id];
         uint8_t can_msg_buffer[8];
         memcpy(can_msg_buffer, &rx_data, data_length);
+        data_length = 0;
         uint8_t response_type = callback(can_msg_buffer, &data_length, (uint8_t)rtr);
         if ((AVLOS_RET_READ == response_type || AVLOS_RET_CALL == response_type) && (data_length > 0))
         {
@@ -138,7 +139,6 @@ void CAN_process_interrupt(void)
             can_transmit_extended(data_length, rx_id, can_msg_buffer);
         }
     }
-
     Watchdog_reset();
 }
 
@@ -152,14 +152,16 @@ void CAN_restore_config(CANConfig *config_)
     config = *config_;
 }
 
-TM_RAMFUNC void CAN_task(void) {
+void CAN_task(void) {
     // Transmit heartbeat
     const uint32_t msg_diff = msTicks - state.last_msg_ms;
     if (msg_diff >= config.heartbeat_period && PAC55XX_CAN->SR.TBS != 0)
     {
         state.last_msg_ms = msTicks;
-        uint8_t buf[4];
-        *(uint32_t *)buf = avlos_proto_hash;
-        can_transmit_extended(4, 0x700 | config.id, buf);
+        uint32_t proto_hash = _avlos_get_proto_hash();
+        uint8_t buf[8];
+        memcpy(buf, &proto_hash, sizeof(proto_hash));
+        memcpy((buf+sizeof(proto_hash)), GIT_VERSION, 4);
+        can_transmit_extended(sizeof(proto_hash)+4, 0x700 | config.id, buf);
     }
 }

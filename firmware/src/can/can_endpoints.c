@@ -18,8 +18,8 @@
 #include <src/can/can_endpoints.h>
 
 
-uint8_t (*avlos_endpoints[67])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_protocol_hash, &avlos_uid, &avlos_Vbus, &avlos_Ibus, &avlos_power, &avlos_temp, &avlos_calibrated, &avlos_errors, &avlos_save_config, &avlos_erase_config, &avlos_reset, &avlos_scheduler_total, &avlos_scheduler_busy, &avlos_scheduler_errors, &avlos_controller_state, &avlos_controller_mode, &avlos_controller_warnings, &avlos_controller_errors, &avlos_controller_position_setpoint, &avlos_controller_position_p_gain, &avlos_controller_velocity_setpoint, &avlos_controller_velocity_limit, &avlos_controller_velocity_p_gain, &avlos_controller_velocity_i_gain, &avlos_controller_velocity_deadband, &avlos_controller_velocity_increment, &avlos_controller_current_Iq_setpoint, &avlos_controller_current_Id_setpoint, &avlos_controller_current_Iq_limit, &avlos_controller_current_Iq_estimate, &avlos_controller_current_bandwidth, &avlos_controller_current_Iq_p_gain, &avlos_controller_current_max_Ibus_regen, &avlos_controller_current_max_Ibrake, &avlos_controller_voltage_Vq_setpoint, &avlos_controller_calibrate, &avlos_controller_idle, &avlos_controller_position_mode, &avlos_controller_velocity_mode, &avlos_controller_current_mode, &avlos_controller_set_pos_vel_setpoints, &avlos_comms_can_rate, &avlos_comms_can_id, &avlos_motor_R, &avlos_motor_L, &avlos_motor_pole_pairs, &avlos_motor_type, &avlos_motor_offset, &avlos_motor_direction, &avlos_motor_calibrated, &avlos_motor_I_cal, &avlos_motor_errors, &avlos_encoder_position_estimate, &avlos_encoder_velocity_estimate, &avlos_encoder_type, &avlos_encoder_bandwidth, &avlos_encoder_calibrated, &avlos_encoder_errors, &avlos_traj_planner_max_accel, &avlos_traj_planner_max_decel, &avlos_traj_planner_max_vel, &avlos_traj_planner_move_to, &avlos_traj_planner_move_to_tlimit, &avlos_traj_planner_errors, &avlos_watchdog_enabled, &avlos_watchdog_triggered, &avlos_watchdog_timeout };
-uint32_t avlos_proto_hash = 3273002564;
+uint8_t (*avlos_endpoints[70])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_protocol_hash, &avlos_uid, &avlos_Vbus, &avlos_Ibus, &avlos_power, &avlos_temp, &avlos_calibrated, &avlos_errors, &avlos_save_config, &avlos_erase_config, &avlos_reset, &avlos_scheduler_total, &avlos_scheduler_busy, &avlos_scheduler_errors, &avlos_controller_state, &avlos_controller_mode, &avlos_controller_warnings, &avlos_controller_errors, &avlos_controller_position_setpoint, &avlos_controller_position_p_gain, &avlos_controller_velocity_setpoint, &avlos_controller_velocity_limit, &avlos_controller_velocity_p_gain, &avlos_controller_velocity_i_gain, &avlos_controller_velocity_deadband, &avlos_controller_velocity_increment, &avlos_controller_current_Iq_setpoint, &avlos_controller_current_Id_setpoint, &avlos_controller_current_Iq_limit, &avlos_controller_current_Iq_estimate, &avlos_controller_current_bandwidth, &avlos_controller_current_Iq_p_gain, &avlos_controller_current_max_Ibus_regen, &avlos_controller_current_max_Ibrake, &avlos_controller_voltage_Vq_setpoint, &avlos_controller_calibrate, &avlos_controller_idle, &avlos_controller_position_mode, &avlos_controller_velocity_mode, &avlos_controller_current_mode, &avlos_controller_set_pos_vel_setpoints, &avlos_comms_can_rate, &avlos_comms_can_id, &avlos_motor_R, &avlos_motor_L, &avlos_motor_pole_pairs, &avlos_motor_type, &avlos_motor_offset, &avlos_motor_direction, &avlos_motor_calibrated, &avlos_motor_I_cal, &avlos_motor_errors, &avlos_encoder_position_estimate, &avlos_encoder_velocity_estimate, &avlos_encoder_type, &avlos_encoder_bandwidth, &avlos_encoder_calibrated, &avlos_encoder_errors, &avlos_traj_planner_max_accel, &avlos_traj_planner_max_decel, &avlos_traj_planner_max_vel, &avlos_traj_planner_t_accel, &avlos_traj_planner_t_decel, &avlos_traj_planner_t_total, &avlos_traj_planner_move_to, &avlos_traj_planner_move_to_tlimit, &avlos_traj_planner_errors, &avlos_watchdog_enabled, &avlos_watchdog_triggered, &avlos_watchdog_timeout };
+uint32_t avlos_proto_hash = 949626128;
 
 uint32_t _avlos_get_proto_hash(void)
 {
@@ -891,6 +891,60 @@ else if (AVLOS_CMD_WRITE == cmd) {
         float v;
         memcpy(&v, buffer, sizeof(v));
         planner_set_max_vel(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_traj_planner_t_accel(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        float v;
+        v = planner_get_deltat_accel();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+else if (AVLOS_CMD_WRITE == cmd) {
+        float v;
+        memcpy(&v, buffer, sizeof(v));
+        planner_set_deltat_accel(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_traj_planner_t_decel(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        float v;
+        v = planner_get_deltat_decel();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+else if (AVLOS_CMD_WRITE == cmd) {
+        float v;
+        memcpy(&v, buffer, sizeof(v));
+        planner_set_deltat_decel(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_traj_planner_t_total(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        float v;
+        v = planner_get_deltat_total();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+else if (AVLOS_CMD_WRITE == cmd) {
+        float v;
+        memcpy(&v, buffer, sizeof(v));
+        planner_set_deltat_total(v);
         return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;

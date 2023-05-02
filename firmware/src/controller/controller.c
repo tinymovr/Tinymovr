@@ -598,12 +598,12 @@ void controller_set_motion_plan(MotionPlan mp)
     state.t_plan = 0.0f;
 }
 
-ControllerConfig *Controller_GetConfig(void)
+ControllerConfig *controller_get_config(void)
 {
     return &config;
 }
 
-void Controller_RestoreConfig(ControllerConfig *config_)
+void controller_restore_config(ControllerConfig *config_)
 {
     config = *config_;
 }

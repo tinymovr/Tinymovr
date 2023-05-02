@@ -27,7 +27,7 @@ typedef struct {
     float deltat_accel;
     float deltat_total;
     float deltat_decel;
-} PlannerConfig;
+} TrajPlannerConfig;
 
 typedef struct {
 	uint8_t errors;
@@ -76,5 +76,8 @@ bool planner_set_deltat_decel(float deltat_decel);
 uint8_t planner_get_errors(void);
 
 bool traj_planner_evaluate(float t, MotionPlan *plan);
+
+TrajPlannerConfig *traj_planner_get_config(void);
+void traj_planner_restore_config(TrajPlannerConfig *config_);
 
 #endif /* CONTROLLER_TRAJECTORY_PLANNER_H_ */

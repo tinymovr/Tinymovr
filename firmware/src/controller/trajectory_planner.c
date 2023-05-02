@@ -22,10 +22,13 @@
 #include <src/utils/utils.h>
 #include <src/controller/trajectory_planner.h>
 
-static PlannerConfig config = {
+static TrajPlannerConfig config = {
 	.max_accel = ENCODER_TICKS_FLOAT,
 	.max_decel = ENCODER_TICKS_FLOAT,
-	.max_vel = 50000.0f
+	.max_vel = 50000.0f,
+	.deltat_accel = 2.0f,
+	.deltat_decel = 2.0f,
+	.deltat_total = 5.0f
 };
 
 static PlannerState state = {0};
@@ -329,4 +332,14 @@ TM_RAMFUNC bool traj_planner_evaluate(float t, MotionPlan *plan)
 		response = false;
 	}
 	return response;
+}
+
+TrajPlannerConfig *traj_planner_get_config(void)
+{
+    return &config;
+}
+
+void traj_planner_restore_config(TrajPlannerConfig *config_)
+{
+    config = *config_;
 }
