@@ -18,7 +18,6 @@
 #pragma once
 
 #include <src/common.h>
-#include 
 
 typedef struct {
     float homing_velocity;
