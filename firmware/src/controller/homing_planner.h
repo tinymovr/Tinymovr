@@ -18,6 +18,7 @@
 #pragma once
 
 #include <src/common.h>
+#include 
 
 typedef struct {
     float homing_velocity;
@@ -31,10 +32,13 @@ typedef struct {
 
 typedef struct {
     float stay_t_meas;
+    uint8_t warnings;
 } HomingPlannerState;
 
 bool homing_planner_start_homing(void);
 bool homing_planner_evaluate(void);
+
+uint8_t homing_planner_get_warnings(void);
 
 float homing_planner_get_homing_velocity(void);
 float homing_planner_get_max_homing_t(void);

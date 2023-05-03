@@ -62,9 +62,13 @@ TM_RAMFUNC bool homing_planner_evaluate()
         const float next_pos_setpoint = current_pos_setpoint - config.homing_velocity * PWM_PERIOD_S;
         controller_set_pos_setpoint_user_frame(next_pos_setpoint);
         controller_set_vel_setpoint_user_frame(-config.homing_velocity);
-        
     }
     return true;
+}
+
+uint8_t homing_planner_get_warnings(void)
+{
+    return state.warnings;
 }
 
 float homing_planner_get_homing_velocity(void)

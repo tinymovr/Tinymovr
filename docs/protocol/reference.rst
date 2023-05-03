@@ -826,7 +826,7 @@ ID: 68
 Type: float
 Units: second
 
-The maximum time the motor is allowed to travel before aborting homing.
+The maximum time the motor is allowed to travel before homing times out and aborts.
 
 
 
@@ -843,10 +843,23 @@ The retraction distance the motor travels after the endstop has been found.
 
 
 
-homing.stall_detect.velocity
+homing.warnings
 -------------------------------------------------------------------
 
 ID: 70
+Type: uint8
+
+
+Any homing warnings, as a bitmask
+
+Flags: 
+- HOMING_TIMEOUT
+
+
+homing.stall_detect.velocity
+-------------------------------------------------------------------
+
+ID: 71
 Type: float
 Units: tick / second
 
@@ -858,7 +871,7 @@ The velocity below which (and together with `stall_detect.delta_pos`) stall dete
 homing.stall_detect.delta_pos
 -------------------------------------------------------------------
 
-ID: 71
+ID: 72
 Type: float
 Units: tick
 
@@ -870,7 +883,7 @@ The velocity below which (and together with `stall_detect.delta_pos`) stall dete
 homing.stall_detect.t
 -------------------------------------------------------------------
 
-ID: 72
+ID: 73
 Type: float
 Units: second
 
@@ -882,7 +895,7 @@ The time to remain in stall detection mode before the motor is considered stalle
 watchdog.enabled
 -------------------------------------------------------------------
 
-ID: 73
+ID: 74
 Type: bool
 
 
@@ -894,7 +907,7 @@ Whether the watchdog is enabled or not.
 watchdog.triggered
 -------------------------------------------------------------------
 
-ID: 74
+ID: 75
 Type: bool
 
 
@@ -906,7 +919,7 @@ Whether the watchdog has been triggered or not.
 watchdog.timeout
 -------------------------------------------------------------------
 
-ID: 75
+ID: 76
 Type: float
 Units: second
 

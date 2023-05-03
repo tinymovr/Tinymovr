@@ -18,7 +18,7 @@
 #ifndef CONTROLLER_TRAJECTORY_PLANNER_H_
 #define CONTROLLER_TRAJECTORY_PLANNER_H_
 
-#include "src/common.h"
+#include <src/common.h>
 
 typedef struct {
 	float max_accel;

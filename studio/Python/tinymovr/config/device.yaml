@@ -456,7 +456,7 @@ remote_attributes:
         meta: {export: True}
         getter_name: homing_planner_get_max_homing_t
         setter_name: homing_planner_set_max_homing_t
-        summary: The maximum time the motor is allowed to travel before aborting homing.
+        summary: The maximum time the motor is allowed to travel before homing times out and aborts.
       - name: retract_dist
         dtype: float
         unit: ticks
@@ -464,6 +464,11 @@ remote_attributes:
         getter_name: homing_planner_get_retract_distance
         setter_name: homing_planner_set_retract_distance
         summary: The retraction distance the motor travels after the endstop has been found.
+      - name: warnings
+        meta: {dynamic: True}
+        flags: [HOMING_TIMEOUT]
+        getter_name: homing_planner_get_warnings
+        summary: Any homing warnings, as a bitmask
       - name: stall_detect
         remote_attributes:
           - name: velocity

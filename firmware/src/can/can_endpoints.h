@@ -72,8 +72,14 @@ typedef enum
     TRAJ_PLANNER_ERRORS_VCRUISE_OVER_LIMIT = (1 << 1)
 } traj_planner_errors_flags;
 
+typedef enum
+{
+    HOMING_WARNINGS_NONE = 0,
+    HOMING_WARNINGS_HOMING_TIMEOUT = (1 << 0)
+} homing_warnings_flags;
+
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[76])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[77])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -759,7 +765,7 @@ uint8_t avlos_homing_velocity(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comm
 /*
 * avlos_homing_max_homing_t
 *
-* The maximum time the motor is allowed to travel before aborting homing.
+* The maximum time the motor is allowed to travel before homing times out and aborts.
 *
 * @param buffer
 * @param buffer_len
@@ -775,6 +781,16 @@ uint8_t avlos_homing_max_homing_t(uint8_t * buffer, uint8_t * buffer_len, Avlos_
 * @param buffer_len
 */
 uint8_t avlos_homing_retract_dist(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_homing_warnings
+*
+* Any homing warnings, as a bitmask
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_homing_warnings(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_homing_stall_detect_velocity
