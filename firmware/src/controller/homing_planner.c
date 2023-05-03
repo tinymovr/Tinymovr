@@ -28,7 +28,7 @@ bool homing_planner_start_homing(void)
     return false;
 }
 
-PAC5XXX_RAMFUNC bool homing_planner_evaluate()
+TM_RAMFUNC bool homing_planner_evaluate()
 {
     const float current_pos_setpoint = controller_get_pos_setpoint_user_frame();
     if (state.stay_t_meas < config.max_stay_t)
@@ -72,22 +72,22 @@ float homing_planner_get_homing_velocity(void)
     return config.homing_velocity;
 }
 
-float homing_planner_get_max_homing_time(void)
+float homing_planner_get_max_homing_t(void)
 {
     return config.max_homing_t;
 }
 
-float homing_planner_get_max_stay_vel(void)
+float homing_planner_get_max_stall_vel(void)
 {
     return config.max_stay_vel;
 }
 
-float homing_planner_get_max_stay_dpos(void)
+float homing_planner_get_max_stall_delta_pos(void)
 {
     return config.max_stay_dpos;
 }
 
-float homing_planner_get_max_stay_t(void)
+float homing_planner_get_max_stall_t(void)
 {
     return config.max_stay_t;
 }
@@ -105,7 +105,7 @@ void homing_planner_set_homing_velocity(float vel)
     }
 }
 
-void homing_planner_set_max_homing_time(float t)
+void homing_planner_set_max_homing_t(float t)
 {
     if (t > 0)
     {
@@ -113,7 +113,7 @@ void homing_planner_set_max_homing_time(float t)
     }
 }
 
-void homing_planner_set_max_stay_vel(float vel)
+void homing_planner_set_max_stall_vel(float vel)
 {
     if (vel >= 0)
     {
@@ -121,7 +121,7 @@ void homing_planner_set_max_stay_vel(float vel)
     }
 }
 
-void homing_planner_set_max_stay_dpos(float dpos)
+void homing_planner_set_max_stall_delta_pos(float dpos)
 {
     if (dpos >= 0)
     {
@@ -129,7 +129,7 @@ void homing_planner_set_max_stay_dpos(float dpos)
     }
 }
 
-void homing_planner_set_max_stay_t(float t)
+void homing_planner_set_max_stall_t(float t)
 {
     if (t > 0)
     {

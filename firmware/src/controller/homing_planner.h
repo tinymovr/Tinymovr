@@ -37,15 +37,15 @@ bool homing_planner_start_homing(void);
 bool homing_planner_evaluate(void);
 
 float homing_planner_get_homing_velocity(void);
-float homing_planner_get_max_homing_time(void);
-float homing_planner_get_max_stay_vel(void);
-float homing_planner_get_max_stay_dpos(void);
-float homing_planner_get_max_stay_t(void);
+float homing_planner_get_max_homing_t(void);
+float homing_planner_get_max_stall_vel(void);
+float homing_planner_get_max_stall_delta_pos(void);
+float homing_planner_get_max_stall_t(void);
 float homing_planner_get_retract_distance(void);
 
 void homing_planner_set_homing_velocity(float vel);
-void homing_planner_set_max_homing_time(float t);
-void homing_planner_set_max_stay_vel(float vel);
-void homing_planner_set_max_stay_dpos(float dpos);
-void homing_planner_set_max_stay_t(float t);
+void homing_planner_set_max_homing_t(float t);
+void homing_planner_set_max_stall_vel(float vel);
+void homing_planner_set_max_stall_delta_pos(float dpos);
+void homing_planner_set_max_stall_t(float t);
 void homing_planner_set_retract_distance(float dist);
