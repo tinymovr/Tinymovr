@@ -441,6 +441,52 @@ remote_attributes:
         flags: [INVALID_INPUT, VCRUISE_OVER_LIMIT]
         getter_name: planner_get_errors
         summary: Any errors in the trajectory planner, as a bitmask
+  - name: homing
+    remote_attributes:
+      - name: velocity
+        dtype: float
+        unit: ticks/s
+        meta: {export: True}
+        getter_name: homing_planner_get_homing_velocity
+        setter_name: homing_planner_set_homing_velocity
+        summary: The velocity at which the motor performs homing.
+      - name: max_homing_t
+        dtype: float
+        unit: s
+        meta: {export: True}
+        getter_name: homing_planner_get_max_homing_t
+        setter_name: homing_planner_set_max_homing_t
+        summary: The maximum time the motor is allowed to travel before aborting homing.
+      - name: retract_dist
+        dtype: float
+        unit: ticks
+        meta: {export: True}
+        getter_name: homing_planner_get_retract_distance
+        setter_name: homing_planner_set_retract_distance
+        summary: The retraction distance the motor travels after the endstop has been found.
+      - name: stall_detect
+        remote_attributes:
+          - name: velocity
+            dtype: float
+            unit: ticks/s
+            meta: {export: True}
+            getter_name: homing_planner_get_max_stall_vel
+            setter_name: homing_planner_set_max_stall_vel
+            summary: The velocity below which (and together with `stall_detect.delta_pos`) stall detection mode is triggered.
+          - name: delta_pos
+            dtype: float
+            unit: ticks
+            meta: {export: True}
+            getter_name: homing_planner_get_max_stall_delta_pos
+            setter_name: homing_planner_set_max_stall_delta_pos
+            summary: The velocity below which (and together with `stall_detect.delta_pos`) stall detection mode is triggered.
+          - name: t
+            dtype: float
+            unit: s
+            meta: {export: True}
+            getter_name: homing_planner_get_max_stall_t
+            setter_name: homing_planner_set_max_stall_t
+            summary: The time to remain in stall detection mode before the motor is considered stalled.
   - name: watchdog
     remote_attributes:
       - name: enabled

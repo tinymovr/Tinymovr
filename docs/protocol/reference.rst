@@ -807,10 +807,82 @@ Flags:
 - VCRUISE_OVER_LIMIT
 
 
-watchdog.enabled
+homing.velocity
 -------------------------------------------------------------------
 
 ID: 67
+Type: float
+Units: tick / second
+
+The velocity at which the motor performs homing.
+
+
+
+
+homing.max_homing_t
+-------------------------------------------------------------------
+
+ID: 68
+Type: float
+Units: second
+
+The maximum time the motor is allowed to travel before aborting homing.
+
+
+
+
+homing.retract_dist
+-------------------------------------------------------------------
+
+ID: 69
+Type: float
+Units: tick
+
+The retraction distance the motor travels after the endstop has been found.
+
+
+
+
+homing.stall_detect.velocity
+-------------------------------------------------------------------
+
+ID: 70
+Type: float
+Units: tick / second
+
+The velocity below which (and together with `stall_detect.delta_pos`) stall detection mode is triggered.
+
+
+
+
+homing.stall_detect.delta_pos
+-------------------------------------------------------------------
+
+ID: 71
+Type: float
+Units: tick
+
+The velocity below which (and together with `stall_detect.delta_pos`) stall detection mode is triggered.
+
+
+
+
+homing.stall_detect.t
+-------------------------------------------------------------------
+
+ID: 72
+Type: float
+Units: second
+
+The time to remain in stall detection mode before the motor is considered stalled.
+
+
+
+
+watchdog.enabled
+-------------------------------------------------------------------
+
+ID: 73
 Type: bool
 
 
@@ -822,7 +894,7 @@ Whether the watchdog is enabled or not.
 watchdog.triggered
 -------------------------------------------------------------------
 
-ID: 68
+ID: 74
 Type: bool
 
 
@@ -834,7 +906,7 @@ Whether the watchdog has been triggered or not.
 watchdog.timeout
 -------------------------------------------------------------------
 
-ID: 69
+ID: 75
 Type: float
 Units: second
 

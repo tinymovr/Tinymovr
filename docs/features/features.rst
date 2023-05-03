@@ -77,23 +77,23 @@ This will generate one trajectory for each controller, which will start and stop
 Homing
 ######
 
-The homing feature enables sensorless homing, endpoint identification and retraction. The homing feature relies on detecting the mechanical resistance when an endpoint is reached. During homing the position error is continuously monitored. Upon exceeding a preset threshold for more than a preset time duration, the motor is considered blocked, and the endpoint found. 
+The homing feature enables sensorless homing, endstop identification and retraction. The homing feature relies on detecting the mechanical resistance when an endstop is reached. During homing the position error is continuously monitored. Upon exceeding a preset threshold for more than a preset time duration, the motor is considered stalled, and the endstop found. 
 
 Configuration
 *************
 
-Because the homing planner relies on mechanical resistance of the structure, it is important to correctly setup, otherwise the sensing performance can be compromised, and even damage to the structure can occur.
+Because the homing planner relies on mechanical resistance of the structure, it is important to set up the corresponding parameters correctly, otherwise the endstop sensing performance can be compromised, and damage to the structure can occur.
 
 There are six parameters in total that control the homing behavior:
 
-* `tmx.homing.velocity`: The homing velocity setpoint
-* `tmx.homing.max_homing_t`: The maximum time Tinymovr is allowed to home before aborting
-* `tmx.homing.block_vel`: The estimated velocity below which the motor is considered blocked
-* `tmx.homing.block_dpos`: The estimated position error above which the motor is considered blocked
-* `tmx.homing.block_t`: The max time beyond which the endpoint is considered found
-* `tmx.homing.retract_dist`: The retraction distance the motor travels after the endpoint has been found
+* `tmx.homing.velocity`: The velocity at which the motor performs homing
+* `tmx.homing.max_homing_t`: The maximum time the motor is allowed to travel before aborting homing
+* `tmx.homing.retract_dist`: The retraction distance the motor travels after the endstop has been found
+* `tmx.homing.stall_detect.velocity`: The velocity below which (and together with `stall_detect.delta_pos`) stall detection mode is triggered
+* `tmx.homing.stall_detect.delta_pos`: The position error above which (and together with `stall_detect.velocity`) stall detection mode is triggered
+* `tmx.homing.stall_detect.t`: The time to remain in stall detection mode before the motor is considered stalled
 
-The torque applied while the motor is blocked, until `block_t` time passes is the maximum allowed torque, as defined in the controller settings.
+The torque applied while the motor is stopped, until `stall_detect.t` time passes is the maximum allowed torque, as defined in the controller settings.
 
 Operation
 *********
@@ -103,3 +103,4 @@ Following proper configuration, the homing operation is initiated as follows:
 .. code-block:: python
 
     tm1.homing.home()
+
