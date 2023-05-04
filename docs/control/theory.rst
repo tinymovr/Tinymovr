@@ -4,7 +4,8 @@
 Control Principles
 ******************
 
-This document provides a high-level introduction to the control principles found in Tinymovr. 
+This document provides a high-level introduction to the essential control principles in Tinymovr. Additional documentation regarding specific high-level control concepts is available in the :ref:`features` section.
+
 
 Permanent Magnet Synchronous Motors (PMSMs)
 ###########################################
@@ -13,10 +14,11 @@ PMSMs is a category which includes the majority of hobby-grade brushless motors.
 
 This is also why, the motor controlled needs to be able to estimate the angular position of the rotor, in order to derive the stator magnetic field that produces torque. Many controllers estimate the rotor using magnetic encoder readings, which is then converted to electrical angle in software. This is termed *sensored estimation*, and this is the method employed in Tinymovr. In contrast, ESCs such as those used in drones use voltage feedback from one of the motor phases to estimate rotor position. This is termed *sensorless estimation*.
 
+
 Field Oriented Control (FOC)
 ############################
 
-FOC is an optimal control scheme used with brushless motors. It is more complex than other algorithms and requires more computing power. A 32 bit micro controller is now enough to run it at a sufficiently high rate, so it is becoming more common. FOC allows for greater performance and controlling directly the current in the phases and consequently the output torque of the motor.
+Field Oriented Control (FOC) is a control scheme employed in brushless motor applications, offering superior performance compared to other algorithms. Although FOC requires more computational power due to its complexity, advancements in technology have made it increasingly accessible. Modern 32-bit microcontrollers can now execute FOC algorithms at high rates, contributing to its widespread adoption. By directly controlling the current in the motor phases, FOC enables precise torque management, resulting in enhanced performance and efficiency for various applications.
 
 The FOC algorithm comprises three main elements:
 
@@ -71,7 +73,7 @@ The integral term is especially useful for tracking positions at low velocities.
 Velocity Integrator Deadband
 ----------------------------
 
-Since firmware version 0.8.12, a configurable integrator deadband has been added. This is useful if you experience "hunting" where the rotor oscillates around the setpoint at standstill. This phenomenon is due to interaction of integrator windup and the non-linearities of cogging torque. The integrator deadband feature is only active in position control mode and disables the integrator term update within a configurable window around the position setpoint (the "deadband").
+The integrator deadband is a setting that is useful in minimizing the "hunting" phenomenon, where the rotor oscillates around the setpoint at standstill. This phenomenon is due to interaction of integrator windup and the non-linearities of cogging torque. The integrator deadband feature is only active in position control mode and disables the integrator term update within a configurable window around the position setpoint (the "deadband").
 
 Take a look at the :ref:`integrator-deadband` endpoint for specifics.
 
@@ -109,14 +111,17 @@ E-scooter
     Where the throttle input is mapped to the current target. It translates to the acceleration of the vehicle, which feels more natural than a velocity input.
 
 
-References
-##########
-
-[1] `High Performance Brushless DC Motor Control <https://www.ti.com/cn/lit/an/sprt702/sprt702.pdf?ts=1618338543430&ref_url=https%253A%252F%252Fwww.google.com%252F>`_
-
 Further Reading
 ###############
+
+Additional documentation regarding specific high-level control concepts in Tinymovr is available in the :ref:`features` section.
 
 `Vector Control (Wikipedia) <https://en.wikipedia.org/wiki/Vector_control_(motor)>`_
 
 `Sensorless Field Oriented Control of Brushless PMSMs <https://krex.k-state.edu/dspace/bitstream/handle/2097/1507/JamesMevey2009.pdf;jsessionid=820C6C90C0851225CAE19AF829939F2A?sequence=1>`_
+
+
+References
+##########
+
+[1] `High Performance Brushless DC Motor Control <https://www.ti.com/cn/lit/an/sprt702/sprt702.pdf?ts=1618338543430&ref_url=https%253A%252F%252Fwww.google.com%252F>`_

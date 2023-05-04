@@ -22,7 +22,6 @@ Welcome to Tinymovr documentation!
    studio/usage
    
    protocol/integrating
-   protocol/reference
    interfaces/interfaces
    
    encoders/encoders
@@ -37,4 +36,6 @@ Welcome to Tinymovr documentation!
    develop/guide
    
    hardware/errata
+
+   protocol/reference
 

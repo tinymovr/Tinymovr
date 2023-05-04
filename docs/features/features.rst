@@ -1,5 +1,11 @@
+
+.. _features:
+
 Features
 ________
+
+
+.. _trajectory-planner-feature:
 
 Trajectory Planner
 ##################
@@ -74,6 +80,9 @@ Time-limited trajectories are useful for synchronizing the acceleration, cruise 
 
 This will generate one trajectory for each controller, which will start and stop at the same time. 
 
+
+.. _homing-feature:
+
 Homing
 ######
 
@@ -103,4 +112,20 @@ Following proper configuration, the homing operation is initiated as follows:
 .. code-block:: python
 
     tm1.homing.home()
+
+
+.. _flux-braking-feature:
+
+Flux Braking
+############
+
+Flux braking is an advanced motor control technique used in electric motor applications to achieve controlled deceleration and stopping while minimizing reverse current due to back electromotive force (back-EMF). 
+
+FOC decouples the torque-producing and magnetizing currents by aligning the stator current vector with the rotor's magnetic field axis. This alignment allows independent control of both the torque and the magnetic flux components. When braking, the motor controller reverses the direction of the torque-producing current in the q-axis, generating a counter-torque that opposes the rotor's motion, thus slowing it down. This deceleration would typically cause a reverse current due to the reduction in kinetic energy and the presence of back electromotive force. The flux braking technique effectively converts the motor's kinetic energy into heat by increasing the d-axis current, which allows for controlled deceleration while minimizing the impact of back-EMF and preventing reverse current.
+
+Two parameters control flux braking:
+
+1. `tmx.controller.current.max_Ibus_regen`: The maximum current (in amperes) allowed to be fed back to the power source before flux braking activates. By adjusting this value, you can control the regenerative braking threshold and determine when flux braking should take effect.
+
+2. `tmx.controller.current.max_Ibrake`: The maximum current (in amperes) allowed to be dumped to the motor windings during flux braking. By setting this value to zero, you can deactivate flux braking. Adjusting this parameter allows you to manage the braking torque and the heat generated during the braking process.
 
