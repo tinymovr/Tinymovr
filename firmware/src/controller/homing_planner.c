@@ -17,7 +17,7 @@ static HomingPlannerConfig config = {
 
 static HomingPlannerState state = {0};
 
-bool homing_planner_start_homing(void)
+bool homing_planner_home(void)
 {
     if (!errors_exist() && controller_get_mode() != CTRL_HOMING)
     {

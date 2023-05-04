@@ -34,7 +34,7 @@ typedef struct {
     uint8_t warnings;
 } HomingPlannerState;
 
-bool homing_planner_start_homing(void);
+bool homing_planner_home(void);
 bool homing_planner_evaluate(void);
 
 uint8_t homing_planner_get_warnings(void);

@@ -492,6 +492,11 @@ remote_attributes:
             getter_name: homing_planner_get_max_stall_t
             setter_name: homing_planner_set_max_stall_t
             summary: The time to remain in stall detection mode before the motor is considered stalled.
+      - name: home
+        summary: Perform the homing operation.
+        caller_name: homing_planner_home
+        dtype: void
+        arguments: []
   - name: watchdog
     remote_attributes:
       - name: enabled

@@ -79,7 +79,7 @@ typedef enum
 } homing_warnings_flags;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[77])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[78])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -821,6 +821,16 @@ uint8_t avlos_homing_stall_detect_delta_pos(uint8_t * buffer, uint8_t * buffer_l
 * @param buffer_len
 */
 uint8_t avlos_homing_stall_detect_t(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_homing_home
+*
+* Perform the homing operation.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_homing_home(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_watchdog_enabled

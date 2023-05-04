@@ -892,10 +892,20 @@ The time to remain in stall detection mode before the motor is considered stalle
 
 
 
-watchdog.enabled
+home() -> void
 -------------------------------------------------------------------
 
 ID: 74
+Return Type: void
+
+
+Perform the homing operation.
+
+
+watchdog.enabled
+-------------------------------------------------------------------
+
+ID: 75
 Type: bool
 
 
@@ -907,7 +917,7 @@ Whether the watchdog is enabled or not.
 watchdog.triggered
 -------------------------------------------------------------------
 
-ID: 75
+ID: 76
 Type: bool
 
 
@@ -919,7 +929,7 @@ Whether the watchdog has been triggered or not.
 watchdog.timeout
 -------------------------------------------------------------------
 
-ID: 76
+ID: 77
 Type: float
 Units: second
 
