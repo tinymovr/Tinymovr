@@ -30,7 +30,8 @@ typedef struct {
 } HomingPlannerConfig;
 
 typedef struct {
-    float stay_t_meas;
+    float home_t_current;
+    float stay_t_current;
     uint8_t warnings;
 } HomingPlannerState;
 
