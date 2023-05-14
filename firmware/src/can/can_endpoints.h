@@ -72,8 +72,14 @@ typedef enum
     TRAJ_PLANNER_ERRORS_VCRUISE_OVER_LIMIT = (1 << 1)
 } traj_planner_errors_flags;
 
+typedef enum
+{
+    HOMING_WARNINGS_NONE = 0,
+    HOMING_WARNINGS_HOMING_TIMEOUT = (1 << 0)
+} homing_warnings_flags;
+
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[70])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[78])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -745,6 +751,86 @@ uint8_t avlos_traj_planner_move_to_tlimit(uint8_t * buffer, uint8_t * buffer_len
 * @param buffer_len
 */
 uint8_t avlos_traj_planner_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_homing_velocity
+*
+* The velocity at which the motor performs homing.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_homing_velocity(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_homing_max_homing_t
+*
+* The maximum time the motor is allowed to travel before homing times out and aborts.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_homing_max_homing_t(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_homing_retract_dist
+*
+* The retraction distance the motor travels after the endstop has been found.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_homing_retract_dist(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_homing_warnings
+*
+* Any homing warnings, as a bitmask
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_homing_warnings(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_homing_stall_detect_velocity
+*
+* The velocity below which (and together with `stall_detect.delta_pos`) stall detection mode is triggered.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_homing_stall_detect_velocity(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_homing_stall_detect_delta_pos
+*
+* The velocity below which (and together with `stall_detect.delta_pos`) stall detection mode is triggered.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_homing_stall_detect_delta_pos(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_homing_stall_detect_t
+*
+* The time to remain in stall detection mode before the motor is considered stalled.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_homing_stall_detect_t(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_homing_home
+*
+* Perform the homing operation.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_homing_home(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_watchdog_enabled

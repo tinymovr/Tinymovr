@@ -18,7 +18,7 @@
 #ifndef CONTROLLER_TRAJECTORY_PLANNER_H_
 #define CONTROLLER_TRAJECTORY_PLANNER_H_
 
-#include "src/common.h"
+#include <src/common.h>
 
 typedef struct {
 	float max_accel;
@@ -75,7 +75,7 @@ bool planner_set_deltat_decel(float deltat_decel);
 
 uint8_t planner_get_errors(void);
 
-bool planner_evaluate(float t, MotionPlan *plan);
+bool traj_planner_evaluate(float t, MotionPlan *plan);
 
 TrajPlannerConfig *traj_planner_get_config(void);
 void traj_planner_restore_config(TrajPlannerConfig *config_);
