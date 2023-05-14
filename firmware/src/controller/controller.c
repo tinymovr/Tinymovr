@@ -351,21 +351,30 @@ TM_RAMFUNC void controller_set_mode(ControlMode new_mode)
 {
     if (new_mode != state.mode)
     {
-        if (new_mode == CTRL_TRAJECTORY)
+        switch (new_mode)
         {
+            case CTRL_HOMING:
+            state.mode = CTRL_HOMING;
+            break;
+
+            case CTRL_TRAJECTORY:
             state.mode = CTRL_TRAJECTORY;
-        }
-        else if (new_mode == CTRL_POSITION)
-        {
+            break;
+
+            case CTRL_POSITION:
             state.mode = CTRL_POSITION;
-        }
-        else if (new_mode == CTRL_VELOCITY)
-        {
+            break;
+
+            case CTRL_VELOCITY:
             state.mode = CTRL_VELOCITY;
-        }
-        else if (new_mode == CTRL_CURRENT)
-        {
+            break;
+
+            case CTRL_CURRENT:
             state.mode = CTRL_CURRENT;
+            break;
+
+            default:
+            break;
         }
     }
 }
