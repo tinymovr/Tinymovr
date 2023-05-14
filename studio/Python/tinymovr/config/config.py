@@ -32,10 +32,14 @@ with open(def_path_str) as dev_def_raw:
 
 
 class ProtocolVersionError(Exception):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, dev_id, version_str, *args, **kwargs):
+        self.dev_id = dev_id
+        self.version_str = cleanup_incomplete_version(version_str)
         msg = (
-            "Incompatible protocol versions (hash mismatch)."
-            "Please try upgrading firmware & studio to the same version."
+            "Incompatible protocol versions (hash mismatch) for device {}. "
+            "Firmware is compatible with Studio version {}.\n\n"
+            "Either upgrade studio and firmware, or install a compatible Studio version like so:\n\n"
+            "pip3 uninstall tinymovr\npip3 install tinymovr=={}".format(self.dev_id, self.version_str, self.version_str)
         )
         super().__init__(msg, *args, **kwargs)
 
@@ -82,7 +86,10 @@ def create_device_with_hash_msg(heartbeat_msg):
     node = deserialize(dev_def)
     hash, *_ = chan.serializer.deserialize(heartbeat_msg.data[:4], DataType.UINT32)
     if node.hash_uint32 != hash:  # hash_uint32 is local, hash is remote
-        raise ProtocolVersionError()
+        version_str = "".join(heartbeat_msg.data[4:])
+        if not version_str.strip():
+            version_str = "1.3.1"
+        raise ProtocolVersionError(node_id, version_str)
     node._channel = chan
     return node
 
@@ -97,3 +104,16 @@ def configure_logging():
     logger = logging.getLogger("tinymovr")
     logger.setLevel(logging.DEBUG)
     return logger
+
+
+def cleanup_incomplete_version(version_str, char='.'):
+    """
+    Clean up any version string that is
+    incomplete or malformed
+    """
+    parts = version_str.split(char)
+    
+    while '' in parts:
+        parts.remove('')
+    
+    return char.join(parts)

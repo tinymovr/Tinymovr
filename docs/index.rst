@@ -22,11 +22,10 @@ Welcome to Tinymovr documentation!
    studio/usage
    
    protocol/integrating
-   protocol/reference
    interfaces/interfaces
    
    encoders/encoders
-   planner/planner
+   features/features
    upgrade/upgrade
    hardware/gimbal
    
@@ -37,4 +36,6 @@ Welcome to Tinymovr documentation!
    develop/guide
    
    hardware/errata
+
+   protocol/reference
 

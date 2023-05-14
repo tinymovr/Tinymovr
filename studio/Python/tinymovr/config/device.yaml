@@ -387,21 +387,42 @@ remote_attributes:
         meta: {export: True}
         getter_name: planner_get_max_accel
         setter_name: planner_set_max_accel
-        summary: The trajectory planner max acceleration.
+        summary: The max allowed acceleration of the generated trajectory.
       - name: max_decel
         dtype: float
         unit: ticks/second/second
         meta: {export: True}
         getter_name: planner_get_max_decel
         setter_name: planner_set_max_decel
-        summary: The trajectory planner max deceleration.
+        summary: The max allowed deceleration of the generated trajectory.
       - name: max_vel
         dtype: float
         unit: ticks/second
         meta: {export: True}
         getter_name: planner_get_max_vel
         setter_name: planner_set_max_vel
-        summary: The trajectory planner max cruise velocity.
+        summary: The max allowed cruise velocity of the generated trajectory.
+      - name: t_accel
+        dtype: float
+        unit: second
+        meta: {export: True}
+        getter_name: planner_get_deltat_accel
+        setter_name: planner_set_deltat_accel
+        summary: In time mode, the acceleration time of the generated trajectory.
+      - name: t_decel
+        dtype: float
+        unit: second
+        meta: {export: True}
+        getter_name: planner_get_deltat_decel
+        setter_name: planner_set_deltat_decel
+        summary: In time mode, the deceleration time of the generated trajectory.
+      - name: t_total
+        dtype: float
+        unit: second
+        meta: {export: True}
+        getter_name: planner_get_deltat_total
+        setter_name: planner_set_deltat_total
+        summary: In time mode, the total time of the generated trajectory.
       - name: move_to
         summary: Move to target position respecting velocity and acceleration limits.
         caller_name: planner_move_to_vlimit
@@ -420,6 +441,62 @@ remote_attributes:
         flags: [INVALID_INPUT, VCRUISE_OVER_LIMIT]
         getter_name: planner_get_errors
         summary: Any errors in the trajectory planner, as a bitmask
+  - name: homing
+    remote_attributes:
+      - name: velocity
+        dtype: float
+        unit: ticks/s
+        meta: {export: True}
+        getter_name: homing_planner_get_homing_velocity
+        setter_name: homing_planner_set_homing_velocity
+        summary: The velocity at which the motor performs homing.
+      - name: max_homing_t
+        dtype: float
+        unit: s
+        meta: {export: True}
+        getter_name: homing_planner_get_max_homing_t
+        setter_name: homing_planner_set_max_homing_t
+        summary: The maximum time the motor is allowed to travel before homing times out and aborts.
+      - name: retract_dist
+        dtype: float
+        unit: ticks
+        meta: {export: True}
+        getter_name: homing_planner_get_retract_distance
+        setter_name: homing_planner_set_retract_distance
+        summary: The retraction distance the motor travels after the endstop has been found.
+      - name: warnings
+        meta: {dynamic: True}
+        flags: [HOMING_TIMEOUT]
+        getter_name: homing_planner_get_warnings
+        summary: Any homing warnings, as a bitmask
+      - name: stall_detect
+        remote_attributes:
+          - name: velocity
+            dtype: float
+            unit: ticks/s
+            meta: {export: True}
+            getter_name: homing_planner_get_max_stall_vel
+            setter_name: homing_planner_set_max_stall_vel
+            summary: The velocity below which (and together with `stall_detect.delta_pos`) stall detection mode is triggered.
+          - name: delta_pos
+            dtype: float
+            unit: ticks
+            meta: {export: True}
+            getter_name: homing_planner_get_max_stall_delta_pos
+            setter_name: homing_planner_set_max_stall_delta_pos
+            summary: The velocity below which (and together with `stall_detect.delta_pos`) stall detection mode is triggered.
+          - name: t
+            dtype: float
+            unit: s
+            meta: {export: True}
+            getter_name: homing_planner_get_max_stall_t
+            setter_name: homing_planner_set_max_stall_t
+            summary: The time to remain in stall detection mode before the motor is considered stalled.
+      - name: home
+        summary: Perform the homing operation.
+        caller_name: homing_planner_home
+        dtype: void
+        arguments: []
   - name: watchdog
     remote_attributes:
       - name: enabled

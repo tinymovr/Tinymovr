@@ -708,7 +708,7 @@ ID: 58
 Type: float
 Units: tick / second
 
-The trajectory planner max acceleration.
+The max allowed acceleration of the generated trajectory.
 
 
 
@@ -720,7 +720,7 @@ ID: 59
 Type: float
 Units: tick / second ** 2
 
-The trajectory planner max deceleration.
+The max allowed deceleration of the generated trajectory.
 
 
 
@@ -732,7 +732,43 @@ ID: 60
 Type: float
 Units: tick / second
 
-The trajectory planner max cruise velocity.
+The max allowed cruise velocity of the generated trajectory.
+
+
+
+
+traj_planner.t_accel
+-------------------------------------------------------------------
+
+ID: 61
+Type: float
+Units: second
+
+In time mode, the acceleration time of the generated trajectory.
+
+
+
+
+traj_planner.t_decel
+-------------------------------------------------------------------
+
+ID: 62
+Type: float
+Units: second
+
+In time mode, the deceleration time of the generated trajectory.
+
+
+
+
+traj_planner.t_total
+-------------------------------------------------------------------
+
+ID: 63
+Type: float
+Units: second
+
+In time mode, the total time of the generated trajectory.
 
 
 
@@ -740,7 +776,7 @@ The trajectory planner max cruise velocity.
 move_to(pos_setpoint) -> void
 -------------------------------------------------------------------
 
-ID: 61
+ID: 64
 Return Type: void
 
 
@@ -750,7 +786,7 @@ Move to target position respecting velocity and acceleration limits.
 move_to_tlimit(pos_setpoint) -> void
 -------------------------------------------------------------------
 
-ID: 62
+ID: 65
 Return Type: void
 
 
@@ -760,7 +796,7 @@ Move to target position respecting time limits for each sector.
 traj_planner.errors
 -------------------------------------------------------------------
 
-ID: 63
+ID: 66
 Type: uint8
 
 
@@ -771,10 +807,105 @@ Flags:
 - VCRUISE_OVER_LIMIT
 
 
+homing.velocity
+-------------------------------------------------------------------
+
+ID: 67
+Type: float
+Units: tick / second
+
+The velocity at which the motor performs homing.
+
+
+
+
+homing.max_homing_t
+-------------------------------------------------------------------
+
+ID: 68
+Type: float
+Units: second
+
+The maximum time the motor is allowed to travel before homing times out and aborts.
+
+
+
+
+homing.retract_dist
+-------------------------------------------------------------------
+
+ID: 69
+Type: float
+Units: tick
+
+The retraction distance the motor travels after the endstop has been found.
+
+
+
+
+homing.warnings
+-------------------------------------------------------------------
+
+ID: 70
+Type: uint8
+
+
+Any homing warnings, as a bitmask
+
+Flags: 
+- HOMING_TIMEOUT
+
+
+homing.stall_detect.velocity
+-------------------------------------------------------------------
+
+ID: 71
+Type: float
+Units: tick / second
+
+The velocity below which (and together with `stall_detect.delta_pos`) stall detection mode is triggered.
+
+
+
+
+homing.stall_detect.delta_pos
+-------------------------------------------------------------------
+
+ID: 72
+Type: float
+Units: tick
+
+The velocity below which (and together with `stall_detect.delta_pos`) stall detection mode is triggered.
+
+
+
+
+homing.stall_detect.t
+-------------------------------------------------------------------
+
+ID: 73
+Type: float
+Units: second
+
+The time to remain in stall detection mode before the motor is considered stalled.
+
+
+
+
+home() -> void
+-------------------------------------------------------------------
+
+ID: 74
+Return Type: void
+
+
+Perform the homing operation.
+
+
 watchdog.enabled
 -------------------------------------------------------------------
 
-ID: 64
+ID: 75
 Type: bool
 
 
@@ -786,7 +917,7 @@ Whether the watchdog is enabled or not.
 watchdog.triggered
 -------------------------------------------------------------------
 
-ID: 65
+ID: 76
 Type: bool
 
 
@@ -798,7 +929,7 @@ Whether the watchdog has been triggered or not.
 watchdog.timeout
 -------------------------------------------------------------------
 
-ID: 66
+ID: 77
 Type: float
 Units: second
 

@@ -1,0 +1,10 @@
+include README.md
+include tinymovr/resources/icons/call.png
+include tinymovr/resources/icons/call_dark.png
+include tinymovr/resources/icons/call@2x.png
+include tinymovr/resources/icons/call_dark@2x.png
+include tinymovr/resources/icons/empty.png
+include tinymovr/resources/icons/empty@2x.png
+include tinymovr/resources/icons/empty_dark.png
+include tinymovr/resources/icons/empty_dark@2x.png
+include tinymovr/config/device.yaml

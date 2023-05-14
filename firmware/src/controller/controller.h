@@ -20,6 +20,7 @@
 
 #include <src/common.h>
 #include <src/controller/trajectory_planner.h>
+#include <src/controller/homing_planner.h>
 
 typedef enum
 {
@@ -33,7 +34,8 @@ typedef enum
     CTRL_CURRENT = 0,
     CTRL_VELOCITY = 1,
     CTRL_POSITION = 2,
-    CTRL_TRAJECTORY = 3
+    CTRL_TRAJECTORY = 3,
+    CTRL_HOMING = 4
 } ControlMode;
 
 typedef struct
@@ -149,7 +151,7 @@ void controller_update_I_gains(void);
 uint8_t controller_get_warnings(void);
 uint8_t controller_get_errors(void);
 
-ControllerConfig *Controller_GetConfig(void);
-void Controller_RestoreConfig(ControllerConfig *config_);
+ControllerConfig *controller_get_config(void);
+void controller_restore_config(ControllerConfig *config_);
 
 #endif /* CONTROLLER_CONTROLLER_H_ */

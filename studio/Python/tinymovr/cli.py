@@ -6,7 +6,7 @@ Usage:
     tinymovr_cli --version
 
 Options:
-    --bus=<bus>  One or more interfaces to use, first available is used [default: canine,slcan].
+    --bus=<bus>  One or more interfaces to use, first available is used [default: canine,slcan_disco].
     --chan=<chan>  The bus device "channel".
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
@@ -83,7 +83,6 @@ def spawn():
     print("Listening for nodes...")
 
     c = Config()
-    c.InteractiveShellApp.gui = "tk"
     c.TerminalIPythonApp.display_banner = False
     IPython.start_ipython(argv=[], config=c, user_ns=user_ns)
     logger.debug("Exiting...")

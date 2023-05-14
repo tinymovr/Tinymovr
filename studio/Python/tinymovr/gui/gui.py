@@ -6,7 +6,7 @@ Usage:
     tinymovr --version
 
 Options:
-    --bus=<bus>  One or more interfaces to use, first available is used [default: canine,slcan].
+    --bus=<bus>  One or more interfaces to use, first available is used [default: canine,slcan_disco].
     --chan=<chan>  The bus device "channel".
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
@@ -14,8 +14,8 @@ Options:
 import sys
 import pkg_resources
 from docopt import docopt
-from PySide2.QtWidgets import QApplication
-from tinymovr.gui import MainWindow, app_stylesheet
+from PySide6.QtWidgets import QApplication
+from tinymovr.gui import MainWindow, app_stylesheet, app_stylesheet_dark, is_dark_mode
 from tinymovr.constants import app_name
 
 
@@ -36,15 +36,15 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-# https://www.loekvandenouweland.com/content/pyside2-big-sur-does-not-show-window.html
-import os
-os.environ['QT_MAC_WANTS_LAYER'] = '1'
 
 def spawn():
     version = pkg_resources.require("tinymovr")[0].version
     arguments = docopt(__doc__, version=app_name + " " + str(version))
     app = QApplication(sys.argv)
-    app.setStyleSheet(app_stylesheet)
+    if is_dark_mode():
+        app.setStyleSheet(app_stylesheet_dark)
+    else:
+        app.setStyleSheet(app_stylesheet)
     w = MainWindow(app, arguments)
     w.show()
     sys.exit(app.exec_())

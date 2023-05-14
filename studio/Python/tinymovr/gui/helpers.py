@@ -19,9 +19,12 @@ import time
 import os
 import enum
 import pint
-from PySide2 import QtGui, QtCore
-from PySide2.QtWidgets import QMessageBox, QFileDialog
+from PySide6.QtCore import Qt
+from PySide6 import QtGui
+from PySide6.QtGui import QPixmap, QIcon, QGuiApplication, QPalette
+from PySide6.QtWidgets import QMessageBox, QFileDialog, QTreeWidget
 from avlos.definitions import RemoteAttribute
+import tinymovr
 
 
 app_stylesheet = """
@@ -40,6 +43,158 @@ app_stylesheet = """
     QPushButton:hover:!pressed
     {
     background-color: #eaeaec;
+    } 
+
+/* --------------------------------------- QScrollBar -----------------------------------*/
+
+    QScrollBar:horizontal
+    {
+        height: 15px;
+        margin: 3px 15px 3px 15px;
+        border: 1px transparent white;
+        border-radius: 4px;
+        background-color: white;
+    }
+
+    QScrollBar::handle:horizontal
+    {
+        background-color: #dfdfe1;      /* #605F5F; */
+        min-width: 5px;
+        border-radius: 4px;
+    }
+
+    QScrollBar::add-line:horizontal
+    {
+        margin: 0px 3px 0px 3px;
+        border-image: url(:/qss_icons/rc/right_arrow_disabled.png);
+        width: 10px;
+        height: 10px;
+        subcontrol-position: right;
+        subcontrol-origin: margin;
+    }
+
+    QScrollBar::sub-line:horizontal
+    {
+        margin: 0px 3px 0px 3px;
+        border-image: url(:/qss_icons/rc/left_arrow_disabled.png);
+        height: 10px;
+        width: 10px;
+        subcontrol-position: left;
+        subcontrol-origin: margin;
+    }
+
+    QScrollBar::add-line:horizontal:hover,QScrollBar::add-line:horizontal:on
+    {
+        border-image: url(:/qss_icons/rc/right_arrow.png);
+        height: 10px;
+        width: 10px;
+        subcontrol-position: right;
+        subcontrol-origin: margin;
+    }
+
+
+    QScrollBar::sub-line:horizontal:hover, QScrollBar::sub-line:horizontal:on
+    {
+        border-image: url(:/qss_icons/rc/left_arrow.png);
+        height: 10px;
+        width: 10px;
+        subcontrol-position: left;
+        subcontrol-origin: margin;
+    }
+
+    QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal
+    {
+        background: none;
+    }
+
+
+    QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
+    {
+        background: none;
+    }
+
+    QScrollBar:vertical
+    {
+        background-color: white;
+        width: 15px;
+        margin: 15px 3px 15px 3px;
+        border: 1px transparent white;
+        border-radius: 4px;
+    }
+
+    QScrollBar::handle:vertical
+    {
+        background-color: #dfdfe1;
+        min-height: 5px;
+        border-radius: 4px;
+    }
+
+    QScrollBar::sub-line:vertical
+    {
+        margin: 3px 0px 3px 0px;
+        border-image: url(:/qss_icons/rc/up_arrow_disabled.png);
+        height: 10px;
+        width: 10px;
+        subcontrol-position: top;
+        subcontrol-origin: margin;
+    }
+
+    QScrollBar::add-line:vertical
+    {
+        margin: 3px 0px 3px 0px;
+        border-image: url(:/qss_icons/rc/down_arrow_disabled.png);
+        height: 10px;
+        width: 10px;
+        subcontrol-position: bottom;
+        subcontrol-origin: margin;
+    }
+
+    QScrollBar::sub-line:vertical:hover,QScrollBar::sub-line:vertical:on
+    {
+        border-image: url(:/qss_icons/rc/up_arrow.png);
+        height: 10px;
+        width: 10px;
+        subcontrol-position: top;
+        subcontrol-origin: margin;
+    }
+
+    QScrollBar::add-line:vertical:hover, QScrollBar::add-line:vertical:on
+    {
+        border-image: url(:/qss_icons/rc/down_arrow.png);
+        height: 10px;
+        width: 10px;
+        subcontrol-position: bottom;
+        subcontrol-origin: margin;
+    }
+
+    QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical
+    {
+        background: none;
+    }
+
+    QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
+    {
+        background: none;
+    }
+"""
+
+
+app_stylesheet_dark = """
+
+/* --------------------------------------- QPushButton -----------------------------------*/
+
+    QPushButton {
+        background-color: #363638;
+        border-radius: 4px; 
+        margin: 0 0 1px 0;
+    }
+    QPushButton:pressed {
+        background-color: #767678;
+        border-style: inset;
+    }
+    QPushButton:hover:!pressed
+    {
+    background-color: #464648;
     }
 
 /* --------------------------------------- QScrollBar -----------------------------------*/
@@ -176,6 +331,25 @@ app_stylesheet = """
 """
 
 
+class OurQTreeWidget(QTreeWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.placeholder_image = load_pixmap("empty.png")
+
+    def paintEvent(self, event):
+        if self.topLevelItemCount() == 0:
+            painter = QtGui.QPainter(self.viewport())
+            painter.setOpacity(0.5)  # Adjust the opacity of the placeholder image
+            pixel_ratio = QtGui.QGuiApplication.primaryScreen().devicePixelRatio()
+            painter.drawPixmap(
+                (self.viewport().width() - self.placeholder_image.width()/pixel_ratio) / 2,
+                (self.viewport().height() - self.placeholder_image.height()/pixel_ratio) / 2,
+                self.placeholder_image,
+            )
+        else:
+            super().paintEvent(event)
+
+
 def format_value(value, include_unit=True):
     """
     Format a numeric value according to its
@@ -190,15 +364,43 @@ def format_value(value, include_unit=True):
     return str(value)
 
 
+def load_pixmap(filename, dark_mode_suffix='_dark', high_dpi_suffix='@2x'):
+    """
+    Load an image from a file and return it as a QPixmap.
+    Load appropriate variants based on pixel ratio and
+    dark or light mode.
+    """
+    # Get the pixel ratio
+    pixel_ratio = QtGui.QGuiApplication.primaryScreen().devicePixelRatio()
+
+    # Prepare the filename based on the conditions
+    parts = filename.split('.')
+    if is_dark_mode():
+        parts[0] += dark_mode_suffix
+    if pixel_ratio > 1:
+        parts[0] += high_dpi_suffix
+    adjusted_filename = '.'.join(parts)
+
+    file_path = os.path.join(
+        os.path.dirname(tinymovr.__file__), "resources", "icons", adjusted_filename
+    )
+
+    # Load the pixmap and set the device pixel ratio
+    pixmap = QtGui.QPixmap(file_path)
+    pixmap.setDevicePixelRatio(pixel_ratio)
+
+    return pixmap
+
+
+def is_dark_mode():
+    return QGuiApplication.palette().color(QPalette.Window).lightness() < 128
+
+
 def load_icon(fname_icon):
     """
-    Load an image from a file and return it
-    as a QIcon
+    Load an image from a file and return it as a QIcon
     """
-    path_this_dir = os.path.dirname(os.path.abspath(__file__))
-    path_icons = os.path.join(path_this_dir, "..", "..", "resources", "icons")
-    path_icon = os.path.join(path_icons, fname_icon)
-    pixmap = QtGui.QPixmap(path_icon)
+    pixmap = load_pixmap(fname_icon)
     icon = QtGui.QIcon()
     icon.addPixmap(pixmap, QtGui.QIcon.Normal)
     icon.addPixmap(pixmap, QtGui.QIcon.Disabled)

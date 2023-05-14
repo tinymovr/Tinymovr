@@ -42,24 +42,25 @@ Launching Studio
 Alternative Adapters/Firmwares
 ##############################
 
-By default Tinymovr Studio searches for slcan-compatible CAN bus adapters, which appear as USB Virtual COM Port devices. To specify an alternative device, use the `--bus` command line argument. 
+By default Tinymovr Studio searches for either slcan-compatible CAN bus adapters or adapters using the `CANine firmware <https://github.com/tinymovr/CANine>`_ [1]_. To specify an alternative device, use the `--bus` command line argument. 
 
-For instance, to work with adapters using the `CANine firmware <https://github.com/tinymovr/CANine>`_, launch Tinymovr Studio as follows:
+For instance, to work with SocketCAN-compatible adapters in linux, launch Tinymovr Studio as follows:
 
 |gui|
 
 .. code-block:: console
 
-    tinymovr --bus=canine
+    tinymovr --bus=socketcan
 
 
 |cli|
 
 .. code-block:: console
 
-    tinymovr_cli --bus=canine
+    tinymovr_cli --bus=socketcan
 
-Note that you need to have completed `setting up CANine <https://canine.readthedocs.io/en/latest/canine.html#canine-firmware>`_ before issuing the above command to work with CANine.
+
+.. [1] Note that you need to have completed `setting up CANine <https://canine.readthedocs.io/en/latest/canine.html#canine-firmware>`_ before working with CANine.
 
 Compatibility
 #############
@@ -157,7 +158,7 @@ All interfaces offered by python-can are supported.
 ``--chan=<chan>``
 =================
 
-The --chan options specifies a channel to use, optionally together with the --bustype option. 
+The --chan options specifies a channel to use, optionally together with the --bus option. 
 
 Example:
 
@@ -248,11 +249,11 @@ You can use a socketcan-enabled CAN adapter with Tinymovr Studio. The CANine ada
 
 .. code-block:: console
 
-    tinymovr --bustype=socketcan --chan=CAN0
+    tinymovr --bus=socketcan --chan=CAN0
 
 |cli|
 
 .. code-block:: console
 
-    tinymovr_cli --bustype=socketcan --chan=CAN0
+    tinymovr_cli --bus=socketcan --chan=CAN0
 

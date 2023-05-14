@@ -34,6 +34,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/yconst/Tinymovr",
     packages=find_packages(include=["tinymovr", "tinymovr.*"]),
+    include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
@@ -51,6 +52,7 @@ setup(
         "importlib_resources",
         "python-can",
         "python-can-canine",
+        "python-can-slcan_disco",
         "avlos",
         "pyserial",
         "pyusb",
@@ -59,7 +61,7 @@ setup(
         "flatten-dict",
         "pint",
     ],
-    extras_require={"gui": ["pyside2", "pyqtgraph"]},
+    extras_require={"gui": ["pyside6", "pyqtgraph>=0.13.3"]},
     entry_points={
         "console_scripts": [
             "tinymovr_cli=tinymovr.cli:spawn",
