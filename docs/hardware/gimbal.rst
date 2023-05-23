@@ -2,6 +2,8 @@
 Gimbal Motors
 *************
 
+.. _gimbal-introduction:
+
 Introduction
 ------------
 

@@ -18,13 +18,25 @@ Note that the Tinymovr Servo Kit includes all of the above in a ready to use kit
 Supported Motor Types
 #####################
 
-Most three-phase pancake-style outrunners can be used with Tinymovr. While there is a lot of variation between motors of even the same size and external appearance, as a general rule-of-thumb motors ranging from 40mm outer diameter to 110mm should work fine with Tinymovr.
+Tinymovr R5.x and R3.x
+**********************
+
+Most three-phase pancake-style outrunners can be used with Tinymovr R5. While there is a lot of variation between motors of even the same size and external appearance, as a general rule-of-thumb motors ranging from 40mm outer diameter to 110mm should work fine with Tinymovr.
+
+For a good quality and affordable option, take a look at our own `Tinymovr Motors <https://tinymovr.com/5208_motor>`_.
+
+Tinymovr M5.x
+*************
+
+Most gimbal motors can be used with Tinymovr M5. Gimbal motors are essentially outrunners with high resistance (they have more turns). You can read more about gimbal motors in :ref:`gimbal-introduction`. Note that, to control gimbal motors with Tinymovr M5, you do not have to (in fact, should not) use Gimbal mode. Tinymovr M5 is capable of accurately sensing current at a lower scale, which is compatible with gimbal motors.
+
 
 Additional details:
 
-Tinymovr expects a motor with sinusoidal back-EMF. Most brushless outrunners have inusoidal back-EMF. If uncertain and you have access to an oscilloscope, you can hook up the motor phases to the scope channels and check out the back-EMF for yourself. 
+Tinymovr expects a motor with sinusoidal back-EMF. Most brushless outrunners (including gimbal motors) have sinusoidal back-EMF. If uncertain and you have access to an oscilloscope, you can hook up the motor phases to the scope channels and check out the back-EMF for yourself. 
 
 Motors with trapezoidal back-EMF can also be controlled, but control will be sub-optimal. The trapezoidal back-EMF will appear as residual in the dq frame, as a result it will be much harder for the current controller to regulate phase currents. The tangible result is that the motor may exhibit increased noise and vibration while running.
+
 
 
 Mechanical Setup
