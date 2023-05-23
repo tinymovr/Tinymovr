@@ -89,7 +89,9 @@ If you are in Windows you will also need to install GNU make. This is rather eas
 Using VSCode
 ############
 
-VSCode-based Tinymovr development is a cross-platform solution (Linux, Macos and Windows supported) for building, flashing and debugging firmware. As of November 2021, it is the official approach to Tinymovr development.
+Our development environment for Tinymovr utilizes VSCode and is designed with cross-platform compatibility in mind. We support all major operating systems: Linux, MacOS, and Windows. This method allows for a unified approach to building, flashing, and debugging firmware.
+
+We take great pride in creating this in-house, cross-platform development solution, as an alternative to the official Windows-only solution, providing enhanced flexibility and simplifiyng the process of developing for Tinymovr across multiple platforms.
 
 
 Building
