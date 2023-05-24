@@ -20,12 +20,12 @@ The onboard sensor is enabled by default, so no special configuration is necessa
 
 .. code-block:: python
 
-    tm1.encoder.type = 1
-    tm1.encoder.bandwidth = 1500
+    tm1.encoder.type = 0
+    tm1.encoder.bandwidth = 300
     tm1.save_config()
     tm1.reset() # encoder change is applied after reset
 
-The value of 1500 in bandwidth is the default value configured for the onboard sensor, which works well for most configurations.
+The value of 300Hz in bandwidth is the default value configured based on the charasteristics of the onboard sensor.
 
 Hall Effect Sensor
 ******************
@@ -68,7 +68,7 @@ As a first step you need to configure the sensor type and observer bandwidth.
     tm1.encoder.type = 1
     tm1.encoder.bandwidth = 100
 
-This sets the encoder type to Hall effect sensor, and the encoder bandwidth to 100. 
+This sets the encoder type to Hall effect sensor, and the encoder bandwidth to 100Hz. 
 
 Next, you need to set the motor configuration:
 
