@@ -13,9 +13,16 @@ For this method you will need a USB to UART adapter or similar device to connect
 .. warning::
    The UART port on Tinymovr is NOT 5V tolerant. Applying 5V voltage will immediately damage the onboard PAC5527 controller. Please use only 3.3V for UART communication.
 
+.. warning::
+   The UART port on Tinymovr offers a 3.3v output for driving very light loads (30mA absolute max). Tinymovr cannot be powered by this pin. In addition, most UART adapters offer 5V power, which is incompatible with Tinymovr. **In short: If in doubt, leave this pin disconnected**.
+
 .. image:: connectors_r5.png
   :width: 800
   :alt: Tinymovr R5 connectors and pinouts
+
+.. image:: connectors_m5.png
+  :width: 800
+  :alt: Tinymovr M5 connectors and pinouts
 
 .. image:: connectors.png
    :width: 800

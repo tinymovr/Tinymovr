@@ -58,8 +58,6 @@ The most important aspect of a correct setup is to ensure the controller is prop
 
 A `3D printable encoder magnet jig <https://github.com/yconst/Tinymovr/blob/master/hardware/misc/magnet_jig.stl>`_ is available, suitable for 6mm disc magnets and 14, 19, 25 and 30mm motor hole diameters.
 
-For a 3D printable motor mount design, check out the `Tinymovr alpha dev kit mount <https://github.com/yconst/Tinymovr/tree/master/hardware/motor-stand>`_ (suitable for 40xx motors).
-
 .. note::
    For safety reasons, you should always ensure the motor & controller assembly are secured to a stable surface before operation. The motor rotor may experience high acceleration that may cause damage or injury if not secured properly.
 
@@ -108,7 +106,11 @@ Connecting Motor
 
 Connect the three motor phases to the three terminals on Tinymovr. The order of connection is not important, and motor direction will be determined during motor/encoder calibration.
 
-For Tinymovr R3.x, the motor leads can be connected by soldering on the PCB. For Tinymovr R5, the leads can be connected by soldering on the PCB, or you can solder a screw terminal block and secure the motor leads on the block.
+* Tinymovr R3.x: The motor leads can be connected by soldering on the PCB. 
+
+* Tinymovr R5.x: The leads can be connected by soldering on the PCB, or you can solder a screw terminal block and secure the motor leads on the block.
+
+* Tinymovr M5.x: The leads can be connected by soldering on the PCB.
 
 .. _connecting-data:
 
@@ -120,6 +122,8 @@ Connect the CAN bus header to one of the two CAN sockets on the board. It is not
 * Tinymovr R3.x: flip ONLY the DIP switch labelled "CAN 120R" to on to enable the 120Ω termination resistor. 
 
 * Tinymovr R5.x: you will need to provide an external 120Ω termination resistor.
+
+* Tinymovr M5.x: you will need to provide an external 120Ω termination resistor.
 
 In small setups with few nodes and short wires, it is better to enable just a single termination resistor, either on one Tinymovr board or on the CAN adapter. In setups with many nodes and long cables, you may need to enable termination resistors in both terminal nodes.
 
@@ -135,7 +139,9 @@ Connecting Power
 
 * Tinymovr R5.x can be powered from a 12-38V (3S-9S) power source.
 
+* Tinymovr M5.x can be powered from a 12-38V (3S-9S) power source.
+
 With the power source off/disconnected, connect the power leads observing correct polarity. Turn on/connect the power source. Upon successful power-up, the onboard LED should light up.
 
 .. note::
-   Each Tinymovr board has a capacitance of around 500μF (R3.x) / 160μF (R5). Such capacitance can introduce significant inrush current upon power-on, especially if several boards are connected to the same power supply. To prevent damage to components from overcurrent, the use of an inrush current limiter or a current-limited power supply is advised.
+   Each Tinymovr board has a capacitance of around 500μF (R3.x) / 200μF (R5) / 50μF (M5). Such capacitance can introduce significant inrush current upon power-on, especially if several boards are connected to the same power supply. To prevent damage to components from overcurrent, the use of an inrush current limiter or a current-limited power supply is advised. We offer a `Power Distribution and protection device <https://tinymovr.com/products/dianome>`_ which is suitable for this task.
