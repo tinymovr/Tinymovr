@@ -10,15 +10,15 @@ R5.x
 
 Tinymovr R5.x is the latest Tinymovr revision. It features increased connectivity in a reduced footprint.
 
-Board Dimensions
-################
+Board Dimensions (R5.1, R5.2)
+#############################
 
 .. image:: dimensions_r5.png
   :width: 800
   :alt: Tinymovr R5 dimensions
 
-Connectivity
-############
+Connectivity (R5.1, R5.2)
+#########################
 
 .. image:: connectors_r5.png
   :width: 800
@@ -33,15 +33,15 @@ M5.x
 
 Tinymovr M5.x is is our specialized driver for gimbal motors and light robotic joints. It features a very compact footprint and 5A max drive.
 
-Board Dimensions
-################
+Board Dimensions (M5.1)
+#######################
 
 .. image:: dimensions_m5.png
   :width: 800
   :alt: Tinymovr M5 dimensions
 
-Connectivity
-############
+Connectivity (M5.1)
+###################
 
 .. image:: connectors_m5.png
   :width: 800
@@ -53,15 +53,15 @@ R3.x
 
 R3.x is the previous Tinymovr revision, with CAN and UART connectivity.
 
-Board Dimensions
-################
+Board Dimensions (R3.x)
+#######################
 
 .. image:: dimensions.png
   :width: 800
   :alt: Tinymovr R3.x dimensions
 
-Connectivity
-############
+Connectivity (R3.x)
+###################
 
 .. image:: connectors.png
   :width: 800
