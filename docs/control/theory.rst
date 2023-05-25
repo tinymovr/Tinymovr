@@ -36,12 +36,12 @@ As the motor phases are connected, current measurement in each of the three phas
 Reference Frames
 ****************
 
-Next, the 3-phase measurements are transformed to the rotating frame of the rotor which is termed dq. The relevant transformation is known as the dq0 transform. The resulting quantities are the direct (d) current and quadrature (q) current. Motor torque is attributed to the quadrature component, while the direct component is minimized.
+Next, the 3-phase measurements are transformed to the rotating frame of the rotor which is termed dq. The relevant transformation is known as the dq0 transform. The resulting quantities are the direct (d) current and quadrature (q) current. Motor torque is attributed to the quadrature component, while the direct component is minimized (except in the case of :ref:`flux-braking-feature`).
 
 Current Regulation and Motor Parameter Identification
 *****************************************************
 
-Because the d and q quantities represent DC signals in the rotational frame, it is possible to apply PI regulation to control current.  For optimal regulation, the PI current regulation requires correct identification of proportional and integral gains. Tinymovr uses the method proposed in [1] to calculate the gains from the resistance and inductance motor parameters. The parameters are measured automatically by the firmware during the calibration procedure. 
+Because the d and q quantities represent DC signals in the rotational frame, it is possible to apply PI regulation to control current. For optimal regulation, the PI current regulation requires correct identification of proportional and integral gains. Tinymovr uses the method proposed in [1] to calculate the gains from the resistance and inductance motor parameters. The parameters are measured automatically by the firmware during the calibration procedure. 
 
 Thus the whole process is automated, and you don't need to worry about it.
 
