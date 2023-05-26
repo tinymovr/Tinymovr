@@ -185,7 +185,7 @@ remote_attributes:
             summary: The Iq estimate.
           - name: bandwidth
             dtype: float
-            unit: rad/s
+            unit: Hz
             meta: {export: True}
             getter_name: controller_get_I_bw
             setter_name: controller_set_I_bw
@@ -364,7 +364,7 @@ remote_attributes:
         summary: The encoder type. Either INTERNAL or HALL.
       - name: bandwidth
         dtype: float
-        unit: rad/s
+        unit: Hz
         meta: {export: True}
         getter_name: observer_get_bw
         setter_name: observer_set_bw
