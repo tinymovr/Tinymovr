@@ -72,7 +72,7 @@ def create_device(node_id):
     node._channel = chan
     # hash_uint32 is local, proto_hash is remote
     if node.hash_uint32 != node.protocol_hash:
-        raise ProtocolVersionError()
+        raise ProtocolVersionError(node_id, "")
     return node
 
 
@@ -86,7 +86,7 @@ def create_device_with_hash_msg(heartbeat_msg):
     node = deserialize(dev_def)
     hash, *_ = chan.serializer.deserialize(heartbeat_msg.data[:4], DataType.UINT32)
     if node.hash_uint32 != hash:  # hash_uint32 is local, hash is remote
-        version_str = "".join(heartbeat_msg.data[4:])
+        version_str = "".join([chr(n) for n in heartbeat_msg.data[4:]])
         if not version_str.strip():
             version_str = "1.3.1"
         raise ProtocolVersionError(node_id, version_str)

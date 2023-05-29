@@ -24,7 +24,7 @@
 static ObserverState state = {0};
 
 static ObserverConfig config = {
-		.track_bw = 1500.0f,
+		.track_bw = 300.0f,
 		.kp = 0.0f,
 		.ki = 0.0f,
 };
