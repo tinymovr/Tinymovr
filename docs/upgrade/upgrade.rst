@@ -13,13 +13,43 @@ For this method you will need a USB to UART adapter or similar device to connect
 .. warning::
    The UART port on Tinymovr is NOT 5V tolerant. Applying 5V voltage will immediately damage the onboard PAC5527 controller. Please use only 3.3V for UART communication.
 
+.. warning::
+   The UART port on Tinymovr offers a 3.3v output for driving very light loads (30mA absolute max). Tinymovr cannot be powered by this pin. In addition, most UART adapters offer 5V power, which is incompatible with Tinymovr. **In short: If in doubt, leave this pin disconnected**.
+
+Connectivity
+############
+
+R5.2
+====
+
+.. image:: connectors_r52.png
+  :width: 800
+  :alt: Tinymovr R5.2 connectors and pinouts
+
+R5.0, R5.1
+==========
+
 .. image:: connectors_r5.png
   :width: 800
-  :alt: Tinymovr R5 connectors and pinouts
+  :alt: Tinymovr R5.0 and R5.1 connectors and pinouts
+
+M5.1
+====
+
+.. image:: connectors_m5.png
+  :width: 800
+  :alt: Tinymovr M5 connectors and pinouts
+
+R3.x
+====
 
 .. image:: connectors.png
    :width: 800
    :alt: Tinymovr R3.x connectors and pinouts
+
+
+Procedure
+#########
 
 Qorvo provides an application to interface with the bootloader environment using UART and enable firmware upgrades. It is available through the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_ as an archive named "PAC55xx ActiveFlashLight Bootloader". Please download and extract the archive and follow these steps:
 
@@ -40,4 +70,8 @@ Upgrading using J-Link
 ======================
 
 Please see :ref:`setting-up-vscode`.
+
+.. warning::
+   Depending on the hardware revision and the batch, either a vertical or a sideways JST-SH connector is used for SWD. In any case, the pin order shown in the above figures is correct. Please consider this when connecting your SWD adapter.
+
 

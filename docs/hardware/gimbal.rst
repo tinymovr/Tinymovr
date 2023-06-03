@@ -2,14 +2,19 @@
 Gimbal Motors
 *************
 
+.. _gimbal-introduction:
+
 Introduction
 ------------
 
-Since firmware v0.8.4 and studio v0.3.4, Tinymovr can drive gimbal-style brushless motors.
+Tinymovr can drive gimbal-style brushless motors in open loop current control, by disabling current sensing. 
+
+.. warning::
+   * This mode is not recommended for Tinymovr M5, which is a specialized gimbal driver and can do closed loop current control with gimbal motors.
 
 What is a gimbal motor anyway?
 
-A gimbal motor is a 3-phase brushless motor whose stator is wound with many turns, and as such exhibits much larger resistance and inductance compared to the high-current brushless motors used to provide lift to drones, rc planes etc. Gimbal motors are used in... well... camera gimbals mainly, because they offer smooth motion and require small currents to produce torque compared to the 'regular' brushless motors. This in turn can help minimize the size of the motor driver and associated wires etc. Note that we refer to reduction of current through the stator windings and not the power converted to heat as a result of Joule heating of stator windings, which is still the same for the same amount of torque.
+A gimbal motor is a 3-phase brushless motor whose stator is wound with many turns, and as such exhibits much larger resistance and inductance compared to the high-current brushless motors used to provide lift to drones, rc planes etc. Gimbal motors are used in... well... camera gimbals mainly. Similar motors can be found in light robotic joints. Such motors offer smooth motion and require small currents to produce torque compared to the 'high current' brushless motors. This in turn can help minimize the size of the motor driver and associated wires etc. Note that we refer to reduction of current through the stator windings and not the power converted to heat as a result of Joule heating of stator windings, which is still the same for the same amount of torque.
 
 To achieve closed-loop current control, motor controllers such as Tinymovr use current measurement resistors in each phase (usually in series with the low-side mosfet) to estimate the current in the motor windings. These resistors have low resistance (in the range of a few milliOhms at most), to limit power dissipation in the resistor and allow operation in wide current ranges (up to several tens of Amps, even hundreds). The drawback is that current measurements exhibit noise of 100s of mA, and as such do not offer accurate measurements of small currents.
 
@@ -19,8 +24,6 @@ Enabling Gimbal Mode
 --------------------
 
 .. warning::
-   * Although tested, gimbal mode is still experimental. Please ensure all safety precautions, and use at your own risk!
-
    * DO NOT perform calibration on a gimbal motor without setting gimbal mode first! There is a risk of damaging the motor and board.
    
    * Using arbitrary resistance and inductance settings can damage your motor and board.

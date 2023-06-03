@@ -89,7 +89,9 @@ If you are in Windows you will also need to install GNU make. This is rather eas
 Using VSCode
 ############
 
-VSCode-based Tinymovr development is a cross-platform solution (Linux, Macos and Windows supported) for building, flashing and debugging firmware. As of November 2021, it is the official approach to Tinymovr development.
+Our development environment for Tinymovr utilizes VSCode and is designed with cross-platform compatibility in mind. We support all major operating systems: Linux, MacOS, and Windows. This method allows for a unified approach to building, flashing, and debugging firmware.
+
+We take great pride in creating this in-house, cross-platform development solution, as an alternative to the official Windows-only solution, providing enhanced flexibility and simplifiyng the process of developing for Tinymovr across multiple platforms.
 
 
 Building
@@ -107,7 +109,26 @@ Tinymovr implements board revision selection using an input menu with a few pred
   :width: 800
   :alt: Board revision selector
 
-Select the board revision against which you are compiling (R32, R33 or R5) from the list. The build process will start, it usually takes less than half a minute. After it finishes, you should end up with a ``build/`` directory inside ``firmware/`` and there you should see the files ``tinymovr_fw.elf``, ``tinymovr_fw.hex`` and ``tinymovr_fw.bin``.
+Select the board revision against which you are compiling from the list. The build process will start, it usually takes less than half a minute. After it finishes, you should end up with a ``build/`` directory inside ``firmware/`` and there you should see the files ``tinymovr_fw.elf``, ``tinymovr_fw.hex`` and ``tinymovr_fw.bin``.
+
+More about Hardware Revisions
+-----------------------------
+
+Tinymovr passes the `BOARD_REV_XX` argument regarding the board revision to the compiler. This is used in the firmware to configure the hardware accordingly. Invoking a make command with the REV argument is as follows:
+
+.. code-block:: console
+
+    make debug REV=R5
+
+
+Currently the following hardware revision values are supported:
+
+- R32
+- R33
+- R50
+- R51
+- R52
+- M5
 
 
 Flashing and Debugging

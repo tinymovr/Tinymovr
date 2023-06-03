@@ -41,11 +41,17 @@ extern volatile uint32_t msTicks;
 
 void CAN_init(void)
 {
-#if defined(BOARD_REV_R5)
+#if defined(BOARD_REV_R52)
+    PAC55XX_SCC->PDMUXSEL.w &= 0xFFFFFF0F;        // Clear bits to select GPIO function
+    PAC55XX_GPIOD->MODE.P7 = IO_PUSH_PULL_OUTPUT; // GPIO configured as an output
+    PAC55XX_GPIOD->OUT.P7 = 0;                    // Set low to force transceiver into normal mode
+    PAC55XX_GPIOD->MODE.P6 = IO_PUSH_PULL_OUTPUT; // GPIO configured as an output
+    PAC55XX_GPIOD->OUT.P6 = 1;                    // Set high to set IO voltage to 3V3
+#elif defined(BOARD_REV_R5)
     // Configure PD7 as GPIO output
     PAC55XX_GPIOD->MODE.P7 = IO_PUSH_PULL_OUTPUT; // GPIO configured as an output
     PAC55XX_SCC->PDMUXSEL.w &= 0xFFFFFF0F;        // Clear bits to select GPIO function
-    PAC55XX_GPIOD->OUT.P7 = 0;                    // Set high to force transceiver into normal mode
+    PAC55XX_GPIOD->OUT.P7 = 0;                    // Set low to force transceiver into normal mode
 #elif defined(BOARD_REV_R3)
     // Configure PF4 as GPIO input
     PAC55XX_GPIOF->MODE.P4 = IO_HIGH_IMPEDENCE_INPUT;

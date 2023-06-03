@@ -7,7 +7,7 @@ jobs:
     runs-on: 'ubuntu-22.04'
     strategy:
       matrix:
-        board-revision: [R32, R33, R5, M5]
+        board-revision: [R32, R33, R50, R51, R52, M5]
     steps:
     - uses: actions/checkout@v2
     - uses: carlosperate/arm-none-eabi-gcc-action@v1

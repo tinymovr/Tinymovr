@@ -375,7 +375,7 @@ controller.current.bandwidth
 
 ID: 30
 Type: float
-Units: radian / second
+Units: hertz
 
 The current controller bandwidth.
 
@@ -668,7 +668,7 @@ encoder.bandwidth
 
 ID: 55
 Type: float
-Units: radian / second
+Units: hertz
 
 The encoder observer bandwidth.
 
