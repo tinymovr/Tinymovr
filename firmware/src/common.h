@@ -95,7 +95,8 @@
 #if defined BOARD_REV_R32 || defined BOARD_REV_R33
 #define BOARD_REV_R3
 #define CAN_PE23
-#elif defined BOARD_REV_R5
+#elif defined BOARD_REV_R51 || defined BOARD_REV_R52
+#define BOARD_REV_R5
 #define CAN_PF67
 #elif defined BOARD_REV_M5
 #define CAN_PD56
