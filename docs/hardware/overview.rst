@@ -10,14 +10,14 @@ R5.x
 
 Tinymovr R5.x is the latest Tinymovr revision. It features increased connectivity in a reduced footprint.
 
-Board Dimensions (R5.1, R5.2)
+Board Dimensions (R5.0, R5.1)
 #############################
 
 .. image:: dimensions_r5.png
   :width: 800
   :alt: Tinymovr R5 dimensions
 
-Connectivity (R5.1, R5.2)
+Connectivity (R5.0, R5.1)
 #########################
 
 .. image:: connectors_r5.png
@@ -26,6 +26,20 @@ Connectivity (R5.1, R5.2)
 
 .. warning::
    The UART pins in Tinymovr R5.1 have the silkscreen reversed. If you are planning to use UART with R5.1, consult :ref:`r51-erratum-1`. This only affects R5.1 boards.
+
+Board Dimensions (R5.2)
+#######################
+
+.. image:: dimensions_r52.png
+  :width: 800
+  :alt: Tinymovr R5.2 dimensions
+
+Connectivity (R5.2)
+###################
+
+.. image:: connectors_r52.png
+  :width: 800
+  :alt: Tinymovr R5.2 connectors and pinouts
 
 
 M5.x
