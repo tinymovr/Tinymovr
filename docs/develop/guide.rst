@@ -138,7 +138,7 @@ Before debugging, make sure the J-Link drivers and software is installed. The dr
 
 The Tinymovr repo includes all VSCode settings configured, except for the JLink `serverpath` variable in `launch.json`, which you'll need to update to reflect your system. Note that there are multiple instances in the file, you'll need to update all of them.
 
-We offer various VSCode launch configurations to suit different development and debugging tasks. These are are briefly outlined below.
+We offer various VSCode launch configurations to suit different development and debugging tasks, including remote Tinymovr flashing debugging using a remote JLink server. These are are briefly outlined below.
 
 
 Rebuild Debug and Start Session
@@ -175,6 +175,12 @@ Attach to Target
 This will attach to an already running target.
 
 
+Flash Built Binary and Start Remote Session
+-------------------------------------------
+
+This will connect to a remote JLink server, upload the firmware to the remote Tinymovr device, and start a remote debug session. You will need to have a JLink Server configured on a network attached device, such as a Raspberry Pi (`here is a good guide on how to do that <https://blog.feabhas.com/2019/07/using-a-raspberry-pi-as-a-remote-headless-j-link-server/>`_). You will also need to input the remote device's IP address to the ``ipAddress`` field of the ``launch.json`` file.
+
+
 Note that the launch configurations can be selected and initiated from the VSCode "Run and Debug" pane. You can also hit ``F5`` to launch the currently selected configuration.
 
 Congrats! You are now fully set to start with Tinymovr development!
@@ -183,7 +189,7 @@ Congrats! You are now fully set to start with Tinymovr development!
 .. _setting-up-eclipse:
 
 Using Eclipse
-##################
+#############
 
 Eclipse is no longer supported. Consider :ref:`setting-up-vscode` instead.
 
