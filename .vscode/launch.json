@@ -5,6 +5,24 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Flash Built Binary and Start Remote Session",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "jlink",
+            "serverpath": "JLinkGDBServerCL",
+            "ipAddress": "0.0.0.0:19020",
+            "device": "PAC55XX",
+            "serverArgs": [
+                "-JLinkDevicesXMLPath",
+                "${workspaceRoot}/firmware/"
+                // "-speed 2000"
+            ],
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
+            "runToEntryPoint": "main"
+        },
+        {
             "cwd": "${workspaceRoot}",
             "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
             "name": "Rebuild Debug and Start Session",

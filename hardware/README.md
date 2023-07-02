@@ -2,7 +2,8 @@
 
 This folder contains 3D models and drawings of the Tinymovr motor controller and associated hardware.
 
-- [Tinymovr R5 STEP files](./R5/)
+- [STEP files for Tinymovr R5.x and related accessories](./R5/)
+- [STEP files for Tinymovr M5.x and related accessories](./M5/)
 - [Tinymovr R3 STEP files](./R3/)
 - [STL and STEP files for the Tinymovr Servo Kit, R2 and R5](./ServoKit/)
 - [STEP files for the ACT8.3 Actuator](./Actuator/)
