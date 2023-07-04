@@ -24,11 +24,11 @@ from avlos.deserializer import deserialize
 from tinymovr.codec import DataType
 from tinymovr.channel import CANChannel
 
-dev_def = None
+default_definition = None
 
 def_path_str = str(files("tinymovr").joinpath("config/device.yaml"))
-with open(def_path_str) as dev_def_raw:
-    dev_def = yaml.safe_load(dev_def_raw)
+with open(def_path_str) as definition_raw:
+    default_definition = yaml.safe_load(definition_raw)
 
 
 class ProtocolVersionError(Exception):
@@ -57,13 +57,13 @@ def get_bus_config(suggested_types=None):
         raise can.CanInitializationError("No active interface found") from exc
 
 
-def create_device(node_id):
+def create_device(node_id, device_definition=default_definition):
     """
     Create a device with the defined ID.
     The hash value will be retrieved from the remote.
     """
     chan = CANChannel(node_id)
-    node = deserialize(dev_def)
+    node = deserialize(device_definition)
     # We use the generated node to retrieve the hash from
     # the remote. This is ok as long as we know that the
     # hash endpoint will always be the 0th one. If there
@@ -76,14 +76,14 @@ def create_device(node_id):
     return node
 
 
-def create_device_with_hash_msg(heartbeat_msg):
+def create_device_with_hash_msg(heartbeat_msg, device_definition=default_definition):
     """
     Create a device, the heartbeat msg will be used
     to decode the actual hash value and id
     """
     node_id = heartbeat_msg.arbitration_id & 0x3F
     chan = CANChannel(node_id)
-    node = deserialize(dev_def)
+    node = deserialize(device_definition)
     hash, *_ = chan.serializer.deserialize(heartbeat_msg.data[:4], DataType.UINT32)
     if node.hash_uint32 != hash:  # hash_uint32 is local, hash is remote
         version_str = "".join([chr(n) for n in heartbeat_msg.data[4:]])
