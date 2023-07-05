@@ -24,6 +24,8 @@
 #include <src/can/can_endpoints.h>
 #include <src/system/system.h>
 
+extern char _eram;
+
 static SystemState state = {0};
 
 static SystemConfig config = {
@@ -109,8 +111,20 @@ TM_RAMFUNC void system_update(void)
 
 void system_reset(void)
 {
-    pac5xxx_tile_register_write(ADDR_WATCHDOG,
-                                pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
+    NVIC_SystemReset();
+}
+
+void system_invoke_bootloader(void)
+{
+    void* eram_addr = &_eram;
+    uint32_t *bl_sram_ptr = (uint32_t*)((uintptr_t)eram_addr - 4);
+
+    bl_sram_ptr[0] = BTL_TRIGGER_PATTERN;
+    bl_sram_ptr[1] = BTL_TRIGGER_PATTERN;
+    bl_sram_ptr[2] = BTL_TRIGGER_PATTERN;
+    bl_sram_ptr[3] = BTL_TRIGGER_PATTERN;
+
+    NVIC_SystemReset();
 }
 
 TM_RAMFUNC float system_get_Vbus(void)

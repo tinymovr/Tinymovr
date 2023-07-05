@@ -35,6 +35,7 @@ typedef struct {
 void system_init(void);
 void system_update(void);
 void system_reset(void);
+void system_invoke_bootloader(void);
 
 inline uint32_t system_get_uid(void)
 {
