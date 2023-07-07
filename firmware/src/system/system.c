@@ -116,14 +116,7 @@ void system_reset(void)
 
 void system_invoke_bootloader(void)
 {
-    void* eram_addr = &_eram;
-    uint32_t *bl_sram_ptr = (uint32_t*)((uintptr_t)eram_addr - 4);
-
-    bl_sram_ptr[0] = BTL_TRIGGER_PATTERN;
-    bl_sram_ptr[1] = BTL_TRIGGER_PATTERN;
-    bl_sram_ptr[2] = BTL_TRIGGER_PATTERN;
-    bl_sram_ptr[3] = BTL_TRIGGER_PATTERN;
-
+    pac5xxx_tile_register_write(ADDR_GP0, BTL_TRIGGER_PATTERN);
     NVIC_SystemReset();
 }
 

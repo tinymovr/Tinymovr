@@ -71,7 +71,7 @@
 #error "Unknown debug configuration"
 #endif
 
-#define BTL_TRIGGER_PATTERN  0x5048434D
+#define BTL_TRIGGER_PATTERN  0x39
 
 #define PI (3.141592f)
 #define TWOPI (6.283185f)
