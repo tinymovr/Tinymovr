@@ -61,6 +61,12 @@ remote_attributes:
     dtype: void
     arguments: []
     meta: {reload_data: True}
+  - name: invoke_bootloader
+    summary: Invoke the bootloader.
+    caller_name: system_invoke_bootloader
+    dtype: void
+    arguments: []
+    meta: {reload_data: True}
   - name: scheduler
     remote_attributes:
       - name: total

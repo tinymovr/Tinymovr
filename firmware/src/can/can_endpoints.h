@@ -79,7 +79,7 @@ typedef enum
 } homing_warnings_flags;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[78])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[79])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -191,6 +191,16 @@ uint8_t avlos_erase_config(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command
 * @param buffer_len
 */
 uint8_t avlos_reset(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_invoke_bootloader
+*
+* Invoke the bootloader.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_invoke_bootloader(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_scheduler_total
