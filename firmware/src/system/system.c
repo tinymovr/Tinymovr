@@ -111,6 +111,7 @@ TM_RAMFUNC void system_update(void)
 
 void system_reset(void)
 {
+    pac5xxx_tile_register_write(ADDR_GP0, 0);
     NVIC_SystemReset();
 }
 
