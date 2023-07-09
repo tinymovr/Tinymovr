@@ -42,6 +42,11 @@ inline uint32_t system_get_uid(void)
     return PAC55XX_INFO1->UNIQUEID[0] ^ PAC55XX_INFO1->UNIQUEID[1] ^ PAC55XX_INFO1->UNIQUEID[2];
 }
 
+inline uint32_t system_get_hw_revision(void)
+{
+    return BOARD_REV_IDX;
+}
+
 float system_get_Vbus(void);
 bool system_get_calibrated(void);
 uint8_t system_get_errors(void);

@@ -96,14 +96,23 @@
 
 #if defined BOARD_REV_R32 || defined BOARD_REV_R33
 #define BOARD_REV_R3
-#define CAN_PE23
 #elif defined BOARD_REV_R50 || BOARD_REV_R51 || defined BOARD_REV_R52
 #define BOARD_REV_R5
-#define CAN_PF67
-#elif defined BOARD_REV_M5
-#define CAN_PD56
+#elif defined BOARD_REV_M51
+#define BOARD_REV_M5
 #else
 #error "Board revision incorrect or not defined"
+#endif
+
+#if defined BOARD_REV_R3
+#define BOARD_REV_IDX 1
+#define CAN_PE23
+#elif defined BOARD_REV_R5
+#define BOARD_REV_IDX 2
+#define CAN_PF67
+#elif defined BOARD_REV_M5
+#define BOARD_REV_IDX 3
+#define CAN_PD56
 #endif
 
 static const float one_by_sqrt3 = 0.57735026919f;

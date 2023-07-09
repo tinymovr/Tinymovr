@@ -10,6 +10,10 @@ remote_attributes:
     dtype: uint32
     getter_name: system_get_uid
     summary: The unique device ID, unique to each PAC55xx chip produced.
+  - name: hw_revision
+    dtype: uint32
+    getter_name: system_get_hw_revision
+    summary: The hardware revision.
   - name: Vbus
     dtype: float
     unit: volt

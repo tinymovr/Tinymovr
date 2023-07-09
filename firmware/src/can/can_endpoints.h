@@ -79,7 +79,7 @@ typedef enum
 } homing_warnings_flags;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[79])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[80])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -101,6 +101,16 @@ uint8_t avlos_protocol_hash(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comman
 * @param buffer_len
 */
 uint8_t avlos_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_hw_revision
+*
+* The hardware revision.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_hw_revision(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_Vbus
