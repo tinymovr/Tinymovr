@@ -87,9 +87,9 @@ static ControllerConfig config = {
 
 static ControllerConfig config = {
     .vel_limit = 100000.0f,
-    .I_limit = 5.0f,
-    .pos_gain = 12.0f,
-    .vel_gain = 6.0e-5f,
+    .I_limit = 4.0f,
+    .pos_gain = 8.0f,
+    .vel_gain = 5.0e-5f,
     .vel_integrator_gain = 0.00020f,
     .vel_integrator_deadband = 200.0f,
     .I_bw = 2000.0,
