@@ -357,13 +357,13 @@ remote_attributes:
         dtype: float
         unit: ticks
         meta: {dynamic: True}
-        getter_name: observer_get_pos_estimate
+        getter_name: observer_get_pos_estimate_user_frame
         summary: The filtered encoder position estimate.
       - name: velocity_estimate
         dtype: float
         unit: ticks/second
         meta: {dynamic: True}
-        getter_name: observer_get_vel_estimate
+        getter_name: observer_get_vel_estimate_user_frame
         summary: The filtered encoder velocity estimate.
       - name: type
         #values: [INTERNAL, HALL]
