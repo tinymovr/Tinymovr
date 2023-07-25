@@ -24,11 +24,14 @@ from avlos.deserializer import deserialize
 from tinymovr.codec import DataType
 from tinymovr.channel import CANChannel
 
-default_definition = None
+tinymovr_definition = None
+bl_definition = None
 
-def_path_str = str(files("tinymovr").joinpath("config/device.yaml"))
-with open(def_path_str) as definition_raw:
-    default_definition = yaml.safe_load(definition_raw)
+with open(str(files("tinymovr").joinpath("config/device.yaml"))) as def_raw:
+    tinymovr_definition = yaml.safe_load(def_raw)
+
+with open(str(files("tinymovr").joinpath("config/bl.yaml"))) as def_raw:
+    bl_definition = yaml.safe_load(def_raw)
 
 
 class ProtocolVersionError(Exception):
@@ -39,7 +42,9 @@ class ProtocolVersionError(Exception):
             "Incompatible protocol versions (hash mismatch) for device {}. "
             "Firmware is compatible with Studio version {}.\n\n"
             "Either upgrade studio and firmware, or install a compatible Studio version like so:\n\n"
-            "pip3 uninstall tinymovr\npip3 install tinymovr=={}".format(self.dev_id, self.version_str, self.version_str)
+            "pip3 uninstall tinymovr\npip3 install tinymovr=={}".format(
+                self.dev_id, self.version_str, self.version_str
+            )
         )
         super().__init__(msg, *args, **kwargs)
 
@@ -57,7 +62,7 @@ def get_bus_config(suggested_types=None):
         raise can.CanInitializationError("No active interface found") from exc
 
 
-def create_device(node_id, device_definition=default_definition):
+def create_device(node_id, device_definition=tinymovr_definition):
     """
     Create a device with the defined ID.
     The hash value will be retrieved from the remote.
@@ -76,7 +81,7 @@ def create_device(node_id, device_definition=default_definition):
     return node
 
 
-def create_device_with_hash_msg(heartbeat_msg, device_definition=default_definition):
+def create_device_with_hash_msg(heartbeat_msg, device_definition=tinymovr_definition):
     """
     Create a device, the heartbeat msg will be used
     to decode the actual hash value and id
@@ -106,14 +111,14 @@ def configure_logging():
     return logger
 
 
-def cleanup_incomplete_version(version_str, char='.'):
+def cleanup_incomplete_version(version_str, char="."):
     """
     Clean up any version string that is
     incomplete or malformed
     """
     parts = version_str.split(char)
-    
-    while '' in parts:
-        parts.remove('')
-    
+
+    while "" in parts:
+        parts.remove("")
+
     return char.join(parts)
