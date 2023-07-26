@@ -25,14 +25,14 @@ Here below is an example using the API from Python scripts and controlling hardw
     from tinymovr.tee import init_tee
     from tinymovr.config import get_bus_config, create_device
 
-    params = get_bus_config(["canine", "slcan"])
+    params = get_bus_config(["canine", "slcan_disco"])
     params["bitrate"] = bitrate
     init_tee(can.Bus(**params))
     tm = create_device(node_id=1)
 
     tm.controller.calibrate()
 
-The above code block will instantiate a Tinymovr with CAN bus id of 1 and calibrate it. Following the above, you can issue commands such as:
+The above code block will instantiate a Tinymovr with CAN bus id of 1 and calibrate it. `slcan_disco` is our custom slcan plugin for python-can that allows discovery of slcan-flashed CANine devices. Following the above, you can issue commands such as:
 
 .. code-block:: python
 
