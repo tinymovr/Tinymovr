@@ -36,19 +36,22 @@ class TMTestCase(unittest.TestCase):
     def setUp(cls):
         params = get_bus_config(["canine", "slcan_disco"])
         params["bitrate"] = 1000000
-        self.can_bus = can.Bus(**params)
+        cls.can_bus = can.Bus(**params)
+
+    def test_bootloader(self, node_id=2):
         init_tee(self.can_bus)
-        tm = create_device(node_id=1, device_definition=tinymovr_definition)
+        tm = create_device(node_id=node_id, device_definition=tinymovr_definition)
         tm_hash = tm.protocol_hash
         tm.invoke_bootloader()
         time.sleep(1)
-        bl = create_device(node_id=1, device_definition=bl_definition)
+        bl = create_device(node_id=node_id, device_definition=bl_definition)
         bl_hash = bl.protocol_hash
         bl.reset()
-        tm = create_device(node_id=1, device_definition=tinymovr_definition)
+        time.sleep(0.1)
+        tm = create_device(node_id=node_id, device_definition=tinymovr_definition)
         tm_hash2 = tm.protocol_hash
         tm.reset()
-        time.sleep(0.05)
+        time.sleep(0.1)
         tm_hash3 = tm.protocol_hash
         self.assertEqual(tm_hash, tm_hash2)
         self.assertEqual(tm_hash, tm_hash3)
