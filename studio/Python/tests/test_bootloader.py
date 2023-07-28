@@ -31,8 +31,10 @@ import unittest
 
 
 class TMTestCase(unittest.TestCase):
-    def test_bootloader(self):
-        params = get_bus_config(["canine", "slcan"])
+
+    @classmethod
+    def setUp(cls):
+        params = get_bus_config(["canine", "slcan_disco"])
         params["bitrate"] = 1000000
         self.can_bus = can.Bus(**params)
         init_tee(self.can_bus)
