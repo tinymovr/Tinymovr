@@ -38,7 +38,7 @@ class TMTestCase(unittest.TestCase):
         params["bitrate"] = 1000000
         cls.can_bus = can.Bus(**params)
 
-    def test_bootloader(self, node_id=2):
+    def test_bootloader(self, node_id=1):
         init_tee(self.can_bus)
         tm = create_device(node_id=node_id, device_definition=tinymovr_definition)
         tm_hash = tm.protocol_hash
