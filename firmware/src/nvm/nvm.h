@@ -31,7 +31,8 @@
 #define SETTINGS_PAGE_HEX (0x0001E000)
 
 struct NVMStruct {
-    uint8_t node_id;
+    uint8_t node_id_1;
+    uint8_t node_id_2;
     ADCConfig adc_config;
     MotorConfig motor_config;
     HallConfig hall_config;

@@ -27,7 +27,8 @@ bool nvm_save_config(void)
 {
 	bool commited = false;
 	uint8_t data[sizeof(struct NVMStruct)];
-	s.node_id = CAN_get_ID();
+	s.node_id_1 = CAN_get_ID();
+	s.node_id_2 = CAN_get_ID();
 	s.adc_config = *ADC_get_config();
 	s.motor_config = *motor_get_config();
 	s.hall_config = *hall_get_config();
