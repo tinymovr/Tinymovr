@@ -50,14 +50,29 @@ class CANChannel(BaseChannel):
         self.evt = Event()
 
     def _recv_cb(self, frame):
+        """
+        Callback method for receiving frames. Append incoming frame
+        to the queue and set the event flag.
+        """
         self.queue.append(frame)
         self.evt.set()
 
     def send(self, data, ep_id):
+        """
+        Send a CAN frame to a specific endpoint. The `rtr` flag is set
+        based on whether data is provided, and the frame is sent via the
+        global tee instance.
+        """
         rtr = False if data and len(data) else True
         get_tee().send(self.create_frame(ep_id, rtr, data))
 
     def recv(self, ep_id, timeout=1.0):
+        """
+        Receive a CAN frame from a specific endpoint. This method waits
+        for a frame with a matching arbitration ID, removes it from the
+        queue, and returns the frame data. If no matching frame is found
+        within the specified timeout, a ResponseError is raised.
+        """
         with self.lock:
             self.evt.wait(timeout=timeout)
             self.evt.clear()
@@ -66,9 +81,9 @@ class CANChannel(BaseChannel):
             while index < len(self.queue):
                 if self.queue[index].arbitration_id == frame_id:
                     return self.queue.pop(index).data
-                index += 1  
+                index += 1
             raise ResponseError(self.node_id)
-        
+
     def create_frame(self, endpoint_id, rtr=False, payload=None):
         """
         Generate a CAN frame using python-can Message class
