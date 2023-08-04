@@ -222,7 +222,7 @@ TM_RAMFUNC int16_t adc_get_mcu_temp(void)
     return adc_state.temp;
 }
 
-TM_RAMFUNC void ADC_GetPhaseCurrents(struct FloatTriplet *phc)
+TM_RAMFUNC void ADC_GetPhaseCurrents(FloatTriplet *phc)
 {
     phc->A = adc_state.I_phase_meas.A;
     if (motor_phases_swapped())

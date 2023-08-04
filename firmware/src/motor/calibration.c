@@ -29,7 +29,6 @@
 
 static inline void set_epos_and_wait(float angle, float I_setpoint);
 static inline void wait_a_while(void);
-static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 
 bool CalibrateResistance(void)
 {
@@ -37,8 +36,8 @@ bool CalibrateResistance(void)
     {
         float I_cal = motor_get_I_cal();
         float V_setpoint = 0.0f;
-        struct FloatTriplet I_phase_meas = {0.0f};
-        struct FloatTriplet modulation_values = {0.0f};
+        FloatTriplet I_phase_meas = {0.0f};
+        FloatTriplet modulation_values = {0.0f};
         for (uint32_t i = 0; i < CAL_R_LEN; i++)
         {
             ADC_GetPhaseCurrents(&I_phase_meas);
@@ -71,8 +70,8 @@ bool CalibrateInductance(void)
         float V_setpoint = 0.0f;
         float I_low = 0.0f;
         float I_high = 0.0f;
-        struct FloatTriplet I_phase_meas = {0.0f};
-        struct FloatTriplet modulation_values = {0.0f};
+        FloatTriplet I_phase_meas = {0.0f};
+        FloatTriplet modulation_values = {0.0f};
 
         for (uint32_t i = 0; i < CAL_L_LEN; i++)
         {
@@ -311,7 +310,7 @@ void reset_calibration(void)
 
 static inline void set_epos_and_wait(float angle, float I_setpoint)
 {
-    struct FloatTriplet modulation_values = {0.0f};
+    FloatTriplet modulation_values = {0.0f};
     float pwm_setpoint = (I_setpoint * motor_get_phase_resistance()) / system_get_Vbus();
     our_clampc(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
     SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),

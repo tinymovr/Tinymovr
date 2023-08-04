@@ -32,7 +32,6 @@ void CLControlStep(void);
 static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
                                                             float vel_gain, float *I);
 
-static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 static MotionPlan motion_plan;
 static ControllerState state = {
 
@@ -448,7 +447,7 @@ TM_RAMFUNC float controller_set_pos_vel_setpoints(float pos_setpoint, float vel_
     return observer_get_pos_estimate_user_frame();
 }
 
-void controller_get_modulation_values(struct FloatTriplet *dc)
+void controller_get_modulation_values(FloatTriplet *dc)
 {
     dc->A = state.modulation_values.A;
     dc->B = state.modulation_values.B;

@@ -139,11 +139,13 @@ static const int32_t timer_freq_hz = ACLK_FREQ_HZ >> TXCTL_PS_DIV;
 static const float twopi_by_enc_ticks = TWOPI / ENCODER_TICKS;
 static const float twopi_by_hall_sectors = TWOPI / HALL_SECTORS;
 
-struct FloatTriplet
+typedef struct 
 {
 	float A;
 	float B;
 	float C;
-};
+} FloatTriplet;
+
+static const FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 
 #endif // #ifndef COMMON_H

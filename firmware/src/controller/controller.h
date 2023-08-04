@@ -46,8 +46,8 @@ typedef struct
     uint8_t warnings;
     uint8_t errors;
     bool is_calibrating;
-    struct FloatTriplet I_phase_meas;
-    struct FloatTriplet modulation_values;
+    FloatTriplet I_phase_meas;
+    FloatTriplet modulation_values;
     float Iq_est;
     float Id_est;
     float Ibus_est;
@@ -115,7 +115,7 @@ float controller_get_Vq_setpoint_user_frame(void);
 
 float controller_set_pos_vel_setpoints(float pos_setpoint, float vel_setpoint);
 
-void controller_get_modulation_values(struct FloatTriplet *dc);
+void controller_get_modulation_values(FloatTriplet *dc);
 
 float controller_get_pos_gain(void);
 void controller_set_pos_gain(float gain);

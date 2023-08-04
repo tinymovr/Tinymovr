@@ -74,7 +74,7 @@ TM_RAMFUNC bool gate_driver_is_enabled(void)
     return (GATEDRIVER_ENABLED == gateDriver.state);
 }
 
-TM_RAMFUNC void gate_driver_set_duty_cycle(struct FloatTriplet *dutycycles)
+TM_RAMFUNC void gate_driver_set_duty_cycle(const FloatTriplet *dutycycles)
 {
 	m1_u_set_duty(dutycycles->A);
 	if (motor_phases_swapped())
