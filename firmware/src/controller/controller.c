@@ -334,7 +334,7 @@ TM_RAMFUNC void controller_set_state(ControlState new_state)
         }
         else // state != STATE_IDLE --> Got to idle state anyway
         {
-            gate_driver_set_duty_cycle(&zeroDC);
+            gate_driver_set_duty_cycle(&three_phase_zero);
             gate_driver_disable();
             state.state = STATE_IDLE;
         }
