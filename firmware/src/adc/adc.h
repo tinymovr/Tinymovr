@@ -89,7 +89,10 @@ typedef enum
 
 typedef struct 
 {
-    int16_t temp;
+    float temp;
+    float temp_cal_const;
+    float temp_D;
+    float I_phase_offset_D;
     FloatTriplet I_phase_meas;
 } ADCState;
 
@@ -98,11 +101,11 @@ typedef struct
     FloatTriplet I_phase_offset;
     float Iphase_limit;
     float I_phase_offset_tau;
-    float I_phase_offset_k;
+    float temp_tau;
 } ADCConfig;
 
 void ADC_Init(void);
-int16_t adc_get_mcu_temp(void);
+float adc_get_mcu_temp(void);
 void ADC_GetPhaseCurrents(FloatTriplet *phc);
 void ADC_update(void);
 

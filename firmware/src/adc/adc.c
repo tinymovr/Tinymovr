@@ -58,13 +58,16 @@ static ADCState adc_state = {0};
 static ADCConfig adc_config = {
     .I_phase_offset = {0},
     .Iphase_limit = 60.0f,
-    .I_phase_offset_tau = 0.2f,
-    .I_phase_offset_k = 0.0f
+    .I_phase_offset_tau = 0.5f,
+    .temp_tau = 1.0
 };
 
 void ADC_Init(void)
 {
-    adc_config.I_phase_offset_k = PWM_PERIOD_S / adc_config.I_phase_offset_tau;
+    // Compute tau-dependent variables
+    adc_state.I_phase_offset_D = 1.0f - powf(EPSILON, -1.0f / (adc_config.I_phase_offset_tau * PWM_FREQ_HZ));
+    adc_state.temp_D = 1.0f - powf(EPSILON, -1.0f / (adc_config.temp_tau * PWM_FREQ_HZ));
+
     // --- Begin CAFE2 Initialization
 
     // Write all CAFE registers
@@ -131,6 +134,12 @@ void ADC_Init(void)
 
     // --- End CAFE2 Initialization
 
+    // Internal MCU temperature sensor reading at FTTEMP temperature in ADC counts.
+    uint16_t ttemp = 0;
+    memcpy(&ttemp, (const size_t *)0x0010041C, sizeof(uint16_t));
+    adc_state.temp_cal_const = (float)ttemp;
+
+    // Disable ADC
     pac5xxx_adc_enable(0);
 
     // EMUX configuration
@@ -217,7 +226,7 @@ void ADC_DTSE_Init(void)
     pac5xxx_dtse_seq_config(18, ADC0, 0, ADC_IRQ0_EN, SEQ_END); // Get result at DTSERES18, Interrupt
 }
 
-TM_RAMFUNC int16_t adc_get_mcu_temp(void)
+TM_RAMFUNC float adc_get_mcu_temp(void)
 {
     return adc_state.temp;
 }
@@ -243,9 +252,9 @@ TM_RAMFUNC void ADC_update(void)
     {
         case STATE_CALIBRATE:
         {
-            adc_config.I_phase_offset.A += (((float)PAC55XX_ADC->DTSERES6.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.A) * adc_config.I_phase_offset_k;
-            adc_config.I_phase_offset.B += (((float)PAC55XX_ADC->DTSERES8.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.B) * adc_config.I_phase_offset_k;
-            adc_config.I_phase_offset.C += (((float)PAC55XX_ADC->DTSERES10.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.C) * adc_config.I_phase_offset_k;
+            adc_config.I_phase_offset.A += (((float)PAC55XX_ADC->DTSERES6.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.A) * adc_state.I_phase_offset_D;
+            adc_config.I_phase_offset.B += (((float)PAC55XX_ADC->DTSERES8.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.B) * adc_state.I_phase_offset_D;
+            adc_config.I_phase_offset.C += (((float)PAC55XX_ADC->DTSERES10.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.C) * adc_state.I_phase_offset_D;
         }
         case STATE_CL_CONTROL:
         {
@@ -259,13 +268,18 @@ TM_RAMFUNC void ADC_update(void)
         default: break;
     }
     
-    // Internal MCU temperature sensor reading at FTTEMP temperature in ADC counts.
-    uint16_t TTEMPS = 0;
-    memcpy(&TTEMPS, (const size_t *)0x0010041C, sizeof(uint16_t));
     // Temperature in oC at time of internal temperature sensor
-    const int32_t FTTEMP = 27; // READ_UINT16(0x0010041E);
-    const int32_t temp_val = (int32_t)(PAC55XX_ADC->DTSERES2.VAL);
-    adc_state.temp = ((((FTTEMP + 273) * ((temp_val * 100) + 12288)) / (((int16_t)TTEMPS * 100) + 12288)) - 273);
+    const float FTTEMP = 27 + 273; // READ_UINT16(0x0010041E);
+    const float temp_val = (float)(PAC55XX_ADC->DTSERES2.VAL);
+    adc_state.temp = ( ((FTTEMP * (temp_val + 122.88f)) / (adc_state.temp_cal_const + 122.88f)) - 273) * adc_state.temp_D + adc_state.temp * (1.0f - adc_state.temp_D);
+
+    // // Internal MCU temperature sensor reading at FTTEMP temperature in ADC counts.
+    // uint16_t TTEMPS = 0;
+    // memcpy(&TTEMPS, (const size_t *)0x0010041C, sizeof(uint16_t));
+    // // Temperature in oC at time of internal temperature sensor
+    // const int32_t FTTEMP = 27; // READ_UINT16(0x0010041E);
+    // const int32_t temp_val = (int32_t)(PAC55XX_ADC->DTSERES2.VAL);
+    // adc_state.temp = ((((FTTEMP + 273) * ((temp_val * 100) + 12288)) / (((int16_t)TTEMPS * 100) + 12288)) - 273);
 }
 
 ADCConfig *ADC_get_config(void)
