@@ -82,6 +82,9 @@ void system_init(void)
     // Vp = 10V , 440mA-540mA, Charge Pump Enable
     pac5xxx_tile_register_write(ADDR_SYSCONF, 0x01);
 
+    // Ensure ADC GP0 register is zero, to bypass bootloader on next boot
+    pac5xxx_tile_register_write(ADDR_GP0, 0);
+
     // Configure reporting of mcu cycles
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
     DWT->CYCCNT = 0;
@@ -111,7 +114,7 @@ TM_RAMFUNC void system_update(void)
 
 void system_reset(void)
 {
-    pac5xxx_tile_register_write(ADDR_GP0, 0);
+    // GP0 register is already zeroed at `system_init()` 
     NVIC_SystemReset();
 }
 
