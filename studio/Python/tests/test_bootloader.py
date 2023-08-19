@@ -53,6 +53,7 @@ class TMTestCase(unittest.TestCase):
         tm.reset()
         time.sleep(0.1)
         tm_hash3 = tm.protocol_hash
+        self.assertNotEqual(tm_hash, 0)
         self.assertEqual(tm_hash, tm_hash2)
         self.assertEqual(tm_hash, tm_hash3)
         self.assertNotEqual(tm_hash, bl_hash)
