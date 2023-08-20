@@ -48,22 +48,68 @@ R3.x
    :alt: Tinymovr R3.x connectors and pinouts
 
 
-Procedure
-#########
+Firmware Update Procedure for Tinymovr
+######################################
 
-Qorvo provides an application to interface with the bootloader environment using UART and enable firmware upgrades. It is available through the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_ as an archive named "PAC55xx ActiveFlashLight Bootloader". Please download and extract the archive and follow these steps:
+Tinymovr has streamlined the firmware update process by leveraging the native CAN bus interface. This guide will walk you through the steps to refresh your Tinymovr's firmware.
 
-1. Inside the "resources" folder run the ActiveFlashLight application
-2. Power on Tinymovr
-3. Under 'COMMUNICATION' click on 'Connect'
-4. Power off and on Tinymov. The application status should now indicate that it is connected to the device. 
-5. Under 'PROGRAMMING' click on 'Browse...' and find the latest 'tinymovr<firmware_version>-R<board_revision>.bin' file for the board being used, which can be downloaded from `releases <https://github.com/tinymovr/Tinymovr/releases>`_. Also take note of any version specific instructions in the release notes.
-6. Under 'PROGRAMMING' click on 'Auto Program'. The application will erase, flash and verify the device with the new firmware. Wait for the process to complete
-7. Once complete, power off Tinymovr and quit the application
+Prerequisites
+=============
 
-You should now be able to use Tinymovr as usual with the new firmware.
+1. **Install the Tinymovr Package**:
 
-We are actively working to provide a cross-platform utility to allow easy firmware file flashing using the command line.
+   If you haven’t already, install the Tinymovr package. This package also comes with the required dependencies:
+
+   .. code-block:: bash
+
+      pip install tinymovr
+
+2. **Download the Firmware**:
+
+   Head to the `Tinymovr Releases Page <https://github.com/tinymovr/Tinymovr/releases/latest>`_ and download the precompiled binary of the firmware that matches your board's hardware revision. Firmware binaries follow the format: ``tinymovr<firmware_version>-<hardware_revision>.bin``. For instance, you might come across a file named ``tinymovr1.5.0-M5.1.bin``.
+
+Flashing the Firmware
+=====================
+
+1. **Set Up Your CAN Interface**:
+
+   Ensure your CAN interface is connected and configured correctly with Tinymovr.
+
+2. **Run the Script**:
+
+   With the firmware .bin file you downloaded, execute the firmware update script:
+
+   .. code-block:: bash
+
+      tinymovr_dfu --node_id=1 --bin=path/to/your/downloaded/tinymovr<version>-<revision>.bin
+
+   Replace the placeholders in the path with the appropriate values based on where you've saved the .bin file and its name.
+
+   Example:
+
+   .. code-block:: bash
+
+      tinymovr_dfu --node_id=1 --bin=~/Downloads/tinymovr1.5.0-M5.1.bin
+
+   To forgo the automatic reset post-flash, append the ``--no-reset`` flag:
+
+   .. code-block:: bash
+
+      tinymovr_dfu --node_id=1 --bin=~/Downloads/tinymovr1.5.0-M5.1.bin --no-reset
+
+3. **Follow the Script's Prompts**:
+
+   The script initially checks if the device's current firmware matches the .bin file. If they're identical, it will bypass the flashing process. If not, it will erase the prior firmware, flash the new version, and validate the update.
+
+4. **Concluding Steps**:
+
+   If you skipped using the ``--no-reset`` flag, the device will reboot automatically after the update. If you used the flag, you'd need to power off and on the Tinymovr by hand.
+
+   You're all set! Your Tinymovr is updated and primed for use with the fresh firmware.
+
+.. note::
+
+   Before updating, it's a wise move to backup your current firmware and settings. Always pore over any version-specific instructions or release notes accompanying fresh firmware updates to stay informed.
 
 
 Upgrading using J-Link
