@@ -299,8 +299,7 @@ remote_attributes:
         setter_name: motor_set_pole_pairs
         summary: The motor pole pair count.
       - name: type
-        #values: [HIGH_CURRENT, GIMBAL]
-        dtype: uint8
+        options: [HIGH_CURRENT, GIMBAL]
         meta: {export: True}
         getter_name: motor_get_is_gimbal
         setter_name: motor_set_is_gimbal

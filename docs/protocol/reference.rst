@@ -583,7 +583,9 @@ Type: uint8
 
 The type of the motor. Either high current or gimbal.
 
-
+Options: 
+- HIGH_CURRENT
+- GIMBAL
 
 
 motor.offset
