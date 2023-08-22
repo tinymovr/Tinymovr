@@ -106,7 +106,7 @@ TM_RAMFUNC uint8_t motor_get_pole_pairs(void)
 
 TM_RAMFUNC void motor_set_pole_pairs(uint8_t pairs)
 {
-	if (pairs > 1u)
+	if (pairs >= 1u)
 	{
 		config.pole_pairs = pairs;
 		config.poles_calibrated = true;
