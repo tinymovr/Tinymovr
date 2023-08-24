@@ -102,7 +102,7 @@ There are six parameters in total that control the homing behavior:
 * `tmx.homing.stall_detect.delta_pos`: The position error above which (and together with `stall_detect.velocity`) stall detection mode is triggered
 * `tmx.homing.stall_detect.t`: The time to remain in stall detection mode before the motor is considered stalled
 
-The torque applied while the motor is stopped, until `stall_detect.t` time passes is the maximum allowed torque, as defined in the controller settings.
+In addition to the above, the phase current while the motor is stopped, until `stall_detect.t` time passes is the maximum allowed phase current, as defined in `tmx.controller.current.Iq_limit`. It is advisable to set this value so that mechanical damage or fatigue is avoided.
 
 Operation
 *********

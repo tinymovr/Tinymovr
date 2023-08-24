@@ -1,9 +1,11 @@
-*****************
-From Zero to Spin
-*****************
+************************
+From Unbox to First Spin
+************************
 
 Preparation
 ###########
+
+Welcome to Tinymovr!
 
 If you are using a Tinymovr Servo Kit/Tinymovr Dev Kit, please ensure you have completed :ref:`connecting-data` and :ref:`connecting-power`.
 
@@ -62,7 +64,7 @@ The Tinymovr Studio GUI offers an overview of the device internals as a tree str
 
 The Tinymovr Servo Kit motor and encoder are already calibrated. If you have your own setup, or if you experience problems with prior calibration, you'll need to go through the following brief calibration procedure.
 
-In Tinymovr Studio, navigate to `tmx->controller`. Press the `Calibrate` button. Note that after pressing this button, the motor will spin. Ensure the rotor is free of obstructions or loads, and the motor is firmly fixed.
+In Tinymovr Studio, navigate to `tmx->controller`. Press the button with the arrow next to the `calibrate` label. Note that after pressing this button, the motor will spin. Ensure the rotor is free of obstructions or loads, and the motor is firmly fixed.
 
 Follow the on-screen prompts. The motor will produce an audible beep and rotate in one direction.
 Your Tinymovr is now ready for operation. Navigate to `tmx->motor`. This will reveal identified motor parameters, namely: phase resistance, phase inductance, number of pole pairs and encoder ticks.
@@ -70,6 +72,6 @@ Your Tinymovr is now ready for operation. Navigate to `tmx->motor`. This will re
 Testing Position Control using the Studio GUI
 #############################################
 
-Navigate back to `tmx->controller`. Press the `Position` button. Note that after pressing the button, the motor will hold position and may spin. The motor should now be actively holding it's position. Try moving it by hand and you should feel resistance.
+Navigate back to `tmx->controller`. Press the button with the arrow next to the `position_mode` label. Note that after pressing the button, the motor will hold position and may spin. The motor should now be actively holding it's position. Try moving it by hand and you should feel resistance.
 
-To command a new position, navigate to `tmx->controller->position`, and double-click on the `setpoint` value. Type in a new position followed by Enter. The motor should jump to the commanded position.
+To command a new position, navigate to `tmx->controller->position`, and double-click on the value next to the `setpoint` label. This value is expressed in ticks, a unit that denotes 1/8192 of the circle. Type in a new position followed by Enter. The motor should jump to the commanded position.
