@@ -18,6 +18,7 @@
 #ifndef SYSTEM_SYSTEM_H_
 #define SYSTEM_SYSTEM_H_
 
+#include <string.h>
 #include <src/common.h>
 #define CLKREF_FREQ_HZ              (4000000)
 #define FRCLK_FREQ_HZ               CLKREF_FREQ_HZ
@@ -36,6 +37,12 @@ void system_init(void);
 void system_update(void);
 void system_reset(void);
 void system_invoke_bootloader(void);
+
+inline uint8_t system_get_fw_version_string(char *buffer)
+{
+    memcpy(buffer, GIT_VERSION, 4);
+    return 4;
+}
 
 inline uint32_t system_get_uid(void)
 {

@@ -9,6 +9,10 @@ remote_attributes:
     dtype: uint32
     getter_name: system_get_uid
     summary: The unique device ID, unique to each PAC55xx chip produced.
+  - name: fw_version
+    dtype: string
+    getter_name: system_get_fw_version_string
+    summary: The firmware version.
   - name: hw_revision
     dtype: uint32
     getter_name: system_get_hw_revision
