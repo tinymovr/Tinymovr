@@ -85,7 +85,7 @@ typedef enum
 } motor_type_options;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[80])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[81])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -107,6 +107,16 @@ uint8_t avlos_protocol_hash(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comman
 * @param buffer_len
 */
 uint8_t avlos_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_fw_version
+*
+* The firmware version.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_fw_version(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_hw_revision
