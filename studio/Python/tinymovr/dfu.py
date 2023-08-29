@@ -19,7 +19,12 @@ import IPython
 from traitlets.config import Config
 from docopt import docopt
 from tinymovr.tee import init_tee, destroy_tee
-from tinymovr.config import get_bus_config, create_device
+from tinymovr.config import (
+    get_bus_config,
+    create_device,
+    tinymovr_definition,
+    bl_definition,
+)
 
 """
 Tinymovr DFU Module
@@ -109,20 +114,18 @@ def spawn():
     node_id = int(args["--node_id"])
     bin_path = args["--bin"]
 
-    # Load device definition from YAML file
-    def_path_str = str(Path(sys.path[0]).joinpath("device.yaml"))
-    definition = None
-    with open(def_path_str) as definition_raw:
-        definition = yaml.safe_load(definition_raw)
-
     # Set up the device
     params = get_bus_config(["canine", "slcan_disco"])
     params["bitrate"] = 1000000
     init_tee(can.Bus(**params), timeout=1.0)
-    device = create_device(node_id=node_id, device_definition=definition)
+    device = create_device(node_id=node_id, device_definition=bl_definition)
 
-    # If a .bin file is specified, upload it to the device
-    if bin_path and Path(bin_path).is_file():
+    # If a non-existing .bin file is specified, raise error
+    if bin_path and not Path(bin_path).is_file():
+        raise FileNotFoundError(f"Bin file {bin_path} not found!")
+    
+    # If an existing .bin file is specified, upload it to the device
+    elif bin_path:
         if compare_bin_and_flash(device, bin_path):
             print("\nDevice memory matches the .bin file. Skipping flashing.")
         else:
@@ -132,7 +135,7 @@ def spawn():
                 print("Resetting device...")
                 device.reset()
 
-    # Otherwise, enter the iPython CLI
+    # If no bin file specified, enter the iPython CLI
     else:
         user_ns = {}
         user_ns["device"] = device
