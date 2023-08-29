@@ -19,10 +19,9 @@ import time
 import os
 import enum
 import pint
-from PySide6.QtCore import Qt
 from PySide6 import QtGui
-from PySide6.QtGui import QPixmap, QIcon, QGuiApplication, QPalette
-from PySide6.QtWidgets import QMessageBox, QFileDialog, QTreeWidget
+from PySide6.QtGui import QGuiApplication, QPalette
+from PySide6.QtWidgets import QMessageBox, QFileDialog
 from avlos.definitions import RemoteAttribute
 import tinymovr
 
@@ -329,25 +328,6 @@ app_stylesheet_dark = """
         background: none;
     }
 """
-
-
-class OurQTreeWidget(QTreeWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.placeholder_image = load_pixmap("empty.png")
-
-    def paintEvent(self, event):
-        if self.topLevelItemCount() == 0:
-            painter = QtGui.QPainter(self.viewport())
-            painter.setOpacity(0.5)  # Adjust the opacity of the placeholder image
-            pixel_ratio = QtGui.QGuiApplication.primaryScreen().devicePixelRatio()
-            painter.drawPixmap(
-                (self.viewport().width() - self.placeholder_image.width()/pixel_ratio) / 2,
-                (self.viewport().height() - self.placeholder_image.height()/pixel_ratio) / 2,
-                self.placeholder_image,
-            )
-        else:
-            super().paintEvent(event)
 
 
 def format_value(value, include_unit=True):

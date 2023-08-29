@@ -47,6 +47,7 @@ from avlos.json_codec import AvlosEncoder
 from tinymovr.gui import (
     Worker,
     OurQTreeWidget,
+    IconComboBoxWidget,
     format_value,
     load_icon,
     display_file_open_dialog,
@@ -211,6 +212,8 @@ class MainWindow(QMainWindow):
                 button.setIcon(load_icon("call.png"))
                 self.tree_widget.setItemWidget(item, 1, button)
                 button.clicked.connect(partial(self.f_call_clicked, item._tm_function))
+            if hasattr(item, "_options_list"):
+                item_widget = IconComboBoxWidget()
         header = self.tree_widget.header()
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
         header.setStretchLastSection(False)
@@ -238,6 +241,9 @@ class MainWindow(QMainWindow):
             all_items.append(widget)
         elif hasattr(node, "__call__"):
             widget._tm_function = node
+            all_items.append(widget)
+        elif hasattr(node, "options"):
+            widget._options_list = [member.value for member in node.options]
             all_items.append(widget)
         return widget, all_items
 
