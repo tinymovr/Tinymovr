@@ -36,6 +36,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QMessageBox
 )
+from pint.errors import UndefinedUnitError
 from PySide6.QtGui import QAction
 import pyqtgraph as pg
 from tinymovr.constants import app_name
@@ -46,6 +47,7 @@ from avlos.json_codec import AvlosEncoder
 from tinymovr.gui import (
     Worker,
     OurQTreeWidget,
+    IconComboBoxWidget,
     format_value,
     load_icon,
     display_file_open_dialog,
@@ -210,6 +212,8 @@ class MainWindow(QMainWindow):
                 button.setIcon(load_icon("call.png"))
                 self.tree_widget.setItemWidget(item, 1, button)
                 button.clicked.connect(partial(self.f_call_clicked, item._tm_function))
+            if hasattr(item, "_options_list"):
+                item_widget = IconComboBoxWidget()
         header = self.tree_widget.header()
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
         header.setStretchLastSection(False)
@@ -238,6 +242,9 @@ class MainWindow(QMainWindow):
         elif hasattr(node, "__call__"):
             widget._tm_function = node
             all_items.append(widget)
+        elif hasattr(node, "options"):
+            widget._options_list = [member.value for member in node.options]
+            all_items.append(widget)
         return widget, all_items
 
     @QtCore.Slot()
@@ -246,7 +253,10 @@ class MainWindow(QMainWindow):
         if item._editing:
             item._editing = False
             attr = item._tm_attribute
-            attr.set_value(get_registry()(item.text(1)))
+            try:
+                attr.set_value(get_registry()(item.text(1)))
+            except UndefinedUnitError:
+                attr.set_value(item.text(1))
             if "reload_data" in attr.meta and attr.meta["reload_data"]:
                 self.worker.reset()
                 return

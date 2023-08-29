@@ -66,6 +66,7 @@ setup(
         "console_scripts": [
             "tinymovr_cli=tinymovr.cli:spawn",
             "tinymovr=tinymovr.gui:spawn",
+            "tinymovr_dfu=tinymovr.dfu:spawn"
         ]
     },
 )

@@ -87,3 +87,7 @@ def spawn():
     IPython.start_ipython(argv=[], config=c, user_ns=user_ns)
     logger.debug("Exiting...")
     destroy_tee()
+
+
+if __name__ == "__main__":
+    spawn()

@@ -29,7 +29,6 @@ class Discovery:
     Discover Tinymovr instances on the CAN bus using the periodically
     transmitted heartbeat frame.
     """
-
     def __init__(self, appeared_cb, disappeared_cb, logger, lost_timeout=2.0):
         self.logger = logger
         self.appeared_cb = appeared_cb
@@ -80,14 +79,14 @@ class Discovery:
 
     def _append_to_queue(self, node_info):
         """
-        Appends a node to the queued nodes list
+        Append a node to the queued nodes list
         """
         self.queued_nodes.append(node_info)
         self.evt.set()
 
     def _runner(self):
         """
-        Asynchronously processes queued nodes
+        Asynchronously process queued nodes
         """
         while True:
             self.evt.wait()

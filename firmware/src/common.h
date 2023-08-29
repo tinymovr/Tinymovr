@@ -71,6 +71,8 @@
 #error "Unknown debug configuration"
 #endif
 
+#define BTL_TRIGGER_PATTERN  0x39
+
 #define PI (3.141592f)
 #define TWOPI (6.283185f)
 #define INVTWOPI (0.159155f)
@@ -94,14 +96,36 @@
 
 #if defined BOARD_REV_R32 || defined BOARD_REV_R33
 #define BOARD_REV_R3
-#define CAN_PE23
 #elif defined BOARD_REV_R50 || BOARD_REV_R51 || defined BOARD_REV_R52
 #define BOARD_REV_R5
+#elif defined BOARD_REV_M51
+#define BOARD_REV_M5
+#else
+#error "Board revision incorrect or not defined"
+#endif
+
+#if defined BOARD_REV_R3
+#define CAN_PE23
+#elif defined BOARD_REV_R5
 #define CAN_PF67
 #elif defined BOARD_REV_M5
 #define CAN_PD56
-#else
-#error "Board revision incorrect or not defined"
+#endif
+
+#if defined BOARD_REV_R32
+#define BOARD_REV_IDX 2
+#elif defined BOARD_REV_R33
+#define BOARD_REV_IDX 3
+#elif defined BOARD_REV_R50
+#define BOARD_REV_IDX 10
+#elif defined BOARD_REV_R51
+#define BOARD_REV_IDX 11
+#elif defined BOARD_REV_R52
+#define BOARD_REV_IDX 12
+#elif defined BOARD_REV_M50
+#define BOARD_REV_IDX 20
+#elif defined BOARD_REV_M51
+#define BOARD_REV_IDX 21
 #endif
 
 static const float one_by_sqrt3 = 0.57735026919f;
@@ -115,11 +139,13 @@ static const int32_t timer_freq_hz = ACLK_FREQ_HZ >> TXCTL_PS_DIV;
 static const float twopi_by_enc_ticks = TWOPI / ENCODER_TICKS;
 static const float twopi_by_hall_sectors = TWOPI / HALL_SECTORS;
 
-struct FloatTriplet
+typedef struct 
 {
 	float A;
 	float B;
 	float C;
-};
+} FloatTriplet;
+
+static const FloatTriplet three_phase_zero = {0.5f, 0.5f, 0.5f};
 
 #endif // #ifndef COMMON_H

@@ -78,8 +78,20 @@ typedef enum
     HOMING_WARNINGS_HOMING_TIMEOUT = (1 << 0)
 } homing_warnings_flags;
 
+typedef enum
+{
+    MOTOR_TYPE_HIGH_CURRENT = 0, 
+    MOTOR_TYPE_GIMBAL = 1
+} motor_type_options;
+
+typedef enum
+{
+    ENCODER_TYPE_INTERNAL = 0, 
+    ENCODER_TYPE_HALL = 1
+} encoder_type_options;
+
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[78])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[81])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -101,6 +113,26 @@ uint8_t avlos_protocol_hash(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comman
 * @param buffer_len
 */
 uint8_t avlos_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_fw_version
+*
+* The firmware version.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_fw_version(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_hw_revision
+*
+* The hardware revision.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_hw_revision(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_Vbus
@@ -191,6 +223,16 @@ uint8_t avlos_erase_config(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command
 * @param buffer_len
 */
 uint8_t avlos_reset(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_invoke_bootloader
+*
+* Invoke the bootloader.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_invoke_bootloader(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_scheduler_total

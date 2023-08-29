@@ -28,7 +28,7 @@ import unittest
 class TMTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        params = get_bus_config(["canine", "slcan"])
+        params = get_bus_config(["canine", "slcan_disco"])
         params["bitrate"] = 1000000
         cls.can_bus = can.Bus(**params)
         init_tee(cls.can_bus)

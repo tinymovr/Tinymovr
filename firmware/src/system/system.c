@@ -24,6 +24,8 @@
 #include <src/can/can_endpoints.h>
 #include <src/system/system.h>
 
+extern char _eram;
+
 static SystemState state = {0};
 
 static SystemConfig config = {
@@ -80,6 +82,9 @@ void system_init(void)
     // Vp = 10V , 440mA-540mA, Charge Pump Enable
     pac5xxx_tile_register_write(ADDR_SYSCONF, 0x01);
 
+    // Ensure ADC GP0 register is zero, to bypass bootloader on next boot
+    pac5xxx_tile_register_write(ADDR_GP0, 0);
+
     // Configure reporting of mcu cycles
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
     DWT->CYCCNT = 0;
@@ -109,8 +114,14 @@ TM_RAMFUNC void system_update(void)
 
 void system_reset(void)
 {
-    pac5xxx_tile_register_write(ADDR_WATCHDOG,
-                                pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
+    // GP0 register is already zeroed at `system_init()` 
+    NVIC_SystemReset();
+}
+
+void system_invoke_bootloader(void)
+{
+    pac5xxx_tile_register_write(ADDR_GP0, BTL_TRIGGER_PATTERN);
+    NVIC_SystemReset();
 }
 
 TM_RAMFUNC float system_get_Vbus(void)

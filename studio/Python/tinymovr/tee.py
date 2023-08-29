@@ -62,7 +62,11 @@ class Tee:
         self.clients.append(Client(filter_cb, recv_cb))
 
     def update(self):
-        """ """
+        """
+        Continuously update the state of the Tee object, checking
+        for messages and distributing them to the appropriate clients
+        based on filter criteria until the state changes to STOPPING.
+        """
         self.state = TeeState.RUNNING
         while TeeState.RUNNING == self.state:
             self._update_once()
@@ -71,7 +75,7 @@ class Tee:
 
     def _update_once(self):
         """
-        Tries to receive a message from the bus object and if successful,
+        Try to receive a message from the bus object and if successful,
         tests reception of each tee instance in the global index.
         """
         frame = self.bus.recv(timeout=self.timeout)

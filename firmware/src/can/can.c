@@ -121,11 +121,14 @@ uint8_t CAN_get_ID(void)
 
 void CAN_set_ID(uint8_t id)
 {
-    pac5xxx_can_reset_mode_set(1); // CAN in reset mode, in order to configure CAN module
-    config.id = id;
-    PAC55XX_CAN->ACR = config.id & 0xFF; // for now we only use 8 bit identifier
-    pac5xxx_can_reset_mode_set(0); // CAN reset mode inactive
-    delay_us(100);
+    if (id >= 1)
+    {
+        pac5xxx_can_reset_mode_set(1); // CAN in reset mode, in order to configure CAN module
+        config.id = id;
+        PAC55XX_CAN->ACR = config.id & 0xFF; // for now we only use 8 bit identifier
+        pac5xxx_can_reset_mode_set(0); // CAN reset mode inactive
+        delay_us(100);
+    }
 }
 
 void CAN_process_interrupt(void)
