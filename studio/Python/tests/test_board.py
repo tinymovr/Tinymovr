@@ -381,6 +381,8 @@ class TestBoard(TMTestCase):
         time.sleep(0.5)
         self.tm.controller.current.max_Ibrake = 0
         self.assertGreater(min(I_brake_vals), -1 * A)
+        self.tm.controller.idle()
+        time.sleep(0.4)
 
 
 if __name__ == "__main__":
