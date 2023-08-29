@@ -368,8 +368,7 @@ remote_attributes:
         getter_name: observer_get_vel_estimate_user_frame
         summary: The filtered encoder velocity estimate.
       - name: type
-        #values: [INTERNAL, HALL]
-        dtype: uint8
+        options: [INTERNAL, HALL]
         meta: {export: True}
         getter_name: encoder_get_type
         setter_name: encoder_set_type

@@ -84,6 +84,12 @@ typedef enum
     MOTOR_TYPE_GIMBAL = 1
 } motor_type_options;
 
+typedef enum
+{
+    ENCODER_TYPE_INTERNAL = 0, 
+    ENCODER_TYPE_HALL = 1
+} encoder_type_options;
+
 extern uint32_t avlos_proto_hash;
 extern uint8_t (*avlos_endpoints[81])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);

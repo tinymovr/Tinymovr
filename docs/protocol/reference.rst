@@ -695,7 +695,9 @@ Type: uint8
 
 The encoder type. Either INTERNAL or HALL.
 
-
+Options: 
+- INTERNAL
+- HALL
 
 
 encoder.bandwidth
