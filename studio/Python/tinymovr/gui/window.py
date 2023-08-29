@@ -36,6 +36,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QMessageBox
 )
+from pint.errors import UndefinedUnitError
 from PySide6.QtGui import QAction
 import pyqtgraph as pg
 from tinymovr.constants import app_name
@@ -246,7 +247,10 @@ class MainWindow(QMainWindow):
         if item._editing:
             item._editing = False
             attr = item._tm_attribute
-            attr.set_value(get_registry()(item.text(1)))
+            try:
+                attr.set_value(get_registry()(item.text(1)))
+            except UndefinedUnitError:
+                attr.set_value(item.text(1))
             if "reload_data" in attr.meta and attr.meta["reload_data"]:
                 self.worker.reset()
                 return
