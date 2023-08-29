@@ -260,8 +260,10 @@ remote_attributes:
         arguments:
           - name: pos_setpoint
             dtype: float
+            unit: tick
           - name: vel_setpoint
             dtype: float
+            unit: tick
   - name: comms
     remote_attributes:
     - name: can
@@ -441,6 +443,7 @@ remote_attributes:
         arguments:
           - name: pos_setpoint
             dtype: float
+            unit: tick
       - name: move_to_tlimit
         summary: Move to target position respecting time limits for each sector.
         caller_name: planner_move_to_tlimit
@@ -448,6 +451,7 @@ remote_attributes:
         arguments:
           - name: pos_setpoint
             dtype: float
+            unit: tick
       - name: errors
         flags: [INVALID_INPUT, VCRUISE_OVER_LIMIT]
         getter_name: planner_get_errors
