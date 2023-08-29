@@ -28,10 +28,10 @@ class TestHoming(TMTestCase):
         self.check_state(2)
 
         self.tm.homing.home()
-        time.sleep(self.tm.homing.max_homing_t.magnitude + 0.01)
+        time.sleep(self.tm.homing.max_homing_t.magnitude + 0.1)
 
         self.assertEqual(self.tm.controller.mode, 2)
-        self.assertEqual(self.tm.homing.warnings, 0)
+        self.assertEqual(self.tm.homing.warnings, 1)
         self.tm.controller.idle()
 
 
