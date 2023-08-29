@@ -24,6 +24,7 @@ from PySide6 import QtCore
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QMainWindow,
+    QDialog,
     QMenu,
     QMenuBar,
     QWidget,
@@ -34,7 +35,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QTreeWidgetItem,
     QPushButton,
-    QMessageBox
+    QMessageBox,
 )
 from pint.errors import UndefinedUnitError
 from PySide6.QtGui import QAction
@@ -48,6 +49,7 @@ from tinymovr.gui import (
     Worker,
     OurQTreeWidget,
     IconComboBoxWidget,
+    ArgumentInputDialog,
     format_value,
     load_icon,
     display_file_open_dialog,
@@ -58,7 +60,6 @@ from tinymovr.gui import (
 
 
 class MainWindow(QMainWindow):
-
     TreeItemCheckedSignal = Signal(dict)
 
     def __init__(self, app, arguments):
@@ -306,7 +307,22 @@ class MainWindow(QMainWindow):
 
     @QtCore.Slot()
     def f_call_clicked(self, f):
-        f()
+        args = []
+
+        # Check if the function has any arguments
+        if f.arguments:
+            dialog = ArgumentInputDialog(f.arguments, self)
+            if dialog.exec_() == QDialog.Accepted:
+                input_values = dialog.get_values()
+                args = [input_values[arg.name] for arg in f.arguments]
+            else:
+                return  # User cancelled, stop the entire process
+
+        # Convert arguments as required using pint
+        args = [get_registry()(arg) for arg in args]
+
+        # Call the function with the collected arguments
+        f(*args)
         if "reload_data" in f.meta and f.meta["reload_data"]:
             self.worker.reset()
 
@@ -353,7 +369,12 @@ class MainWindow(QMainWindow):
             self.delete_graph_by_attr_name(attr_name)
 
     def show_about_box(self):
-        version_str = (pkg_resources.require("tinymovr")[0].version)
+        version_str = pkg_resources.require("tinymovr")[0].version
         app_str = "{} {}".format(app_name, version_str)
-        QMessageBox.about(self, "About Tinymovr", "{}\nhttps://tinymovr.com\n\nCat Sleeping Icon by Denis Sazhin from Noun Project".format(app_str))
-
+        QMessageBox.about(
+            self,
+            "About Tinymovr",
+            "{}\nhttps://tinymovr.com\n\nCat Sleeping Icon by Denis Sazhin from Noun Project".format(
+                app_str
+            ),
+        )

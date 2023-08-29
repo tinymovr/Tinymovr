@@ -16,7 +16,8 @@ from tinymovr.gui.helpers import (
 )
 from tinymovr.gui.widgets import (
     OurQTreeWidget,
-    IconComboBoxWidget
+    IconComboBoxWidget,
+    ArgumentInputDialog
 )
 from tinymovr.gui.worker import Worker
 from tinymovr.gui.window import MainWindow
