@@ -1,6 +1,6 @@
 """
 Usage:
-    dfu.py [--node_id=ID] [--bin=PATH] [--no-reset]
+    dfu.py --node_id=ID [--bin=PATH] [--no-reset]
 
 Options:
     --node_id=ID The CAN Node id of the bootloader to address.
@@ -48,9 +48,9 @@ BIN_CHUNK_SIZE = 4
 FLASH_START_ADDR = 0x00001000
 
 
-def compare_bin_and_flash(device, bin_path, string="Comparing"):
+def compare_bin_w_device(device, bin_path, string="Comparing"):
     """
-    Compare .bin file and flash memory
+    Compare .bin file and device non-volatile memory
     """
     with Progress() as progress:
         total_size = os.path.getsize(bin_path)  # Get the total size of .bin file
@@ -105,7 +105,6 @@ def upload_bin(device, bin_path):
                 flash_addr += BIN_CHUNK_SIZE * 4  # Update the flash address
                 uploaded_size += len(chunk)  # Update the uploaded size
                 progress.update(task2, advance=BIN_CHUNK_SIZE * 4)
-    print("Done.")
 
 
 def spawn():
@@ -126,11 +125,11 @@ def spawn():
     
     # If an existing .bin file is specified, upload it to the device
     elif bin_path:
-        if compare_bin_and_flash(device, bin_path):
+        if compare_bin_w_device(device, bin_path):
             print("\nDevice memory matches the .bin file. Skipping flashing.")
         else:
             upload_bin(device, bin_path)
-            compare_bin_and_flash(device, bin_path, string="Verifying")
+            compare_bin_w_device(device, bin_path, string="Verifying")
             if not args["--no-reset"]:
                 print("Resetting device...")
                 device.reset()
