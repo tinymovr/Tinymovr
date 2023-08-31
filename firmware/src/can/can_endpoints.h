@@ -27,7 +27,12 @@ typedef enum
 {
     ERRORS_NONE = 0,
     ERRORS_UNDERVOLTAGE = (1 << 0), 
-    ERRORS_DRIVER_FAULT = (1 << 1)
+    ERRORS_DRIVER_FAULT = (1 << 1), 
+    ERRORS_CHARGE_PUMP_FAULT_STAT = (1 << 2), 
+    ERRORS_CHARGE_PUMP_FAULT = (1 << 3), 
+    ERRORS_DRV10_DISABLE = (1 << 4), 
+    ERRORS_DRV32_DISABLE = (1 << 5), 
+    ERRORS_DRV54_DISABLE = (1 << 6)
 } errors_flags;
 
 typedef enum

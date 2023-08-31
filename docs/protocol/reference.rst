@@ -126,6 +126,11 @@ Any system errors, as a bitmask
 Flags: 
 - UNDERVOLTAGE
 - DRIVER_FAULT
+- CHARGE_PUMP_FAULT_STAT
+- CHARGE_PUMP_FAULT
+- DRV10_DISABLE
+- DRV32_DISABLE
+- DRV54_DISABLE
 
 
 save_config() -> void

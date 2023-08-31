@@ -40,4 +40,4 @@ void CAN_process_interrupt(void);
 CANConfig *CAN_get_config(void);
 void CAN_restore_config(CANConfig *config_);
 
-void CAN_task(void);
+void CAN_update(void);
