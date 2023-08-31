@@ -22,7 +22,7 @@ import pint
 from PySide6 import QtGui
 from PySide6.QtGui import QGuiApplication, QPalette
 from PySide6.QtWidgets import QMessageBox, QFileDialog
-from avlos.definitions import RemoteAttribute
+from avlos.definitions import RemoteAttribute, RemoteEnum, RemoteBitmask
 import tinymovr
 
 
@@ -345,11 +345,15 @@ def format_value(value, include_unit=True):
         return "{0:.6g}".format(value)
     return str(value)
 
-def bitmask_string_representation(bitmask_value):
-    labels_in_bitmask = [label.name for label in type(bitmask_value) if label & bitmask_value]
-    return ', '.join(labels_in_bitmask)
 
-def load_pixmap(filename, dark_mode_suffix='_dark', high_dpi_suffix='@2x'):
+def bitmask_string_representation(bitmask_value):
+    labels_in_bitmask = [
+        label.name for label in type(bitmask_value) if label & bitmask_value
+    ]
+    return ", ".join(labels_in_bitmask)
+
+
+def load_pixmap(filename, dark_mode_suffix="_dark", high_dpi_suffix="@2x"):
     """
     Load an image from a file and return it as a QPixmap.
     Load appropriate variants based on pixel ratio and
@@ -359,12 +363,12 @@ def load_pixmap(filename, dark_mode_suffix='_dark', high_dpi_suffix='@2x'):
     pixel_ratio = QtGui.QGuiApplication.primaryScreen().devicePixelRatio()
 
     # Prepare the filename based on the conditions
-    parts = filename.split('.')
+    parts = filename.split(".")
     if is_dark_mode():
         parts[0] += dark_mode_suffix
     if pixel_ratio > 1:
         parts[0] += high_dpi_suffix
-    adjusted_filename = '.'.join(parts)
+    adjusted_filename = ".".join(parts)
 
     file_path = os.path.join(
         os.path.dirname(tinymovr.__file__), "resources", "icons", adjusted_filename
