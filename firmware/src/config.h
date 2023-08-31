@@ -27,8 +27,9 @@
 // Timer clock divider
 #define TXCTL_PS_DIV                TXCTL_PS_DIV2
 
-// Desired PWM Frequency (Hz).
+// PWM and Systick frequency
 #define PWM_FREQ_HZ              (20000)
+#define SYSTICK_FREQ_HZ          (1000)
 
 // Control parameters
 #define PWM_LIMIT                   (0.8f)

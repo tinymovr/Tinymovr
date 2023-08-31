@@ -97,7 +97,7 @@ void system_init(void)
     state.Vbus = 12.0f;
 
     // Derive VBus D value for given tau value
-    config.Vbus_D = 1.0f - powf(EPSILON, -1.0f / (config.Vbus_tau * PWM_FREQ_HZ));
+    config.Vbus_D = 1.0f - powf(EPSILON, -1.0f / (config.Vbus_tau * SYSTICK_FREQ_HZ));
 
     /* Initialize Systick per 1ms */
     SysTick_Config(150000); // TODO: Use var
