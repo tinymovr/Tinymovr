@@ -39,7 +39,6 @@ int main(void)
     UART_Init();
 	observer_init();
 	ADC_Init();
-	GateDriver_Init();
     CAN_init();
     Timer_Init();
     Watchdog_init();
