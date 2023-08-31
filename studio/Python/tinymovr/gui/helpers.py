@@ -516,10 +516,13 @@ def get_dynamic_attrs(attr_dict):
     Get the attributes that are marked as dynamic in the spec.
     """
     dynamic_attrs = []
-    for _, attr in attr_dict.items():
-        if isinstance(attr, RemoteAttribute):
-            if "dynamic" in attr.meta and attr.meta["dynamic"] == True:
-                dynamic_attrs.append(attr)
+
+    for attr in attr_dict.values():
+        if isinstance(
+            attr, (RemoteAttribute, RemoteEnum, RemoteBitmask)
+        ) and attr.meta.get("dynamic"):
+            dynamic_attrs.append(attr)
         elif hasattr(attr, "remote_attributes"):
             dynamic_attrs.extend(get_dynamic_attrs(attr.remote_attributes))
+
     return dynamic_attrs
