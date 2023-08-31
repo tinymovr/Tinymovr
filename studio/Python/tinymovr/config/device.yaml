@@ -47,7 +47,7 @@ remote_attributes:
     getter_name: system_get_calibrated
     summary: Whether the system has been calibrated.
   - name: errors
-    flags: [UNDERVOLTAGE, DRIVER_FAULT]
+    flags: [UNDERVOLTAGE, DRIVER_FAULT, CHARGE_PUMP_FAULT_STAT, CHARGE_PUMP_FAULT, DRV10_DISABLE, DRV32_DISABLE, DRV54_DISABLE]
     meta: {dynamic: True}
     getter_name: system_get_errors
     summary: Any system errors, as a bitmask

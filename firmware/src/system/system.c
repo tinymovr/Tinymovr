@@ -110,6 +110,16 @@ TM_RAMFUNC void system_update(void)
     {
         state.errors |= ERRORS_UNDERVOLTAGE;
     }
+    const uint8_t drv_status = pac5xxx_tile_register_read(ADDR_STATDRV);
+    if (drv_status > 0)
+    {
+        state.errors |= ((drv_status & 0x7) << 4);
+    }
+    const uint8_t drv_fault = pac5xxx_tile_register_read(ADDR_DRV_FLT);
+    if (drv_fault > 0)
+    {
+        state.errors |= ((drv_fault & 0x7) << 1);
+    }
 }
 
 void system_reset(void)
