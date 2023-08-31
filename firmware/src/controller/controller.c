@@ -124,11 +124,11 @@ void Controller_ControlLoop(void)
             reset_calibration();
             if (ENCODER_MA7XX == encoder_get_type())
             {
-                (void)((CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && calibrate_offset_and_rectification());
+                (void)((CalibrateADCOffset() && CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && calibrate_offset_and_rectification());
             }
             else if (ENCODER_HALL == encoder_get_type())
             {
-                (void)((CalibrateResistance() && CalibrateInductance()) && calibrate_hall_sequence());
+                (void)((CalibrateADCOffset() && CalibrateResistance() && CalibrateInductance()) && calibrate_hall_sequence());
             }
             state.is_calibrating = false;
             controller_set_state(STATE_IDLE);
