@@ -76,20 +76,10 @@ remote_attributes:
     meta: {reload_data: True}
   - name: scheduler
     remote_attributes:
-      - name: total
-        dtype: uint32
-        meta: {dynamic: True}
-        getter_name: Scheduler_GetTotalCycles
-        summary: Total processor cycles in a single PWM cycle.
-      - name: busy
-        dtype: uint32
-        meta: {dynamic: True}
-        getter_name: Scheduler_GetBusyCycles
-        summary: Busy processor cycles in a single PWM cycle.
       - name: errors
         flags: [CONTROL_BLOCK_REENTERED]
         meta: {dynamic: True}
-        getter_name: controller_get_errors
+        getter_name: scheduler_get_errors
         summary: Any scheduler errors, as a bitmask
   - name: controller
     remote_attributes:

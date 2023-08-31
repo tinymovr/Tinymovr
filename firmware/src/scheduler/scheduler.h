@@ -26,15 +26,8 @@ typedef struct
 	bool busy;
 
     uint8_t errors;
-    uint32_t busy_cycles;
-    uint32_t total_cycles;
-    uint32_t busy_loop_start;
-    uint32_t total_loop_start;
 } SchedulerState;
 
 void WaitForControlLoopInterrupt(void);
-
-uint32_t Scheduler_GetTotalCycles(void);
-uint32_t Scheduler_GetBusyCycles(void);
 
 uint8_t scheduler_get_errors(void);

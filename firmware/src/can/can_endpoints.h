@@ -96,7 +96,7 @@ typedef enum
 } encoder_type_options;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[81])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[79])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -238,26 +238,6 @@ uint8_t avlos_reset(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 * @param buffer_len
 */
 uint8_t avlos_invoke_bootloader(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
-
-/*
-* avlos_scheduler_total
-*
-* Total processor cycles in a single PWM cycle.
-*
-* @param buffer
-* @param buffer_len
-*/
-uint8_t avlos_scheduler_total(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
-
-/*
-* avlos_scheduler_busy
-*
-* Busy processor cycles in a single PWM cycle.
-*
-* @param buffer
-* @param buffer_len
-*/
-uint8_t avlos_scheduler_busy(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_scheduler_errors

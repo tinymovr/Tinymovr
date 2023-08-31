@@ -85,11 +85,6 @@ void system_init(void)
     // Ensure ADC GP0 register is zero, to bypass bootloader on next boot
     pac5xxx_tile_register_write(ADDR_GP0, 0);
 
-    // Configure reporting of mcu cycles
-    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-    DWT->CYCCNT = 0;
-    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-
     // Configure error handling
     SCB->CCR |= 0x10;
 

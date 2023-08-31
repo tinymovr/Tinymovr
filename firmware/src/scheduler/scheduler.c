@@ -63,7 +63,6 @@ void WaitForControlLoopInterrupt(void)
 		else
 		{
 			state.busy = false;
-			state.busy_cycles = DWT->CYCCNT - state.busy_loop_start;
 			// Go back to sleep
 			__DSB();
 			__ISB();
@@ -72,7 +71,6 @@ void WaitForControlLoopInterrupt(void)
 	}
 	state.busy = true;
 	state.adc_interrupt = false;
-	state.busy_loop_start = DWT->CYCCNT;
 	// We have to service the control loop by updating
 	// current measurements and encoder estimates.
 	if (ENCODER_MA7XX == encoder_get_type())
@@ -103,10 +101,6 @@ void ADC_IRQHandler(void)
 	{
 		state.adc_interrupt = true;
 	}
-	
-    const uint32_t current_timestamp = DWT->CYCCNT;
-	state.total_cycles = current_timestamp - state.total_loop_start;
-	state.total_loop_start = current_timestamp;
 }
 
 void CAN_IRQHandler(void)
@@ -133,16 +127,6 @@ void Wdt_IRQHandler(void)
 	PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_WRITE_AVALABLE;
     // Interrupt flag needs to be cleared here
     PAC55XX_WWDT->WWDTFLAG.IF = 1;
-}
-
-TM_RAMFUNC uint32_t Scheduler_GetTotalCycles(void)
-{
-    return state.total_cycles;
-}
-
-TM_RAMFUNC uint32_t Scheduler_GetBusyCycles(void)
-{
-    return state.busy_cycles;
 }
 
 TM_RAMFUNC uint8_t scheduler_get_errors(void)
