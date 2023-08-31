@@ -336,13 +336,18 @@ def format_value(value, include_unit=True):
     type and return the formatted string
     """
     if isinstance(value, enum.IntFlag):
-        return str(value) if value > 0 else "(no flags)"
+        return bitmask_string_representation(value) if value > 0 else "(no flags)"
+    if isinstance(value, enum.IntEnum):
+        return value.name
     if not include_unit and isinstance(value, pint.Quantity):
         return str(value.magnitude)
     if isinstance(value, float):
         return "{0:.6g}".format(value)
     return str(value)
 
+def bitmask_string_representation(bitmask_value):
+    labels_in_bitmask = [label.name for label in type(bitmask_value) if label & bitmask_value]
+    return ', '.join(labels_in_bitmask)
 
 def load_pixmap(filename, dark_mode_suffix='_dark', high_dpi_suffix='@2x'):
     """
