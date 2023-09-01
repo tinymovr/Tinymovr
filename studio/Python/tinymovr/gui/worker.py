@@ -43,7 +43,7 @@ class Worker(QObject):
         init_tee(can.Bus(**busparams))
         self._init_containers()
         self.dsc = Discovery(self._node_appeared, self._node_disappeared, self.logger)
-        self.timed_getter = TimedGetter(lambda e: self.handle_error.emit(e))
+        self.timed_getter = TimedGetter()
         self._rate_limited_update = RateLimitedFunction(lambda: self._update(), 0.040)
         self.running = True
 
@@ -78,7 +78,10 @@ class Worker(QObject):
     def _get_attr_values(self):
         vals = {}
         for attr in self.active_attrs:
-            vals[attr.full_name] = self.timed_getter.get_value(attr.get_value)
+            try:
+                vals[attr.full_name] = self.timed_getter.get_value(attr.get_value)
+            except Exception as e:
+                self.handle_error.emit(e)
         start_time = time.time()
         self.dynamic_attrs.sort(
             key=lambda attr: self.dynamic_attrs_last_update[attr.full_name]
@@ -92,8 +95,11 @@ class Worker(QObject):
                 else 0
             )
             if (attr.full_name not in vals) and (start_time - t > 0.5):
-                vals[attr.full_name] = self.timed_getter.get_value(attr.get_value)
-                self.dynamic_attrs_last_update[attr.full_name] = start_time
+                try:
+                    vals[attr.full_name] = self.timed_getter.get_value(attr.get_value)
+                    self.dynamic_attrs_last_update[attr.full_name] = start_time
+                except Exception as e:
+                    self.handle_error.emit(e)
                 break
         return vals
 

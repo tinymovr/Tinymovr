@@ -134,9 +134,12 @@ class MainWindow(QMainWindow):
         main_widget.setMinimumHeight(600)
         self.setCentralWidget(main_widget)
 
+        self.timeout_count = 0
+
         buses = arguments["--bus"].rsplit(sep=",")
         channel = arguments["--chan"]
         bitrate = int(arguments["--bitrate"])
+        self.max_timeouts = int(arguments["--max-timeouts"])
 
         if channel == None:
             params = get_bus_config(buses)
@@ -164,7 +167,14 @@ class MainWindow(QMainWindow):
     @QtCore.Slot()
     def handle_worker_error(self, e):
         if isinstance(e, ChannelResponseError):
-            self.logger.warn("Timeout occured")
+            if self.timeout_count > self.max_timeouts:
+                self.timeout_count = 0
+                self.logger.warn("Max timeouts exceeded. Triggering rescan...")
+                self.worker.reset()
+            else:
+                self.logger.warn("Timeout while getting value.")
+                self.timeout_count += 1
+            
         else:
             raise e
 
