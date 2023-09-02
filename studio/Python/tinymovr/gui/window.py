@@ -70,7 +70,6 @@ class MainWindow(QMainWindow):
 
         self.start_time = time.time()
         self.logger = configure_logging()
-        bitrate = int(arguments["--bitrate"])
 
         self.attr_widgets_by_id = {}
         self.graphs_by_id = {}
@@ -204,7 +203,7 @@ class MainWindow(QMainWindow):
         self.right_layout.addWidget(graph_widget)
 
     @QtCore.Slot()
-    def regen_tree(self, tms_by_id):
+    def regen_tree(self, devices_by_name):
         """
         Regenerate the attribute tree
         """
@@ -213,8 +212,8 @@ class MainWindow(QMainWindow):
         self.tree_widget.clear()
         self.tree_widget.setEnabled(False)
         all_items = []
-        for name, node in tms_by_id.items():
-            widget, items_list = self.parse_node(node, name)
+        for name, device in devices_by_name.items():
+            widget, items_list = self.parse_node(device, name)
             self.tree_widget.addTopLevelItem(widget)
             all_items.extend(items_list)
         for item in all_items:

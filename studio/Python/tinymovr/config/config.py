@@ -16,6 +16,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import yaml
+from pathlib import Path
 import logging
 from importlib_resources import files
 import can
@@ -24,14 +25,14 @@ from avlos.deserializer import deserialize
 from tinymovr.codec import DataType
 from tinymovr.channel import CANChannel
 
-tinymovr_definition = None
-bl_definition = None
+definitions = {"hash_uint32": {}, "name": {}}
 
-with open(str(files("tinymovr").joinpath("config/device.yaml"))) as def_raw:
-    tinymovr_definition = yaml.safe_load(def_raw)
-
-with open(str(files("tinymovr").joinpath("config/bl.yaml"))) as def_raw:
-    bl_definition = yaml.safe_load(def_raw)
+for yaml_file in Path(files("tinymovr").joinpath("specs/")).glob("*.yaml"):
+    with open(str(yaml_file)) as def_raw:
+        definition = yaml.safe_load(def_raw)
+        tmp_node = deserialize(definition)
+        definitions["hash_uint32"][tmp_node.hash_uint32] = definition
+        definitions["name"][definition["name"]] = definition
 
 
 class ProtocolVersionError(Exception):
@@ -62,39 +63,56 @@ def get_bus_config(suggested_types=None):
         raise can.CanInitializationError("No active interface found") from exc
 
 
-def create_device(node_id, device_definition=tinymovr_definition):
+def create_device(node_id):
     """
     Create a device with the defined ID.
     The hash value will be retrieved from the remote.
     """
     chan = CANChannel(node_id)
-    node = deserialize(device_definition)
-    # We use the generated node to retrieve the hash from
-    # the remote. This is ok as long as we know that the
-    # hash endpoint will always be the 0th one. If there
-    # is a hash mismatch, we raise an exception, otherwise
-    # we return the device node as is.
+
+    # Temporarily using a default definition to get the protocol_hash
+    # This assumes that `protocol_hash` is standard across different definitions
+    # Get the first definition as a temp
+    tmp_definition = list(definitions["hash_uint32"].values())[0]
+    node = deserialize(tmp_definition)
     node._channel = chan
-    # hash_uint32 is local, proto_hash is remote
-    if node.hash_uint32 != node.protocol_hash:
+
+    # Check for the correct definition using the remote hash
+    protocol_hash = node.protocol_hash
+    device_definition = definitions["hash_uint32"].get(protocol_hash)
+
+    if not device_definition:
+        raise ValueError(f"No device definition found for hash {protocol_hash}.")
+
+    node = deserialize(device_definition)
+    node._channel = chan
+    if node.hash_uint32 != protocol_hash:
         raise ProtocolVersionError(node_id, "")
+
     return node
 
 
-def create_device_with_hash_msg(heartbeat_msg, device_definition=tinymovr_definition):
+def create_device_with_hash_msg(heartbeat_msg):
     """
     Create a device, the heartbeat msg will be used
-    to decode the actual hash value and id
+    to decode the actual hash value and id.
     """
     node_id = heartbeat_msg.arbitration_id & 0x3F
     chan = CANChannel(node_id)
-    node = deserialize(device_definition)
+
     hash, *_ = chan.serializer.deserialize(heartbeat_msg.data[:4], DataType.UINT32)
-    if node.hash_uint32 != hash:  # hash_uint32 is local, hash is remote
+    device_definition = definitions["hash_uint32"].get(hash)
+
+    if not device_definition:
+        raise ValueError(f"No device definition found for hash {hash}.")
+
+    node = deserialize(device_definition)
+    if node.hash_uint32 != hash:
         version_str = "".join([chr(n) for n in heartbeat_msg.data[4:]])
         if not version_str.strip():
             version_str = "1.3.1"
         raise ProtocolVersionError(node_id, version_str)
+
     node._channel = chan
     return node
 

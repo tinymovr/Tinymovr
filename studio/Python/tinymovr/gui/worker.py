@@ -18,7 +18,6 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 import time
 import can
-from canine import CANineBus
 from PySide6 import QtCore
 from PySide6.QtCore import QObject
 from PySide6.QtWidgets import (
@@ -42,7 +41,7 @@ class Worker(QObject):
         self.mutx = QtCore.QMutex()
         init_tee(can.Bus(**busparams))
         self._init_containers()
-        self.dsc = Discovery(self._node_appeared, self._node_disappeared, self.logger)
+        self.dsc = Discovery(self._device_appeared, self._device_disappeared, self.logger)
         self.timed_getter = TimedGetter()
         self._rate_limited_update = RateLimitedFunction(lambda: self._update(), 0.040)
         self.running = True
@@ -58,14 +57,14 @@ class Worker(QObject):
 
     def force_regen(self):
         self.mutx.lock()
-        self.regen.emit(dict(self.tms_by_id))
+        self.regen.emit(dict(self.devices_by_name))
         self.mutx.unlock()
 
     def reset(self):
         self.mutx.lock()
         self.dsc.reset()
         self._init_containers()
-        self.regen.emit(dict(self.tms_by_id))
+        self.regen.emit(dict(self.devices_by_name))
         self.mutx.unlock()
 
     @QtCore.Slot(dict)
@@ -106,7 +105,8 @@ class Worker(QObject):
     def _init_containers(self):
         self.active_attrs = set()
         self.dynamic_attrs = []
-        self.tms_by_id = {}
+        self.devices_by_name = {}
+        self.names_by_id = {}
         self.dynamic_attrs_last_update = {}
 
     def _update(self):
@@ -117,20 +117,22 @@ class Worker(QObject):
         self.mutx.unlock()
         QApplication.processEvents()
 
-    def _node_appeared(self, node, name):
+    def _device_appeared(self, device, node_id):
         self.mutx.lock()
-        node_name = "{}{}".format(base_node_name, name)
-        self.tms_by_id[node_name] = node
-        node.name = node_name
-        node.include_base_name = True
-        self.dynamic_attrs = get_dynamic_attrs(self.tms_by_id)
-        self.regen.emit(dict(self.tms_by_id))
+        display_name = "{}{}".format(device.name, node_id)
+        self.devices_by_name[display_name] = device
+        self.names_by_id[node_id] = display_name
+        device.name = display_name
+        device.include_base_name = True
+        self.dynamic_attrs = get_dynamic_attrs(self.devices_by_name)
+        self.regen.emit(dict(self.devices_by_name))
         self.mutx.unlock()
 
-    def _node_disappeared(self, name):
+    def _device_disappeared(self, node_id):
         self.mutx.lock()
-        node_name = "{}{}".format(base_node_name, name)
-        del self.tms_by_id[node_name]
-        self.dynamic_attrs = get_dynamic_attrs(self.tms_by_id)
-        self.regen.emit(dict(self.tms_by_id))
+        display_name = "{}{}".format(self.names_by_id[node_id], node_id)
+        del self.devices_by_name[display_name]
+        del self.names_by_id[node_id]
+        self.dynamic_attrs = get_dynamic_attrs(self.devices_by_name)
+        self.regen.emit(dict(self.devices_by_name))
         self.mutx.unlock()
