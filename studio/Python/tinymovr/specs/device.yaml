@@ -68,9 +68,9 @@ remote_attributes:
     dtype: void
     arguments: []
     meta: {reload_data: True}
-  - name: invoke_bootloader
-    summary: Invoke the bootloader.
-    caller_name: system_invoke_bootloader
+  - name: enter_dfu
+    summary: Enter DFU mode.
+    caller_name: system_enter_dfu
     dtype: void
     arguments: []
     meta: {reload_data: True}
