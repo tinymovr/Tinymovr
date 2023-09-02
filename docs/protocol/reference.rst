@@ -163,14 +163,14 @@ Return Type: void
 Reset the device.
 
 
-invoke_bootloader() -> void
+enter_dfu() -> void
 -------------------------------------------------------------------
 
 ID: 13
 Return Type: void
 
 
-Invoke the bootloader.
+Enter DFU mode.
 
 
 scheduler.errors

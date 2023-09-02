@@ -82,7 +82,7 @@ void system_init(void)
     // Vp = 10V , 440mA-540mA, Charge Pump Enable
     pac5xxx_tile_register_write(ADDR_SYSCONF, 0x01);
 
-    // Ensure ADC GP0 register is zero, to bypass bootloader on next boot
+    // Ensure ADC GP0 register is zero, to bypass DFU mode on next boot
     pac5xxx_tile_register_write(ADDR_GP0, 0);
 
     // Configure error handling
@@ -125,7 +125,7 @@ void system_reset(void)
     NVIC_SystemReset();
 }
 
-void system_invoke_bootloader(void)
+void system_enter_dfu(void)
 {
     pac5xxx_tile_register_write(ADDR_GP0, BTL_TRIGGER_PATTERN);
     NVIC_SystemReset();

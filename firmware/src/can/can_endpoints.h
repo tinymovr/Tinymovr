@@ -230,14 +230,14 @@ uint8_t avlos_erase_config(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command
 uint8_t avlos_reset(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_invoke_bootloader
+* avlos_enter_dfu
 *
-* Invoke the bootloader.
+* Enter DFU mode.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_invoke_bootloader(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t avlos_enter_dfu(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_scheduler_errors
