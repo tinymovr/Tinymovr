@@ -42,7 +42,7 @@
 
 // Encoder rectification lookup table size
 #define ECN_BITS (6)
-#define ECN_SIZE (2 << ECN_BITS)
+#define ECN_SIZE (1 << ECN_BITS)
 
 // UART
 #define UART_ENUM UARTB
