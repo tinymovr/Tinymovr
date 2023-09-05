@@ -239,19 +239,20 @@ bool calibrate_hall_sequence(void)
 bool calibrate_offset_and_rectification(void)
 {
     // Size below is an arbitrary large number ie > ECN_SIZE * npp
-    int16_t error_ticks[ECN_SIZE * 24];
+    int16_t error_ticks_f[ECN_SIZE * 20];
+    int16_t error_ticks_r[ECN_SIZE * 20];
     const int16_t npp = motor_get_pole_pairs();
     const int16_t n = ECN_SIZE * npp;
-    const int16_t nconv = 50;
+    const int16_t nconv = 100;
     const float delta = 2 * PI * npp / (n * nconv);
     const float e_pos_to_ticks = ((float)ENCODER_TICKS) / (2 * PI * npp);
     float e_pos_ref = 0.f;
     const float I_setpoint = motor_get_I_cal();
-    ma7xx_clear_rec_table();
     int16_t *lut = ma7xx_get_rec_table_ptr();
+    set_epos_and_wait(e_pos_ref, I_setpoint);
     wait_a_while();
-    int16_t offset_raw = ma7xx_get_angle_raw();
-    // Perform measuerments, store only mean of F + B error
+    int32_t offset_raw = ma7xx_get_angle_raw();
+
     for (uint32_t i = 0; i < n; i++)
     {
         for (uint8_t j = 0; j < nconv; j++)
@@ -261,7 +262,7 @@ bool calibrate_offset_and_rectification(void)
         }
         WaitForControlLoopInterrupt();
         const float pos_meas = observer_get_pos_estimate();
-        error_ticks[i] = (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
+        error_ticks_f[i] = (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
     }
     offset_raw = (offset_raw + ma7xx_get_angle_raw()) / 2;
     for (uint32_t i = 0; i < n; i++)
@@ -273,10 +274,12 @@ bool calibrate_offset_and_rectification(void)
         }
         WaitForControlLoopInterrupt();
         const float pos_meas = observer_get_pos_estimate();
-        error_ticks[n - i - 1] = (int16_t)(0.5f * ((float)error_ticks[n - i - 1] + e_pos_ref * e_pos_to_ticks - pos_meas));
+        error_ticks_r[n - i - 1] = (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
     }
     gate_driver_set_duty_cycle(&three_phase_zero);
     gate_driver_disable();
+
+    const uint16_t offset_idx = offset_raw >> (ENCODER_BITS - ECN_BITS);
 
     // FIR filtering and map measurements to lut
     for (int16_t i=0; i<ECN_SIZE; i++)
@@ -293,10 +296,10 @@ bool calibrate_offset_and_rectification(void)
             {
                 read_idx -= n;
             }
-            acc += error_ticks[read_idx];
+            acc += error_ticks_f[read_idx] + error_ticks_r[read_idx];
         }
-        acc /= ECN_SIZE;
-        int16_t write_idx = i + (offset_raw >> ECN_BITS);
+        acc = acc / (ECN_SIZE * 2);
+        int16_t write_idx = i + offset_idx;
         if (write_idx > (ECN_SIZE - 1))
         {
             write_idx -= ECN_SIZE;
