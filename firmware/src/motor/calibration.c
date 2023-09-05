@@ -299,6 +299,7 @@ bool calibrate_offset_and_rectification(void)
             acc += error_ticks_f[read_idx] + error_ticks_r[read_idx];
         }
         acc = acc / (ECN_SIZE * 2);
+        acc = (int32_t)((acc - offset_raw) * 1.1f) + offset_raw;
         int16_t write_idx = i + offset_idx;
         if (write_idx > (ECN_SIZE - 1))
         {
