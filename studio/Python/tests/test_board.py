@@ -104,7 +104,7 @@ class TestBoard(TMTestCase):
         self.tm.controller.velocity_mode()
         self.check_state(2)
 
-        R = 14
+        R = 15
 
         velocity_pairs = []
 
