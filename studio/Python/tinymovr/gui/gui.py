@@ -1,7 +1,7 @@
 """Tinymovr Studio GUI
 
 Usage:
-    tinymovr [--bus=<bus>] [--chan=<chan>] [--bitrate=<bitrate>]
+    tinymovr [--bus=<bus>] [--chan=<chan>] [--bitrate=<bitrate>] [--max-timeouts=<count>]
     tinymovr -h | --help
     tinymovr --version
 
@@ -9,6 +9,7 @@ Options:
     --bus=<bus>  One or more interfaces to use, first available is used [default: canine,slcan_disco].
     --chan=<chan>  The bus device "channel".
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
+    --max-timeouts=<count>  Max timeouts before nodes are rescanned [default: 5].
 """
 
 import sys

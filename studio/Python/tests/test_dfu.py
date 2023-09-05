@@ -1,5 +1,5 @@
 """
-Tinymovr Bootloader Test Class
+Tinymovr DFU Test Class
 Copyright Ioannis Chatzikonstantinou 2020-2023
 
 Implements convenience functionality.
@@ -23,8 +23,7 @@ from tinymovr import init_tee, destroy_tee
 from tinymovr.config import (
     get_bus_config,
     create_device,
-    tinymovr_definition,
-    bl_definition,
+    definitions
 )
 
 import unittest
@@ -38,17 +37,17 @@ class TMTestCase(unittest.TestCase):
         params["bitrate"] = 1000000
         cls.can_bus = can.Bus(**params)
 
-    def test_bootloader(self, node_id=1):
+    def test_dfu(self, node_id=1):
         init_tee(self.can_bus)
-        tm = create_device(node_id=node_id, device_definition=tinymovr_definition)
+        tm = create_device(node_id=node_id)
         tm_hash = tm.protocol_hash
-        tm.invoke_bootloader()
+        tm.enter_dfu()
         time.sleep(1)
-        bl = create_device(node_id=node_id, device_definition=bl_definition)
+        bl = create_device(node_id=node_id)
         bl_hash = bl.protocol_hash
         bl.reset()
         time.sleep(0.1)
-        tm = create_device(node_id=node_id, device_definition=tinymovr_definition)
+        tm = create_device(node_id=node_id)
         tm_hash2 = tm.protocol_hash
         tm.reset()
         time.sleep(0.1)

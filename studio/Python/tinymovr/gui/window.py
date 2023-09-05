@@ -24,6 +24,7 @@ from PySide6 import QtCore
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QMainWindow,
+    QDialog,
     QMenu,
     QMenuBar,
     QWidget,
@@ -34,7 +35,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QTreeWidgetItem,
     QPushButton,
-    QMessageBox
+    QMessageBox,
 )
 from pint.errors import UndefinedUnitError
 from PySide6.QtGui import QAction
@@ -48,6 +49,7 @@ from tinymovr.gui import (
     Worker,
     OurQTreeWidget,
     IconComboBoxWidget,
+    ArgumentInputDialog,
     format_value,
     load_icon,
     display_file_open_dialog,
@@ -58,7 +60,6 @@ from tinymovr.gui import (
 
 
 class MainWindow(QMainWindow):
-
     TreeItemCheckedSignal = Signal(dict)
 
     def __init__(self, app, arguments):
@@ -69,7 +70,6 @@ class MainWindow(QMainWindow):
 
         self.start_time = time.time()
         self.logger = configure_logging()
-        bitrate = int(arguments["--bitrate"])
 
         self.attr_widgets_by_id = {}
         self.graphs_by_id = {}
@@ -133,9 +133,12 @@ class MainWindow(QMainWindow):
         main_widget.setMinimumHeight(600)
         self.setCentralWidget(main_widget)
 
+        self.timeout_count = 0
+
         buses = arguments["--bus"].rsplit(sep=",")
         channel = arguments["--chan"]
         bitrate = int(arguments["--bitrate"])
+        self.max_timeouts = int(arguments["--max-timeouts"])
 
         if channel == None:
             params = get_bus_config(buses)
@@ -163,7 +166,14 @@ class MainWindow(QMainWindow):
     @QtCore.Slot()
     def handle_worker_error(self, e):
         if isinstance(e, ChannelResponseError):
-            self.logger.warn("Timeout occured")
+            if self.timeout_count > self.max_timeouts:
+                self.timeout_count = 0
+                self.logger.warn("Max timeouts exceeded. Triggering rescan...")
+                self.worker.reset()
+            else:
+                self.logger.warn("Timeout while getting value.")
+                self.timeout_count += 1
+            
         else:
             raise e
 
@@ -193,7 +203,7 @@ class MainWindow(QMainWindow):
         self.right_layout.addWidget(graph_widget)
 
     @QtCore.Slot()
-    def regen_tree(self, tms_by_id):
+    def regen_tree(self, devices_by_name):
         """
         Regenerate the attribute tree
         """
@@ -202,8 +212,8 @@ class MainWindow(QMainWindow):
         self.tree_widget.clear()
         self.tree_widget.setEnabled(False)
         all_items = []
-        for name, node in tms_by_id.items():
-            widget, items_list = self.parse_node(node, name)
+        for name, device in devices_by_name.items():
+            widget, items_list = self.parse_node(device, name)
             self.tree_widget.addTopLevelItem(widget)
             all_items.extend(items_list)
         for item in all_items:
@@ -306,7 +316,22 @@ class MainWindow(QMainWindow):
 
     @QtCore.Slot()
     def f_call_clicked(self, f):
-        f()
+        args = []
+
+        # Check if the function has any arguments
+        if f.arguments:
+            dialog = ArgumentInputDialog(f.arguments, self)
+            if dialog.exec_() == QDialog.Accepted:
+                input_values = dialog.get_values()
+                args = [input_values[arg.name] for arg in f.arguments]
+            else:
+                return  # User cancelled, stop the entire process
+
+        # Convert arguments as required using pint
+        args = [get_registry()(arg) for arg in args]
+
+        # Call the function with the collected arguments
+        f(*args)
         if "reload_data" in f.meta and f.meta["reload_data"]:
             self.worker.reset()
 
@@ -353,7 +378,12 @@ class MainWindow(QMainWindow):
             self.delete_graph_by_attr_name(attr_name)
 
     def show_about_box(self):
-        version_str = (pkg_resources.require("tinymovr")[0].version)
+        version_str = pkg_resources.require("tinymovr")[0].version
         app_str = "{} {}".format(app_name, version_str)
-        QMessageBox.about(self, "About Tinymovr", "{}\nhttps://tinymovr.com\n\nCat Sleeping Icon by Denis Sazhin from Noun Project".format(app_str))
-
+        QMessageBox.about(
+            self,
+            "About Tinymovr",
+            "{}\nhttps://tinymovr.com\n\nCat Sleeping Icon by Denis Sazhin from Noun Project".format(
+                app_str
+            ),
+        )

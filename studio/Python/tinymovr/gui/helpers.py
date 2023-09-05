@@ -22,7 +22,7 @@ import pint
 from PySide6 import QtGui
 from PySide6.QtGui import QGuiApplication, QPalette
 from PySide6.QtWidgets import QMessageBox, QFileDialog
-from avlos.definitions import RemoteAttribute
+from avlos.definitions import RemoteAttribute, RemoteEnum, RemoteBitmask
 import tinymovr
 
 
@@ -336,7 +336,9 @@ def format_value(value, include_unit=True):
     type and return the formatted string
     """
     if isinstance(value, enum.IntFlag):
-        return str(value) if value > 0 else "(no flags)"
+        return bitmask_string_representation(value) if value > 0 else "(no flags)"
+    if isinstance(value, enum.IntEnum):
+        return value.name
     if not include_unit and isinstance(value, pint.Quantity):
         return str(value.magnitude)
     if isinstance(value, float):
@@ -344,7 +346,14 @@ def format_value(value, include_unit=True):
     return str(value)
 
 
-def load_pixmap(filename, dark_mode_suffix='_dark', high_dpi_suffix='@2x'):
+def bitmask_string_representation(bitmask_value):
+    labels_in_bitmask = [
+        label.name for label in type(bitmask_value) if label & bitmask_value
+    ]
+    return ", ".join(labels_in_bitmask)
+
+
+def load_pixmap(filename, dark_mode_suffix="_dark", high_dpi_suffix="@2x"):
     """
     Load an image from a file and return it as a QPixmap.
     Load appropriate variants based on pixel ratio and
@@ -354,12 +363,12 @@ def load_pixmap(filename, dark_mode_suffix='_dark', high_dpi_suffix='@2x'):
     pixel_ratio = QtGui.QGuiApplication.primaryScreen().devicePixelRatio()
 
     # Prepare the filename based on the conditions
-    parts = filename.split('.')
+    parts = filename.split(".")
     if is_dark_mode():
         parts[0] += dark_mode_suffix
     if pixel_ratio > 1:
         parts[0] += high_dpi_suffix
-    adjusted_filename = '.'.join(parts)
+    adjusted_filename = ".".join(parts)
 
     file_path = os.path.join(
         os.path.dirname(tinymovr.__file__), "resources", "icons", adjusted_filename
@@ -412,19 +421,15 @@ class TimedGetter:
     information for the getter function
     """
 
-    def __init__(self, error_handler):
-        self.error_handler = error_handler
+    def __init__(self):
         self.dt = 0
 
     def get_value(self, getter):
-        try:
-            get_start_time = time.time()
-            val = getter()
-            get_dt = time.time() - get_start_time
-            self.dt = self.dt * 0.99 + get_dt * 0.01
-            return val
-        except Exception as e:
-            self.error_handler(e)
+        get_start_time = time.time()
+        val = getter()
+        get_dt = time.time() - get_start_time
+        self.dt = self.dt * 0.99 + get_dt * 0.01
+        return val
 
 
 class RateLimitedFunction:
@@ -511,10 +516,13 @@ def get_dynamic_attrs(attr_dict):
     Get the attributes that are marked as dynamic in the spec.
     """
     dynamic_attrs = []
-    for _, attr in attr_dict.items():
-        if isinstance(attr, RemoteAttribute):
-            if "dynamic" in attr.meta and attr.meta["dynamic"] == True:
-                dynamic_attrs.append(attr)
+
+    for attr in attr_dict.values():
+        if isinstance(
+            attr, (RemoteAttribute, RemoteEnum, RemoteBitmask)
+        ) and attr.meta.get("dynamic"):
+            dynamic_attrs.append(attr)
         elif hasattr(attr, "remote_attributes"):
             dynamic_attrs.extend(get_dynamic_attrs(attr.remote_attributes))
+
     return dynamic_attrs

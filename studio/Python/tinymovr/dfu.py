@@ -1,9 +1,9 @@
 """
 Usage:
-    dfu.py --node_id=ID [--bin=PATH] [--no-reset]
+    dfu.py --node_id=ID --bin=PATH [--no-reset]
 
 Options:
-    --node_id=ID The CAN Node id of the bootloader to address.
+    --node_id=ID The CAN Node ID of the device in DFU mode.
     --bin=PATH   The path of the .bin file to upload.
     --no-reset   Do not perform a reset following successful flashing.
 """
@@ -22,8 +22,7 @@ from tinymovr.tee import init_tee, destroy_tee
 from tinymovr.config import (
     get_bus_config,
     create_device,
-    tinymovr_definition,
-    bl_definition,
+    definitions
 )
 
 """
@@ -117,10 +116,13 @@ def spawn():
     params = get_bus_config(["canine", "slcan_disco"])
     params["bitrate"] = 1000000
     init_tee(can.Bus(**params), timeout=1.0)
-    device = create_device(node_id=node_id, device_definition=bl_definition)
+    device = create_device(node_id=node_id)
+
+    if not bin_path:
+        raise FileNotFoundError(f"No bin file specified!")
 
     # If a non-existing .bin file is specified, raise error
-    if bin_path and not Path(bin_path).is_file():
+    elif bin_path and not Path(bin_path).is_file():
         raise FileNotFoundError(f"Bin file {bin_path} not found!")
     
     # If an existing .bin file is specified, upload it to the device
@@ -133,14 +135,6 @@ def spawn():
             if not args["--no-reset"]:
                 print("Resetting device...")
                 device.reset()
-
-    # If no bin file specified, enter the iPython CLI
-    else:
-        user_ns = {}
-        user_ns["device"] = device
-        c = Config()
-        c.TerminalIPythonApp.display_banner = False
-        IPython.start_ipython(argv=[], config=c, user_ns=user_ns)
     destroy_tee()
 
 

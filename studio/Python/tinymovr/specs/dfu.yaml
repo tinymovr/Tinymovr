@@ -1,5 +1,5 @@
 
-name: tm_bl
+name: tm_dfu
 remote_attributes:
   - name: protocol_hash
     dtype: uint32
@@ -26,7 +26,7 @@ remote_attributes:
   - name: error
     options: [NONE, START_EXECUTION_STACK_POINTER_OUT_OF_RANGE, START_EXECUTION_ADDRESS_OUT_OF_RANGE, START_EXECUTION_ADDRESS_LSB_NOT_SET]
     getter_name: system_get_error
-    summary: The last error encountered by the bootloader
+    summary: The last error encountered in DFU
   - name: read_flash_32
     summary: Read a 32 bit value from the flash
     caller_name: nvm_read_flash_32

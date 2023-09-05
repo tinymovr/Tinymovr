@@ -30,6 +30,14 @@
 static inline void set_epos_and_wait(float angle, float I_setpoint);
 static inline void wait_a_while(void);
 
+bool CalibrateADCOffset(void)
+{
+    // We only need to wait here, the ADC loop will
+    // perform the offset calibration automatically
+    wait_a_while();
+    return true;
+}
+
 bool CalibrateResistance(void)
 {
     if (!motor_get_is_gimbal())

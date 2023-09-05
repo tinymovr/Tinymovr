@@ -47,7 +47,7 @@ remote_attributes:
     getter_name: system_get_calibrated
     summary: Whether the system has been calibrated.
   - name: errors
-    flags: [UNDERVOLTAGE, DRIVER_FAULT]
+    flags: [UNDERVOLTAGE, DRIVER_FAULT, CHARGE_PUMP_FAULT_STAT, CHARGE_PUMP_FAULT, DRV10_DISABLE, DRV32_DISABLE, DRV54_DISABLE]
     meta: {dynamic: True}
     getter_name: system_get_errors
     summary: Any system errors, as a bitmask
@@ -68,28 +68,18 @@ remote_attributes:
     dtype: void
     arguments: []
     meta: {reload_data: True}
-  - name: invoke_bootloader
-    summary: Invoke the bootloader.
-    caller_name: system_invoke_bootloader
+  - name: enter_dfu
+    summary: Enter DFU mode.
+    caller_name: system_enter_dfu
     dtype: void
     arguments: []
     meta: {reload_data: True}
   - name: scheduler
     remote_attributes:
-      - name: total
-        dtype: uint32
-        meta: {dynamic: True}
-        getter_name: Scheduler_GetTotalCycles
-        summary: Total processor cycles in a single PWM cycle.
-      - name: busy
-        dtype: uint32
-        meta: {dynamic: True}
-        getter_name: Scheduler_GetBusyCycles
-        summary: Busy processor cycles in a single PWM cycle.
       - name: errors
         flags: [CONTROL_BLOCK_REENTERED]
         meta: {dynamic: True}
-        getter_name: controller_get_errors
+        getter_name: scheduler_get_errors
         summary: Any scheduler errors, as a bitmask
   - name: controller
     remote_attributes:
@@ -260,8 +250,10 @@ remote_attributes:
         arguments:
           - name: pos_setpoint
             dtype: float
+            unit: tick
           - name: vel_setpoint
             dtype: float
+            unit: tick
   - name: comms
     remote_attributes:
     - name: can
@@ -441,6 +433,7 @@ remote_attributes:
         arguments:
           - name: pos_setpoint
             dtype: float
+            unit: tick
       - name: move_to_tlimit
         summary: Move to target position respecting time limits for each sector.
         caller_name: planner_move_to_tlimit
@@ -448,6 +441,7 @@ remote_attributes:
         arguments:
           - name: pos_setpoint
             dtype: float
+            unit: tick
       - name: errors
         flags: [INVALID_INPUT, VCRUISE_OVER_LIMIT]
         getter_name: planner_get_errors

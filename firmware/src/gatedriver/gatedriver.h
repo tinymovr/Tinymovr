@@ -18,17 +18,7 @@
 #ifndef GATEDRIVER_GATEDRIVER_H_
 #define GATEDRIVER_GATEDRIVER_H_
 
-typedef enum {
-	GATEDRIVER_DISABLED = 0,
-	GATEDRIVER_ENABLED = 1
-} GateDriverState;
 
-struct GateDriver_
-{
-    GateDriverState state;
-};
-
-void GateDriver_Init(void);
 void gate_driver_enable(void);
 void gate_driver_disable(void);
 bool gate_driver_is_enabled(void);

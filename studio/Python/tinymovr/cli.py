@@ -65,16 +65,16 @@ def spawn():
     user_ns["tms"] = tms
 
     def node_appeared(node, node_id):
-        node_name = "{}{}".format(base_node_name, node_id)
-        print("Found {} with device id {}".format(node_name, node.uid))
+        display_name = "{}{}".format(node.name, node_id)
+        print("Found {} with device uid {}".format(display_name, node.uid))
         tms[node_id] = node
-        user_ns[node_name] = node
+        user_ns[display_name] = node
 
     def node_disappeared(node_id):
-        node_name = "{}{}".format(base_node_name, node_id)
-        print("Lost {}".format(node_name))
+        display_name = "{}{}".format(tms[node_id].name, node_id)
+        print("Lost {}".format(display_name))
+        del user_ns[display_name]
         del tms[node_id]
-        del user_ns[node_name]
 
     print(app_name + " " + str(version))
 
