@@ -1,0 +1,441 @@
+
+name: tm
+version: 1.0.1.b1
+remote_attributes:
+  - name: protocol_hash
+    dtype: uint32
+    getter_name: _avlos_get_proto_hash
+    summary: The Avlos protocol hash.
+  - name: uid
+    dtype: uint32
+    getter_name: system_get_uid
+    summary: The unique device ID, unique to each PAC55xx chip produced.
+  - name: Vbus
+    dtype: float
+    unit: volt
+    meta: {dynamic: True}
+    getter_name: system_get_Vbus
+    summary: The measured bus voltage.
+  - name: Ibus
+    dtype: float
+    unit: ampere
+    meta: {dynamic: True}
+    getter_name: controller_get_Ibus_est
+    summary: The estimated bus current. Only estimates current drawn by motor.
+  - name: power
+    dtype: float
+    unit: watt
+    meta: {dynamic: True}
+    getter_name: controller_get_power_est
+    summary: The estimated power. Only estimates power drawn by motor.
+  - name: temp
+    dtype: float
+    unit: degC
+    meta: {dynamic: True}
+    getter_name: adc_get_mcu_temp
+    summary: The internal temperature of the PAC55xx MCU.
+  - name: calibrated
+    dtype: bool
+    meta: {dynamic: True}
+    getter_name: system_get_calibrated
+    summary: Whether the system has been calibrated.
+  - name: errors
+    flags: [UNDERVOLTAGE, DRIVER_FAULT]
+    meta: {dynamic: True}
+    getter_name: system_get_errors
+    summary: Any system errors, as a bitmask
+  - name: save_config
+    summary: Save configuration to non-volatile memory.
+    caller_name: nvm_save_config
+    dtype: void
+    arguments: []
+  - name: erase_config
+    summary: Erase the config stored in non-volatile memory and reset the device.
+    caller_name: nvm_erase
+    dtype: void
+    arguments: []
+    meta: {reload_data: True}
+  - name: reset
+    summary: Reset the device.
+    caller_name: system_reset
+    dtype: void
+    arguments: []
+    meta: {reload_data: True}
+  - name: scheduler
+    remote_attributes:
+      - name: total
+        dtype: uint32
+        meta: {dynamic: True}
+        getter_name: Scheduler_GetTotalCycles
+        summary: Total processor cycles in a single PWM cycle.
+      - name: busy
+        dtype: uint32
+        meta: {dynamic: True}
+        getter_name: Scheduler_GetBusyCycles
+        summary: Busy processor cycles in a single PWM cycle.
+      - name: errors
+        flags: [CONTROL_BLOCK_REENTERED]
+        meta: {dynamic: True}
+        getter_name: controller_get_errors
+        summary: Any scheduler errors, as a bitmask
+  - name: controller
+    remote_attributes:
+      - name: state
+        dtype: uint8
+        meta: {dynamic: True}
+        getter_name: controller_get_state
+        setter_name: controller_set_state
+        summary: The state of the controller.
+      - name: mode
+        dtype: uint8
+        meta: {dynamic: True}
+        getter_name: controller_get_mode
+        setter_name: controller_set_mode
+        summary: The control mode of the controller.
+      - name: warnings
+        meta: {dynamic: True}
+        flags: [VELOCITY_LIMITED, CURRENT_LIMITED, MODULATION_LIMITED]
+        getter_name: controller_get_warnings
+        summary: Any controller warnings, as a bitmask
+      - name: errors
+        meta: {dynamic: True}
+        flags: [CURRENT_LIMIT_EXCEEDED]
+        getter_name: controller_get_errors
+        summary: Any controller errors, as a bitmask
+      - name: position
+        remote_attributes:
+          - name: setpoint
+            dtype: float
+            unit: tick
+            getter_name: controller_get_pos_setpoint_user_frame
+            setter_name: controller_set_pos_setpoint_user_frame
+            summary: The position setpoint.
+          - name: p_gain
+            dtype: float
+            meta: {export: True}
+            getter_name: controller_get_pos_gain
+            setter_name: controller_set_pos_gain
+            summary: The proportional gain of the position controller.
+      - name: velocity
+        remote_attributes:
+          - name: setpoint
+            dtype: float
+            unit: tick/sec
+            getter_name: controller_get_vel_setpoint_user_frame
+            setter_name: controller_set_vel_setpoint_user_frame
+            summary: The velocity setpoint.
+          - name: limit
+            dtype: float
+            unit: tick/sec
+            meta: {export: True}
+            getter_name: controller_get_vel_limit
+            setter_name: controller_set_vel_limit
+            summary: The velocity limit.
+          - name: p_gain
+            dtype: float
+            meta: {export: True}
+            getter_name: controller_get_vel_gain
+            setter_name: controller_set_vel_gain
+            summary: The proportional gain of the velocity controller.
+          - name: i_gain
+            dtype: float
+            meta: {export: True}
+            getter_name: controller_get_vel_integrator_gain
+            setter_name: controller_set_vel_integrator_gain
+            summary: The integral gain of the velocity controller.
+          - name: deadband
+            dtype: float
+            unit: tick
+            meta: {export: True}
+            getter_name: controller_get_vel_integrator_deadband
+            setter_name: controller_set_vel_integrator_deadband
+            rst_target: integrator-deadband
+            summary: The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
+          - name: increment
+            dtype: float
+            meta: {export: True}
+            getter_name: controller_get_vel_increment
+            setter_name: controller_set_vel_increment
+            summary: Max velocity setpoint increment (ramping) rate. Set to 0 to disable.
+      - name: current
+        remote_attributes:
+          - name: Iq_setpoint
+            dtype: float
+            unit: ampere
+            getter_name: controller_get_Iq_setpoint_user_frame
+            setter_name: controller_set_Iq_setpoint_user_frame
+            summary: The Iq setpoint.
+          - name: Id_setpoint
+            dtype: float
+            unit: ampere
+            meta: {dynamic: True}
+            getter_name: controller_get_Id_setpoint_user_frame
+            summary: The Id setpoint.
+          - name: Iq_limit
+            dtype: float
+            unit: ampere
+            getter_name: controller_get_Iq_limit
+            setter_name: controller_set_Iq_limit
+            summary: The Iq limit.
+          - name: Iq_estimate
+            dtype: float
+            unit: ampere
+            meta: {dynamic: True}
+            getter_name: controller_get_Iq_estimate_user_frame
+            summary: The Iq estimate.
+          - name: bandwidth
+            dtype: float
+            unit: rad/s
+            meta: {export: True}
+            getter_name: controller_get_I_bw
+            setter_name: controller_set_I_bw
+            summary: The current controller bandwidth.
+          - name: Iq_p_gain
+            dtype: float
+            getter_name: controller_get_Iq_gain
+            summary: The current controller proportional gain.
+          - name: max_Ibus_regen
+            dtype: float
+            unit: ampere
+            getter_name: controller_get_max_Ibus_regen
+            setter_name: controller_set_max_Ibus_regen
+            summary: The max current allowed to be fed back to the power source before flux braking activates.
+          - name: max_Ibrake
+            dtype: float
+            unit: ampere
+            meta: {export: True}
+            getter_name: controller_get_max_Ibrake
+            setter_name: controller_set_max_Ibrake
+            summary: The max current allowed to be dumped to the motor windings during flux braking. Set to zero to deactivate flux braking.
+      - name: voltage
+        remote_attributes:
+          - name: Vq_setpoint
+            dtype: float
+            unit: volt
+            meta: {dynamic: True}
+            getter_name: controller_get_Vq_setpoint_user_frame
+            summary: The Vq setpoint.
+      - name: calibrate
+        summary: Calibrate the device.
+        caller_name: controller_calibrate
+        dtype: void
+        arguments: []
+      - name: idle
+        summary: Set idle mode, disabling the driver.
+        caller_name: controller_idle
+        dtype: void
+        arguments: []
+      - name: position_mode
+        summary: Set position control mode.
+        caller_name: controller_position_mode
+        dtype: void
+        arguments: []
+      - name: velocity_mode
+        summary: Set velocity control mode.
+        caller_name: controller_velocity_mode
+        dtype: void
+        arguments: []
+      - name: current_mode
+        summary: Set current control mode.
+        caller_name: controller_current_mode
+        dtype: void
+        arguments: []
+      - name: set_pos_vel_setpoints
+        summary: Set the position and velocity setpoints in one go, and retrieve the position estimate
+        caller_name: controller_set_pos_vel_setpoints
+        dtype: float
+        arguments:
+          - name: pos_setpoint
+            dtype: float
+          - name: vel_setpoint
+            dtype: float
+  - name: comms
+    remote_attributes:
+    - name: can
+      remote_attributes:
+      - name: rate
+        dtype: uint32
+        meta: {export: True}
+        getter_name: CAN_get_kbit_rate
+        setter_name: CAN_set_kbit_rate
+        rst_target: api-can-rate
+        summary: The baud rate of the CAN interface.
+      - name: id
+        dtype: uint32
+        meta: {export: True, reload_data: True}
+        getter_name: CAN_get_ID
+        setter_name: CAN_set_ID
+        summary: The ID of the CAN interface.
+  - name: motor
+    remote_attributes:
+      - name: R
+        dtype: float
+        unit: ohm
+        meta: {dynamic: True, export: True}
+        getter_name: motor_get_phase_resistance
+        setter_name: motor_set_phase_resistance
+        summary: The motor Resistance value.
+      - name: L
+        dtype: float
+        unit: henry
+        meta: {dynamic: True, export: True}
+        getter_name: motor_get_phase_inductance
+        setter_name: motor_set_phase_inductance
+        summary: The motor Inductance value.
+      - name: pole_pairs
+        dtype: uint8
+        meta: {dynamic: True, export: True}
+        getter_name: motor_get_pole_pairs
+        setter_name: motor_set_pole_pairs
+        summary: The motor pole pair count.
+      - name: type
+        #values: [HIGH_CURRENT, GIMBAL]
+        dtype: uint8
+        meta: {export: True}
+        getter_name: motor_get_is_gimbal
+        setter_name: motor_set_is_gimbal
+        summary: The type of the motor. Either high current or gimbal.
+      - name: offset
+        dtype: float
+        meta: {export: True}
+        getter_name: motor_get_user_offset
+        setter_name: motor_set_user_offset
+        summary: User-defined offset of the motor.
+      - name: direction
+        dtype: int8
+        meta: {export: True}
+        getter_name: motor_get_user_direction
+        setter_name: motor_set_user_direction
+        summary: User-defined direction of the motor.
+      - name: calibrated
+        dtype: bool
+        meta: {dynamic: True}
+        getter_name: motor_get_calibrated
+        summary: Whether the motor has been calibrated.
+      - name: I_cal
+        dtype: float
+        unit: ampere
+        meta: {export: True}
+        getter_name: motor_get_I_cal
+        setter_name: motor_set_I_cal
+        summary: The calibration current.
+      - name: errors
+        flags: [PHASE_RESISTANCE_OUT_OF_RANGE, PHASE_INDUCTANCE_OUT_OF_RANGE,INVALID_POLE_PAIRS]
+        meta: {dynamic: True}
+        getter_name: motor_get_errors
+        summary: Any motor/calibration errors, as a bitmask
+      # - name: phase_currents
+      #   remote_attributes:
+      #     - name: U
+      #       dtype: float
+      #       unit: ampere
+      #       getter_name: motor_get_IU
+      #       summary: Measured current in phase U.
+      #     - name: V
+      #       dtype: float
+      #       unit: ampere
+      #       getter_name: motor_get_IV
+      #       summary: Measured current in phase V.
+      #     - name: W
+      #       dtype: float
+      #       unit: ampere
+      #       getter_name: motor_get_IW
+      #       summary: Measured current in phase W.
+  - name: encoder
+    remote_attributes:
+      - name: position_estimate
+        dtype: float
+        unit: ticks
+        meta: {dynamic: True}
+        getter_name: observer_get_pos_estimate
+        summary: The filtered encoder position estimate.
+      - name: velocity_estimate
+        dtype: float
+        unit: ticks/second
+        meta: {dynamic: True}
+        getter_name: observer_get_vel_estimate
+        summary: The filtered encoder velocity estimate.
+      - name: type
+        #values: [INTERNAL, HALL]
+        dtype: uint8
+        meta: {export: True}
+        getter_name: encoder_get_type
+        setter_name: encoder_set_type
+        summary: The encoder type. Either INTERNAL or HALL.
+      - name: bandwidth
+        dtype: float
+        unit: rad/s
+        meta: {export: True}
+        getter_name: observer_get_bw
+        setter_name: observer_set_bw
+        summary: The encoder observer bandwidth.
+      - name: calibrated
+        dtype: bool
+        meta: {dynamic: True}
+        getter_name: encoder_get_calibrated
+        summary: Whether the encoder has been calibrated.
+      - name: errors
+        flags: [CALIBRATION_FAILED, READING_UNSTABLE]
+        meta: {dynamic: True}
+        getter_name: encoder_get_errors
+        summary: Any encoder errors, as a bitmask
+  - name: traj_planner
+    remote_attributes:
+      - name: max_accel
+        dtype: float
+        unit: ticks/s
+        meta: {export: True}
+        getter_name: planner_get_max_accel
+        setter_name: planner_set_max_accel
+        summary: The trajectory planner max acceleration.
+      - name: max_decel
+        dtype: float
+        unit: ticks/second/second
+        meta: {export: True}
+        getter_name: planner_get_max_decel
+        setter_name: planner_set_max_decel
+        summary: The trajectory planner max deceleration.
+      - name: max_vel
+        dtype: float
+        unit: ticks/second
+        meta: {export: True}
+        getter_name: planner_get_max_vel
+        setter_name: planner_set_max_vel
+        summary: The trajectory planner max cruise velocity.
+      - name: move_to
+        summary: Move to target position respecting velocity and acceleration limits.
+        caller_name: planner_move_to_vlimit
+        dtype: void
+        arguments:
+          - name: pos_setpoint
+            dtype: float
+      - name: move_to_tlimit
+        summary: Move to target position respecting time limits for each sector.
+        caller_name: planner_move_to_tlimit
+        dtype: void
+        arguments:
+          - name: pos_setpoint
+            dtype: float
+      - name: errors
+        flags: [INVALID_INPUT, VCRUISE_OVER_LIMIT]
+        getter_name: planner_get_errors
+        summary: Any errors in the trajectory planner, as a bitmask
+  - name: watchdog
+    remote_attributes:
+      - name: enabled
+        dtype: bool
+        getter_name: Watchdog_get_enabled
+        setter_name: Watchdog_set_enabled
+        summary: Whether the watchdog is enabled or not.
+      - name: triggered
+        dtype: bool
+        meta: {dynamic: True}
+        getter_name: Watchdog_triggered
+        summary: Whether the watchdog has been triggered or not.
+      - name: timeout
+        dtype: float
+        unit: s
+        meta: {export: True}
+        getter_name: Watchdog_get_timeout_seconds
+        setter_name: Watchdog_set_timeout_seconds
+        summary: The watchdog timeout period.

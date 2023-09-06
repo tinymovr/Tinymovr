@@ -1,20 +1,16 @@
 Upgrading Firmware
-##################
+******************
 
-It is possible to upgrade the firmware in two ways: Using the bootloader through UART using the ActiveFlashLight application (Windows only), and through Eclipse using a J-Link adapter.
+Introduction
+############
 
+It is possible to upgrade the firmware of your Tinymovr device in different ways, depending on the board you have: 
 
-Upgrading using bootloader
-==========================
+1. :ref:`upgrade-using-dfu` connection (fw 1.6 or later, boards shipped starting 8th Sep. 2023)
+2. :ref:`upgrade-using-activeflashlight` connection (fw 1.5 or earlier, boards shipped until the 7th Sep. 2023)
+3. :ref:`upgrade-using-vscode-and-jlink` (all boards)
 
-For this method you will need a USB to UART adapter or similar device to connect to Tinymovr's UART interface, such as an FTDI interface or similar. Such devices are very common and inexpensive. Please follow the diagram below to correctly setup the UART interface.
-
-
-.. warning::
-   The UART port on Tinymovr is NOT 5V tolerant. Applying 5V voltage will immediately damage the onboard PAC5527 controller. Please use only 3.3V for UART communication.
-
-.. warning::
-   The UART port on Tinymovr offers a 3.3v output for driving very light loads (30mA absolute max). Tinymovr cannot be powered by this pin. In addition, most UART adapters offer 5V power, which is incompatible with Tinymovr. **In short: If in doubt, leave this pin disconnected**.
+A revision of the hardware connectivity and each of the above methods is provided below.
 
 Connectivity
 ############
@@ -47,11 +43,12 @@ R3.x
    :width: 800
    :alt: Tinymovr R3.x connectors and pinouts
 
+.. _upgrade-using-dfu:
 
-Firmware Update Procedure for Tinymovr
-######################################
+Upgrade using DFU and CAN bus
+#############################
 
-Tinymovr has streamlined the firmware update process by leveraging the native CAN bus interface. This guide will walk you through the steps to refresh your Tinymovr's firmware.
+Since firmware 1.6, we have streamlined the firmware update process with a bootloader that supports DFU through the native CAN bus interface. This guide will walk you through the steps to upgrade your Tinymovr's firmware.
 
 Prerequisites
 =============
@@ -77,7 +74,7 @@ Flashing the Firmware
 
 2. **Run the Script**:
 
-   With the firmware .bin file you downloaded, execute the firmware update script:
+   With the firmware .bin file you downloaded, execute the DFU script:
 
    .. code-block:: bash
 
@@ -111,11 +108,47 @@ Flashing the Firmware
 
    Before updating, it's a wise move to backup your current firmware and settings. Always pore over any version-specific instructions or release notes accompanying fresh firmware updates to stay informed.
 
+.. _upgrade-using-activeflashlight:
 
-Upgrading using J-Link
-======================
+Upgrade using ActiveFlashlight and UART
+#######################################
 
-Please see :ref:`setting-up-vscode`.
+Prerequisites
+=============
+
+For this method you will need a USB to UART adapter or similar device to connect to Tinymovr's UART interface, such as an FTDI interface or similar. Such devices are very common and inexpensive. Please follow the diagram below to correctly setup the UART interface.
+
+
+.. warning::
+   The UART port on Tinymovr is NOT 5V tolerant. Applying 5V voltage will immediately damage the onboard PAC5527 controller. Please use only 3.3V for UART communication.
+
+.. warning::
+   The UART port on Tinymovr offers a 3.3v output for driving very light loads (30mA absolute max). Tinymovr cannot be powered by this pin. In addition, most UART adapters offer 5V power, which is incompatible with Tinymovr. **In short: If in doubt, leave this pin disconnected**.
+
+Flashing the Firmware
+=====================
+
+.. warning::
+   This is a legacy upgrade approach that is maintained here to facilitate existing users. New users should :ref:`upgrade-using-dfu`
+
+Qorvo, the maker of the PAC chip used in Tinymovr, provides an application to interface with the bootloader environment using UART and enable firmware upgrades. It is available through the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_ as an archive named "PAC55xx ActiveFlashLight Bootloader". Please download and extract the archive and follow these steps:
+
+1. Inside the "resources" folder run the ActiveFlashLight application
+2. Power on Tinymovr
+3. Under 'COMMUNICATION' click on 'Connect'
+4. Power off and on Tinymov. The application status should now indicate that it is connected to the device. 
+5. Under 'PROGRAMMING' click on 'Browse...' and find the latest 'tinymovr<firmware_version>-R<board_revision>.bin' file for the board being used, which can be downloaded from `releases <https://github.com/tinymovr/Tinymovr/releases>`_. Also take note of any version specific instructions in the release notes.
+6. Under 'PROGRAMMING' click on 'Auto Program'. The application will erase, flash and verify the device with the new firmware. Wait for the process to complete
+7. Once complete, power off Tinymovr and quit the application
+
+You should now be able to use Tinymovr as usual with the new firmware.
+
+.. _upgrade-using-vscode-and-jlink:
+
+Upgrade using VSCode and J-Link
+###############################
+
+Please see :ref:`develop-setting-up-vscode`.
 
 .. warning::
    Depending on the hardware revision and the batch, either a vertical or a sideways JST-SH connector is used for SWD. In any case, the pin order shown in the above figures is correct. Please consider this when connecting your SWD adapter.
