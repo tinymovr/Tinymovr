@@ -148,7 +148,7 @@ You should now be able to use Tinymovr as usual with the new firmware.
 Upgrade using VSCode and J-Link
 ###############################
 
-Please see :ref:`setting-up-vscode`.
+Please see :ref:`develop-setting-up-vscode`.
 
 .. warning::
    Depending on the hardware revision and the batch, either a vertical or a sideways JST-SH connector is used for SWD. In any case, the pin order shown in the above figures is correct. Please consider this when connecting your SWD adapter.
