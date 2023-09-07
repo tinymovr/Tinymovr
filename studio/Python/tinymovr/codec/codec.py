@@ -30,31 +30,39 @@ class Codec:
 
     def deserialize(self, buffer: bytes):
         raise NotImplementedError()
-
+    
 
 class StructCodec(Codec):
-    """
-    Python struct-based codec
-    Adapted from:
-    https://github.com/madcowswe/ODrive/blob/master/Firmware/fibre/python/fibre/remote_object.py
-    """
 
     def __init__(self, struct_format, target_type: type):
         self._struct_format = struct_format
         self._target_type = target_type
-
-    def get_length(self) -> int:
-        return struct.calcsize(self._struct_format)
 
     def serialize(self, value) -> bytes:
         value = self._target_type(value)
         return struct.pack(self._struct_format, value)
 
     def deserialize(self, buffer: bytes):
-        trimmed_buffer: bytes = buffer[: self.get_length()]
+        size = struct.calcsize(self._struct_format)
+        trimmed_buffer: bytes = buffer[: size]
         value = struct.unpack(self._struct_format, trimmed_buffer)
         value = value[0] if len(value) == 1 else value
-        return self._target_type(value)
+        return self._target_type(value), size
+        
+
+class StringCodec:
+
+    def serialize(self, value) -> bytes:
+        value += '\x00'
+        value = self._target_type(value)
+        return struct.pack(self._struct_format, value)
+
+    def deserialize(self, buffer: bytes):
+        # Use the length of the buffer directly for unpacking
+        size = len(buffer)
+        value = struct.unpack(f"{size}s", buffer)
+        value = value[0] if len(value) == 1 else value
+        return value.rstrip(b'\x00').decode('utf-8'), size
 
 
 codecs: Dict[DataType, StructCodec] = {
@@ -66,6 +74,7 @@ codecs: Dict[DataType, StructCodec] = {
     DataType.INT32: StructCodec("<i", int),
     DataType.UINT32: StructCodec("<I", int),
     DataType.FLOAT: StructCodec("<f", float),
+    DataType.STR: StringCodec(),
 }
 
 
@@ -87,6 +96,8 @@ class MultibyteCodec(Codec):
         index: int = 0
         values = []
         for dtype in args:
-            values.append(codecs[dtype].deserialize(data[index:]))
-            index += codecs[dtype].get_length()
+            value, size = codecs[dtype].deserialize(data[index:])
+            values.append(value)
+            index += size
         return values
+    

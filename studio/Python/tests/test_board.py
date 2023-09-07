@@ -191,13 +191,13 @@ class TestBoard(TMTestCase):
         self.tm.controller.velocity.setpoint = 0
         time.sleep(0.5)
 
-    def test_h_timings(self):
-        """
-        Test DWT busy/total cycle timings
-        """
-        self.assertGreater(self.tm.scheduler.total, 0)
-        self.assertGreater(self.tm.scheduler.busy, 0)
-        self.assertLess(self.tm.scheduler.busy, 3000)
+    # def test_h_timings(self):
+    #     """
+    #     Test DWT busy/total cycle timings
+    #     """
+    #     self.assertGreater(self.tm.scheduler.total, 0)
+    #     self.assertGreater(self.tm.scheduler.busy, 0)
+    #     self.assertLess(self.tm.scheduler.busy, 3000)
 
     def test_i_states(self):
         """
@@ -381,6 +381,8 @@ class TestBoard(TMTestCase):
         time.sleep(0.5)
         self.tm.controller.current.max_Ibrake = 0
         self.assertGreater(min(I_brake_vals), -1 * A)
+        self.tm.controller.idle()
+        time.sleep(0.4)
 
 
 if __name__ == "__main__":

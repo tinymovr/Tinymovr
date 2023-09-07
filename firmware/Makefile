@@ -104,7 +104,7 @@ all: release
 debug: CFLAGS += -DDEBUG -g2 -O1
 debug: CPPFLAGS += -DDEBUG -g2 -O1
 debug: LDFLAGS += -O1
-debug: OBJECTS += $(BUILDDIR)/bootloader.o
+debug: OBJECTS += $(BUILDDIR)/bootloader_$(REV).o
 debug: binary
 
 # Upgrade target
@@ -114,7 +114,7 @@ upgrade: LDFLAGS += -O3
 upgrade: binary
 
 # Release target
-release: OBJECTS += $(BUILDDIR)/bootloader.o
+release: OBJECTS += $(BUILDDIR)/bootloader_$(REV).o
 release: upgrade
 
 # Binary target
@@ -131,7 +131,7 @@ $(BIN): $(ELF)
 
 # Link
 $(ELF): $(OBJECTS)
-	- $(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.bl_section,alloc,load,readonly,data,contents $(PROJECTDIR)/bootloader.bin $(BUILDDIR)/bootloader.o
+	- $(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.bl_section,alloc,load,readonly,data,contents $(PROJECTDIR)/bootloader/bootloader_$(REV).bin $(BUILDDIR)/bootloader_$(REV).o
 	$(LD) $(LDFLAGS) $(OBJECTS) -o $(ELF)
 	$(SIZE_EX) --format=berkeley $(ELF)
 

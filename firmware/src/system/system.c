@@ -24,6 +24,8 @@
 #include <src/can/can_endpoints.h>
 #include <src/system/system.h>
 
+extern char _eram;
+
 static SystemState state = {0};
 
 static SystemConfig config = {
@@ -80,10 +82,8 @@ void system_init(void)
     // Vp = 10V , 440mA-540mA, Charge Pump Enable
     pac5xxx_tile_register_write(ADDR_SYSCONF, 0x01);
 
-    // Configure reporting of mcu cycles
-    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-    DWT->CYCCNT = 0;
-    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+    // Ensure ADC GP0 register is zero, to bypass DFU mode on next boot
+    pac5xxx_tile_register_write(ADDR_GP0, 0);
 
     // Configure error handling
     SCB->CCR |= 0x10;
@@ -92,7 +92,7 @@ void system_init(void)
     state.Vbus = 12.0f;
 
     // Derive VBus D value for given tau value
-    config.Vbus_D = 1.0f - powf(EPSILON, -1.0f / (config.Vbus_tau * PWM_FREQ_HZ));
+    config.Vbus_D = 1.0f - powf(EPSILON, -1.0f / (config.Vbus_tau * SYSTICK_FREQ_HZ));
 
     /* Initialize Systick per 1ms */
     SysTick_Config(150000); // TODO: Use var
@@ -105,12 +105,30 @@ TM_RAMFUNC void system_update(void)
     {
         state.errors |= ERRORS_UNDERVOLTAGE;
     }
+    const uint8_t drv_status = pac5xxx_tile_register_read(ADDR_STATDRV);
+    if (drv_status > 0)
+    {
+        state.errors |= ((drv_status & 0x7) << 4);
+    }
+    const uint8_t drv_fault = pac5xxx_tile_register_read(ADDR_DRV_FLT);
+    if (drv_fault > 0)
+    {
+        // We use 0x5 mask because we ignore CHARGE_PUMP_FAULT_STAT
+        // for the time being, as it seems to always be set.
+        state.errors |= ((drv_fault & 0x5) << 1);
+    }
 }
 
 void system_reset(void)
 {
-    pac5xxx_tile_register_write(ADDR_WATCHDOG,
-                                pac5xxx_tile_register_read(ADDR_WATCHDOG) | 0x80);
+    // GP0 register is already zeroed at `system_init()` 
+    NVIC_SystemReset();
+}
+
+void system_enter_dfu(void)
+{
+    pac5xxx_tile_register_write(ADDR_GP0, BTL_TRIGGER_PATTERN);
+    NVIC_SystemReset();
 }
 
 TM_RAMFUNC float system_get_Vbus(void)

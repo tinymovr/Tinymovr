@@ -32,7 +32,6 @@ void CLControlStep(void);
 static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
                                                             float vel_gain, float *I);
 
-static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
 static MotionPlan motion_plan;
 static ControllerState state = {
 
@@ -87,9 +86,9 @@ static ControllerConfig config = {
 
 static ControllerConfig config = {
     .vel_limit = 100000.0f,
-    .I_limit = 5.0f,
-    .pos_gain = 12.0f,
-    .vel_gain = 6.0e-5f,
+    .I_limit = 4.0f,
+    .pos_gain = 8.0f,
+    .vel_gain = 5.0e-5f,
     .vel_integrator_gain = 0.00020f,
     .vel_integrator_deadband = 200.0f,
     .I_bw = 2000.0,
@@ -125,11 +124,11 @@ void Controller_ControlLoop(void)
             reset_calibration();
             if (ENCODER_MA7XX == encoder_get_type())
             {
-                (void)((CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && calibrate_offset_and_rectification());
+                (void)((CalibrateADCOffset() && CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && calibrate_offset_and_rectification());
             }
             else if (ENCODER_HALL == encoder_get_type())
             {
-                (void)((CalibrateResistance() && CalibrateInductance()) && calibrate_hall_sequence());
+                (void)((CalibrateADCOffset() && CalibrateResistance() && CalibrateInductance()) && calibrate_hall_sequence());
             }
             state.is_calibrating = false;
             controller_set_state(STATE_IDLE);
@@ -335,7 +334,7 @@ TM_RAMFUNC void controller_set_state(ControlState new_state)
         }
         else // state != STATE_IDLE --> Got to idle state anyway
         {
-            gate_driver_set_duty_cycle(&zeroDC);
+            gate_driver_set_duty_cycle(&three_phase_zero);
             gate_driver_disable();
             state.state = STATE_IDLE;
         }
@@ -448,7 +447,7 @@ TM_RAMFUNC float controller_set_pos_vel_setpoints(float pos_setpoint, float vel_
     return observer_get_pos_estimate_user_frame();
 }
 
-void controller_get_modulation_values(struct FloatTriplet *dc)
+void controller_get_modulation_values(FloatTriplet *dc)
 {
     dc->A = state.modulation_values.A;
     dc->B = state.modulation_values.B;

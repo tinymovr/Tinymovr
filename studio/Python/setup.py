@@ -53,7 +53,7 @@ setup(
         "python-can",
         "python-can-canine",
         "python-can-slcan_disco",
-        "avlos",
+        "avlos>=0.6.6",
         "pyserial",
         "pyusb",
         "pyyaml",
@@ -66,6 +66,7 @@ setup(
         "console_scripts": [
             "tinymovr_cli=tinymovr.cli:spawn",
             "tinymovr=tinymovr.gui:spawn",
+            "tinymovr_dfu=tinymovr.dfu:spawn"
         ]
     },
 )

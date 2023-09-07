@@ -18,6 +18,7 @@
 #ifndef SYSTEM_SYSTEM_H_
 #define SYSTEM_SYSTEM_H_
 
+#include <string.h>
 #include <src/common.h>
 #define CLKREF_FREQ_HZ              (4000000)
 #define FRCLK_FREQ_HZ               CLKREF_FREQ_HZ
@@ -35,10 +36,22 @@ typedef struct {
 void system_init(void);
 void system_update(void);
 void system_reset(void);
+void system_enter_dfu(void);
+
+inline uint8_t system_get_fw_version_string(char *buffer)
+{
+    memcpy(buffer, GIT_VERSION, 4);
+    return 4;
+}
 
 inline uint32_t system_get_uid(void)
 {
     return PAC55XX_INFO1->UNIQUEID[0] ^ PAC55XX_INFO1->UNIQUEID[1] ^ PAC55XX_INFO1->UNIQUEID[2];
+}
+
+inline uint32_t system_get_hw_revision(void)
+{
+    return BOARD_REV_IDX;
 }
 
 float system_get_Vbus(void);

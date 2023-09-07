@@ -7,4 +7,5 @@ include tinymovr/resources/icons/empty.png
 include tinymovr/resources/icons/empty@2x.png
 include tinymovr/resources/icons/empty_dark.png
 include tinymovr/resources/icons/empty_dark@2x.png
-include tinymovr/config/device.yaml
+include tinymovr/specs/device.yaml
+include tinymovr/specs/dfu.yaml

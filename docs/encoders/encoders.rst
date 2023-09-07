@@ -68,7 +68,7 @@ As a first step you need to configure the sensor type and observer bandwidth.
     tm1.encoder.type = 1
     tm1.encoder.bandwidth = 100
 
-This sets the encoder type to Hall effect sensor, and the encoder bandwidth to 100Hz. 
+This sets the encoder type to Hall effect sensor, and the encoder bandwidth to 100Hz. Note that the change of the encoder type will not propagate until the next reset; in effect, the `encoder.type` variable value will still show as the previous one, here as 0, until you finish configuration and reset.
 
 Next, you need to set the motor configuration:
 

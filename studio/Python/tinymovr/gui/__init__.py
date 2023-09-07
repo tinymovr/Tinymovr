@@ -10,10 +10,14 @@ from tinymovr.gui.helpers import (
     hold_sema,
     TimedGetter,
     RateLimitedFunction,
-    OurQTreeWidget,
     check_selected_items,
     get_dynamic_attrs,
     is_dark_mode
+)
+from tinymovr.gui.widgets import (
+    OurQTreeWidget,
+    IconComboBoxWidget,
+    ArgumentInputDialog
 )
 from tinymovr.gui.worker import Worker
 from tinymovr.gui.window import MainWindow

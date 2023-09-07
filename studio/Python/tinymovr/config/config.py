@@ -16,6 +16,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import yaml
+from pathlib import Path
 import logging
 from importlib_resources import files
 import can
@@ -24,11 +25,14 @@ from avlos.deserializer import deserialize
 from tinymovr.codec import DataType
 from tinymovr.channel import CANChannel
 
-dev_def = None
+definitions = {"hash_uint32": {}, "name": {}}
 
-def_path_str = str(files("tinymovr").joinpath("config/device.yaml"))
-with open(def_path_str) as dev_def_raw:
-    dev_def = yaml.safe_load(dev_def_raw)
+for yaml_file in Path(files("tinymovr").joinpath("specs/")).glob("*.yaml"):
+    with open(str(yaml_file)) as def_raw:
+        definition = yaml.safe_load(def_raw)
+        tmp_node = deserialize(definition)
+        definitions["hash_uint32"][tmp_node.hash_uint32] = definition
+        definitions["name"][definition["name"]] = definition
 
 
 class ProtocolVersionError(Exception):
@@ -39,7 +43,9 @@ class ProtocolVersionError(Exception):
             "Incompatible protocol versions (hash mismatch) for device {}. "
             "Firmware is compatible with Studio version {}.\n\n"
             "Either upgrade studio and firmware, or install a compatible Studio version like so:\n\n"
-            "pip3 uninstall tinymovr\npip3 install tinymovr=={}".format(self.dev_id, self.version_str, self.version_str)
+            "pip3 uninstall tinymovr\npip3 install tinymovr=={}".format(
+                self.dev_id, self.version_str, self.version_str
+            )
         )
         super().__init__(msg, *args, **kwargs)
 
@@ -63,33 +69,50 @@ def create_device(node_id):
     The hash value will be retrieved from the remote.
     """
     chan = CANChannel(node_id)
-    node = deserialize(dev_def)
-    # We use the generated node to retrieve the hash from
-    # the remote. This is ok as long as we know that the
-    # hash endpoint will always be the 0th one. If there
-    # is a hash mismatch, we raise an exception, otherwise
-    # we return the device node as is.
+
+    # Temporarily using a default definition to get the protocol_hash
+    # This assumes that `protocol_hash` is standard across different definitions
+    # Get the first definition as a temp
+    tmp_definition = list(definitions["hash_uint32"].values())[0]
+    node = deserialize(tmp_definition)
     node._channel = chan
-    # hash_uint32 is local, proto_hash is remote
-    if node.hash_uint32 != node.protocol_hash:
+
+    # Check for the correct definition using the remote hash
+    protocol_hash = node.protocol_hash
+    device_definition = definitions["hash_uint32"].get(protocol_hash)
+
+    if not device_definition:
+        raise ValueError(f"No device definition found for hash {protocol_hash}.")
+
+    node = deserialize(device_definition)
+    node._channel = chan
+    if node.hash_uint32 != protocol_hash:
         raise ProtocolVersionError(node_id, "")
+
     return node
 
 
 def create_device_with_hash_msg(heartbeat_msg):
     """
     Create a device, the heartbeat msg will be used
-    to decode the actual hash value and id
+    to decode the actual hash value and id.
     """
     node_id = heartbeat_msg.arbitration_id & 0x3F
     chan = CANChannel(node_id)
-    node = deserialize(dev_def)
+
     hash, *_ = chan.serializer.deserialize(heartbeat_msg.data[:4], DataType.UINT32)
-    if node.hash_uint32 != hash:  # hash_uint32 is local, hash is remote
+    device_definition = definitions["hash_uint32"].get(hash)
+
+    if not device_definition:
+        raise ValueError(f"No device definition found for hash {hash}.")
+
+    node = deserialize(device_definition)
+    if node.hash_uint32 != hash:
         version_str = "".join([chr(n) for n in heartbeat_msg.data[4:]])
         if not version_str.strip():
             version_str = "1.3.1"
         raise ProtocolVersionError(node_id, version_str)
+
     node._channel = chan
     return node
 
@@ -106,14 +129,14 @@ def configure_logging():
     return logger
 
 
-def cleanup_incomplete_version(version_str, char='.'):
+def cleanup_incomplete_version(version_str, char="."):
     """
     Clean up any version string that is
     incomplete or malformed
     """
     parts = version_str.split(char)
-    
-    while '' in parts:
-        parts.remove('')
-    
+
+    while "" in parts:
+        parts.remove("")
+
     return char.join(parts)

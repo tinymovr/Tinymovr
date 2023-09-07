@@ -29,7 +29,14 @@
 
 static inline void set_epos_and_wait(float angle, float I_setpoint);
 static inline void wait_a_while(void);
-static struct FloatTriplet zeroDC = {0.5f, 0.5f, 0.5f};
+
+bool CalibrateADCOffset(void)
+{
+    // We only need to wait here, the ADC loop will
+    // perform the offset calibration automatically
+    wait_a_while();
+    return true;
+}
 
 bool CalibrateResistance(void)
 {
@@ -37,8 +44,8 @@ bool CalibrateResistance(void)
     {
         float I_cal = motor_get_I_cal();
         float V_setpoint = 0.0f;
-        struct FloatTriplet I_phase_meas = {0.0f};
-        struct FloatTriplet modulation_values = {0.0f};
+        FloatTriplet I_phase_meas = {0.0f};
+        FloatTriplet modulation_values = {0.0f};
         for (uint32_t i = 0; i < CAL_R_LEN; i++)
         {
             ADC_GetPhaseCurrents(&I_phase_meas);
@@ -49,7 +56,7 @@ bool CalibrateResistance(void)
             WaitForControlLoopInterrupt();
         }
         const float R = our_fabsf(V_setpoint / I_cal);
-        gate_driver_set_duty_cycle(&zeroDC);
+        gate_driver_set_duty_cycle(&three_phase_zero);
         if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
         {
             uint8_t *error_ptr = motor_get_error_ptr();
@@ -71,8 +78,8 @@ bool CalibrateInductance(void)
         float V_setpoint = 0.0f;
         float I_low = 0.0f;
         float I_high = 0.0f;
-        struct FloatTriplet I_phase_meas = {0.0f};
-        struct FloatTriplet modulation_values = {0.0f};
+        FloatTriplet I_phase_meas = {0.0f};
+        FloatTriplet modulation_values = {0.0f};
 
         for (uint32_t i = 0; i < CAL_L_LEN; i++)
         {
@@ -95,7 +102,7 @@ bool CalibrateInductance(void)
         const float num_cycles = CAL_L_LEN / 2;
         const float dI_by_dt = (I_high - I_low) / (PWM_PERIOD_S * num_cycles);
         const float L = CAL_V_INDUCTANCE / dI_by_dt;
-        gate_driver_set_duty_cycle(&zeroDC);
+        gate_driver_set_duty_cycle(&three_phase_zero);
         if ((L <= MIN_PHASE_INDUCTANCE) || (L >= MAX_PHASE_INDUCTANCE))
         {
             uint8_t *error_ptr = motor_get_error_ptr();
@@ -153,7 +160,7 @@ bool CalibrateDirectionAndPolePairs(void)
     {
         set_epos_and_wait(epos_target * (1.0f - ((float)i / CAL_DIR_LEN)), I_setpoint);
     }
-    gate_driver_set_duty_cycle(&zeroDC);
+    gate_driver_set_duty_cycle(&three_phase_zero);
     if (success && epos_start > epos_end)
     {
         motor_set_phases_swapped(true);
@@ -209,7 +216,7 @@ bool calibrate_hall_sequence(void)
         current_sector = hall_get_sector();
     }
 
-    gate_driver_set_duty_cycle(&zeroDC);
+    gate_driver_set_duty_cycle(&three_phase_zero);
 
     // Check that the number of sectors discovered is the same as expected
     if (sector_pos != HALL_SECTORS - 1)
@@ -268,7 +275,7 @@ bool calibrate_offset_and_rectification(void)
         const float pos_meas = observer_get_pos_estimate();
         error_ticks[n - i - 1] = (int16_t)(0.5f * ((float)error_ticks[n - i - 1] + e_pos_ref * e_pos_to_ticks - pos_meas));
     }
-    gate_driver_set_duty_cycle(&zeroDC);
+    gate_driver_set_duty_cycle(&three_phase_zero);
     gate_driver_disable();
 
     // FIR filtering and map measurements to lut
@@ -311,7 +318,7 @@ void reset_calibration(void)
 
 static inline void set_epos_and_wait(float angle, float I_setpoint)
 {
-    struct FloatTriplet modulation_values = {0.0f};
+    FloatTriplet modulation_values = {0.0f};
     float pwm_setpoint = (I_setpoint * motor_get_phase_resistance()) / system_get_Vbus();
     our_clampc(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
     SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),

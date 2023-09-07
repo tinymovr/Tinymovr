@@ -34,6 +34,7 @@
 #define CAL_V_INDUCTANCE      (5.0f)
 #endif
 
+bool CalibrateADCOffset(void);
 bool CalibrateResistance(void);
 bool CalibrateInductance(void);
 bool CalibrateDirectionAndPolePairs(void);

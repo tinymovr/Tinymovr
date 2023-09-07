@@ -2,13 +2,17 @@ name: Tinymovr Studio Test with Tox
 
 on: [push]
 
+env:  # Define the environment variables for this step
+  TEST_PYPI_USERNAME: ${{ secrets.TEST_PYPI_USERNAME }}
+  TEST_PYPI_PASSWORD: ${{ secrets.TEST_PYPI_PASSWORD }}
+
 jobs:
   test-studio-tox:
 
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10"]
+        python-version: ["3.9", "3.10", "3.11"]
 
     steps:
     - uses: actions/checkout@v2
@@ -24,3 +28,6 @@ jobs:
       run:  |
         cd studio/Python
         tox
+
+
+        
