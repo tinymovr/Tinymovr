@@ -1,10 +1,11 @@
 """
 Usage:
-    dfu.py --node_id=ID --bin=PATH [--no-reset]
+    dfu.py --node_id=ID [--bin=PATH | --recovery] [--no-reset]
 
 Options:
     --node_id=ID The CAN Node ID of the device in DFU mode.
     --bin=PATH   The path of the .bin file to upload.
+    --recovery   Perform recovery procedure for inaccessible DFU bootloader.
     --no-reset   Do not perform a reset following successful flashing.
 """
 
@@ -19,11 +20,8 @@ import IPython
 from traitlets.config import Config
 from docopt import docopt
 from tinymovr.tee import init_tee, destroy_tee
-from tinymovr.config import (
-    get_bus_config,
-    create_device,
-    definitions
-)
+from tinymovr.config import get_bus_config, create_device
+from tinymovr.channel import ResponseError
 
 """
 Tinymovr DFU Module
@@ -132,26 +130,41 @@ def spawn():
     # Set up the device
     params = get_bus_config(["canine", "slcan_disco"])
     params["bitrate"] = 1000000
-    init_tee(can.Bus(**params), timeout=1.0)
-    device = create_device(node_id=node_id)
 
-    if not bin_path:
-        raise FileNotFoundError(f"No bin file specified!")
+    if args["--recovery"]:
 
-    # If a non-existing .bin file is specified, raise error
-    elif bin_path and not Path(bin_path).is_file():
-        raise FileNotFoundError(f"Bin file {bin_path} not found!")
+        input("Please power off the device and then press any key to continue...")
+        print("Now power on the device.")
+        init_tee(can.Bus(**params), timeout=1.0)
+        while True:
+            try:
+                device = create_device(node_id=node_id)
+                print("The device is now in DFU mode.")
+                break
+            except ResponseError:
+                pass
+    else:
     
-    # If an existing .bin file is specified, upload it to the device
-    elif bin_path:
-        if compare_bin_w_device(device, bin_path):
-            print("\nDevice memory matches the .bin file. Skipping flashing.")
-        else:
-            upload_bin(device, bin_path)
-            compare_bin_w_device(device, bin_path, string="Verifying")
-            if not args["--no-reset"]:
-                print("Resetting device...")
-                device.reset()
+        init_tee(can.Bus(**params), timeout=1.0)
+        device = create_device(node_id=node_id)
+
+        if not bin_path:
+            raise FileNotFoundError(f"No bin file specified!")
+
+        # If a non-existing .bin file is specified, raise error
+        elif bin_path and not Path(bin_path).is_file():
+            raise FileNotFoundError(f"Bin file {bin_path} not found!")
+
+        # If an existing .bin file is specified, upload it to the device
+        elif bin_path:
+            if compare_bin_w_device(device, bin_path):
+                print("\nDevice memory matches the .bin file. Skipping flashing.")
+            else:
+                upload_bin(device, bin_path)
+                compare_bin_w_device(device, bin_path, string="Verifying")
+                if not args["--no-reset"]:
+                    print("Resetting device...")
+                    device.reset()
     destroy_tee()
 
 
