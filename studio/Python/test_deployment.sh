@@ -26,8 +26,11 @@ python setup.py sdist bdist_wheel
 twine upload --repository-url https://test.pypi.org/legacy/ dist/* \
   -u $TEST_PYPI_USERNAME -p $TEST_PYPI_PASSWORD
 
-# Install package from Test PyPI
-pip install --index-url https://test.pypi.org/simple/ tinymovr
+# Install the latest version of tinymovr from Test PyPI without its dependencies
+pip install --index-url https://test.pypi.org/simple/ tinymovr --no-deps --upgrade
+
+# Now, install its dependencies
+pip install tinymovr
 
 # Set PYTHONPATH to ensure unittest finds the test
 export PYTHONPATH=$PWD:$PYTHONPATH
