@@ -78,7 +78,7 @@ Flashing the Firmware
 
    .. code-block:: bash
 
-      tinymovr_dfu --node_id=1 --bin=path/to/your/downloaded/tinymovr<version>-<revision>.bin
+      tinymovr_dfu --node_id=<your node id> --bin=path/to/your/downloaded/tinymovr<version>-<revision>.bin
 
    Replace the placeholders in the path with the appropriate values based on where you've saved the .bin file and its name.
 
@@ -86,13 +86,13 @@ Flashing the Firmware
 
    .. code-block:: bash
 
-      tinymovr_dfu --node_id=1 --bin=~/Downloads/tinymovr1.5.0-M5.1.bin
+      tinymovr_dfu --node_id=<your node id> --bin=~/Downloads/tinymovr1.5.0-M5.1.bin
 
    To forgo the automatic reset post-flash, append the ``--no-reset`` flag:
 
    .. code-block:: bash
 
-      tinymovr_dfu --node_id=1 --bin=~/Downloads/tinymovr1.5.0-M5.1.bin --no-reset
+      tinymovr_dfu --node_id=<your node id> --bin=~/Downloads/tinymovr1.5.0-M5.1.bin --no-reset
 
 3. **Follow the Script's Prompts**:
 
@@ -107,6 +107,17 @@ Flashing the Firmware
 .. note::
 
    Before updating, it's a wise move to backup your current firmware and settings. Always pore over any version-specific instructions or release notes accompanying fresh firmware updates to stay informed.
+
+Recovery Mode
+#############
+
+The DFU mode can be triggered upon device power up, which is useful to deal with problems resulting from inaccessible user firmware (e.g. mismatch between firmware and hardware revision). This feature will put the device into DFU mode immediately after power up. To use recovery mode, run the following command:
+
+   .. code-block:: bash
+
+      tinymovr_dfu --node_id=<your node id> --recovery
+
+Then follow the instructions to trigger DFU mode. After this step, you will be able to :ref:`upgrade-using-dfu`. You will need to know the device node ID to use this feature.
 
 .. _upgrade-using-activeflashlight:
 
