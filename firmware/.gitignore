@@ -6,3 +6,6 @@ build
 
 # Ignore modifications to pac55xx_sdk
 pac55xx_sdk
+
+#Ignore built binaries
+release_binaries
