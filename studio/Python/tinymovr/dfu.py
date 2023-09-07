@@ -72,6 +72,15 @@ def compare_bin_w_device(device, bin_path, string="Comparing"):
     return True
 
 
+def calculate_local_checksum(chunk):
+    """Calculate the checksum for a chunk of data"""
+    checksum = sum(
+        int.from_bytes(chunk[i * 4 : (i + 1) * 4], byteorder="little")
+        for i in range(BIN_CHUNK_SIZE)
+    )
+    return checksum & 0xFFFFFFFF  # To ensure we get a 32-bit value
+
+
 def upload_bin(device, bin_path):
     """
     Upload a binary file to the device
@@ -98,8 +107,16 @@ def upload_bin(device, bin_path):
                     )
                     device.write_scratch_32(i, value)
                     time.sleep(1e-5)
-                # Commit the data in scratchpad to flash memory
-                device.commit(flash_addr)
+
+                # Commit the data in scratchpad to flash memory and get checksum
+                device_checksum = device.commit(flash_addr)
+
+                local_checksum = calculate_local_checksum(chunk)
+
+                if device_checksum != local_checksum:
+                    print(f"Checksum mismatch at address {flash_addr:08X}. Exiting...")
+                    sys.exit(1)  # Exit the program
+
                 chunk = bin_file.read(BIN_CHUNK_SIZE * 4)  # Read the next 128 bytes
                 flash_addr += BIN_CHUNK_SIZE * 4  # Update the flash address
                 uploaded_size += len(chunk)  # Update the uploaded size
