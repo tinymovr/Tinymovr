@@ -3,7 +3,7 @@ name: tm_dfu
 remote_attributes:
   - name: protocol_hash
     dtype: uint32
-    getter_name: _avlos_get_proto_hash
+    getter_name: _system_get_proto_hash_and_trigger_dfu
     summary: The Avlos protocol hash.
   - name: uid
     dtype: uint32

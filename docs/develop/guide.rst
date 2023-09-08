@@ -1,12 +1,12 @@
-********************
-Firmware Development
-********************
+**********
+Developers
+**********
 
 
 Overview
 ########
 
-This document provides a guide for setting up a development environment for developing Tinymovr firmware. There are two alternatives, a cross-platform approach using the Arm toolchain, make and VSCode, and a Windows-only approach using Eclipse. The former is suggested.
+This document provides a guide for setting up a development environment for developing for Tinymovr, including firmware and client software (Studio). 
 
 
 Hardware Connections
@@ -45,8 +45,10 @@ Connection with SWD adapter (e.g. isolator) for R5:
 As of Tinymovr 1.0.1, it is no longer necessary to patch the `JLinkDevices.xml` file with the PAC additions, in order for JLinkGDBServer to work properly. Relevant files are included in the repo.
 
 
-Setting up
-##########
+.. _develop-preparation:
+
+Preparation
+###########
 
 First, clone the Tinymovr repo:
 
@@ -83,8 +85,8 @@ If you are in Windows you will also need to install GNU make. This is rather eas
 
     choco install make
 
-.. _setting-up-vscode:
 
+.. _develop-setting-up-vscode:
 
 Using VSCode
 ############
@@ -186,10 +188,34 @@ Note that the launch configurations can be selected and initiated from the VSCod
 Congrats! You are now fully set to start with Tinymovr development!
 
 
-.. _setting-up-eclipse:
-
 Using Eclipse
 #############
 
-Eclipse is no longer supported. Consider :ref:`setting-up-vscode` instead.
+Eclipse is no longer supported. Consider :ref:`develop-setting-up-vscode` instead.
+
+
+Setup Studio for Development
+############################
+
+Tinymovr Studio is a Python application and as such can be easily set up to facilitate development. The approach is to use `pip` to install Tinymovr in develop mode, from a local copy of the (`git repo <https://github.com/tinymovr/Tinymovr>`_). This allows any changes you make to the local code to be immediately available when you run the executable (`tinymovr`, `tinymovr_cli`, or `tinymovr_dfu`).
+
+.. note::
+   We recommend installing Tinymovr in a virtual environment. `Here is a quick tutorial on how to setup a virtual environment using Conda <https://conda.io/projects/conda/en/latest/user-guide/getting-started.html#managing-environments>`_.
+
+Clone the Tinymovr repo as outlined in the first step of :ref:`develop-preparation`. Then:
+
+.. code-block:: console
+
+    cd <tinymovr_location>/studio/Python/
+    pip3 install -e .
+
+or to enable GUI support:
+
+.. code-block:: console
+
+    pip3 install -e .[GUI]
+
+This will install the Tinymovr Studio in develop mode. Now, `tinymovr`, `tinymovr_cli` and `tinymovr_dfu` will use the local Tinymovr Studio code.
+
+Happy coding!
 

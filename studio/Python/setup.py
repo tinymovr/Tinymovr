@@ -53,7 +53,7 @@ setup(
         "python-can",
         "python-can-canine",
         "python-can-slcan_disco",
-        "avlos",
+        "avlos>=0.6.6",
         "pyserial",
         "pyusb",
         "pyyaml",
