@@ -64,7 +64,7 @@ To set the velocity estimate in encoder ticks:
     command: .V10000
     (no response)
 
-The values passed or returned are always integers scaled by the appropriate factor (see command reference below).
+The values passed or returned are always integers scaled by the mentioned factor (see command reference below).
 
 Note that command characters are case-sensitive, i.e. capitals and small represent different commands. As a convention, capital letters are setters and small are getters, where applicable.
 
@@ -98,7 +98,7 @@ Example
 .A
 ==
 
-Transition to close loop control state.
+Transition to closed loop control state.
 
 Example
 
@@ -270,29 +270,37 @@ Example
 
     .G2
 
-.h
+.H
 ==
 
-Get motor phase resistance (mOhm).
+Get/set motor phase resistance (mOhm).
 
 Example
 
 .. code-block:: shell
 
-    .h
+    .H
     200
 
-.l
+.. code-block:: shell
+
+    .H 200
+
+.L
 ==
 
-Get motor phase inductance (μH).
+Get/set motor phase inductance (μH).
 
 Example
 
 .. code-block:: shell
 
-    .l
+    .L
     2000
+
+.. code-block:: shell
+
+    .L 2000
 
 .R
 ==
