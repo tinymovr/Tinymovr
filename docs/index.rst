@@ -24,7 +24,7 @@ Welcome to Tinymovr documentation!
    protocol/integrating
    interfaces/interfaces
    
-   encoders/encoders
+   sensors/sensors
    features/features
    upgrade/upgrade
    hardware/gimbal
