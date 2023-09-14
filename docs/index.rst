@@ -28,11 +28,10 @@ Welcome to Tinymovr documentation!
    features/features
    upgrade/upgrade
    hardware/gimbal
-   
-   hardware/canine
-   
-   troubleshooting
+
+   control/tuning
    control/theory
+   troubleshooting
    develop/guide
    
    hardware/errata
