@@ -1,8 +1,8 @@
 .. _studio-installation:
 
-****************************
-Tinymovr Studio Installation
-****************************
+*******************
+Studio Installation
+*******************
 
 Tinymovr Studio is a cross-platform GUI application, CLI application, and Python library that offers easy access to all of Tinymovr's functionality. 
 
