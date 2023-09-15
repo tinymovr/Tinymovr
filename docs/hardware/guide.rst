@@ -9,10 +9,11 @@ Requirements
 ############
 
 1. A 3-phase brushless motor (see below for supported types)
-2. A means to talk CAN Bus, such as CANine or a Canable-compatible adapter.
-3. A mechanical rig that ensures firm connection between the Tinymovr PCB and the brushless motor. Designs that can be 3D printed are available.
+2. A diametrically magnetized sensor magnet (included with Tinymovr), mounted firmly on the motor shaft.
+3. A means to talk CAN Bus, such as CANine or a Canable-compatible adapter.
+4. A mechanical rig that ensures firm connection between the Tinymovr PCB and the brushless motor. Designs that can be 3D printed are available.
 
-Note that the Tinymovr Servo Kit includes all of the above in a ready to use kit.
+The Tinymovr Servo Kit includes all of the above, except for the CANine adapter, in a ready to use kit.
 
 
 Supported Motor Types
@@ -30,23 +31,19 @@ Tinymovr M5.x
 
 Most gimbal motors can be used with Tinymovr M5. Gimbal motors are essentially outrunners with high resistance (they have more turns). You can read more about gimbal motors in :ref:`gimbal-introduction`. Note that, to control gimbal motors with Tinymovr M5, you do not have to (in fact, should not) use Gimbal mode. Tinymovr M5 is capable of accurately sensing current at a lower scale, which is compatible with gimbal motors.
 
+.. note::
+   * Tinymovr expects a motor with sinusoidal back-EMF. Most brushless outrunners (including gimbal motors) have sinusoidal back-EMF. If uncertain and you have access to an oscilloscope, you can hook up the motor phases to the scope channels and check out the back-EMF for yourself. 
 
-Additional details:
-
-Tinymovr expects a motor with sinusoidal back-EMF. Most brushless outrunners (including gimbal motors) have sinusoidal back-EMF. If uncertain and you have access to an oscilloscope, you can hook up the motor phases to the scope channels and check out the back-EMF for yourself. 
-
-Motors with trapezoidal back-EMF can also be controlled, but control will be sub-optimal. The trapezoidal back-EMF will appear as residual in the dq frame, as a result it will be much harder for the current controller to regulate phase currents. The tangible result is that the motor may exhibit increased noise and vibration while running.
-
+   * Motors with trapezoidal back-EMF can also be controlled, but control will be sub-optimal. The trapezoidal back-EMF will appear as residual in the dq frame, as a result it will be much harder for the current controller to regulate phase currents. The tangible result is that the motor may exhibit increased noise and vibration while running.
 
 
 Mechanical Setup
 ################
 
-
-Mounting motor and Tinymovr
+Mounting Motor and Tinymovr
 ***************************
 
-The most important aspect of a correct setup is to ensure the controller is properly positioned in relation to the motor. The center of the PCB, where the encoder is located, should lie as close to the motor rotation axis as possible. In addition, the distance from the encoder magnet to the encoder IC should be less than 2mm (less than 1mm if you are mounting the PCB packwards, i.e. the encoder IC is facing away from the magnet).
+The most important aspect of a correct setup is to ensure the controller is properly positioned in relation to the sensor magnet. We assume that the center of the PCB, where the angle sensor IC is located, is located coaxially to the motor shaft, and thet the sensor magnet is at the end of the shaft (check out the diagrms below). In addition, the distance from the sensor magnet to the sensor IC should be less than 2mm (less than 1mm if you are mounting the PCB packwards, i.e. the sensor IC is facing away from the magnet).
 
 .. figure:: mount.png
   :width: 800
@@ -56,7 +53,7 @@ The most important aspect of a correct setup is to ensure the controller is prop
 
   Tinymovr and motor mechanical mounting
 
-A `3D printable encoder magnet jig <https://github.com/yconst/Tinymovr/blob/master/hardware/misc/magnet_jig.stl>`_ is available, suitable for 6mm disc magnets and 14, 19, 25 and 30mm motor hole diameters.
+A `3D printable sensor magnet jig <https://github.com/yconst/Tinymovr/blob/master/hardware/misc/magnet_jig.stl>`_ is available, suitable for 6mm disc magnets and 14, 19, 25 and 30mm motor hole diameters.
 
 .. note::
    For safety reasons, you should always ensure the motor & controller assembly are secured to a stable surface before operation. The motor rotor may experience high acceleration that may cause damage or injury if not secured properly.
@@ -69,24 +66,20 @@ A `3D printable encoder magnet jig <https://github.com/yconst/Tinymovr/blob/mast
 
   Left: Magnet mount directly on shaft. Right: Magnet mount using 3d-printed holder.
 
+Sensor Magnet and Mounting Tips
+-------------------------------
 
-Magnet on the rear side of the PCB
+* Unless using an external sensor (e.g. Hall effect sensor), Tinymovr requires proximity to the sensor magnet to operate. If the magnet is not in close proximity, an error will be raised upon power up, preventing any further action (calibration, closed loop control).
 
-TL;DR: It is possible to have the magnet on the rear side of the PCB, i.e. opposite of the magnet sensor IC, but the gap needs to be reduced to account for the PCB thickness. 
+* Ensure the sensor magnet is firmly attached to the motor shaft, otherwise it may slip out of sync. Use strong adhesive to secure.
 
-This has been verified by MPS in `this forum post <https://forum.monolithicpower.com/t/mounting-ma702-and-magnet-on-opposite-sides-of-pcb/1609>`_, quoted below:
+* It is possible to have the magnet on the rear side of the PCB, i.e. opposite of the magnet sensor IC, but the gap needs to be reduced to account for the PCB thickness. This has been verified by MPS in `this forum post <https://forum.monolithicpower.com/t/mounting-ma702-and-magnet-on-opposite-sides-of-pcb/1609>`_, quoted below: 
+  *[...] this type of arrangement is possible, what really matters in the end is that there is enough magnetic field reaching the sensor.
+  Of course the minimum distance is imposed by the thickness of the PCB, so it puts some constraints on the design, that you have to take into account when chosing the magnet (you can use our online simulation tool for that). But as long as the PCB is not acting as a magnetic shield (due to copper plane), then it is fine.*
 
-  [...] this type of arrangement is possible, what really matters in the end is that there is enough magnetic field reaching the sensor.
-  Of course the minimum distance is imposed by the thickness of the PCB, so it puts some constraints on the design, that you have to take into account when chosing the magnet (you can use our online simulation tool for that). But as long as the PCB is not acting as a magnetic shield (due to copper plane), then it is fine.
+* Calibration needs to be performed without any loads on the motor. If the motor is coupled to a load, the sensor offset angle may not be determined correctly, leading to a sub-optimal setup.
 
-
-Mounting Tips
-
-* Ensure the encoder magnet is firmly attached to the motor shaft, otherwise it may slip out of sync. Use strong adhesive to secure.
-
-* Calibration needs to be performed without any loads on the motor. If the motor is coupled to a load, the encoder offset angle may not be determined correctly, leading to a sub-optimal setup.
-
-* Adjust your termination resistor DIP switch (if needed) before putting together your actuator, to avoid needing to disassemble it for adjustment later on. See also :ref:`connecting-data`.
+* For Tinymovr R3.3, adjust your termination resistor DIP switch (if needed) before putting together your actuator, to avoid needing to disassemble it for adjustment later on. See also :ref:`connecting-data`.
 
 
 .. _electrical-setup:
@@ -104,7 +97,7 @@ Electrical setup comprises three main parts: Motor connection, data connection a
 Connecting Motor
 ################
 
-Connect the three motor phases to the three terminals on Tinymovr. The order of connection is not important, and motor direction will be determined during motor/encoder calibration.
+Connect the three motor phases to the three terminals on Tinymovr. The order of connection is not important, and motor direction will be determined during motor/sensor calibration.
 
 * Tinymovr R3.x: The motor leads can be connected by soldering on the PCB. 
 

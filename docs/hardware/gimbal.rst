@@ -2,6 +2,14 @@
 Gimbal Motors
 *************
 
+.. |cli| raw:: html
+
+   <span style="padding:3px 10px;margin: 10px auto; background:#85dff1; border-radius: 12px; font-family: sans-serif; font-size: 14px;">CLI</span>
+
+.. |gui| raw:: html
+
+   <span style="padding:3px 10px;margin: 10px auto; background:#85f1df; border-radius: 12px; font-family: sans-serif; font-size: 14px;">GUI</span>
+
 .. _gimbal-introduction:
 
 Introduction
@@ -29,6 +37,12 @@ Enabling Gimbal Mode
    * Using arbitrary resistance and inductance settings can damage your motor and board.
 
 To enable gimbal mode, set the motor configuration as follows:
+
+|gui|
+
+
+
+|cli|
 
 .. code-block:: python
 
@@ -60,17 +74,35 @@ Alternatuvely, using the units interface:
 
 Control that the settings are correct:
 
+|cli|
+
 .. code-block:: python
     
     >>>tm1.motor
 
 Ensure the values above are correct. You can now calibrate the motor:
 
+|gui| Set Gimbal Motor Parameters
+
+.. image:: gui_gimbal.png
+  :width: 400
+  :alt: Set Gimbal Motor Parameters
+
+|cli|
+
 .. code-block:: python
     
     >>>tm1.controller.calibrate()
 
-Because the motor is set as gimbal, calibration will bypass resistance and inductance measurement, and will only calculate pole pairs, offset and direction. After calibration `tmx.motor.calibrated` should return true:
+Because the motor is set as gimbal, calibration will bypass resistance and inductance measurement, and will only calculate pole pairs, offset and direction. After calibration `tmx.motor.calibrated` should have a value of True:
+
+|gui| Calibrate Motor
+
+.. image:: gui_calibrate.png
+  :width: 400
+  :alt: Calibrate Motor
+
+|cli|
 
 .. code-block:: python
     
@@ -81,4 +113,4 @@ Because the motor is set as gimbal, calibration will bypass resistance and induc
 Controlling the Motor
 ---------------------
 
-Gimbal mode has identical functionality as the regular mode. Position, velocity and current control modes are supported. Note that you may have to tune the control gains to achieve optimal performance. In addition, due to the fact that current control is open loop, high angular velocities may not be available.
+Gimbal mode has identical functionality as the default high-current mode. Position, velocity and current control modes are supported. Depending on your motor charaacteristics, you may have to tune the control gains to achieve optimal performance. In addition, due to the fact that current control is open loop, high angular velocities may not be available.

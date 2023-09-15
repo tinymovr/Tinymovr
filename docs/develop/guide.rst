@@ -95,6 +95,23 @@ Our development environment for Tinymovr utilizes VSCode and is designed with cr
 
 We take great pride in creating this in-house, cross-platform development solution, as an alternative to the official Windows-only solution, providing enhanced flexibility and simplifiyng the process of developing for Tinymovr across multiple platforms.
 
+Configuring
+***********
+
+You'll need to configure the path to the JLink debug server in `.vscode/launch.json`. The configuration blocks look like this:
+
+.. code-block:: javascript
+  
+    "windows": {
+        // Update the path below as necessary
+        "serverpath": "C:\\Program Files\\SEGGER\\JLink\\JLinkGDBServerCL.exe" 
+    },
+    "linux": {
+        // Update the path below as necessary
+        "serverpath": "/opt/SEGGER/JLink/JLinkGDBServer" 
+    }
+
+There are several instances of such blocks in the file that need to be updated.
 
 Building
 ********
