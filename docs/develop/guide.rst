@@ -62,7 +62,9 @@ The file comes in a zipped installer exe (!), which all it does is extract the c
 
 .. code-block:: console
 
-    cp -r <pac55xx_sdk_location> <tinymovr_location>/firmware/
+    cp -r <pac55xx_sdk_location> <tinymovr_location>/firmware/pac55xx_sdk/
+
+In any case, the target directory should be named `pac55xx_sdk`. The above copy command ensures this.
 
 Now you have the required PAC SDK almost ready. There is a small patch that you will need to apply in the pac55xx_sdk directory. It is suggested to use the `Python patch package <https://pypi.org/project/patch/>`_, which is cross-platform. If you do not have the package, install using pip:
 
