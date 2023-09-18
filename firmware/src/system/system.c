@@ -108,13 +108,14 @@ TM_RAMFUNC void system_update(void)
     const uint8_t drv_status = pac5xxx_tile_register_read(ADDR_STATDRV);
     if (drv_status > 0)
     {
-        state.errors |= ((drv_status & 0x7) << 4);
+        state.errors |= ((drv_status & 0x56) << 1);
     }
     const uint8_t drv_fault = pac5xxx_tile_register_read(ADDR_DRV_FLT);
     if (drv_fault > 0)
     {
         // We use 0x5 mask because we ignore CHARGE_PUMP_FAULT_STAT
-        // for the time being, as it seems to always be set.
+        // for the time being, as it seems to always be set, and
+        // ERRORS_DRVXX_DISABLE, as it seems to give spurious errors.
         state.errors |= ((drv_fault & 0x5) << 1);
     }
 }
