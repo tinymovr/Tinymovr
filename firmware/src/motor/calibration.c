@@ -250,9 +250,7 @@ bool calibrate_offset_and_rectification(void)
     int16_t *lut = ma7xx_get_rec_table_ptr();
     set_epos_and_wait(e_pos_ref, I_setpoint);
     wait_a_while();
-    float offset_obs = observer_get_pos_estimate();
     const uint16_t offset_idx = ma7xx_get_angle_raw() >> (ENCODER_BITS - ECN_BITS);
-    const float cf = motor_get_cf();
 
     for (uint32_t i = 0; i < n; i++)
     {
