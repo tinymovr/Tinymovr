@@ -239,7 +239,7 @@ bool calibrate_hall_sequence(void)
 bool calibrate_offset_and_rectification(void)
 {
     // Size below is an arbitrary large number ie > ECN_SIZE * npp
-    int16_t error_ticks[ECN_SIZE * 20];
+    float error_ticks[ECN_SIZE * 20];
     const int16_t npp = motor_get_pole_pairs();
     const int16_t n = ECN_SIZE * npp;
     const int16_t nconv = 100;
@@ -250,7 +250,9 @@ bool calibrate_offset_and_rectification(void)
     int16_t *lut = ma7xx_get_rec_table_ptr();
     set_epos_and_wait(e_pos_ref, I_setpoint);
     wait_a_while();
-    int32_t offset_raw = ma7xx_get_angle_raw();
+    float offset_obs = observer_get_pos_estimate();
+    const uint16_t offset_idx = ma7xx_get_angle_raw() >> (ENCODER_BITS - ECN_BITS);
+    const float cf = motor_get_cf();
 
     for (uint32_t i = 0; i < n; i++)
     {
@@ -263,7 +265,6 @@ bool calibrate_offset_and_rectification(void)
         const float pos_meas = observer_get_pos_estimate();
         error_ticks[i] = (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
     }
-    offset_raw = (offset_raw + ma7xx_get_angle_raw()) / 2;
     for (uint32_t i = 0; i < n; i++)
     {
         for (uint8_t j = 0; j < nconv; j++)
@@ -278,12 +279,10 @@ bool calibrate_offset_and_rectification(void)
     gate_driver_set_duty_cycle(&three_phase_zero);
     gate_driver_disable();
 
-    const uint16_t offset_idx = offset_raw >> (ENCODER_BITS - ECN_BITS);
-
     // FIR filtering and map measurements to lut
     for (int16_t i=0; i<ECN_SIZE; i++)
     {
-        int32_t acc = 0;
+        float acc = 0;
         for (int16_t j = 0; j < ECN_SIZE; j++)
         {
             int16_t read_idx = -ECN_SIZE / 2 + j + i * npp;
@@ -297,8 +296,8 @@ bool calibrate_offset_and_rectification(void)
             }
             acc += error_ticks[read_idx];
         }
-        acc = acc / (ECN_SIZE * 2);
         acc = (int32_t)((acc - offset_raw) * 1.1f) + offset_raw;
+        acc = acc / ((float)(ECN_SIZE * 2));
         int16_t write_idx = i + offset_idx;
         if (write_idx > (ECN_SIZE - 1))
         {
