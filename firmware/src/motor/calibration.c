@@ -230,7 +230,7 @@ bool calibrate_hall_sequence(void)
     }
     else
     {
-        uint8_t *error_ptr = motor_get_error_ptr();
+        uint8_t *error_ptr = hall_get_error_ptr();
         *error_ptr |= ENCODER_ERRORS_CALIBRATION_FAILED;
     }
     return success;
