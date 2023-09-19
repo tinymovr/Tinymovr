@@ -28,13 +28,13 @@
 #include <src/motor/calibration.h>
 
 static inline void set_epos_and_wait(float angle, float I_setpoint);
-static inline void wait_a_while(void);
+static inline void wait_pwm_cycles(uint32_t cycles);
 
 bool CalibrateADCOffset(void)
 {
     // We only need to wait here, the ADC loop will
     // perform the offset calibration automatically
-    wait_a_while();
+    wait_pwm_cycles(10000);
     return true;
 }
 
@@ -249,7 +249,7 @@ bool calibrate_offset_and_rectification(void)
     const float I_setpoint = motor_get_I_cal();
     int16_t *lut = ma7xx_get_rec_table_ptr();
     set_epos_and_wait(e_pos_ref, I_setpoint);
-    wait_a_while();
+    wait_pwm_cycles(5000);
     const uint16_t offset_idx = ma7xx_get_angle_raw() >> (ENCODER_BITS - ECN_BITS);
 
     for (uint32_t i = 0; i < n; i++)
@@ -302,17 +302,18 @@ bool calibrate_offset_and_rectification(void)
         }
         lut[write_idx] = (int16_t)acc;
     }
-    wait_a_while();
+    wait_pwm_cycles(5000);
     ma7xx_set_rec_calibrated();
     return true;
 }
 
 void reset_calibration(void)
 {
+    ADC_reset();
     encoder_reset();
     observer_reset();
     motor_reset_calibration();
-    wait_a_while();
+    wait_pwm_cycles(5000);
 }
 
 static inline void set_epos_and_wait(float angle, float I_setpoint)
@@ -326,11 +327,11 @@ static inline void set_epos_and_wait(float angle, float I_setpoint)
     WaitForControlLoopInterrupt();
 }
 
-static inline void wait_a_while(void)
+static inline void wait_pwm_cycles(uint32_t cycles)
 {
     // Wait a while for the observer to settle
     // TODO: This is a bit of a hack, can be improved!
-    for (int i = 0; i < 5000; i++)
+    for (uint32_t i = 0; i < cycles; i++)
     {
         WaitForControlLoopInterrupt();
     }

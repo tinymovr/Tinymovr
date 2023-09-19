@@ -58,7 +58,7 @@ static ADCState adc_state = {0};
 static ADCConfig adc_config = {
     .I_phase_offset = {0},
     .Iphase_limit = 60.0f,
-    .I_phase_offset_tau = 0.5f,
+    .I_phase_offset_tau = 0.1f,
     .temp_tau = 1.0
 };
 
@@ -181,6 +181,13 @@ void ADC_AIO_Init(void)
 
     pac5xxx_tile_register_write(ADDR_CFGAIO4, AIO0to5_DIFF_AMP_MODE | ADC_GAIN_VAL | LP_HP_EN_1us);
     pac5xxx_tile_register_write(ADDR_CFGAIO5, HP_DIS_LP_EN_PR1 | OFFSET_EN | CAL_OFFSET_DIS | LP_HP_EN_1us);
+}
+
+void ADC_reset(void)
+{
+    adc_config.I_phase_offset.A = 0;
+    adc_config.I_phase_offset.B = 0;
+    adc_config.I_phase_offset.C = 0;
 }
 
 void ADC_DTSE_Init(void)
