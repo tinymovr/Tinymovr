@@ -62,7 +62,7 @@ static ADCConfig adc_config = {
     .temp_tau = 1.0
 };
 
-void ADC_Init(void)
+void ADC_init(void)
 {
     // Compute tau-dependent variables
     adc_state.I_phase_offset_D = 1.0f - powf(EPSILON, -1.0f / (adc_config.I_phase_offset_tau * PWM_FREQ_HZ));
