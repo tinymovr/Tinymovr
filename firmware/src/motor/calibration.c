@@ -27,8 +27,24 @@
 #include <src/system/system.h>
 #include <src/motor/calibration.h>
 
-static inline void set_epos_and_wait(float angle, float I_setpoint);
-static inline void wait_pwm_cycles(uint32_t cycles);
+static inline void set_epos_and_wait(float angle, float I_setpoint)
+{
+    FloatTriplet modulation_values = {0.0f};
+    float pwm_setpoint = (I_setpoint * motor_get_phase_resistance()) / system_get_Vbus();
+    our_clampc(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
+    SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),
+        &modulation_values.A, &modulation_values.B, &modulation_values.C);
+    gate_driver_set_duty_cycle(&modulation_values);
+    WaitForControlLoopInterrupt();
+}
+
+static inline void wait_pwm_cycles(uint32_t cycles)
+{
+    for (uint32_t i = 0; i < cycles; i++)
+    {
+        WaitForControlLoopInterrupt();
+    }
+}
 
 bool CalibrateADCOffset(void)
 {
@@ -316,23 +332,4 @@ void reset_calibration(void)
     wait_pwm_cycles(5000);
 }
 
-static inline void set_epos_and_wait(float angle, float I_setpoint)
-{
-    FloatTriplet modulation_values = {0.0f};
-    float pwm_setpoint = (I_setpoint * motor_get_phase_resistance()) / system_get_Vbus();
-    our_clampc(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
-    SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),
-        &modulation_values.A, &modulation_values.B, &modulation_values.C);
-    gate_driver_set_duty_cycle(&modulation_values);
-    WaitForControlLoopInterrupt();
-}
 
-static inline void wait_pwm_cycles(uint32_t cycles)
-{
-    // Wait a while for the observer to settle
-    // TODO: This is a bit of a hack, can be improved!
-    for (uint32_t i = 0; i < cycles; i++)
-    {
-        WaitForControlLoopInterrupt();
-    }
-}
