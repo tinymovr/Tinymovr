@@ -135,7 +135,6 @@ static const float threehalfpi = 4.7123889f;
 static const float pi = PI;
 static const float halfpi = PI * 0.5f;
 static const float quarterpi = PI * 0.25f;
-//static const int32_t timer_freq_hz = ACLK_FREQ_HZ / (pow(2, TXCTL_PS_DIV)); // (alternative)
 static const int32_t timer_freq_hz = ACLK_FREQ_HZ >> TXCTL_PS_DIV;
 static const float twopi_by_enc_ticks = TWOPI / ENCODER_TICKS;
 static const float twopi_by_hall_sectors = TWOPI / HALL_SECTORS;
