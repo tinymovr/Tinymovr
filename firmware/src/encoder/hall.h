@@ -35,6 +35,8 @@ typedef struct
 void hall_init(void);
 
 uint8_t hall_get_errors(void);
+uint8_t *hall_get_error_ptr(void);
+
 int16_t hall_get_angle(void);
 void hall_update(bool check_error);
 uint8_t hall_get_sector(void);

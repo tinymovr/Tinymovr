@@ -104,7 +104,8 @@ typedef struct
     float temp_tau;
 } ADCConfig;
 
-void ADC_Init(void);
+void ADC_init(void);
+void ADC_reset(void);
 float adc_get_mcu_temp(void);
 void ADC_GetPhaseCurrents(FloatTriplet *phc);
 void ADC_update(void);

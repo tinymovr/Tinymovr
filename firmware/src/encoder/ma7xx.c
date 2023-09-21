@@ -51,10 +51,11 @@ TM_RAMFUNC int16_t ma7xx_get_angle_raw(void)
 
 TM_RAMFUNC int16_t ma7xx_get_angle_rectified(void)
 {
+    const uint8_t offset_bits = (ENCODER_BITS - ECN_BITS);
     const int16_t angle = state.angle;
-    const int16_t off_1 = config.rec_table[angle>>ECN_BITS];
-	const int16_t off_2 = config.rec_table[((angle>>ECN_BITS) + 1) % ECN_SIZE];
-	const int16_t off_interp = off_1 + ((off_2 - off_1)* (angle - ((angle>>ECN_BITS)<<ECN_BITS))>>ECN_BITS);
+    const int16_t off_1 = config.rec_table[angle>>offset_bits];
+	const int16_t off_2 = config.rec_table[((angle>>offset_bits) + 1) % ECN_SIZE];
+	const int16_t off_interp = off_1 + ((off_2 - off_1)* (angle - ((angle>>offset_bits)<<offset_bits))>>offset_bits);
 	return angle + off_interp;
 }
 

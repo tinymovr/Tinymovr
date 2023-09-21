@@ -24,7 +24,7 @@
 
 #if __ARM_FEATURE_FMA && __ARM_FP&4 && !__SOFTFP__ && !BROKEN_VFP_ASM
 
-PAC5XXX_RAMFUNC static inline float fast_sqrt(float x)
+static inline float fast_sqrt(float x)
 {
 	__asm__ ("vsqrt.f32 %0, %1" : "=t"(x) : "t"(x));
 	return x;

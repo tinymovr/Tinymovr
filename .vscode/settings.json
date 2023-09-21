@@ -13,6 +13,5 @@
         "test_*.py"
     ],
     "python.testing.pytestEnabled": false,
-    "python.testing.unittestEnabled": true,
-    "python.formatting.provider": "black"
+    "python.testing.unittestEnabled": true
 }

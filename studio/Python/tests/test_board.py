@@ -28,7 +28,7 @@ ureg = get_registry()
 A = ureg.ampere
 ticks = ureg.ticks
 s = ureg.second
-tsleep = 0.18
+tsleep = 0.19
 
 
 class TestBoard(TMTestCase):
@@ -94,7 +94,6 @@ class TestBoard(TMTestCase):
             self.assertAlmostEqual(
                 i * 1000 * ticks, self.tm.encoder.position_estimate, delta=1000 * ticks
             )
-            time.sleep(tsleep)
 
     def test_e_velocity_control(self):
         """
@@ -105,7 +104,7 @@ class TestBoard(TMTestCase):
         self.tm.controller.velocity_mode()
         self.check_state(2)
 
-        R = 14
+        R = 15
 
         velocity_pairs = []
 

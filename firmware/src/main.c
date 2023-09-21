@@ -38,7 +38,7 @@ int main(void)
     encoder_init();
     UART_Init();
 	observer_init();
-	ADC_Init();
+	ADC_init();
     CAN_init();
     Timer_Init();
     Watchdog_init();
