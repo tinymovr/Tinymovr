@@ -43,6 +43,10 @@ class Worker(QObject):
         )
         self.timed_getter = TimedGetter()
 
+        self.dt_update = 1
+        self.dt_load = 0
+        self.t_last_update = time.time()
+
     @QtCore.Slot()
     def stop(self):
         destroy_tee()
@@ -102,12 +106,17 @@ class Worker(QObject):
         self.dynamic_attrs_last_update = {}
 
     def _update(self):
+        t = time.time()
+        self.dt_update = self.dt_update * 0.95 + (t - self.t_last_update) * 0.05
+        self.t_last_update = t
         self.mutx.lock()
+        t = time.time()
         last_updated = self._get_attr_values()
+        self.dt_load = self.dt_load * 0.95 + (time.time() - t) * 0.05
         if len(last_updated) > 0:
             self.updateAttrsSignal.emit(last_updated)
             self.updateTimingsSignal.emit(
-                {"meas_freq": 0, "load": 0, "getter_dt": self.timed_getter.dt}
+                {"meas_freq": 1/self.dt_update, "load": self.dt_load/self.dt_update, "getter_dt": self.timed_getter.dt}
             )
         self.mutx.unlock()
 
