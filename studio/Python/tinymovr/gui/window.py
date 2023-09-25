@@ -319,9 +319,9 @@ class MainWindow(QMainWindow):
         meas_freq = timings_dict["meas_freq"]
         meas_freq_str = "-" if meas_freq == 0 else "{:.1f}Hz".format(meas_freq)
         self.status_label.setText(
-            "{}\t CH:{:.0f}%\t RT:{:.1f}ms".format(
+            "{}\t Load:{:.0f}%\t RT:{:.1f}ms".format(
                 meas_freq_str,
-                timings_dict["load"],
+                timings_dict["load"] * 100,
                 timings_dict["getter_dt"] * 1000,
             )
         )
