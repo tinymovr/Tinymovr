@@ -1,12 +1,15 @@
 """
 Usage:
-    dfu.py --node_id=ID [--bin=PATH | --recovery] [--no-reset]
+    dfu.py --node_id=ID [--bin=PATH | --recovery] [--no-reset] [--bus=<bus>] [--chan=<chan>] [--bitrate=<bitrate>]
 
 Options:
     --node_id=ID The CAN Node ID of the device in DFU mode.
     --bin=PATH   The path of the .bin file to upload.
     --recovery   Perform recovery procedure for inaccessible DFU bootloader.
     --no-reset   Do not perform a reset following successful flashing.
+    --bus=<bus>  One or more interfaces to use, first available is used [default: canine,slcan_disco].
+    --chan=<chan>  The bus device "channel".
+    --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
 
 import sys
@@ -123,15 +126,22 @@ def upload_bin(device, bin_path):
 
 def spawn():
     # Parse command line arguments
-    args = docopt(__doc__)
-    node_id = int(args["--node_id"])
-    bin_path = args["--bin"]
+    arguments = docopt(__doc__)
+    node_id = int(arguments["--node_id"])
+    bin_path = arguments["--bin"]
 
     # Set up the device
-    params = get_bus_config(["canine", "slcan_disco"])
-    params["bitrate"] = 1000000
+    buses = arguments["--bus"].rsplit(sep=",")
+    channel = arguments["--chan"]
+    bitrate = int(arguments["--bitrate"])
 
-    if args["--recovery"]:
+    if not channel:
+        params = get_bus_config(buses)
+        params["bitrate"] = bitrate
+    else:
+        params = {"bustype": buses[0], "channel": channel, "bitrate": bitrate}
+
+    if arguments["--recovery"]:
 
         input("Please power off the device and then press any key to continue...")
         print("Now power on the device.")
@@ -162,7 +172,7 @@ def spawn():
             else:
                 upload_bin(device, bin_path)
                 compare_bin_w_device(device, bin_path, string="Verifying")
-                if not args["--no-reset"]:
+                if not arguments["--no-reset"]:
                     print("Resetting device...")
                     device.reset()
     destroy_tee()
