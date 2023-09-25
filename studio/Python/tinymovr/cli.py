@@ -12,7 +12,6 @@ Options:
 """
 
 import can
-from canine import CANineBus
 import pkg_resources
 import IPython
 from traitlets.config import Config
@@ -20,7 +19,7 @@ from docopt import docopt
 
 from tinymovr import init_tee, destroy_tee
 from tinymovr.discovery import Discovery
-from tinymovr.constants import app_name, base_node_name
+from tinymovr.constants import app_name
 from tinymovr.config import get_bus_config, configure_logging
 
 """

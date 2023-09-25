@@ -37,6 +37,11 @@ TM_RAMFUNC uint8_t hall_get_errors(void)
     return state.errors;
 }
 
+TM_RAMFUNC uint8_t *hall_get_error_ptr(void)
+{
+	return &(state.errors);
+}
+
 TM_RAMFUNC int16_t hall_get_angle(void)
 {
     return state.angle;

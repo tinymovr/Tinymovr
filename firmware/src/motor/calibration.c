@@ -27,14 +27,30 @@
 #include <src/system/system.h>
 #include <src/motor/calibration.h>
 
-static inline void set_epos_and_wait(float angle, float I_setpoint);
-static inline void wait_a_while(void);
+static inline void set_epos_and_wait(float angle, float I_setpoint)
+{
+    FloatTriplet modulation_values = {0.0f};
+    float pwm_setpoint = (I_setpoint * motor_get_phase_resistance()) / system_get_Vbus();
+    our_clampc(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
+    SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),
+        &modulation_values.A, &modulation_values.B, &modulation_values.C);
+    gate_driver_set_duty_cycle(&modulation_values);
+    WaitForControlLoopInterrupt();
+}
+
+static inline void wait_pwm_cycles(uint32_t cycles)
+{
+    for (uint32_t i = 0; i < cycles; i++)
+    {
+        WaitForControlLoopInterrupt();
+    }
+}
 
 bool CalibrateADCOffset(void)
 {
     // We only need to wait here, the ADC loop will
     // perform the offset calibration automatically
-    wait_a_while();
+    wait_pwm_cycles(10000);
     return true;
 }
 
@@ -230,7 +246,7 @@ bool calibrate_hall_sequence(void)
     }
     else
     {
-        uint8_t *error_ptr = motor_get_error_ptr();
+        uint8_t *error_ptr = hall_get_error_ptr();
         *error_ptr |= ENCODER_ERRORS_CALIBRATION_FAILED;
     }
     return success;
@@ -239,19 +255,19 @@ bool calibrate_hall_sequence(void)
 bool calibrate_offset_and_rectification(void)
 {
     // Size below is an arbitrary large number ie > ECN_SIZE * npp
-    int16_t error_ticks[ECN_SIZE * 24];
+    float error_ticks[ECN_SIZE * 20];
     const int16_t npp = motor_get_pole_pairs();
     const int16_t n = ECN_SIZE * npp;
-    const int16_t nconv = 50;
+    const int16_t nconv = 100;
     const float delta = 2 * PI * npp / (n * nconv);
     const float e_pos_to_ticks = ((float)ENCODER_TICKS) / (2 * PI * npp);
     float e_pos_ref = 0.f;
     const float I_setpoint = motor_get_I_cal();
-    ma7xx_clear_rec_table();
     int16_t *lut = ma7xx_get_rec_table_ptr();
-    wait_a_while();
-    int16_t offset_raw = ma7xx_get_angle_raw();
-    // Perform measuerments, store only mean of F + B error
+    set_epos_and_wait(e_pos_ref, I_setpoint);
+    wait_pwm_cycles(5000);
+    const uint16_t offset_idx = ma7xx_get_angle_raw() >> (ENCODER_BITS - ECN_BITS);
+
     for (uint32_t i = 0; i < n; i++)
     {
         for (uint8_t j = 0; j < nconv; j++)
@@ -263,7 +279,6 @@ bool calibrate_offset_and_rectification(void)
         const float pos_meas = observer_get_pos_estimate();
         error_ticks[i] = (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
     }
-    offset_raw = (offset_raw + ma7xx_get_angle_raw()) / 2;
     for (uint32_t i = 0; i < n; i++)
     {
         for (uint8_t j = 0; j < nconv; j++)
@@ -273,7 +288,7 @@ bool calibrate_offset_and_rectification(void)
         }
         WaitForControlLoopInterrupt();
         const float pos_meas = observer_get_pos_estimate();
-        error_ticks[n - i - 1] = (int16_t)(0.5f * ((float)error_ticks[n - i - 1] + e_pos_ref * e_pos_to_ticks - pos_meas));
+        error_ticks[n - i - 1] += (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
     }
     gate_driver_set_duty_cycle(&three_phase_zero);
     gate_driver_disable();
@@ -281,7 +296,7 @@ bool calibrate_offset_and_rectification(void)
     // FIR filtering and map measurements to lut
     for (int16_t i=0; i<ECN_SIZE; i++)
     {
-        int32_t acc = 0;
+        float acc = 0;
         for (int16_t j = 0; j < ECN_SIZE; j++)
         {
             int16_t read_idx = -ECN_SIZE / 2 + j + i * npp;
@@ -295,44 +310,26 @@ bool calibrate_offset_and_rectification(void)
             }
             acc += error_ticks[read_idx];
         }
-        acc /= ECN_SIZE;
-        int16_t write_idx = i + (offset_raw >> ECN_BITS);
+        acc = acc / ((float)(ECN_SIZE * 2));
+        int16_t write_idx = i + offset_idx;
         if (write_idx > (ECN_SIZE - 1))
         {
             write_idx -= ECN_SIZE;
         }
         lut[write_idx] = (int16_t)acc;
     }
-    wait_a_while();
+    wait_pwm_cycles(5000);
     ma7xx_set_rec_calibrated();
     return true;
 }
 
 void reset_calibration(void)
 {
+    ADC_reset();
     encoder_reset();
     observer_reset();
     motor_reset_calibration();
-    wait_a_while();
+    wait_pwm_cycles(5000);
 }
 
-static inline void set_epos_and_wait(float angle, float I_setpoint)
-{
-    FloatTriplet modulation_values = {0.0f};
-    float pwm_setpoint = (I_setpoint * motor_get_phase_resistance()) / system_get_Vbus();
-    our_clampc(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
-    SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),
-        &modulation_values.A, &modulation_values.B, &modulation_values.C);
-    gate_driver_set_duty_cycle(&modulation_values);
-    WaitForControlLoopInterrupt();
-}
 
-static inline void wait_a_while(void)
-{
-    // Wait a while for the observer to settle
-    // TODO: This is a bit of a hack, can be improved!
-    for (int i = 0; i < 5000; i++)
-    {
-        WaitForControlLoopInterrupt();
-    }
-}
