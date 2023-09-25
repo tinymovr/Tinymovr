@@ -9,7 +9,6 @@ from tinymovr.gui.helpers import (
     magnitude_of,
     hold_sema,
     TimedGetter,
-    RateLimitedFunction,
     check_selected_items,
     get_dynamic_attrs,
     is_dark_mode

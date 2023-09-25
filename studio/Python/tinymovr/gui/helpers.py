@@ -432,36 +432,6 @@ class TimedGetter:
         return val
 
 
-class RateLimitedFunction:
-    """
-    A class that limits the rate of calls to a passed
-    function f
-    """
-
-    def __init__(self, func, rate):
-        self.func = func
-        self.rate = rate
-        self.busy_dt = 0
-        self.meas_dt = 0
-        self.load = 0
-        self.stop = False
-
-    def call(self, *args, **kwargs):
-        if self.busy_dt > 0 and self.busy_dt < self.rate:
-            self.load = self.load * 0.99 + self.busy_dt / self.rate * 0.01
-            time.sleep(self.rate - self.busy_dt)
-            self.meas_dt = self.rate
-        else:
-            self.load = 1
-            self.meas_dt = self.busy_dt
-        start_time = time.time()
-        self.func()
-        self.busy_dt = time.time() - start_time
-
-    def __call__(self, *args, **kwargs):
-        self.call(self, *args, **kwargs)
-
-
 def display_warning(title, text):
     """
     Display a pop up message with a warning

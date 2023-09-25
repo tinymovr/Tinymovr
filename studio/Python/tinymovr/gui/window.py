@@ -21,7 +21,7 @@ from functools import partial
 from contextlib import suppress
 import json
 from PySide6 import QtCore
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, QTimer
 from PySide6.QtWidgets import (
     QMainWindow,
     QDialog,
@@ -146,22 +146,29 @@ class MainWindow(QMainWindow):
         else:
             params = {"bustype": buses[0], "channel": channel, "bitrate": bitrate}
 
-        self.thread = QtCore.QThread()
         self.worker = Worker(params, self.logger)
+
         self.TreeItemCheckedSignal.connect(self.worker.update_active_attrs)
-        self.thread.started.connect(self.worker.run)
-        self.worker.moveToThread(self.thread)
-        self.worker.handle_error.connect(self.handle_worker_error)
-        self.worker.regen.connect(self.regen_tree)
-        self.worker.update_attrs.connect(self.attrs_updated)
+        self.worker.handleErrorSignal.connect(
+            self.handle_worker_error, QtCore.Qt.QueuedConnection
+        )
+        self.worker.regenSignal.connect(self.regen_tree, QtCore.Qt.QueuedConnection)
+        self.worker.updateAttrsSignal.connect(
+            self.attrs_updated, QtCore.Qt.QueuedConnection
+        )
+        self.worker.updateTimingsSignal.connect(
+            self.timings_updated, QtCore.Qt.QueuedConnection
+        )
         app.aboutToQuit.connect(self.about_to_quit)
-        self.thread.start()
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.worker._update)
+        self.timer.start(40)
 
     @QtCore.Slot()
     def about_to_quit(self):
+        self.timer.stop()
         self.worker.stop()
-        self.thread.quit()
-        self.thread.wait()
 
     @QtCore.Slot()
     def handle_worker_error(self, e):
@@ -173,7 +180,7 @@ class MainWindow(QMainWindow):
             else:
                 self.logger.warn("Timeout while getting value.")
                 self.timeout_count += 1
-            
+
         else:
             raise e
 
@@ -289,7 +296,12 @@ class MainWindow(QMainWindow):
     @QtCore.Slot()
     def attrs_updated(self, data):
         for attr_name, val in data.items():
-            self.attr_widgets_by_id[attr_name]["widget"].setText(1, format_value(val))
+            try:
+                self.attr_widgets_by_id[attr_name]["widget"].setText(
+                    1, format_value(val)
+                )
+            except RuntimeError:
+                self.logger.warn("Attribute widget disappeared while updating")
             if attr_name in self.graphs_by_id:
                 graph_info = self.graphs_by_id[attr_name]
                 x = graph_info["data"]["x"]
@@ -301,16 +313,16 @@ class MainWindow(QMainWindow):
                 y.append(magnitude_of(val))
                 graph_info["data_line"].setData(x, y)
                 graph_info["widget"].update()
-        meas_dt = self.worker._rate_limited_update.meas_dt
-        if meas_dt == 0:
-            meas_dt_str = "-"
-        else:
-            meas_dt_str = "{:.1f}Hz".format(meas_dt)
+
+    @QtCore.Slot()
+    def timings_updated(self, timings_dict):
+        meas_freq = timings_dict["meas_freq"]
+        meas_freq_str = "-" if meas_freq == 0 else "{:.1f}Hz".format(meas_freq)
         self.status_label.setText(
             "{}\t CH:{:.0f}%\t RT:{:.1f}ms".format(
-                meas_dt_str,
-                self.worker._rate_limited_update.load * 100,
-                self.worker.timed_getter.dt * 1000,
+                meas_freq_str,
+                timings_dict["load"],
+                timings_dict["getter_dt"] * 1000,
             )
         )
 
@@ -318,7 +330,6 @@ class MainWindow(QMainWindow):
     def f_call_clicked(self, f):
         args = []
 
-        # Check if the function has any arguments
         if f.arguments:
             dialog = ArgumentInputDialog(f.arguments, self)
             if dialog.exec_() == QDialog.Accepted:
@@ -326,11 +337,8 @@ class MainWindow(QMainWindow):
                 args = [input_values[arg.name] for arg in f.arguments]
             else:
                 return  # User cancelled, stop the entire process
-
-        # Convert arguments as required using pint
         args = [get_registry()(arg) for arg in args]
 
-        # Call the function with the collected arguments
         f(*args)
         if "reload_data" in f.meta and f.meta["reload_data"]:
             self.worker.reset()
