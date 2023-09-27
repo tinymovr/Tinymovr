@@ -242,18 +242,20 @@ Happy coding!
 Custom Device Definitions
 #########################
 
-Tinymovr uses YAML files for device specification (the spec). Device spec files reside in `{tinymovr_package_dir}/studio/Python/tinymovr/specs/`. This is where files covering Tinymovr firmware 1.3.x to 1.6.x are situated by default. 
+Tinymovr uses YAML files for device specification (the spec). Device spec files reside in ``{tinymovr_package_dir}/studio/Python/tinymovr/specs/``. This is where files covering Tinymovr firmware 1.3.x to 1.6.x are situated by default. 
 
-You can add custom device spec files in this directory to tell Tinymovr Studio GUI, CLI and library how to communicate with custom devices. For instance, assuming that you have installed Tinymovr Studio using `pip3`, you will need to find the directory of the tinymovr package first using the command below:
+You can add custom device spec files in this directory to tell Tinymovr Studio GUI, CLI and library how to communicate with custom devices. For instance, assuming that you have installed Tinymovr Studio using ``pip3``, you will need to find the directory of the tinymovr package first using the command below:
 
 Windows
+
 .. code-block:: console
 
     python -c "import os, tinymovr; print(os.path.dirname(tinymovr.__file__))"
 
 Macos and Linux
+
 .. code-block:: console
 
     python3 -c "import os, tinymovr; print(os.path.dirname(tinymovr.__file__))"
 
-Then, paste your custom spec file to `{tinymovr_package_dir}/studio/Python/tinymovr/specs/`. Tinymovr should correctly discover your custom device.
+Then, paste your custom spec file to ``{tinymovr_package_dir}/studio/Python/tinymovr/specs/``. Tinymovr should correctly discover your custom device.
