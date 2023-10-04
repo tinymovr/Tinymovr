@@ -367,19 +367,30 @@ class TestBoard(TMTestCase):
         # Ensure we're idle
         self.check_state(0)
         self.try_calibrate()
-
-        self.tm.controller.current.max_Ibrake = 10
-        self.tm.controller.velocity_mode()
-        self.tm.controller.velocity.setpoint = 200000
-        time.sleep(0.4)
-        self.tm.controller.velocity.setpoint = 0
-        I_brake_vals = []
-        for _ in range(50):
-            I_brake_vals.append(self.tm.Ibus)
-            time.sleep(0.005)
-        time.sleep(0.5)
         self.tm.controller.current.max_Ibrake = 0
-        self.assertGreater(min(I_brake_vals), -1 * A)
+        self.tm.controller.velocity_mode()
+        for v_set in [-250000, 250000]:
+            self.tm.controller.velocity.setpoint = v_set
+            time.sleep(0.4)
+            self.tm.controller.velocity.setpoint = 0
+            I_brake_vals = []
+            for _ in range(200):
+                I_brake_vals.append(self.tm.Ibus)
+                time.sleep(0.001)
+            time.sleep(0.2)
+            self.assertLess(min(I_brake_vals), -0.12 * A)
+        self.tm.controller.current.max_Ibrake = 10
+        for v_set in [-250000, 250000]:
+            self.tm.controller.velocity.setpoint = v_set
+            time.sleep(0.4)
+            self.tm.controller.velocity.setpoint = 0
+            I_brake_vals = []
+            for _ in range(200):
+                I_brake_vals.append(self.tm.Ibus)
+                time.sleep(0.001)
+            time.sleep(0.2)
+            self.assertGreater(min(I_brake_vals), -0.12 * A)
+        self.tm.controller.current.max_Ibrake = 0
         self.tm.controller.idle()
         time.sleep(0.4)
 
