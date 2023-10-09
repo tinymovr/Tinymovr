@@ -30,8 +30,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
     QPushButton,
-    QFormLayout,
-    QHeaderView
+    QFormLayout
 )
 from avlos import get_registry
 from tinymovr.gui.helpers import load_icon, load_pixmap, format_value
@@ -74,10 +73,10 @@ class FuncTreeWidgetItem(NodeTreeWidgetItem):
         button = QPushButton("")
         button.setIcon(load_icon("call.png"))
         self.treeWidget().setItemWidget(self, 1, button)
-        button.clicked.connect(partial(self.f_call_clicked, self._tm_node))
+        button.clicked.connect(partial(self._on_f_call_clicked, self._tm_node))
 
     @QtCore.Slot()
-    def f_call_clicked(self, f):
+    def _on_f_call_clicked(self, f):
         args = []
 
         if f.arguments:
@@ -102,8 +101,12 @@ class OptionsTreeWidgetItem(NodeTreeWidgetItem):
 
     def _add_to_tree_cb(self):
         combo_box = IconComboBoxWidget("call.png", self._tm_node.options)
+        combo_box.currentIndexChanged.connect(self._on_combobox_changed)
         self.treeWidget().setItemWidget(self, 1, combo_box)
-        #combo_box.clicked.connect(partial(self.combo_item_selected, self._tm_node))
+
+    @QtCore.Slot()
+    def _on_f_call_clicked(self, index):
+        self._tm_node.set_value(index)
 
 
 class PlaceholderQTreeWidget(QTreeWidget):
