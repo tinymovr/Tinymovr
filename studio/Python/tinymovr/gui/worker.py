@@ -116,7 +116,11 @@ class Worker(QObject):
         if len(last_updated) > 0:
             self.updateAttrsSignal.emit(last_updated)
             self.updateTimingsSignal.emit(
-                {"meas_freq": 1/self.dt_update, "load": self.dt_load/self.dt_update, "getter_dt": self.timed_getter.dt}
+                {
+                    "meas_freq": 1 / self.dt_update,
+                    "load": self.dt_load / self.dt_update,
+                    "getter_dt": self.timed_getter.dt,
+                }
             )
         self.mutx.unlock()
 
