@@ -15,8 +15,8 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from functools import partial
 from PySide6 import QtGui, QtCore
+from PySide6.QtCore import Signal, QTimer
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (
     QWidget,
@@ -65,45 +65,43 @@ class EdgeTreeWidgetItem(QTreeWidgetItem):
 class AttrTreeWidgetItem(EdgeTreeWidgetItem):
     def __init__(self, name, node, *args, **kwargs):
         super().__init__(name, node, *args, **kwargs)
-        self.setText(1, format_value(node.get_value()))
-        self.setCheckState(0, QtCore.Qt.Unchecked)
-        self._editing = False
+        editable = hasattr(self._tm_node, "setter_name") and self._tm_node.setter_name != None
+        if editable:
+            self.text_editor = JoggableLineEdit(format_value(node.get_value()), editable, editable)
+            self.text_editor.ValueChangedByJog.connect(self._on_editor_text_changed)
+            self.text_editor.editingFinished.connect(self._on_editor_text_changed)
+        else:
+            self.text_editor = QLineEdit(format_value(node.get_value()))
         self._checked = False
 
     def _add_to_tree_cb(self):
-        self.treeWidget().itemDoubleClicked.connect(self._on_item_double_clicked)
+        self.treeWidget().setItemWidget(self, 1, self.text_editor)
+        self.setCheckState(0, QtCore.Qt.Unchecked)
 
-    def _on_item_double_clicked(self, item, column):
-        if item == self and column == 1:
-            if (
-                hasattr(self._tm_node, "setter_name")
-                and self._tm_node.setter_name != None
-            ):
-                self.setFlags(self.flags() | QtCore.Qt.ItemIsEditable)
-                self._editing = True
-            elif self._orig_flags != self.flags():
-                self.setFlags(self._orig_flags)
-                self._editing = False
+    def set_text(self, text):
+        self.text_editor.setText(text)
 
+    @QtCore.Slot()
     def _on_editor_text_changed(self):
         attr = self._tm_node
-        if self._editing:
-            self._editing = False
-            try:
-                attr.set_value(get_registry()(self.text(1)))
-            except UndefinedUnitError:
-                attr.set_value(self.text(1))
-            if "reload_data" in attr.meta and attr.meta["reload_data"]:
-                self.worker.reset()
-                return
-            else:
-                self.setText(1, format_value(attr.get_value()))
+        text = self.text_editor.text()
+        try:
+            attr.set_value(get_registry()(text))
+        except UndefinedUnitError:
+            attr.set_value(text)
+        if "reload_data" in attr.meta and attr.meta["reload_data"]:
+            self.worker.reset()
+            return
         else:
-            checked = self.checkState(0) == QtCore.Qt.Checked
-            if checked != self._checked:
-                self._checked = checked
-                return False
-        return True
+            self.text_editor.setText(format_value(attr.get_value()))
+    
+    @QtCore.Slot()
+    def _on_checkbox_changed(self):
+        checked = self.checkState(0) == QtCore.Qt.Checked
+        if checked != self._checked:
+            self._checked = checked
+            return True
+        return False
 
 
 class FuncTreeWidgetItem(EdgeTreeWidgetItem):
@@ -229,6 +227,65 @@ class IconComboBoxWidget(QWidget):
         layout.addWidget(self.combo)
 
         self.setLayout(layout)
+
+
+class JoggableLineEdit(QLineEdit):
+
+    ValueChangedByJog = Signal()
+
+    def __init__(self, initial_text="0", editable=True, joggable=True, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.editable = editable
+        self.joggable = joggable
+        self.jogging = False
+        self.last_x = 0
+        self.setText(initial_text)
+        self.setReadOnly(not editable)
+        self.normal_cursor = self.cursor()
+        
+        self.jog_start_timer = QTimer(self)
+        self.jog_start_timer.setSingleShot(True)
+        self.jog_start_timer.timeout.connect(self.start_jog)
+
+    def mousePressEvent(self, event):
+        if self.joggable:
+            self.jog_start_timer.start(500)
+            self.last_x = event.x()
+        super().mousePressEvent(event)
+
+    def start_jog(self):
+        self.setReadOnly(True)
+        self.setCursor(QtGui.QCursor(QtGui.Qt.ClosedHandCursor))
+        self.jogging = True
+
+    def mouseReleaseEvent(self, event):
+        if self.joggable:
+            self.jog_start_timer.stop()
+            
+            self.setReadOnly(not self.editable)
+            self.setCursor(self.normal_cursor)
+            self.jogging = False
+        super().mouseReleaseEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self.jogging:
+            diff = event.x() - self.last_x
+            text = self.text()
+            try:
+                try:
+                    value = get_registry()(text)
+                except UndefinedUnitError:
+                    value = float(text)
+                if value != 0:
+                    value += value * diff * 0.02
+                    self.setText(str(value))
+                    self.ValueChangedByJog.emit()
+            except ValueError:
+                pass
+            self.last_x = event.x()
+        else:
+            self.jog_start_timer.stop()
+            super().mouseMoveEvent(event)
 
 
 class ArgumentInputDialog(QDialog):

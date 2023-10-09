@@ -246,7 +246,7 @@ class MainWindow(QMainWindow):
 
     @QtCore.Slot()
     def item_changed(self, item):
-        if not item._on_editor_text_changed():
+        if item._on_checkbox_changed():
             attr = item._tm_node
             attr_name = attr.full_name
             checked = item._checked
@@ -260,9 +260,7 @@ class MainWindow(QMainWindow):
     def attrs_updated(self, data):
         for attr_name, val in data.items():
             try:
-                self.attr_widgets_by_id[attr_name]["widget"].setText(
-                    1, format_value(val)
-                )
+                self.attr_widgets_by_id[attr_name]["widget"].set_text(format_value(val))
             except RuntimeError:
                 self.logger.warn("Attribute widget disappeared while updating")
             if attr_name in self.graphs_by_id:
