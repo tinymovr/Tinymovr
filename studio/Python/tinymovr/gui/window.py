@@ -17,7 +17,6 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 import time
 import pkg_resources
-from functools import partial
 from contextlib import suppress
 import json
 from PySide6 import QtCore
@@ -33,8 +32,6 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHeaderView,
     QLabel,
-    QTreeWidgetItem,
-    QPushButton,
     QMessageBox,
 )
 from pint.errors import UndefinedUnitError
@@ -46,12 +43,15 @@ from tinymovr.config import get_bus_config, configure_logging
 from avlos import get_registry
 from avlos.json_codec import AvlosEncoder
 from tinymovr.gui import (
+    NodeTreeWidgetItem,
+    AttrTreeWidgetItem,
+    FuncTreeWidgetItem,
+    OptionsTreeWidgetItem,
     Worker,
-    OurQTreeWidget,
+    PlaceholderQTreeWidget,
     IconComboBoxWidget,
     ArgumentInputDialog,
     format_value,
-    load_icon,
     display_file_open_dialog,
     display_file_save_dialog,
     magnitude_of,
@@ -97,7 +97,7 @@ class MainWindow(QMainWindow):
         self.setMenuBar(self.menu_bar)
 
         # Setup the tree widget
-        self.tree_widget = OurQTreeWidget()
+        self.tree_widget = PlaceholderQTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
         self.tree_widget.itemDoubleClicked.connect(self.double_click)
         self.tree_widget.setHeaderLabels(["Attribute", "Value"])
@@ -112,8 +112,8 @@ class MainWindow(QMainWindow):
         self.left_layout.setSpacing(0)
         self.left_layout.setContentsMargins(0, 0, 0, 0)
         self.left_frame.setLayout(self.left_layout)
-        self.left_frame.setMinimumWidth(340)
-        self.left_frame.setMaximumWidth(460)
+        self.left_frame.setMinimumWidth(320)
+        self.left_frame.setMaximumWidth(420)
         self.left_frame.setStyleSheet("border:0;")
 
         self.right_frame = QFrame(self)
@@ -218,51 +218,32 @@ class MainWindow(QMainWindow):
         self.attr_widgets_by_id = {}
         self.tree_widget.clear()
         self.tree_widget.setEnabled(False)
-        all_items = []
         for name, device in devices_by_name.items():
-            widget, items_list = self.parse_node(device, name)
-            self.tree_widget.addTopLevelItem(widget)
-            all_items.extend(items_list)
-        for item in all_items:
-            if hasattr(item, "_tm_function"):
-                button = QPushButton("")
-                button.setIcon(load_icon("call.png"))
-                self.tree_widget.setItemWidget(item, 1, button)
-                button.clicked.connect(partial(self.f_call_clicked, item._tm_function))
-            if hasattr(item, "_options_list"):
-                item_widget = IconComboBoxWidget()
+            widget = self.parse_node(device, name)
+            widget.add_to_tree(self.tree_widget)
         header = self.tree_widget.header()
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
-        header.setStretchLastSection(False)
+        header.setStretchLastSection(True)
         self.tree_widget.setEnabled(True)
 
     def parse_node(self, node, name):
-        widget = QTreeWidgetItem([name, 0, ""])
-        widget._orig_flags = widget.flags()
-        all_items = []
         if hasattr(node, "remote_attributes"):
+            widget = NodeTreeWidgetItem(name)
             for attr_name, attr in node.remote_attributes.items():
-                items, items_list = self.parse_node(attr, attr_name)
-                widget.addChild(items)
-                all_items.extend(items_list)
-        elif hasattr(node, "get_value"):
-            widget.setText(1, format_value(node.get_value()))
-            widget.setCheckState(0, QtCore.Qt.Unchecked)
-            widget._tm_attribute = node
-            widget._editing = False
-            widget._checked = False
+                attr_widgets_node_widget = self.parse_node(attr, attr_name)
+                widget.addChild(attr_widgets_node_widget)
+        elif hasattr(node, "__call__"):
+            widget = FuncTreeWidgetItem(name, node)
+        else:
+            if hasattr(node, "options"):
+                widget = OptionsTreeWidgetItem(name, node)
+            elif hasattr(node, "get_value"):
+                widget = AttrTreeWidgetItem(name, node)
             self.attr_widgets_by_id[node.full_name] = {
                 "node": node,
                 "widget": widget,
             }
-            all_items.append(widget)
-        elif hasattr(node, "__call__"):
-            widget._tm_function = node
-            all_items.append(widget)
-        elif hasattr(node, "options"):
-            widget._options_list = [member.value for member in node.options]
-            all_items.append(widget)
-        return widget, all_items
+        return widget
 
     @QtCore.Slot()
     def item_changed(self, item):
@@ -325,23 +306,6 @@ class MainWindow(QMainWindow):
                 timings_dict["getter_dt"] * 1000,
             )
         )
-
-    @QtCore.Slot()
-    def f_call_clicked(self, f):
-        args = []
-
-        if f.arguments:
-            dialog = ArgumentInputDialog(f.arguments, self)
-            if dialog.exec_() == QDialog.Accepted:
-                input_values = dialog.get_values()
-                args = [input_values[arg.name] for arg in f.arguments]
-            else:
-                return  # User cancelled, stop the entire process
-        args = [get_registry()(arg) for arg in args]
-
-        f(*args)
-        if "reload_data" in f.meta and f.meta["reload_data"]:
-            self.worker.reset()
 
     @QtCore.Slot()
     def double_click(self, item, column):
