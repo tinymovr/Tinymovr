@@ -30,8 +30,9 @@ from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
     QPushButton,
-    QFormLayout
+    QFormLayout,
 )
+from pint.errors import UndefinedUnitError
 from avlos import get_registry
 from tinymovr.gui.helpers import load_icon, load_pixmap, format_value
 
@@ -50,34 +51,72 @@ class NodeTreeWidgetItem(QTreeWidgetItem):
             self.child(i)._add_to_tree_cb()
 
 
-class AttrTreeWidgetItem(NodeTreeWidgetItem):
+class EdgeTreeWidgetItem(QTreeWidgetItem):
     def __init__(self, name, node, *args, **kwargs):
-        super().__init__(name, *args, **kwargs)
-        self.setText(
-            1, format_value(node.get_value())
-        )
+        super().__init__([name, 0, ""], *args, **kwargs)
+        self._tm_node = node
+        self._orig_flags = self.flags()
         self.setToolTip(0, node.summary)
+
+    def _add_to_tree_cb(self):
+        pass
+
+
+class AttrTreeWidgetItem(EdgeTreeWidgetItem):
+    def __init__(self, name, node, *args, **kwargs):
+        super().__init__(name, node, *args, **kwargs)
+        self.setText(1, format_value(node.get_value()))
         self.setCheckState(0, QtCore.Qt.Unchecked)
-        self._tm_attribute = node
         self._editing = False
         self._checked = False
 
+    def _add_to_tree_cb(self):
+        self.treeWidget().itemDoubleClicked.connect(self._on_item_double_clicked)
 
-class FuncTreeWidgetItem(NodeTreeWidgetItem):
-    def __init__(self, name, node, *args, **kwargs):
-        super().__init__(name, *args, **kwargs)
-        self._tm_node = node
-        self.setToolTip(0, node.summary)
+    def _on_item_double_clicked(self, item, column):
+        if item == self and column == 1:
+            if (
+                hasattr(self._tm_node, "setter_name")
+                and self._tm_node.setter_name != None
+            ):
+                self.setFlags(self.flags() | QtCore.Qt.ItemIsEditable)
+                self._editing = True
+            elif self._orig_flags != self.flags():
+                self.setFlags(self._orig_flags)
+                self._editing = False
 
+    def _on_editor_text_changed(self):
+        attr = self._tm_node
+        if self._editing:
+            self._editing = False
+            try:
+                attr.set_value(get_registry()(self.text(1)))
+            except UndefinedUnitError:
+                attr.set_value(self.text(1))
+            if "reload_data" in attr.meta and attr.meta["reload_data"]:
+                self.worker.reset()
+                return
+            else:
+                self.setText(1, format_value(attr.get_value()))
+        else:
+            checked = self.checkState(0) == QtCore.Qt.Checked
+            if checked != self._checked:
+                self._checked = checked
+                return False
+        return True
+
+
+class FuncTreeWidgetItem(EdgeTreeWidgetItem):
     def _add_to_tree_cb(self):
         button = QPushButton("")
         button.setIcon(load_icon("call.png"))
         self.treeWidget().setItemWidget(self, 1, button)
-        button.clicked.connect(partial(self._on_f_call_clicked, self._tm_node))
+        button.clicked.connect(self._on_f_call_clicked)
 
     @QtCore.Slot()
-    def _on_f_call_clicked(self, f):
+    def _on_f_call_clicked(self):
         args = []
+        f = self._tm_node
 
         if f.arguments:
             dialog = ArgumentInputDialog(f.arguments, self.treeWidget())
@@ -90,23 +129,22 @@ class FuncTreeWidgetItem(NodeTreeWidgetItem):
 
         f(*args)
         if "reload_data" in f.meta and f.meta["reload_data"]:
-            self.worker.reset()
+            self.treeWidget().window().worker.reset()
 
 
-class OptionsTreeWidgetItem(NodeTreeWidgetItem):
-    def __init__(self, name, node, *args, **kwargs):
-        super().__init__(name, *args, **kwargs)
-        self._tm_node = node
-        self.setToolTip(0, node.summary)
-
+class OptionsTreeWidgetItem(EdgeTreeWidgetItem):
     def _add_to_tree_cb(self):
-        combo_box = IconComboBoxWidget("call.png", self._tm_node.options)
-        combo_box.currentIndexChanged.connect(self._on_combobox_changed)
-        self.treeWidget().setItemWidget(self, 1, combo_box)
+        self.combo_box_container = IconComboBoxWidget("call.png", self._tm_node.options)
+        self.combo_box_container.combo.setCurrentIndex(self._tm_node.get_value())
+        self.combo_box_container.combo.currentIndexChanged.connect(
+            self._on_combobox_changed
+        )
+        self.treeWidget().setItemWidget(self, 1, self.combo_box_container)
 
     @QtCore.Slot()
-    def _on_f_call_clicked(self, index):
+    def _on_combobox_changed(self, index):
         self._tm_node.set_value(index)
+        self.combo_box_container.combo.setCurrentIndex(self._tm_node.get_value())
 
 
 class PlaceholderQTreeWidget(QTreeWidget):
@@ -162,7 +200,7 @@ class IconComboBoxWidget(QWidget):
     - combo (QComboBox): The embedded combo box that is part of this widget.
 
     Public Methods:
-    - __init__(icon_path, enum_options, parent=None): Constructor to initialize the 
+    - __init__(icon_path, enum_options, parent=None): Constructor to initialize the
       composite widget with a specified icon, IntEnum options, and an optional parent widget.
 
     Usage:

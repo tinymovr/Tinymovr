@@ -99,7 +99,6 @@ class MainWindow(QMainWindow):
         # Setup the tree widget
         self.tree_widget = PlaceholderQTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
-        self.tree_widget.itemDoubleClicked.connect(self.double_click)
         self.tree_widget.setHeaderLabels(["Attribute", "Value"])
 
         self.status_label = QLabel()
@@ -247,32 +246,15 @@ class MainWindow(QMainWindow):
 
     @QtCore.Slot()
     def item_changed(self, item):
-        # Value changed
-        if item._editing:
-            item._editing = False
-            attr = item._tm_attribute
-            try:
-                attr.set_value(get_registry()(item.text(1)))
-            except UndefinedUnitError:
-                attr.set_value(item.text(1))
-            if "reload_data" in attr.meta and attr.meta["reload_data"]:
-                self.worker.reset()
-                return
-            else:
-                item.setText(1, format_value(attr.get_value()))
-
-        # Checkbox changed
-        if hasattr(item, "_tm_attribute"):
-            attr = item._tm_attribute
+        if not item._on_editor_text_changed():
+            attr = item._tm_node
             attr_name = attr.full_name
-            checked = item.checkState(0) == QtCore.Qt.Checked
-            if checked != item._checked:
-                item._checked = checked
-                self.TreeItemCheckedSignal.emit({"attr": attr, "checked": checked})
-                if checked and attr_name not in self.graphs_by_id:
-                    self.add_graph_for_attr(attr)
-                elif not checked and attr_name in self.graphs_by_id:
-                    self.delete_graph_by_attr_name(attr_name)
+            checked = item._checked
+            self.TreeItemCheckedSignal.emit({"attr": attr, "checked": checked})
+            if checked and attr_name not in self.graphs_by_id:
+                self.add_graph_for_attr(attr)
+            elif not checked and attr_name in self.graphs_by_id:
+                self.delete_graph_by_attr_name(attr_name)
 
     @QtCore.Slot()
     def attrs_updated(self, data):
@@ -306,19 +288,6 @@ class MainWindow(QMainWindow):
                 timings_dict["getter_dt"] * 1000,
             )
         )
-
-    @QtCore.Slot()
-    def double_click(self, item, column):
-        if (
-            column == 1
-            and hasattr(item, "_tm_attribute")
-            and hasattr(item._tm_attribute, "setter_name")
-            and item._tm_attribute.setter_name != None
-        ):
-            item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
-            item._editing = True
-        elif item._orig_flags != item.flags():
-            item.setFlags(item._orig_flags)
 
     def on_export(self):
         selected_items = self.tree_widget.selectedItems()
