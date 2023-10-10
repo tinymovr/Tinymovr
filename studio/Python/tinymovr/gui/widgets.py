@@ -34,7 +34,7 @@ from PySide6.QtWidgets import (
 )
 from pint.errors import UndefinedUnitError
 from avlos import get_registry
-from avlos.datatypes import DataType 
+from avlos.datatypes import DataType
 from tinymovr.gui.helpers import load_icon, load_pixmap, format_value
 
 
@@ -62,9 +62,16 @@ class EdgeTreeWidgetItem(QTreeWidgetItem):
 class AttrTreeWidgetItem(EdgeTreeWidgetItem):
     def __init__(self, name, node, *args, **kwargs):
         super().__init__(name, node, *args, **kwargs)
-        editable = hasattr(self._tm_node, "setter_name") and self._tm_node.setter_name != None
+        editable = (
+            hasattr(self._tm_node, "setter_name") and self._tm_node.setter_name != None
+        )
         if editable and node.dtype == DataType.FLOAT:
-            self.text_editor = JoggableLineEdit(format_value(node.get_value()), editable, editable, node.meta.get("jog_step"))
+            self.text_editor = JoggableLineEdit(
+                format_value(node.get_value()),
+                editable,
+                editable,
+                node.meta.get("jog_step"),
+            )
             self.text_editor.ValueChangedByJog.connect(self._on_editor_text_changed)
             self.text_editor.editingFinished.connect(self._on_editor_text_changed)
         else:
@@ -94,7 +101,7 @@ class AttrTreeWidgetItem(EdgeTreeWidgetItem):
             return
         else:
             self.text_editor.setText(format_value(attr.get_value()))
-    
+
     @QtCore.Slot()
     def _on_checkbox_changed(self):
         checked = self.checkState(0) == QtCore.Qt.Checked
@@ -244,7 +251,7 @@ class JoggableLineEdit(QLineEdit):
         self.setText(initial_text)
         self.setReadOnly(not editable)
         self.normal_cursor = self.cursor()
-        
+
         self.jog_start_timer = QTimer(self)
         self.jog_start_timer.setSingleShot(True)
         self.jog_start_timer.timeout.connect(self.start_jog)
@@ -266,13 +273,13 @@ class JoggableLineEdit(QLineEdit):
                 value = float(text)
             except ValueError:
                 value = get_registry()(text).magnitude
-            self.current_jog_step =  max(abs(value) * 0.01, 1e-6)
+            self.current_jog_step = max(abs(value) * 0.01, 1e-6)
         self.jogging = True
 
     def mouseReleaseEvent(self, event):
         if self.joggable:
             self.jog_start_timer.stop()
-            
+
             self.setReadOnly(not self.editable)
             self.setCursor(self.normal_cursor)
             self.jogging = False
@@ -287,7 +294,7 @@ class JoggableLineEdit(QLineEdit):
                     value = float(text)
                 except ValueError:
                     value = get_registry()(text).magnitude
-                value += self.current_jog_step * diff                  
+                value += self.current_jog_step * diff
                 self.setText(str(value))
                 self.ValueChangedByJog.emit()
             except ValueError:
