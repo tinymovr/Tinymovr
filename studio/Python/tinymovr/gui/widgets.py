@@ -34,6 +34,7 @@ from PySide6.QtWidgets import (
 )
 from pint.errors import UndefinedUnitError
 from avlos import get_registry
+from avlos.datatypes import DataType 
 from tinymovr.gui.helpers import load_icon, load_pixmap, format_value
 
 
@@ -66,17 +67,20 @@ class AttrTreeWidgetItem(EdgeTreeWidgetItem):
     def __init__(self, name, node, *args, **kwargs):
         super().__init__(name, node, *args, **kwargs)
         editable = hasattr(self._tm_node, "setter_name") and self._tm_node.setter_name != None
-        if editable:
+        if editable and node.dtype == DataType.FLOAT:
             self.text_editor = JoggableLineEdit(format_value(node.get_value()), editable, editable)
             self.text_editor.ValueChangedByJog.connect(self._on_editor_text_changed)
             self.text_editor.editingFinished.connect(self._on_editor_text_changed)
         else:
             self.text_editor = QLineEdit(format_value(node.get_value()))
+        if not editable:
+            self.text_editor.setReadOnly(True)
         self._checked = False
 
     def _add_to_tree_cb(self):
         self.treeWidget().setItemWidget(self, 1, self.text_editor)
-        self.setCheckState(0, QtCore.Qt.Unchecked)
+        if self._tm_node.dtype == DataType.FLOAT:
+            self.setCheckState(0, QtCore.Qt.Unchecked)
 
     def set_text(self, text):
         self.text_editor.setText(text)
