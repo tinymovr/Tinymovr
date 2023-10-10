@@ -15,7 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <src/encoder/encoder.h>
+#include <src/sensors/sensor.h>
 #include "src/common.h"
 #include "src/system/system.h"
 

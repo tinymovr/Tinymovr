@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 #include <src/common.h>
-#include <src/encoder/encoder.h>
+#include <src/sensors/sensor.h>
 
 typedef struct 
 {
@@ -30,7 +30,7 @@ typedef struct
 	float vel_estimate;
 	uint16_t encoder_ticks;
 	uint16_t encoder_half_ticks;
-	EncoderType encoder_type;
+	SensorType encoder_type;
 } ObserverState;
 
 typedef struct 

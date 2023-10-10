@@ -17,12 +17,12 @@
 
 #include <src/common.h>
 #include <src/motor/motor.h>
-#include <src/encoder/ma7xx.h>
-#include <src/encoder/hall.h>
-#include <src/encoder/encoder.h>
+#include <src/sensors/ma7xx.h>
+#include <src/sensors/hall.h>
+#include <src/sensors/sensor.h>
 
-static EncoderConfig config = {0};
-static EncoderState state = {0};
+static SensorConfig config = {0};
+static SensorState state = {0};
 
 void encoder_init(void)
 {
@@ -92,7 +92,7 @@ TM_RAMFUNC float encoder_ticks_to_eangle()
 #endif
 }
 
-EncoderType encoder_get_type(void)
+SensorType encoder_get_type(void)
 {
     return state.current_encoder_type;
 }
@@ -102,7 +102,7 @@ TM_RAMFUNC bool encoder_get_calibrated(void)
     return state.get_calibrated_ptr();
 }
 
-TM_RAMFUNC void encoder_set_type(EncoderType enc_type)
+TM_RAMFUNC void encoder_set_type(SensorType enc_type)
 {
 #ifdef BOARD_REV_R5
     if (ENCODER_MA7XX == enc_type)
@@ -123,12 +123,12 @@ TM_RAMFUNC uint8_t encoder_get_errors(void)
     return state.get_error_ptr();
 }
 
-EncoderConfig* encoder_get_config(void)
+SensorConfig* encoder_get_config(void)
 {
     return &config;
 }
 
-void encoder_restore_config(EncoderConfig* config_)
+void encoder_restore_config(SensorConfig* config_)
 {
     config = *config_;
 }

@@ -29,22 +29,22 @@ typedef void (*void_func)(void);
 typedef enum {
 	ENCODER_MA7XX = 0,
 	ENCODER_HALL = 1
-} EncoderType;
+} SensorType;
 
 typedef struct {
-    EncoderType current_encoder_type;
+    SensorType current_encoder_type;
     uint8_getter get_error_ptr;
     bool_getter get_calibrated_ptr;
     bool_setter update_angle_ptr;
     int16_getter get_angle_ptr;
     void_func reset_encoder_ptr;
     uint16_t ticks;
-} EncoderState;
+} SensorState;
 
 typedef struct
 {
-    EncoderType encoder_type;
-} EncoderConfig;
+    SensorType encoder_type;
+} SensorConfig;
 
 void encoder_init(void);
 void encoder_reset(void);
@@ -55,13 +55,13 @@ void encoder_update(bool check_error);
 uint16_t encoder_get_ticks(void);
 float encoder_ticks_to_eangle(void);
 
-EncoderType encoder_get_type(void);
-void encoder_set_type(EncoderType enc_type);
+SensorType encoder_get_type(void);
+void encoder_set_type(SensorType enc_type);
 
 bool encoder_get_calibrated(void);
 
 uint8_t encoder_get_errors(void);
 
-EncoderConfig* encoder_get_config(void);
-void encoder_restore_config(EncoderConfig* config_);
+SensorConfig* encoder_get_config(void);
+void encoder_restore_config(SensorConfig* config_);
 

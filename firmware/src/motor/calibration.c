@@ -20,8 +20,8 @@
 #include <src/gatedriver/gatedriver.h>
 #include <src/scheduler/scheduler.h>
 #include <src/utils/utils.h>
-#include <src/encoder/ma7xx.h>
-#include <src/encoder/hall.h>
+#include <src/sensors/ma7xx.h>
+#include <src/sensors/hall.h>
 #include <src/controller/controller.h>
 #include <src/can/can_endpoints.h>
 #include <src/system/system.h>

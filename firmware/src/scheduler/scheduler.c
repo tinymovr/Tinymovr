@@ -22,8 +22,8 @@
 #include <src/can/can.h>
 #include <src/uart/uart_interface.h>
 #include <src/uart/uart_lowlevel.h>
-#include <src/encoder/encoder.h>
-#include <src/encoder/ma7xx.h>
+#include <src/sensors/sensor.h>
+#include <src/sensors/ma7xx.h>
 #include <src/observer/observer.h>
 #include <src/can/can_endpoints.h>
 #include <src/scheduler/scheduler.h>

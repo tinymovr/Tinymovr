@@ -8,7 +8,7 @@
 #include <string.h>
 #include <src/adc/adc.h>
 #include <src/system/system.h>
-#include <src/encoder/encoder.h>
+#include <src/sensors/sensor.h>
 #include <src/observer/observer.h>
 #include <src/motor/motor.h>
 #include <src/scheduler/scheduler.h>

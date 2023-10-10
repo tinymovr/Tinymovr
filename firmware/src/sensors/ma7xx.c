@@ -20,7 +20,7 @@
 #include <src/ssp/ssp_func.h>
 #include <src/utils/utils.h>
 #include <src/can/can_endpoints.h>
-#include <src/encoder/ma7xx.h>
+#include <src/sensors/ma7xx.h>
 
 static MA7xxConfig config = {0};
 static MA7xxState state = {0};

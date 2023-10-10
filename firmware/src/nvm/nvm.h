@@ -19,9 +19,9 @@
 
 #include <src/adc/adc.h>
 #include <src/motor/motor.h>
-#include <src/encoder/hall.h>
-#include <src/encoder/ma7xx.h>
-#include <src/encoder/encoder.h>
+#include <src/sensors/hall.h>
+#include <src/sensors/ma7xx.h>
+#include <src/sensors/sensor.h>
 #include <src/observer/observer.h>
 #include <src/controller/controller.h>
 #include <src/controller/trajectory_planner.h>
@@ -37,7 +37,7 @@ struct NVMStruct {
     MotorConfig motor_config;
     HallConfig hall_config;
     MA7xxConfig ma7xx_config;
-    EncoderConfig encoder_config;
+    SensorConfig encoder_config;
     ObserverConfig observer_config;
     ControllerConfig controller_config;
     CANConfig can_config;

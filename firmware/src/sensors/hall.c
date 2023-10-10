@@ -17,7 +17,7 @@
 
 #include <string.h>
 #include <src/system/system.h>
-#include <src/encoder/hall.h>
+#include <src/sensors/hall.h>
 
 #define AIO6789_IO_MODE                 0x00
 #define AIO_INPUT                       0x00
