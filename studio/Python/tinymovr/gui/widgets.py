@@ -233,12 +233,14 @@ class JoggableLineEdit(QLineEdit):
 
     ValueChangedByJog = Signal()
 
-    def __init__(self, initial_text="0", editable=True, joggable=True, *args, **kwargs):
+    def __init__(self, initial_text="0", editable=True, joggable=True, jog_step=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.editable = editable
         self.joggable = joggable
         self.jogging = False
         self.last_x = 0
+        self.jog_step = jog_step
+        self.current_jog_step = 0
         self.setText(initial_text)
         self.setReadOnly(not editable)
         self.normal_cursor = self.cursor()
@@ -256,6 +258,15 @@ class JoggableLineEdit(QLineEdit):
     def start_jog(self):
         self.setReadOnly(True)
         self.setCursor(QtGui.QCursor(QtGui.Qt.ClosedHandCursor))
+        if self.jog_step:
+            self.current_jog_step = self.jog_step
+        else:
+            text = self.text()
+            try:
+                value = float(text)
+            except ValueError:
+                value = get_registry()(text).magnitude
+            self.current_jog_step =  max(abs(value) * 0.01, 1e-6)
         self.jogging = True
 
     def mouseReleaseEvent(self, event):
@@ -273,15 +284,14 @@ class JoggableLineEdit(QLineEdit):
             text = self.text()
             try:
                 try:
-                    value = get_registry()(text)
-                except UndefinedUnitError:
                     value = float(text)
-                if value != 0:
-                    value += value * diff * 0.02
-                    self.setText(str(value))
-                    self.ValueChangedByJog.emit()
+                except ValueError:
+                    value = get_registry()(text).magnitude
+                value += self.current_jog_step * diff                  
+                self.setText(str(value))
+                self.ValueChangedByJog.emit()
             except ValueError:
-                pass
+                print("valueerror")
             self.last_x = event.x()
         else:
             self.jog_start_timer.stop()
