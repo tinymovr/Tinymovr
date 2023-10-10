@@ -39,6 +39,19 @@ from tinymovr.gui.helpers import load_icon, load_pixmap, format_value
 
 
 class NodeTreeWidgetItem(QTreeWidgetItem):
+    """
+    NodeTreeWidgetItem: A specialized tree widget item class for managing hierarchical node structures.
+
+    Designed to facilitate the addition of child nodes to a given tree widget, it ensures that the underlying node
+    structure is accurately reflected within the tree widget interface.
+
+    Inheritance:
+    - Inherits from QTreeWidgetItem.
+
+    Methods:
+    - add_to_tree(tree_widget): Adds the current tree widget item to the provided tree widget and initializes its children.
+    - _add_to_tree_cb(): Iteratively calls the '_add_to_tree_cb' method for each child node, enabling a recursive representation of the node hierarchy.
+    """
 
     def add_to_tree(self, tree_widget):
         tree_widget.addTopLevelItem(self)
@@ -50,6 +63,24 @@ class NodeTreeWidgetItem(QTreeWidgetItem):
 
 
 class EdgeTreeWidgetItem(QTreeWidgetItem):
+    """
+    EdgeTreeWidgetItem: A base tree widget item subclass for representing and managing nodes.
+
+    Designed as a base class for other specialized tree widget items, it assists in presenting nodes
+    within a QTreeWidget. Each node has a name and a summary, with the summary being set as a tooltip
+    for the tree item.
+
+    Inheritance:
+    - Inherits from QTreeWidgetItem.
+
+    Attributes:
+    - _tm_node (Node): The node associated with this tree widget item.
+
+    Methods:
+    - __init__(name, node, *args, **kwargs): Initializes the tree widget item with the provided name and node.
+    - _add_to_tree_cb(): A callback method meant to be overridden by subclasses for adding custom components to the tree.
+    """
+
     def __init__(self, name, node, *args, **kwargs):
         super().__init__([name, 0, ""], *args, **kwargs)
         self._tm_node = node
@@ -60,6 +91,28 @@ class EdgeTreeWidgetItem(QTreeWidgetItem):
 
 
 class AttrTreeWidgetItem(EdgeTreeWidgetItem):
+    """
+    AttrTreeWidgetItem: A tree widget item subclass designed for managing and presenting attributes.
+
+    This widget item specializes in showing attributes and provides an interface for editing them,
+    especially when they are of type `FLOAT`. It integrates with the `JoggableLineEdit` for
+    floating-point attributes that support in-line jogging. For attributes that don't support
+    jogging or aren't of type `FLOAT`, a standard QLineEdit is used.
+
+    Inheritance:
+    - Inherits from EdgeTreeWidgetItem.
+
+    Attributes:
+    - text_editor (QLineEdit or JoggableLineEdit): Editor for the attribute's value.
+    - _checked (bool): A private attribute that maintains the checkbox state (for FLOAT types).
+
+    Methods:
+    - _add_to_tree_cb(): Adds the text editor to the tree widget. If the attribute is of type FLOAT, a checkbox is also added.
+    - set_text(text): Sets the provided text to the text editor.
+    - _on_editor_text_changed(): Slot to handle changes in the text editor. This method manages the process of setting the attribute value and triggers data reload if necessary.
+    - _on_checkbox_changed(): Slot to handle checkbox state changes (used for FLOAT types).
+    """
+
     def __init__(self, name, node, *args, **kwargs):
         super().__init__(name, node, *args, **kwargs)
         editable = (
@@ -112,6 +165,24 @@ class AttrTreeWidgetItem(EdgeTreeWidgetItem):
 
 
 class FuncTreeWidgetItem(EdgeTreeWidgetItem):
+    """
+    FuncTreeWidgetItem: A tree widget item subclass for managing and triggering functions.
+
+    This widget item is specialized to present functions that can be invoked via a button.
+    Once the button is clicked, the function associated with the widget item is executed.
+    If the function requires arguments, an input dialog is presented to the user to collect them.
+
+    Inheritance:
+    - Inherits from EdgeTreeWidgetItem.
+
+    Attributes:
+    - None directly in this class. Inherits attributes from the superclass.
+
+    Methods:
+    - _add_to_tree_cb(): Adds a button with an icon to the tree widget. The button serves as the trigger to invoke the associated function.
+    - _on_f_call_clicked(): Slot to handle button click events. This method manages the process of collecting function arguments and invoking the function. If the function has associated meta information indicating the need to reload data, a reset operation on the tree widget's worker is triggered.
+    """
+
     def _add_to_tree_cb(self):
         button = QPushButton("")
         button.setIcon(load_icon("call.png"))
@@ -138,6 +209,24 @@ class FuncTreeWidgetItem(EdgeTreeWidgetItem):
 
 
 class OptionsTreeWidgetItem(EdgeTreeWidgetItem):
+    """
+    OptionsTreeWidgetItem: A tree widget item subclass for managing selectable options.
+
+    This widget item is specialized to handle options in the form of a combo box.
+    The combo box is populated with the provided options and integrated within the tree widget.
+    The current selection index of the combo box is synchronized with the underlying node's value.
+
+    Attributes:
+    - combo_box_container (IconComboBoxWidget): A custom combo box widget containing an icon and a combo box.
+
+    Inheritance:
+    - Inherits from EdgeTreeWidgetItem.
+
+    Methods:
+    - _add_to_tree_cb(): Sets up and adds the combo box to the tree widget.
+    - _on_combobox_changed(int): Slot to handle combo box index changes, synchronizes the new index with the underlying node's value.
+    """
+
     def _add_to_tree_cb(self):
         self.combo_box_container = IconComboBoxWidget("call.png", self._tm_node.options)
         self.combo_box_container.combo.setCurrentIndex(self._tm_node.get_value())
@@ -237,10 +326,41 @@ class IconComboBoxWidget(QWidget):
 
 
 class JoggableLineEdit(QLineEdit):
+    """
+    A QLineEdit subclass that supports "jogging" (incremental adjustments) of its value
+    using mouse movement.
+
+    Features:
+    - User can edit the text as a regular QLineEdit.
+    - By holding the mouse button down for a short delay, the control enters jogging mode.
+      Moving the mouse horizontally adjusts the value.
+    - The increment step for jogging can be preset or will be determined based on the current value.
+
+    Signals:
+    - ValueChangedByJog: Emitted when the value is changed via jogging.
+
+    Attributes:
+    - editable (bool): Determines if the QLineEdit is editable when not jogging.
+    - joggable (bool): Determines if the control supports jogging.
+    - jogging (bool): Indicates if the control is currently in jogging mode.
+    - jog_step (float or None): The increment step for jogging. If None, it's determined based on the value.
+
+    Usage:
+    editor = JoggableLineEdit(initial_text="0", editable=True, joggable=True)
+    editor.ValueChangedByJog.connect(some_function)
+    """
 
     ValueChangedByJog = Signal()
 
-    def __init__(self, initial_text="0", editable=True, joggable=True, jog_step=None, *args, **kwargs):
+    def __init__(
+        self,
+        initial_text="0",
+        editable=True,
+        joggable=True,
+        jog_step=None,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.editable = editable
         self.joggable = joggable
@@ -306,6 +426,34 @@ class JoggableLineEdit(QLineEdit):
 
 
 class ArgumentInputDialog(QDialog):
+    """
+    A QDialog subclass that provides a dynamic form for user input based on a list of arguments.
+
+    The dialog populates a QFormLayout with a QLabel and QLineEdit for each provided argument.
+    It also appends Ok and Cancel buttons to finalize or dismiss the input.
+
+    Features:
+    - Each argument provided will be represented as a row with its name and data type.
+    - User input can be retrieved as a dictionary using the `get_values` method.
+
+    Attributes:
+    - arguments (list): A list of objects with 'name' and 'dtype' attributes to represent each argument.
+    - inputs (dict): A dictionary mapping argument names to their QLineEdit instances.
+
+    Usage:
+    dialog = ArgumentInputDialog(arguments)
+    if dialog.exec_() == QDialog.Accepted:
+        values = dialog.get_values()
+
+    Args:
+    - arguments (list): A list of objects where each object should have a 'name' and 'dtype' attribute.
+    - parent (QWidget, optional): Parent widget for this dialog.
+
+    Methods:
+    - get_values(): Returns a dictionary mapping argument names to user inputs.
+
+    """
+
     def __init__(self, arguments, parent=None):
         super(ArgumentInputDialog, self).__init__(parent)
         self.arguments = arguments
