@@ -23,7 +23,6 @@ from PySide6 import QtCore
 from PySide6.QtCore import Signal, QTimer
 from PySide6.QtWidgets import (
     QMainWindow,
-    QDialog,
     QMenu,
     QMenuBar,
     QWidget,
@@ -34,7 +33,6 @@ from PySide6.QtWidgets import (
     QLabel,
     QMessageBox,
 )
-from pint.errors import UndefinedUnitError
 from PySide6.QtGui import QAction
 import pyqtgraph as pg
 from tinymovr.constants import app_name
@@ -49,8 +47,6 @@ from tinymovr.gui import (
     OptionsTreeWidgetItem,
     Worker,
     PlaceholderQTreeWidget,
-    IconComboBoxWidget,
-    ArgumentInputDialog,
     format_value,
     display_file_open_dialog,
     display_file_save_dialog,
