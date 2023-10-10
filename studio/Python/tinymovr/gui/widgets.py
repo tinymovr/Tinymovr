@@ -68,7 +68,7 @@ class AttrTreeWidgetItem(EdgeTreeWidgetItem):
         super().__init__(name, node, *args, **kwargs)
         editable = hasattr(self._tm_node, "setter_name") and self._tm_node.setter_name != None
         if editable and node.dtype == DataType.FLOAT:
-            self.text_editor = JoggableLineEdit(format_value(node.get_value()), editable, editable)
+            self.text_editor = JoggableLineEdit(format_value(node.get_value()), editable, editable, node.meta.get("jog_step"))
             self.text_editor.ValueChangedByJog.connect(self._on_editor_text_changed)
             self.text_editor.editingFinished.connect(self._on_editor_text_changed)
         else:
