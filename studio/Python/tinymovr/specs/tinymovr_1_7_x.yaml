@@ -331,60 +331,102 @@ remote_attributes:
         meta: {dynamic: True}
         getter_name: motor_get_errors
         summary: Any motor/calibration errors, as a bitmask
-      # - name: phase_currents
-      #   remote_attributes:
-      #     - name: U
-      #       dtype: float
-      #       unit: ampere
-      #       getter_name: motor_get_IU
-      #       summary: Measured current in phase U.
-      #     - name: V
-      #       dtype: float
-      #       unit: ampere
-      #       getter_name: motor_get_IV
-      #       summary: Measured current in phase V.
-      #     - name: W
-      #       dtype: float
-      #       unit: ampere
-      #       getter_name: motor_get_IW
-      #       summary: Measured current in phase W.
-  - name: encoder
+  - name: sensors
     remote_attributes:
-      - name: position_estimate
-        dtype: float
-        unit: ticks
-        meta: {dynamic: True}
-        getter_name: observer_get_pos_estimate_user_frame
-        summary: The filtered encoder position estimate.
-      - name: velocity_estimate
-        dtype: float
-        unit: ticks/second
-        meta: {dynamic: True}
-        getter_name: observer_get_vel_estimate_user_frame
-        summary: The filtered encoder velocity estimate.
-      - name: type
-        options: [INTERNAL, HALL]
-        meta: {export: True}
-        getter_name: encoder_get_type
-        setter_name: encoder_set_type
-        summary: The encoder type. Either INTERNAL or HALL.
-      - name: bandwidth
-        dtype: float
-        unit: Hz
-        meta: {export: True}
-        getter_name: observer_get_bw
-        setter_name: observer_set_bw
-        summary: The encoder observer bandwidth.
-      - name: calibrated
-        dtype: bool
-        meta: {dynamic: True}
-        getter_name: encoder_get_calibrated
-        summary: Whether the encoder has been calibrated.
-      - name: errors
-        flags: [CALIBRATION_FAILED, READING_UNSTABLE]
-        meta: {dynamic: True}
-        getter_name: encoder_get_errors
-        summary: Any encoder errors, as a bitmask
+      - setup:
+        remote_attributes:
+          - name: onboard
+            remote_attributes:
+              - name: calibrated
+                dtype: bool
+                meta: {dynamic: True}
+                getter_name: 
+                summary: Whether the encoder has been calibrated.
+              - name: errors
+                flags: [CALIBRATION_FAILED, READING_UNSTABLE]
+                meta: {dynamic: True}
+                getter_name: 
+                summary: Any encoder errors, as a bitmask
+          - name: external_spi
+            remote_attributes:
+              - name: calibrated
+                dtype: bool
+                meta: {dynamic: True}
+                getter_name: 
+                summary: Whether the encoder has been calibrated.
+              - name: errors
+                flags: [CALIBRATION_FAILED, READING_UNSTABLE]
+                meta: {dynamic: True}
+                getter_name: 
+                summary: Any encoder errors, as a bitmask
+          - name: hall
+            remote_attributes:
+              - name: calibrated
+                dtype: bool
+                meta: {dynamic: True}
+                getter_name: 
+                summary: Whether the encoder has been calibrated.
+              - name: errors
+                flags: [CALIBRATION_FAILED, READING_UNSTABLE]
+                meta: {dynamic: True}
+                getter_name: 
+                summary: Any encoder errors, as a bitmask
+      - select:
+        remote_attributes:
+          - position:
+            remote_attributes:
+              - name: type
+                options: [ONBOARD, SPI, HALL]
+                meta: {export: True}
+                getter_name: 
+                setter_name: 
+                summary: The encoder type. Either ONBOARD, external SPI or HALL.
+              - name: bandwidth
+                dtype: float
+                unit: Hz
+                meta: {export: True}
+                getter_name: 
+                setter_name: 
+                summary: The encoder observer bandwidth.
+              - name: position_estimate
+                dtype: float
+                unit: ticks
+                meta: {dynamic: True}
+                getter_name: observer_get_pos_estimate_user_frame
+                summary: The filtered encoder position estimate.
+              - name: velocity_estimate
+                dtype: float
+                unit: ticks/second
+                meta: {dynamic: True}
+                getter_name: observer_get_vel_estimate_user_frame
+                summary: The filtered encoder velocity estimate.
+          - commutation:
+            remote_attributes:
+              - name: type
+                options: [ONBOARD, SPI, HALL]
+                meta: {export: True}
+                getter_name: 
+                setter_name: 
+                summary: The encoder type. Either ONBOARD, external SPI or HALL.
+              - name: bandwidth
+                dtype: float
+                unit: Hz
+                meta: {export: True}
+                getter_name: 
+                setter_name: 
+                summary: The encoder observer bandwidth.
+              - name: position_estimate
+                dtype: float
+                unit: ticks
+                meta: {dynamic: True}
+                getter_name: observer_get_pos_estimate_user_frame
+                summary: The filtered encoder position estimate.
+              - name: velocity_estimate
+                dtype: float
+                unit: ticks/second
+                meta: {dynamic: True}
+                getter_name: observer_get_vel_estimate_user_frame
+                summary: The filtered encoder velocity estimate.    
   - name: traj_planner
     remote_attributes:
       - name: max_accel
