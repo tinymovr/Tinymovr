@@ -39,9 +39,6 @@ from tinymovr.gui.helpers import load_icon, load_pixmap, format_value
 
 
 class NodeTreeWidgetItem(QTreeWidgetItem):
-    def __init__(self, name, *args, **kwargs):
-        super().__init__([name, 0, ""], *args, **kwargs)
-        self._orig_flags = self.flags()
 
     def add_to_tree(self, tree_widget):
         tree_widget.addTopLevelItem(self)
@@ -56,7 +53,6 @@ class EdgeTreeWidgetItem(QTreeWidgetItem):
     def __init__(self, name, node, *args, **kwargs):
         super().__init__([name, 0, ""], *args, **kwargs)
         self._tm_node = node
-        self._orig_flags = self.flags()
         self.setToolTip(0, node.summary)
 
     def _add_to_tree_cb(self):
