@@ -33,7 +33,7 @@ app_stylesheet = """
     QPushButton {
         background-color: #ededef;
         border-radius: 4px; 
-        margin: 0 0 1px 0;
+        margin: 3px 10px 3px 0;
     }
     QPushButton:pressed {
         background-color: #cdcdcf;
@@ -43,6 +43,22 @@ app_stylesheet = """
     {
     background-color: #eaeaec;
     } 
+
+/* --------------------------------------- QComboBox -----------------------------------*/
+
+    QComboBox {
+        margin: 0 10px 0 5px;
+    }
+
+    QComboBox {
+        margin: 0 10px 0 0;
+    }
+
+    QComboBox::drop-down {
+        border: none;
+        background-color: #ededef;
+        border-radius: 4px; 
+    }
 
 /* --------------------------------------- QScrollBar -----------------------------------*/
 
@@ -57,7 +73,7 @@ app_stylesheet = """
 
     QScrollBar::handle:horizontal
     {
-        background-color: #dfdfe1;      /* #605F5F; */
+        background-color: #dfdfe1; 
         min-width: 5px;
         border-radius: 4px;
     }
@@ -174,6 +190,11 @@ app_stylesheet = """
     QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
     {
         background: none;
+    }
+
+    QAbstractScrollArea::corner {
+        background: #dfdfe1;
+        border: none;
     }
 """
 
@@ -185,7 +206,7 @@ app_stylesheet_dark = """
     QPushButton {
         background-color: #363638;
         border-radius: 4px; 
-        margin: 0 0 1px 0;
+        margin: 3px 10px 3px 0;
     }
     QPushButton:pressed {
         background-color: #767678;
@@ -196,6 +217,37 @@ app_stylesheet_dark = """
     background-color: #464648;
     }
 
+/* --------------------------------------- QComboBox -----------------------------------*/
+
+    QComboBox {
+        margin: 0 10px 0 5px;
+    }
+    
+    QComboBox::drop-down {
+        border: none;
+        background-color: #363638;
+        border-radius: 4px; 
+    }
+
+    QComboBox::down-arrow
+    {   
+        border: 0px;
+        background-repeat: no-repeat;
+        background-position: center center;
+        border-image: url(:/qss_icons/rc/down_arrow.png);
+        height:20px;
+        width:20px;
+    }
+
+/* ----------------------------------- Headers (dark only) -------------------------------*/
+
+    QHeaderView::section {
+        border-right-color: #262628;
+        border-right-width: 1px;
+        border-style: solid;
+        margin: 0 4px;
+    }
+
 /* --------------------------------------- QScrollBar -----------------------------------*/
 
     QScrollBar:horizontal
@@ -204,12 +256,12 @@ app_stylesheet_dark = """
         margin: 3px 15px 3px 15px;
         border: 1px transparent white;
         border-radius: 4px;
-        background-color: white;
+        background-color: #363638;
     }
 
     QScrollBar::handle:horizontal
     {
-        background-color: #dfdfe1;      /* #605F5F; */
+        background-color: #605F5F; 
         min-width: 5px;
         border-radius: 4px;
     }
@@ -266,7 +318,7 @@ app_stylesheet_dark = """
 
     QScrollBar:vertical
     {
-        background-color: white;
+        background-color: #363638;
         width: 15px;
         margin: 15px 3px 15px 3px;
         border: 1px transparent white;
@@ -275,7 +327,7 @@ app_stylesheet_dark = """
 
     QScrollBar::handle:vertical
     {
-        background-color: #dfdfe1;
+        background-color: #605F5F;
         min-height: 5px;
         border-radius: 4px;
     }
@@ -326,6 +378,11 @@ app_stylesheet_dark = """
     QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
     {
         background: none;
+    }
+
+    QAbstractScrollArea::corner {
+        background: #363638;
+        border: none;
     }
 """
 
@@ -405,14 +462,6 @@ def magnitude_of(val):
     if isinstance(val, pint.Quantity):
         return val.magnitude
     return val
-
-
-def hold_sema(sema):
-    sema.acquire()
-    try:
-        yield
-    finally:
-        sema.release()
 
 
 class TimedGetter:
