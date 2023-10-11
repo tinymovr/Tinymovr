@@ -248,18 +248,14 @@ TM_RAMFUNC void CLControlStep(void)
     }
 
     const float e_phase = observer_get_epos();
+    const float e_phase_vel = observer_get_evel();
     const float c_I = fast_cos(e_phase);
     const float s_I = fast_sin(e_phase);
 
-    float Vd;
-    float Vq;
-    if (motor_get_is_gimbal() == true)
-    {
-        const float e_phase_vel = observer_get_evel();
-        Vd = -e_phase_vel * motor_get_phase_inductance() * Iq_setpoint;
-        Vq = motor_get_phase_resistance() * Iq_setpoint;
-    }
-    else
+    float Vd = -e_phase_vel * motor_get_phase_inductance() * Iq_setpoint;
+    float Vq = motor_get_phase_resistance() * Iq_setpoint;
+
+    if (motor_get_is_gimbal() == false) // high-current
     {
         ADC_GetPhaseCurrents(&(state.I_phase_meas));
 
@@ -280,8 +276,8 @@ TM_RAMFUNC void CLControlStep(void)
         state.Id_integrator_Vd += delta_Id * PWM_PERIOD_S * config.Id_integrator_gain;
         state.Iq_integrator_Vq += delta_Iq * PWM_PERIOD_S * config.Iq_integrator_gain;
 
-        Vd = (delta_Id * config.I_gain) + state.Id_integrator_Vd;
-        Vq = (delta_Iq * config.I_gain) + state.Iq_integrator_Vq;
+        Vd += (delta_Id * config.I_gain) + state.Id_integrator_Vd;
+        Vq += (delta_Iq * config.I_gain) + state.Iq_integrator_Vq;
     }
     state.Vq_setpoint = Vq;
     
