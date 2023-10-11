@@ -141,7 +141,8 @@ class AttrTreeWidgetItem(EdgeTreeWidgetItem):
             self.setCheckState(0, QtCore.Qt.Unchecked)
 
     def set_text(self, text):
-        self.text_editor.setText(text)
+        if not self.text_editor.hasFocus():
+            self.text_editor.setText(text)
 
     @QtCore.Slot()
     def _on_editor_text_changed(self):
