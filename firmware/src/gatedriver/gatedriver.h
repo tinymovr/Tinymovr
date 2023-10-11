@@ -30,17 +30,17 @@ void gate_driver_set_duty_cycle(const FloatTriplet *dc);
 //=============================================
 static inline void m1_u_set_duty(const float duty)
 {
-    uint16_t val = ((uint16_t)(duty * (timer_freq_hz/PWM_FREQ_HZ) )) >>1;
+    uint16_t val = ((uint16_t)(duty * (TIMER_FREQ_HZ/PWM_FREQ_HZ) )) >>1;
     PAC55XX_TIMERA->CCTR4.CTR = val;
 }
 static inline void m1_v_set_duty(const float duty)
 {
-    uint16_t val = ((uint16_t)(duty * (timer_freq_hz/PWM_FREQ_HZ) )) >>1;
+    uint16_t val = ((uint16_t)(duty * (TIMER_FREQ_HZ/PWM_FREQ_HZ) )) >>1;
     PAC55XX_TIMERA->CCTR5.CTR = val;
 }
 static inline void m1_w_set_duty(const float duty)
 {
-    uint16_t val = ((uint16_t)(duty * (timer_freq_hz/PWM_FREQ_HZ) )) >>1;
+    uint16_t val = ((uint16_t)(duty * (TIMER_FREQ_HZ/PWM_FREQ_HZ) )) >>1;
     PAC55XX_TIMERA->CCTR6.CTR = val;
 }
 
