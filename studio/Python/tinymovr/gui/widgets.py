@@ -52,6 +52,8 @@ class NodeTreeWidgetItem(QTreeWidgetItem):
     - add_to_tree(tree_widget): Adds the current tree widget item to the provided tree widget and initializes its children.
     - _add_to_tree_cb(): Iteratively calls the '_add_to_tree_cb' method for each child node, enabling a recursive representation of the node hierarchy.
     """
+    def __init__(self, name, *args, **kwargs):
+        super().__init__([name, 0, ""], *args, **kwargs)
 
     def add_to_tree(self, tree_widget):
         tree_widget.addTopLevelItem(self)
@@ -139,7 +141,8 @@ class AttrTreeWidgetItem(EdgeTreeWidgetItem):
             self.setCheckState(0, QtCore.Qt.Unchecked)
 
     def set_text(self, text):
-        self.text_editor.setText(text)
+        if not self.text_editor.hasFocus():
+            self.text_editor.setText(text)
 
     @QtCore.Slot()
     def _on_editor_text_changed(self):

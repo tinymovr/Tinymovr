@@ -221,7 +221,7 @@ void ADC_DTSE_Init(void)
     PAC55XX_ADC->DTSETRIGENT0TO3.TRIG1CFGIDX = 12;                    // DTSE Trigger 1 Sequence Configuration Entry Index
     PAC55XX_ADC->DTSETRIGENT0TO3.TRIG1EDGE = ADCDTSE_TRIGEDGE_RISING; // PWMA0 rising edge
 
-    pac5xxx_timer_a_ccctr1_value_set((timer_freq_hz / 2 / PWM_FREQ_HZ) - 2);
+    pac5xxx_timer_a_ccctr1_value_set((TIMER_FREQ_HZ/(2*PWM_FREQ_HZ)) - 2);
 
     //===== Setup DTSE Sequence B (sense current) - Starts at Entry 12 =====
     pac5xxx_dtse_seq_config(12, ADC0, EMUX_AIO10, 0, 0);
