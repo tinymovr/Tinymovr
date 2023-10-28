@@ -151,4 +151,10 @@ typedef struct
 
 static const FloatTriplet three_phase_zero = {0.5f, 0.5f, 0.5f};
 
+typedef bool (*bool_getter)(void);
+typedef void (*bool_setter)(bool);
+typedef uint8_t (*uint8_getter)(void);
+typedef int16_t (*int16_getter)(void);
+typedef void (*void_func)(void);
+
 #endif // #ifndef COMMON_H

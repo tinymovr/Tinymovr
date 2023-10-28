@@ -19,49 +19,42 @@
 
 #include <src/common.h>
 
-// TODO: Make external in a separate unit
-typedef bool (*bool_getter)(void);
-typedef void (*bool_setter)(bool);
-typedef uint8_t (*uint8_getter)(void);
-typedef int16_t (*int16_getter)(void);
-typedef void (*void_func)(void);
-
 typedef enum {
-	ENCODER_MA7XX = 0,
-	ENCODER_HALL = 1
+	SENSOR_MA7XX = 0,
+	SENSOR_HALL = 1
 } SensorType;
 
 typedef struct {
-    SensorType current_encoder_type;
+    SensorType desired_sensor_type;
+} SensorConfig;
+
+typedef struct {
+    SensorType actual_sensor_type;
     uint8_getter get_error_ptr;
     bool_getter get_calibrated_ptr;
     bool_setter update_angle_ptr;
     int16_getter get_angle_ptr;
-    void_func reset_encoder_ptr;
+    void_func reset_sensor_ptr;
     uint16_t ticks;
-} SensorState;
+    SensorConfig config;
+} Sensor;
 
-typedef struct
-{
-    SensorType encoder_type;
-} SensorConfig;
+void sensor_init(Sensor *s);
+void sensor_reset(Sensor *s);
 
-void encoder_init(void);
-void encoder_reset(void);
+int16_t sensor_get_angle(Sensor *s);
+void sensor_update(Sensor *s, bool check_error);
 
-int16_t encoder_get_angle(void);
-void encoder_update(bool check_error);
+uint16_t sensor_get_ticks(Sensor *s);
+float sensor_ticks_to_eangle(Sensor *s);
 
-uint16_t encoder_get_ticks(void);
-float encoder_ticks_to_eangle(void);
+SensorType sensor_get_type(Sensor *s);
+void sensor_set_type(Sensor *s, SensorType sensor_type);
 
-SensorType encoder_get_type(void);
-void encoder_set_type(SensorType enc_type);
+bool sensor_get_calibrated(Sensor *s);
 
-bool encoder_get_calibrated(void);
+uint8_t sensor_get_errors(Sensor *s);
 
-uint8_t encoder_get_errors(void);
-
-SensorConfig* encoder_get_config(void);
-void encoder_restore_config(SensorConfig* config_);
+SensorConfig* sensor_get_config(Sensor *s);
+void sensor_restore_config(Sensor *s, SensorConfig* config_);
 
