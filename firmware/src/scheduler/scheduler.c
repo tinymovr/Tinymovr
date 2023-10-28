@@ -73,7 +73,7 @@ void WaitForControlLoopInterrupt(void)
 	state.adc_interrupt = false;
 	// We have to service the control loop by updating
 	// current measurements and encoder estimates.
-	if (ENCODER_MA7XX == encoder_get_type())
+	if (SENSOR_MA7XX == encoder_get_type())
 	{
 		ma7xx_send_angle_cmd();
 	}

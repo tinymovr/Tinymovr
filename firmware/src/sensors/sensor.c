@@ -27,11 +27,11 @@ static SensorState state = {0};
 void encoder_init(void)
 {
 #ifdef BOARD_REV_R5
-    if (ENCODER_MA7XX == config.encoder_type)
+    if (SENSOR_MA7XX == config.encoder_type)
     {
 #endif
         ma7xx_init();
-        state.current_encoder_type = ENCODER_MA7XX;
+        state.current_encoder_type = SENSOR_MA7XX;
         state.get_error_ptr = &ma7xx_get_errors;
         state.get_calibrated_ptr = &ma7xx_rec_is_calibrated;
         state.get_angle_ptr = &ma7xx_get_angle_rectified;
@@ -40,10 +40,10 @@ void encoder_init(void)
         state.ticks = ENCODER_TICKS;
 #ifdef BOARD_REV_R5
     }
-    else if (ENCODER_HALL == config.encoder_type)
+    else if (SENSOR_HALL == config.encoder_type)
     {
         hall_init();
-        state.current_encoder_type = ENCODER_HALL;
+        state.current_encoder_type = SENSOR_HALL;
         state.get_error_ptr = &hall_get_errors;
         state.get_calibrated_ptr = &hall_sector_map_is_calibrated;
         state.get_angle_ptr = &hall_get_angle;
@@ -82,7 +82,7 @@ TM_RAMFUNC float encoder_ticks_to_eangle()
 #ifdef BOARD_REV_R5
     // We need to derive this during call, because the motor pole pairs
     // may change after calibration, or after user input
-    if (ENCODER_MA7XX == state.current_encoder_type)
+    if (SENSOR_MA7XX == state.current_encoder_type)
     {
 #endif
         return twopi_by_enc_ticks * motor_get_pole_pairs();
@@ -105,15 +105,15 @@ TM_RAMFUNC bool encoder_get_calibrated(void)
 TM_RAMFUNC void encoder_set_type(SensorType enc_type)
 {
 #ifdef BOARD_REV_R5
-    if (ENCODER_MA7XX == enc_type)
+    if (SENSOR_MA7XX == enc_type)
     {
 #endif
-        config.encoder_type = ENCODER_MA7XX;
+        config.encoder_type = SENSOR_MA7XX;
 #ifdef BOARD_REV_R5
     }
-    else if (ENCODER_HALL == enc_type)
+    else if (SENSOR_HALL == enc_type)
     {
-        config.encoder_type = ENCODER_HALL;
+        config.encoder_type = SENSOR_HALL;
     }
 #endif
 }

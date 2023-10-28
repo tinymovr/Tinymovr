@@ -112,7 +112,7 @@ TM_RAMFUNC float observer_get_vel_estimate(void)
 
 TM_RAMFUNC float observer_get_epos(void)
 {
-	if (ENCODER_MA7XX == state.encoder_type)
+	if (SENSOR_MA7XX == state.encoder_type)
 	{
 		return state.pos_estimate_wrapped * twopi_by_enc_ticks * motor_get_pole_pairs();
 	}
@@ -121,7 +121,7 @@ TM_RAMFUNC float observer_get_epos(void)
 
 TM_RAMFUNC float observer_get_evel(void)
 {
-	if (ENCODER_MA7XX == state.encoder_type)
+	if (SENSOR_MA7XX == state.encoder_type)
 	{
 		return state.vel_estimate * twopi_by_enc_ticks * motor_get_pole_pairs();
 	}
