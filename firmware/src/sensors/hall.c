@@ -22,9 +22,6 @@
 #define AIO6789_IO_MODE                 0x00
 #define AIO_INPUT                       0x00
 
-static HallConfig config = {0};
-static HallState state = {0};
-
 void hall_init(void)
 {
     pac5xxx_tile_register_write(ADDR_CFGAIO7, AIO6789_IO_MODE | AIO_INPUT);
@@ -32,31 +29,9 @@ void hall_init(void)
     pac5xxx_tile_register_write(ADDR_CFGAIO9, AIO6789_IO_MODE | AIO_INPUT);
 }
 
-TM_RAMFUNC uint8_t hall_get_errors(void)
+void hall_deinit(Sensor *s)
 {
-    return state.errors;
-}
 
-TM_RAMFUNC uint8_t *hall_get_error_ptr(void)
-{
-	return &(state.errors);
-}
-
-TM_RAMFUNC int16_t hall_get_angle(void)
-{
-    return state.angle;
-}
-
-TM_RAMFUNC void hall_update(bool check_error)
-{
-    const uint8_t sector = (pac5xxx_tile_register_read(ADDR_DINSIG1) >> 1) & 0x07;
-    state.sector = sector;
-    state.angle = config.sector_map[state.sector];
-}
-
-TM_RAMFUNC uint8_t hall_get_sector(void)
-{
-    return state.sector;
 }
 
 void hall_clear_sector_map(void)
@@ -78,14 +53,4 @@ bool hall_sector_map_is_calibrated(void)
 uint8_t *hall_get_sector_map_ptr(void)
 {
     return config.sector_map;
-}
-
-HallConfig* hall_get_config(void)
-{
-    return &config;
-}
-
-void hall_restore_config(HallConfig* config_)
-{
-    config = *config_;
 }

@@ -17,34 +17,53 @@
 
 #pragma once
 
-#include <src/common.h>
+#include <src/sensor/sensor.h>
 
 typedef struct
 {
 	uint8_t sector_map[8];
     bool sector_map_calibrated;
-} HallConfig;
+} HallSensorConfig;
 
 typedef struct
 {
     uint8_t errors;
 	uint16_t angle;
     uint8_t sector;
-} HallState;
+} HallSensorState;
 
-void hall_init(void);
+Sensor hall_init(void);
+Sensor hall_init_with_config(SensorSpecificConfig *c);
+void hall_deinit(Sensor *s);
 
-uint8_t hall_get_errors(void);
-uint8_t *hall_get_error_ptr(void);
+void hall_clear_sector_map(Sensor *s);
+void hall_set_sector_map_calibrated(Sensor *s);
+bool hall_sector_map_is_calibrated(Sensor *s);
+uint8_t *hall_get_sector_map_ptr(Sensor *s);
 
-int16_t hall_get_angle(void);
-void hall_update(bool check_error);
-uint8_t hall_get_sector(void);
+inline uint8_t hall_get_errors(Sensor *s)
+{
+    return s->state.hall_state.errors;
+}
 
-void hall_clear_sector_map(void);
-void hall_set_sector_map_calibrated(void);
-bool hall_sector_map_is_calibrated(void);
-uint8_t *hall_get_sector_map_ptr(void);
+inline uint8_t *hall_get_error_ptr(Sensor *s)
+{
+    return &(s->state.hall_state.errors);
+}
 
-HallConfig* hall_get_config(void);
-void hall_restore_config(HallConfig* config_);
+inline int16_t hall_get_angle(Sensor *s)
+{
+    return s->state.hall_state.angle;
+}
+
+inline void hall_update(Sensor *s, bool check_error)
+{
+    const uint8_t sector = (pac5xxx_tile_register_read(ADDR_DINSIG1) >> 1) & 0x07;
+    s->state.hall_state.sector = sector;
+    s->state.hall_state.angle = config.sector_map[state.sector];
+}
+
+inline uint8_t hall_get_sector(Sensor *s)
+{
+    return s->state.hall_state.sector;
+}
