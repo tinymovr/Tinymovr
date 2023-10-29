@@ -72,6 +72,24 @@ Flashing the Firmware
 
    Ensure your CAN interface is connected and configured correctly with Tinymovr.
 
+2. **Enter DFU Mode**:
+
+   Launch the Tinymovr CLI:
+
+   .. code-block:: bash
+
+      tinymovr_cli
+
+   Once inside teh CLI, type the following to enter DFU Mode:
+
+   .. code-block:: python
+
+      tmx.enter_dfu()
+
+   Then exit the CLI by typing ``exit``.
+
+   If you are getting an exception after this command, it means that either your Tinymovr does not come with the DFU bootloader, so you will have to :ref:`upgrade-using-activeflashlight`, or your board is already in DFU mode.
+
 2. **Run the Script**:
 
    With the firmware .bin file you downloaded, execute the DFU script:
