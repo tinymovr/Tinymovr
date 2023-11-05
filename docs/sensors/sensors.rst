@@ -100,7 +100,7 @@ At this point, you are ready to perform motor/sensor calibration. This will meas
 
 .. code-block:: python
 
-    tmx.calibrate()
+    tmx.controller.calibrate()
 
 After calibration finishes, you should be able to control the motor:
 
@@ -115,6 +115,6 @@ Once you have determined that the motor behaves as expected, set to idle and per
 
 .. code-block:: python
 
-    tmx.idle()
+    tmx.controller.idle()
     tmx.save_config()
 
