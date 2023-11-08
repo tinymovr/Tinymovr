@@ -23,6 +23,17 @@
 #include <src/sensors/hall.h>
 #include <src/sensors/sensor.h>
 
+#define SENSOR_CNT_BITS 2
+#define SENSOR_COUNT (1 << SENSOR_CNT_BITS)
+
+typedef Sensor (*sensor_init_func_t)(void);
+typedef bool (*sensor_is_calibrated_func_t)(Sensor *);
+typedef bool (*sensor_calibrate_func_t)(Sensor *);
+typedef uint32_t (*sensor_get_angle_func_t)(Sensor *);
+typedef void (*sensor_reset_func_t)(Sensor *);
+typedef void (*sensor_update_func_t)(Sensor *);
+typedef uint8_t (*sensor_get_error_func_t)(Sensor *);
+
 typedef enum {
     SENSOR_MA7XX = 0,
     SENSOR_HALL = 1,
@@ -51,28 +62,39 @@ typedef union {
 
 // Generic sensor struct
 typedef struct {
-    sensor_type_t type;
     sensor_init_func_t init_func;
     sensor_is_calibrated_func_t is_calibrated_func;
-    sensor_read_func_t read_func;
+    sensor_calibrate_func_t calibrate_func;
+    sensor_get_angle_func_t get_angle_func;
     sensor_reset_func_t reset_func;
     sensor_update_func_t update_func;
     sensor_get_error_func_t get_error_func;
     SensorConfig config;
     SensorSpecificState state;
+    sensor_type_t type : 4;
+    uint8_t id : SENSOR_CNT_BITS;
+    bool initialized : 1;
+    bool current : 1;
 } Sensor;
 
-extern Sensor sensor;
+Sensor sensors[SENSOR_COUNT];
+Sensor *sensor_commutation;
+Sensor *sensor_position;
 
-void sensor_init_with_config(SensorConfig *c);
+
+Sensor make_blank_sensor(void);
+Sensor sensor_init(void);
+Sensor sensor_init_with_config(SensorConfig *c);
 void sensor_deinit(Sensor *s);
 void sensor_reset(Sensor *s);
-SensorConfig* sensor_get_config(Sensor *s);
-void sensor_restore_config(Sensor *s, SensorConfig* config_);
+void make_default_sensor_config(void);
+uint32_t sensors_config_length(void);
+bool sensors_serialize_config_to_buffer(uint8_t *buffer, uint32_t len);
+bool sensors_initialize_with_config_buffer(uint8_t *buffer, uint32_t len);
 
 inline int16_t sensor_get_angle(Sensor *s)
 {
-    return s->read_func();
+    return s->get_angle_func();
 }
 
 inline void sensor_update(Sensor *s, bool check_error)
@@ -127,6 +149,11 @@ inline void sensor_set_type(Sensor *s, SensorType sensor_type)
 inline bool sensor_get_calibrated(Sensor *s)
 {
     return s->is_calibrated_func();
+}
+
+inline bool sensor_calibrate(Sensor *s)
+{
+    return s->calibrate_func(s);
 }
 
 inline uint8_t sensor_get_errors(Sensor *s)

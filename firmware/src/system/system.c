@@ -132,6 +132,15 @@ void system_enter_dfu(void)
     NVIC_SystemReset();
 }
 
+void system_reset_calibration(void)
+{
+    ADC_reset();
+    encoder_reset();
+    observer_reset();
+    motor_reset_calibration();
+    wait_pwm_cycles(5000);
+}
+
 TM_RAMFUNC float system_get_Vbus(void)
 {
     return state.Vbus;

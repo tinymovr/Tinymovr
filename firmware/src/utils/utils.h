@@ -42,6 +42,14 @@ static inline float our_fabsf(float x)
 
 #endif
 
+static inline void wait_pwm_cycles(uint32_t cycles)
+{
+    for (uint32_t i = 0; i < cycles; i++)
+    {
+        WaitForControlLoopInterrupt();
+    }
+}
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #pragma GCC diagnostic ignored "-Wuninitialized"

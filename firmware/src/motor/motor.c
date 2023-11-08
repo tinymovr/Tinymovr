@@ -16,7 +16,12 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <src/controller/controller.h>
+#include <src/observer/observer.h>
+#include <src/gatedriver/gatedriver.h>
+#include <src/scheduler/scheduler.h>
 #include <src/utils/utils.h>
+#include <src/can/can_endpoints.h>
+#include <src/system/system.h>
 #include <src/motor/motor.h>
 
 #if defined BOARD_REV_R32 || defined BOARD_REV_R33 || defined BOARD_REV_R5
@@ -80,6 +85,86 @@ void motor_reset_calibration()
 	config.user_direction = 1;
 	config.poles_calibrated = false;
 	config.phases_swapped = false;
+}
+
+bool motor_calibrate_resistance(void)
+{
+    if (!motor_get_is_gimbal())
+    {
+        float I_cal = motor_get_I_cal();
+        float V_setpoint = 0.0f;
+        FloatTriplet I_phase_meas = {0.0f};
+        FloatTriplet modulation_values = {0.0f};
+        for (uint32_t i = 0; i < CAL_R_LEN; i++)
+        {
+            ADC_GetPhaseCurrents(&I_phase_meas);
+            V_setpoint += CAL_V_GAIN * (I_cal - I_phase_meas.A);
+            const float pwm_setpoint = V_setpoint / system_get_Vbus();
+            SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
+            gate_driver_set_duty_cycle(&modulation_values);
+            WaitForControlLoopInterrupt();
+        }
+        const float R = our_fabsf(V_setpoint / I_cal);
+        gate_driver_set_duty_cycle(&three_phase_zero);
+        if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
+        {
+            uint8_t *error_ptr = motor_get_error_ptr();
+            *error_ptr |= MOTOR_ERRORS_PHASE_RESISTANCE_OUT_OF_RANGE;
+            return false;
+        }
+        else
+        {
+            motor_set_phase_resistance(R);
+        }
+    }
+    return true;
+}
+
+bool motor_calibrate_inductance(void)
+{
+    if (!motor_get_is_gimbal())
+    {
+        float V_setpoint = 0.0f;
+        float I_low = 0.0f;
+        float I_high = 0.0f;
+        FloatTriplet I_phase_meas = {0.0f};
+        FloatTriplet modulation_values = {0.0f};
+
+        for (uint32_t i = 0; i < CAL_L_LEN; i++)
+        {
+            ADC_GetPhaseCurrents(&I_phase_meas);
+            if ((i & 0x2u) == 0x2u)
+            {
+                I_high += I_phase_meas.A;
+                V_setpoint = -CAL_V_INDUCTANCE;
+            }
+            else
+            {
+                I_low += I_phase_meas.A;
+                V_setpoint = CAL_V_INDUCTANCE;
+            }
+            const float pwm_setpoint = V_setpoint / system_get_Vbus();
+            SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
+            gate_driver_set_duty_cycle(&modulation_values);
+            WaitForControlLoopInterrupt();
+        }
+        const float num_cycles = CAL_L_LEN / 2;
+        const float dI_by_dt = (I_high - I_low) / (PWM_PERIOD_S * num_cycles);
+        const float L = CAL_V_INDUCTANCE / dI_by_dt;
+        gate_driver_set_duty_cycle(&three_phase_zero);
+        if ((L <= MIN_PHASE_INDUCTANCE) || (L >= MAX_PHASE_INDUCTANCE))
+        {
+            uint8_t *error_ptr = motor_get_error_ptr();
+            *error_ptr |= MOTOR_ERRORS_PHASE_INDUCTANCE_OUT_OF_RANGE;
+            return false;
+        }
+        else
+        {
+            motor_set_phase_inductance(L);
+            controller_update_I_gains();
+        }
+    }
+    return true;
 }
 
 TM_RAMFUNC uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad)

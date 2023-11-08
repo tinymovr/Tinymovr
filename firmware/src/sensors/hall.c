@@ -24,33 +24,105 @@
 
 void hall_init(void)
 {
+    HallConfig c = {0};
+    return hall_init_with_config(*c);
+}
+
+Sensor hall_init_with_config(SensorSpecificConfig *c)
+{
+    Sensor s = make_blank_sensor();
+    s->get_angle_func = hall_get_angle;
+    s->update_func = hall_update;
+    s->reset_func = hall_clear_sector_map;
+    s->get_error_func = hall_get_errors;
+    s->is_calibrated_func = hall_sector_map_is_calibrated;
+    s->calibrate_func = ma7xx_calibrate;
+    s->config = *c;
+    s->state.hall_state.hw_defaults[0] = pac5xxx_tile_register_read(ADDR_CFGAIO7);
+    s->state.hall_state.hw_defaults[1] = pac5xxx_tile_register_read(ADDR_CFGAIO8);
+    s->state.hall_state.hw_defaults[2] = pac5xxx_tile_register_read(ADDR_CFGAIO9);
     pac5xxx_tile_register_write(ADDR_CFGAIO7, AIO6789_IO_MODE | AIO_INPUT);
     pac5xxx_tile_register_write(ADDR_CFGAIO8, AIO6789_IO_MODE | AIO_INPUT);
     pac5xxx_tile_register_write(ADDR_CFGAIO9, AIO6789_IO_MODE | AIO_INPUT);
+    return s;
 }
 
 void hall_deinit(Sensor *s)
 {
-
+    pac5xxx_tile_register_write(ADDR_CFGAIO7, s->state.hall_state.hw_defaults[0]);
+    pac5xxx_tile_register_write(ADDR_CFGAIO8, s->state.hall_state.hw_defaults[1]);
+    pac5xxx_tile_register_write(ADDR_CFGAIO9, s->state.hall_state.hw_defaults[2]);
 }
 
-void hall_clear_sector_map(void)
+bool hall_sector_map_is_calibrated(Sensor *s)
 {
-    (void)memset(config.sector_map, 0, sizeof(config.sector_map));
-	config.sector_map_calibrated = false;
+    return s->config.hall_config.sector_map_calibrated;
 }
 
-void hall_set_sector_map_calibrated(void)
+bool hall_calibrate_sequence(Sensor *s)
 {
-    config.sector_map_calibrated = true;
-}
+    (void)memset(s->config.hall_config.sector_map, 0, sizeof(config.sector_map));
+	s->config.hall_config.sector_map_calibrated = false;
+    uint8_t *sector_map = s->config.hall_config.sector_map;
+    const float I_setpoint = motor_get_I_cal();
+    bool success = true;
 
-bool hall_sector_map_is_calibrated(void)
-{
-    return config.sector_map_calibrated;
-}
+    // Stay a bit at starting epos
+	for (uint32_t i=0; i<CAL_STAY_LEN; i++)
+	{
+		set_epos_and_wait(0, I_setpoint);
+	}
+    const uint8_t init_sector = hall_get_sector();
+    uint8_t current_sector = init_sector;
+    uint8_t last_sector = init_sector;
+    uint8_t sector_pos = 0;
+    const float increment = TWOPI / CAL_DIR_LEN;
+    float angle = 0;
 
-uint8_t *hall_get_sector_map_ptr(void)
-{
-    return config.sector_map;
+    sector_map[current_sector] = sector_pos;
+
+    // Move to the 2nd sector
+    while ((current_sector == init_sector) && (angle < TWOPI / HALL_SECTORS))
+    {
+        set_epos_and_wait(angle, I_setpoint);
+        angle += increment;
+        current_sector = hall_get_sector();
+    }
+
+    // Save the rest of the sectors
+    while ((current_sector != init_sector) && (angle < TWOPI))
+    {
+        if (current_sector != last_sector)
+        {
+            last_sector = current_sector;
+            sector_pos++;
+            if (sector_pos >= HALL_SECTORS)
+            {
+                success = false;
+                break;
+            }
+            sector_map[current_sector] = sector_pos;
+        }
+        set_epos_and_wait(angle, I_setpoint);
+        angle += increment;
+        current_sector = hall_get_sector();
+    }
+
+    gate_driver_set_duty_cycle(&three_phase_zero);
+
+    // Check that the number of sectors discovered is the same as expected
+    if (sector_pos != HALL_SECTORS - 1)
+    {
+        success = false;
+    }
+
+    if (success)
+    {
+        s->config.hall_config.sector_map_calibrated = true;
+    }
+    else
+    {
+        s->state.hall_state.errors |= ENCODER_ERRORS_CALIBRATION_FAILED;
+    }
+    return success;
 }

@@ -37,6 +37,7 @@ void system_init(void);
 void system_update(void);
 void system_reset(void);
 void system_enter_dfu(void);
+void system_reset_calibration(void);
 
 inline uint8_t system_get_fw_version_string(char *buffer)
 {

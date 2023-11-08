@@ -233,7 +233,15 @@ void ADC_DTSE_Init(void)
     pac5xxx_dtse_seq_config(18, ADC0, 0, ADC_IRQ0_EN, SEQ_END); // Get result at DTSERES18, Interrupt
 }
 
-TM_RAMFUNC float adc_get_mcu_temp(void)
+bool ADC_calibrate_offset(void)
+{
+    // We only need to wait here, the ADC loop will
+    // perform the offset calibration automatically
+    wait_pwm_cycles(10000);
+    return true;
+}
+
+TM_RAMFUNC float ADC_get_mcu_temp(void)
 {
     return adc_state.temp;
 }

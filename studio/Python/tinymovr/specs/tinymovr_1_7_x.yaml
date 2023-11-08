@@ -349,6 +349,12 @@ remote_attributes:
                 summary: Any encoder errors, as a bitmask
           - name: external_spi
             remote_attributes:
+              - name: type
+                options: [MA7XX, AS5047, AMT22]
+                meta: {export: True}
+                getter_name: get_external_spi_sensor_type
+                setter_name: set_external_spi_sensor_type
+                summary: The type of external sensor type. Either MA7XX, AS5047 or AMT22.
               - name: calibrated
                 dtype: bool
                 meta: {dynamic: True}
@@ -378,15 +384,15 @@ remote_attributes:
               - name: type
                 options: [ONBOARD, SPI, HALL]
                 meta: {export: True}
-                getter_name: 
-                setter_name: 
-                summary: The encoder type. Either ONBOARD, external SPI or HALL.
+                getter_name: get_position_sensor_type
+                setter_name: set_position_sensor_type
+                summary: The encoder type. Either ONBOARD, SPI or HALL.
               - name: bandwidth
                 dtype: float
                 unit: Hz
                 meta: {export: True}
-                getter_name: 
-                setter_name: 
+                getter_name: get_position_sensor_bandwidth
+                setter_name: set_position_sensor_bandwidth
                 summary: The encoder observer bandwidth.
               - name: position_estimate
                 dtype: float
@@ -405,15 +411,15 @@ remote_attributes:
               - name: type
                 options: [ONBOARD, SPI, HALL]
                 meta: {export: True}
-                getter_name: 
-                setter_name: 
-                summary: The encoder type. Either ONBOARD, external SPI or HALL.
+                getter_name: get_commutation_sensor_type
+                setter_name: set_commutation_sensor_type
+                summary: The encoder type. Either ONBOARD, SPI or HALL.
               - name: bandwidth
                 dtype: float
                 unit: Hz
                 meta: {export: True}
-                getter_name: 
-                setter_name: 
+                getter_name: get_commutation_sensor_bandwidth
+                setter_name: set_commutation_sensor_bandwidth
                 summary: The encoder observer bandwidth.
               - name: position_estimate
                 dtype: float

@@ -53,15 +53,16 @@ typedef struct
     uint8_t error;
 } MA7xxSensorState;
 
-Sensor ma7xx_init_with_ssp_port(SSP_TYPE ssp);
+Sensor ma7xx_init();
 Sensor ma7xx_init_with_config(SensorSpecificConfig *c);
 void ma7xx_deinit(Sensor *s);
 void ma7xx_clear_rec_table(Sensor *s);
-void ma7xx_set_rec_calibrated(Sensor *s);
 bool ma7xx_rec_is_calibrated(Sensor *s);
 int16_t *ma7xx_get_rec_table_ptr(Sensor *s);
 uint16_t ma7xx_write_reg(Sensor *s, uint8_t, uint8_t);
 uint8_t ma7xx_read_reg(Sensor *s, uint8_t);
+bool ma7xx_calibrate_offset_and_rectification(Sensor *s);
+bool ma7xx_calibrate_direction_and_pole_pair_count(Sensor *s);
 
 inline uint8_t ma7xx_get_errors(Sensor *s)
 {
@@ -103,4 +104,9 @@ inline void ma7xx_update(Sensor *s, bool check_error)
 		}
     }
     state.angle = angle;
+}
+
+inline void ma7xx_calibrate(Sensor *s)
+{
+    return ma7xx_calibrate_direction_and_pole_pair_count() && ma7xx_calibrate_offset_and_rectification();
 }

@@ -16,8 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef OBSERVER_OBSERVER_H_
-#define OBSERVER_OBSERVER_H_
+#pragma once
 
 #include <stdint.h>
 #include <src/common.h>
@@ -30,6 +29,7 @@ typedef struct
 	float vel_estimate;
 	uint16_t encoder_ticks;
 	uint16_t encoder_half_ticks;
+	bool valid;
 	SensorType encoder_type;
 } ObserverState;
 
@@ -38,25 +38,109 @@ typedef struct
 	float track_bw;
 	float kp;
 	float ki;
+	uint8_t sensor_id;
 } ObserverConfig;
 
-void observer_init(void);
-void observer_reset(void);
+typedef struct {
+	ObserverConfig config;
+	ObserverState state;
+} Observer;
 
-void observer_update(void);
-float observer_get_pos_estimate(void);
-float observer_get_diff(float target);
-float observer_get_vel_estimate(void);
-float observer_get_epos(void);
-float observer_get_evel(void);
+Observer observers[2];
+Observer *observer_commutation;
+Observer *observer_position;
 
-float observer_get_pos_estimate_user_frame(void);
-float observer_get_vel_estimate_user_frame(void);
+Observer observer_init(Sensor *s);
+void observer_reset(Observer *o);
 
-float observer_get_bw(void);
-void observer_set_bw(float bw);
+float observer_get_bw(Observer *o);
+void observer_set_bw(Observer *o, float bw);
 
-ObserverConfig* observer_get_config(void);
-void observer_restore_config(ObserverConfig* config_);
+void make_default_observer_config(void);
+uint32_t observers_config_length(void);
+bool observers_serialize_config_to_buffer(uint8_t *buffer, uint32_t len);
+bool observers_initialize_with_config_buffer(uint8_t *buffer, uint32_t len);
+ 
+inline void observer_update(Observer *o)
+{
+	if (o->state.valid == false)
+	{
+		const int16_t angle_meas = sensors[o->config.sensor_idx]->get_angle_func();
+		const float delta_pos_est = PWM_PERIOD_S * o->state.vel_estimate;
+		float delta_pos_meas = angle_meas - o->state.pos_estimate_wrapped;
+		if (delta_pos_meas < -(o->state.encoder_half_ticks))
+		{
+			delta_pos_meas += o->state.encoder_ticks;
+		}
+		else if (delta_pos_meas >= o->state.encoder_half_ticks)
+		{
+			delta_pos_meas -= o->state.encoder_ticks;
+		}
+		const float delta_pos_error = delta_pos_meas - delta_pos_est;
+		const float incr_pos = delta_pos_est + (PWM_PERIOD_S * o->config.kp * delta_pos_error);
+		o->state.pos_estimate_wrapped += incr_pos;
+		if (o->state.pos_estimate_wrapped < 0)
+		{
+			o->state.pos_estimate_wrapped += o->state.encoder_ticks;
+			o->state.pos_sector -= 1;
+		}
+		else if (o->state.pos_estimate_wrapped >= o->state.encoder_ticks)
+		{
+			o->state.pos_estimate_wrapped -= o->state.encoder_ticks;
+			o->state.pos_sector += 1;
+		}
+		o->state.vel_estimate += PWM_PERIOD_S * o->config.ki * delta_pos_error;
+		o->state.valid = true;
+	}
+}
 
-#endif /* OBSERVER_OBSERVER_H_ */
+inline void observer_invalidate(Observer *o)
+{
+	o->state.valid = false;
+}
+
+inline float observer_get_pos_estimate(Observer *o)
+{
+	const float primary = o->state.encoder_ticks * o->state.pos_sector;
+	return primary + o->state.pos_estimate_wrapped;
+}
+
+inline float observer_get_diff(Observer *o, float target)
+{
+	const float primary = o->state.encoder_ticks * o->state.pos_sector;
+	const float diff_sector = target - primary;
+	return diff_sector - o->state.pos_estimate_wrapped;
+}
+
+inline float observer_get_vel_estimate(Observer *o)
+{
+	return o->state.vel_estimate;
+}
+
+inline float observer_get_epos(Observer *o)
+{
+	if (SENSOR_MA7XX == o->state.encoder_type)
+	{
+		return o->state.pos_estimate_wrapped * twopi_by_enc_ticks * motor_get_pole_pairs();
+	}
+	return o->state.pos_estimate_wrapped * twopi_by_hall_sectors;
+}
+
+inline float observer_get_evel(Observer *o)
+{
+	if (SENSOR_MA7XX == o->state.encoder_type)
+	{
+		return o->state.vel_estimate * twopi_by_enc_ticks * motor_get_pole_pairs();
+	}
+	return o->state.vel_estimate * twopi_by_hall_sectors;
+}
+
+inline float observer_get_pos_estimate_user_frame(Observer *o)
+{
+	return (observer_get_pos_estimate() - motor_get_user_offset()) * motor_get_user_direction();
+}
+
+inline float observer_get_vel_estimate_user_frame(Observer *o)
+{
+	return o->state.vel_estimate * motor_get_user_direction();
+}

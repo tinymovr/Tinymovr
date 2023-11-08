@@ -31,6 +31,22 @@
 #define MAX_PHASE_INDUCTANCE (1e-2f)
 #endif
 
+#define CAL_R_LEN             (2 * PWM_FREQ_HZ)
+#define CAL_L_LEN             (1 * PWM_FREQ_HZ)
+#define CAL_OFFSET_LEN        (1 * PWM_FREQ_HZ)
+#define CAL_STAY_LEN          (PWM_FREQ_HZ / 2)
+#define CAL_DIR_LEN           (3 * PWM_FREQ_HZ)
+#define CAL_PHASE_TURNS       (8)
+#if defined BOARD_REV_R32 || BOARD_REV_R33 || defined BOARD_REV_R5
+#define CAL_V_GAIN            (0.0005f)
+#define CAL_V_INDUCTANCE      (2.0f)
+#elif defined BOARD_REV_M5
+#define CAL_V_GAIN            (0.002f)
+#define CAL_V_INDUCTANCE      (5.0f)
+#endif
+
+
+
 typedef struct
 {
 	uint8_t pole_pairs;
@@ -56,6 +72,8 @@ typedef struct
 } MotorState;
 
 void motor_reset_calibration(void);
+bool motor_calibrate_resistance(void);
+bool motor_calibrate_inductance(void);
 
 uint8_t motor_get_pole_pairs(void);
 uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad);
@@ -91,4 +109,15 @@ uint8_t *motor_get_error_ptr(void);
 
 MotorConfig *motor_get_config(void);
 void motor_restore_config(MotorConfig *config_);
+
+static inline void set_epos_and_wait(float angle, float I_setpoint)
+{
+    FloatTriplet modulation_values = {0.0f};
+    float pwm_setpoint = (I_setpoint * motor_get_phase_resistance()) / system_get_Vbus();
+    our_clampc(&pwm_setpoint, -PWM_LIMIT, PWM_LIMIT);
+    SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),
+        &modulation_values.A, &modulation_values.B, &modulation_values.C);
+    gate_driver_set_duty_cycle(&modulation_values);
+    WaitForControlLoopInterrupt();
+}
 

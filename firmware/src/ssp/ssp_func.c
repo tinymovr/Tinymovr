@@ -760,6 +760,36 @@ void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t cph, uint8_t cpol)
     ssp_ptr->CON.SSPEN = SSP_CONTROL_ENABLE;                 // SSP Enable
 }
 
+void ssp_deinit(SSP_TYPE ssp)
+{
+    PAC55XX_SSP_TYPEDEF *ssp_ptr;
+
+    switch (ssp)
+    {
+        case SSPA:
+            ssp_ptr = PAC55XX_SSPA;
+            break;
+
+        case SSPB:
+            ssp_ptr = PAC55XX_SSPB;
+            break;
+
+        case SSPC:
+            ssp_ptr = PAC55XX_SSPC;
+            break;
+
+        case SSPD:
+            ssp_ptr = PAC55XX_SSPD;
+            break;
+
+        default:
+            ssp_ptr = PAC55XX_SSPD;
+            break;
+    }
+    ssp_interrupt_disable(ssp);
+    ssp_ptr->CON.SSPEN = SSP_CONTROL_DISNABLE;
+}
+
 //==============================================================================
 ///@brief
 ///     Write a 16-bit data to SSP manually

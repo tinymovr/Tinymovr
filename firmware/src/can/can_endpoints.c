@@ -111,7 +111,7 @@ uint8_t avlos_temp(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
 if (AVLOS_CMD_READ == cmd) {
         float v;
-        v = adc_get_mcu_temp();
+        v = ADC_get_mcu_temp();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
