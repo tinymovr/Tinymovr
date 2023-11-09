@@ -24,29 +24,26 @@
 
 // ONBOARD_SENSOR_SSP_PORT, SSP_MS_MASTER, Mode 0)
 
-Sensor ma7xx_init()
+bool ma7xx_init(Sensor *s)
 {
-    MA7xxConfig c = {0};
-    c.ssp_port = ONBOARD_SENSOR_SSP_PORT;
-    return ma7xx_init_with_config(*c);
+    MA7xxConfig c = {.id = get_next_sensor_id(), .ssp_port = ONBOARD_SENSOR_SSP_PORT};
+    return ma7xx_init_with_config(s, *c);
 }
 
-Sensor ma7xx_init_with_config(SensorSpecificConfig *c)
+bool ma7xx_init_with_config(Sensor *s, SensorSpecificConfig *c)
 {
-    Sensor s = make_blank_sensor();
     s->get_angle_func = ma7xx_get_angle_rectified;
     s->update_func = ma7xx_update;
     s->reset_func = ma7xx_clear_rec_table;
     s->get_error_func = ma7xx_get_errors;
     s->is_calibrated_func = ma7xx_rec_is_calibrated;
     s->calibrate_func = ma7xx_calibrate;
-    s->config = *c;
-    MA7xxConfig *c = s->config.ss_config.ma7xx_config;
-    ssp_init(c->ssp_port, SSP_MS_MASTER, 0, 0);
+    const MA7xxConfig *sensor_c = s->config.ss_config.ma7xx_config;
+    ssp_init(sensor_c->ssp_port, SSP_MS_MASTER, 0, 0);
     delay_us(16000); // ensure 16ms sensor startup time as per the datasheet
     ma7xx_send_angle_cmd(&s);
     ma7xx_update(&s, false);
-    return s;
+    return true;
 }
 
 void ma7xx_deinit(Sensor *s)

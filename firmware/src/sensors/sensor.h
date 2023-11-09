@@ -25,11 +25,12 @@
 
 #define SENSOR_CNT_BITS 2
 #define SENSOR_COUNT (1 << SENSOR_CNT_BITS)
+static_assert((SENSOR_COUNT & (SENSOR_COUNT - 1)) == 0, "SENSOR_COUNT must be a power of 2");
 
 typedef Sensor (*sensor_init_func_t)(void);
 typedef bool (*sensor_is_calibrated_func_t)(Sensor *);
 typedef bool (*sensor_calibrate_func_t)(Sensor *);
-typedef uint32_t (*sensor_get_angle_func_t)(Sensor *);
+typedef int16_t (*sensor_get_angle_func_t)(Sensor *);
 typedef void (*sensor_reset_func_t)(Sensor *);
 typedef void (*sensor_update_func_t)(Sensor *);
 typedef uint8_t (*sensor_get_error_func_t)(Sensor *);
@@ -49,8 +50,9 @@ typedef union {
 } SensorSpecificConfig;
 
 typedef struct {
-    SensorType configured_sensor_type;
     SensorSpecificConfig ss_config;
+    uint32_t id;
+    sensor_type_t type;
 } SensorConfig;
 
 typedef union {
@@ -71,8 +73,6 @@ typedef struct {
     sensor_get_error_func_t get_error_func;
     SensorConfig config;
     SensorSpecificState state;
-    sensor_type_t type : 4;
-    uint8_t id : SENSOR_CNT_BITS;
     bool initialized : 1;
     bool current : 1;
 } Sensor;
@@ -82,15 +82,14 @@ Sensor *sensor_commutation;
 Sensor *sensor_position;
 
 
-Sensor make_blank_sensor(void);
-Sensor sensor_init(void);
-Sensor sensor_init_with_config(SensorConfig *c);
+uint32_t get_next_sensor_id(void);
+bool sensor_init_with_config(Sensor *s, SensorConfig *c);
 void sensor_deinit(Sensor *s);
 void sensor_reset(Sensor *s);
 void make_default_sensor_config(void);
 uint32_t sensors_config_length(void);
-bool sensors_serialize_config_to_buffer(uint8_t *buffer, uint32_t len);
-bool sensors_initialize_with_config_buffer(uint8_t *buffer, uint32_t len);
+bool sensors_serialize_config_to_buffer(uint8_t *buffer, uint32_t *len);
+bool sensors_initialize_with_config_buffer(const uint8_t *buffer, const uint32_t len);
 
 inline int16_t sensor_get_angle(Sensor *s)
 {
@@ -99,7 +98,11 @@ inline int16_t sensor_get_angle(Sensor *s)
 
 inline void sensor_update(Sensor *s, bool check_error)
 {
-    s->update_func(check_error);
+    if (s->current == false)
+    {
+        s->update_func(check_error);
+        s->current = true;
+    }
 }
 
 inline uint16_t sensor_get_ticks(Sensor *s) {

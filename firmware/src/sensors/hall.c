@@ -22,15 +22,14 @@
 #define AIO6789_IO_MODE                 0x00
 #define AIO_INPUT                       0x00
 
-void hall_init(void)
+bool hall_init(Sensor *s)
 {
-    HallConfig c = {0};
-    return hall_init_with_config(*c);
+    HallConfig c = {.id = get_next_sensor_id()};
+    return hall_init_with_config(s, *c);
 }
 
-Sensor hall_init_with_config(SensorSpecificConfig *c)
+bool hall_init_with_config(Sensor *s, SensorSpecificConfig *c)
 {
-    Sensor s = make_blank_sensor();
     s->get_angle_func = hall_get_angle;
     s->update_func = hall_update;
     s->reset_func = hall_clear_sector_map;
@@ -44,7 +43,7 @@ Sensor hall_init_with_config(SensorSpecificConfig *c)
     pac5xxx_tile_register_write(ADDR_CFGAIO7, AIO6789_IO_MODE | AIO_INPUT);
     pac5xxx_tile_register_write(ADDR_CFGAIO8, AIO6789_IO_MODE | AIO_INPUT);
     pac5xxx_tile_register_write(ADDR_CFGAIO9, AIO6789_IO_MODE | AIO_INPUT);
-    return s;
+    return true;
 }
 
 void hall_deinit(Sensor *s)

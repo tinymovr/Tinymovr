@@ -33,8 +33,8 @@ typedef struct
     uint8_t hw_defaults[3];
 } HallSensorState;
 
-Sensor hall_init(void);
-Sensor hall_init_with_config(SensorSpecificConfig *c);
+bool hall_init(Sensor *s);
+bool hall_init_with_config(Sensor *s, SensorSpecificConfig *c);
 void hall_deinit(Sensor *s);
 
 bool hall_sector_map_is_calibrated(Sensor *s);

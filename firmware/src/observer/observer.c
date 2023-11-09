@@ -71,15 +71,23 @@ void make_default_observer_config(void)
 
 uint32_t observers_config_length(void)
 {
-
+	uint32_t config_length = 0;
+    for (uint8_t i=0; i<OBSERVER_COUNT; i++)
+    {
+        if (sensors[i].initialized)
+        {
+            config_length += len(SensorConfig);
+        }
+    }
+    return config_length;
 }
 
-bool observers_serialize_config_to_buffer(uint8_t *buffer, uint32_t len)
+bool observers_serialize_config_to_buffer(uint8_t *buffer, uint32_t *len)
 {
 
 }
 
-bool observers_initialize_with_config_buffer(uint8_t *buffer, uint32_t len)
+bool observers_initialize_with_config_buffer(const uint8_t *buffer, const uint32_t len)
 {
-	
+
 }

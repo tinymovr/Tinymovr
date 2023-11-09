@@ -53,8 +53,8 @@ typedef struct
     uint8_t error;
 } MA7xxSensorState;
 
-Sensor ma7xx_init();
-Sensor ma7xx_init_with_config(SensorSpecificConfig *c);
+bool ma7xx_init(Sensor *s);
+bool ma7xx_init_with_config(Sensor *s, SensorSpecificConfig *c);
 void ma7xx_deinit(Sensor *s);
 void ma7xx_clear_rec_table(Sensor *s);
 bool ma7xx_rec_is_calibrated(Sensor *s);
