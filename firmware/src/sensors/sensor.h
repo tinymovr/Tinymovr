@@ -36,10 +36,11 @@ typedef void (*sensor_update_func_t)(Sensor *);
 typedef uint8_t (*sensor_get_error_func_t)(Sensor *);
 
 typedef enum {
-    SENSOR_MA7XX = 0,
-    SENSOR_HALL = 1,
-    SENSOR_AS5047 = 2,
-    SENSOR_AMT22 = 3
+    SENSOR_INVALID = 0,
+    SENSOR_MA7XX = 1,
+    SENSOR_HALL = 2,
+    SENSOR_AS5047 = 3,
+    SENSOR_AMT22 = 4
 } sensor_type_t;
 
 typedef union {

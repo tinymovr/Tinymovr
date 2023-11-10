@@ -19,7 +19,6 @@
 #include <src/utils/utils.h>
 #include <src/rtt/SEGGER_RTT.h>
 #include <src/controller/controller.h>
-#include <src/sensors/sensor.h>
 #include <src/motor/motor.h>
 #include <src/can/can_endpoints.h>
 #include <src/system/system.h>

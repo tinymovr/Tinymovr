@@ -69,24 +69,23 @@ uint32_t sensors_config_length(void)
     {
         if (sensors[i].initialized)
         {
-            config_length += len(SensorConfig);
+            config_length += sizeof(SensorConfig);
         }
     }
     return config_length;
 }
 
-bool serialize_sensors_config_to_buffer(uint8_t *buffer, uint32_t *len)
+bool sensors_serialize_config_to_buffer(uint8_t *buffer, uint32_t *len)
 {
     uint8_t *buffer_pos = buffer;
     memcpy(buffer, &(sensor_commutation->id), sizeof(sensor_commutation->id));
     buffer_pos += sizeof(sensor_commutation->id);
     memcpy(buffer, &(sensor_position->id), sizeof(sensor_position->id));
     buffer_pos += sizeof(sensor_position->id);
-    const uint32_t position_id = *sensor_commutation.id
 
     for (uint8_t i=0; i<SENSOR_COUNT; i++)
     {
-        if (sensors[i].initialized == true)
+        if (sensors[i].config.type != SENSOR_INVALID && sensors[i].initialized == true)
         {
             if (buffer_pos - buffer <= *len - sizeof(SensorConfig))
             {
@@ -103,7 +102,7 @@ bool serialize_sensors_config_to_buffer(uint8_t *buffer, uint32_t *len)
     return true;
 }
 
-bool initialize_sensors_with_config_buffer(const uint8_t *buffer, const uint32_t len)
+bool sensors_initialize_with_config_buffer(const uint8_t *buffer, const uint32_t len)
 {
     uint8_t *buffer_pos = buffer;
     uint32_t commutation_id, position_id;
@@ -127,14 +126,17 @@ bool initialize_sensors_with_config_buffer(const uint8_t *buffer, const uint32_t
     }
     for (uint8_t i=0; i<SENSOR_COUNT; i++)
     {
-        sensor_init_with_config(&(sensors[i]), &(configs[i]));
-        if (sensors[i].config.id == commutation_id)
+        if (configs[i].type != SENSOR_INVALID)
         {
-            sensor_commutation = &(sensors[i]);
-        }
-        else if (sensors[i].config.id == position_id)
-        {
-            sensor_position = &(sensors[i]);
+            sensor_init_with_config(&(sensors[i]), &(configs[i]));
+            if (sensors[i].config.id == commutation_id)
+            {
+                sensor_commutation = &(sensors[i]);
+            }
+            else if (sensors[i].config.id == position_id)
+            {
+                sensor_position = &(sensors[i]);
+            }
         }
     }
     return true;
