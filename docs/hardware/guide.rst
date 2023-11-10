@@ -137,4 +137,15 @@ Connecting Power
 With the power source off/disconnected, connect the power leads observing correct polarity. Turn on/connect the power source. Upon successful power-up, the onboard LED should light up.
 
 .. note::
-   Each Tinymovr board has a capacitance of around 500μF (R3.x) / 200μF (R5) / 50μF (M5). Such capacitance can introduce significant inrush current upon power-on, especially if several boards are connected to the same power supply. To prevent damage to components from overcurrent, the use of an inrush current limiter or a current-limited power supply is advised. We offer a `Power Distribution and protection device <https://tinymovr.com/products/dianome>`_ which is suitable for this task.
+   Each Tinymovr board has a capacitance of around 500μF (R3.x) / 240μF (R5) / 50μF (M5). Such capacitance can introduce significant inrush current upon power-on, especially if several boards are connected to the same power supply. To prevent damage to components from overcurrent, the use of an inrush current limiter or a current-limited power supply is advised. We offer a `Power Distribution and protection device <https://tinymovr.com/products/dianome>`_ which is suitable for this task.
+
+.. _daisy-chain:
+
+Connecting Multiple Nodes (Daisy-Chaining)
+##########################################
+
+Multiple nodes can be connected in a single CAN Bus network by means of daisy-chaining. Tinymovr R5 and Tinymovr M5 offer two CAN Bus ports for this purpose, which makes it easy to daisy-chain units. Note that for networks with long cable lengths, you may need termination on both ends. On one end this can be achieved with the onboard termination resistor of CANine, but on the other end you will have to provide your own.
+
+.. image:: daisy_chain.png
+  :width: 800
+  :alt: Connecting multiple nodes by daisy-chaining
