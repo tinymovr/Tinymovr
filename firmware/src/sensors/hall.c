@@ -35,8 +35,9 @@ bool hall_init_with_config(Sensor *s, SensorSpecificConfig *c)
     s->reset_func = hall_clear_sector_map;
     s->get_error_func = hall_get_errors;
     s->is_calibrated_func = hall_sector_map_is_calibrated;
-    s->calibrate_func = ma7xx_calibrate;
-    s->config = *c;
+    s->calibrate_func = hall_calibrate_sequence;
+    s->config.type = SENSOR_HALL;
+    s->config.ss_config = *c;
     s->state.hall_state.hw_defaults[0] = pac5xxx_tile_register_read(ADDR_CFGAIO7);
     s->state.hall_state.hw_defaults[1] = pac5xxx_tile_register_read(ADDR_CFGAIO8);
     s->state.hall_state.hw_defaults[2] = pac5xxx_tile_register_read(ADDR_CFGAIO9);

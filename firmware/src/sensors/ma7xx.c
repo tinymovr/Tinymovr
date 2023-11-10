@@ -38,8 +38,9 @@ bool ma7xx_init_with_config(Sensor *s, SensorSpecificConfig *c)
     s->get_error_func = ma7xx_get_errors;
     s->is_calibrated_func = ma7xx_rec_is_calibrated;
     s->calibrate_func = ma7xx_calibrate;
-    const MA7xxConfig *sensor_c = s->config.ss_config.ma7xx_config;
-    ssp_init(sensor_c->ssp_port, SSP_MS_MASTER, 0, 0);
+    s->config.type = SENSOR_MA7XX;
+    s->config.ss_config = *c;
+    ssp_init(s->config.ss_config.ma7xx_config.ssp_port, SSP_MS_MASTER, 0, 0);
     delay_us(16000); // ensure 16ms sensor startup time as per the datasheet
     ma7xx_send_angle_cmd(&s);
     ma7xx_update(&s, false);
