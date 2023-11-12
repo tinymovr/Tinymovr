@@ -36,11 +36,11 @@ typedef void (*sensor_update_func_t)(Sensor *);
 typedef uint8_t (*sensor_get_error_func_t)(Sensor *);
 
 typedef enum {
-    SENSOR_INVALID = 0,
-    SENSOR_MA7XX = 1,
-    SENSOR_HALL = 2,
-    SENSOR_AS5047 = 3,
-    SENSOR_AMT22 = 4
+    SENSOR_TYPE_INVALID = 0,
+    SENSOR_TYPE_MA7XX = 1,
+    SENSOR_TYPE_HALL = 2,
+    SENSOR_TYPE_AS5047 = 3,
+    SENSOR_TYPE_AMT22 = 4
 } sensor_type_t;
 
 typedef union {
@@ -63,8 +63,9 @@ typedef union {
     AMT22SensorState amt22_state;
 } SensorSpecificState;
 
-// Generic sensor struct
 typedef struct {
+    SensorConfig config;
+    SensorSpecificState state;
     sensor_init_func_t init_func;
     sensor_is_calibrated_func_t is_calibrated_func;
     sensor_calibrate_func_t calibrate_func;
@@ -72,8 +73,6 @@ typedef struct {
     sensor_reset_func_t reset_func;
     sensor_update_func_t update_func;
     sensor_get_error_func_t get_error_func;
-    SensorConfig config;
-    SensorSpecificState state;
     bool initialized : 1;
     bool current : 1;
 } Sensor;
@@ -87,10 +86,11 @@ uint32_t get_next_sensor_id(void);
 bool sensor_init_with_config(Sensor *s, SensorConfig *c);
 void sensor_deinit(Sensor *s);
 void sensor_reset(Sensor *s);
-void make_default_sensor_config(void);
+
+void sensors_init_with_defaults(void);
 uint32_t sensors_config_length(void);
 bool sensors_serialize_config_to_buffer(uint8_t *buffer, uint32_t *len);
-bool sensors_initialize_with_config_buffer(const uint8_t *buffer, const uint32_t len);
+bool sensors_init_with_config_buffer(const uint8_t *buffer, const uint32_t len);
 
 inline int16_t sensor_get_angle(Sensor *s)
 {

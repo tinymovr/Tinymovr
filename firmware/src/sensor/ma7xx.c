@@ -22,12 +22,10 @@
 #include <src/can/can_endpoints.h>
 #include <src/sensors/ma7xx.h>
 
-// ONBOARD_SENSOR_SSP_PORT, SSP_MS_MASTER, Mode 0)
-
-bool ma7xx_init(Sensor *s)
+bool ma7xx_init_with_defaults(Sensor *s)
 {
     MA7xxConfig c = {.id = get_next_sensor_id(), .ssp_port = ONBOARD_SENSOR_SSP_PORT};
-    return ma7xx_init_with_config(s, *c);
+    return ma7xx_init_with_config(s, &c);
 }
 
 bool ma7xx_init_with_config(Sensor *s, SensorSpecificConfig *c)
@@ -38,7 +36,7 @@ bool ma7xx_init_with_config(Sensor *s, SensorSpecificConfig *c)
     s->get_error_func = ma7xx_get_errors;
     s->is_calibrated_func = ma7xx_rec_is_calibrated;
     s->calibrate_func = ma7xx_calibrate;
-    s->config.type = SENSOR_MA7XX;
+    s->config.type = SENSOR_TYPE_MA7XX;
     s->config.ss_config = *c;
     ssp_init(s->config.ss_config.ma7xx_config.ssp_port, SSP_MS_MASTER, 0, 0);
     delay_us(16000); // ensure 16ms sensor startup time as per the datasheet

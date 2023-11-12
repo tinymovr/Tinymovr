@@ -22,10 +22,10 @@
 #define AIO6789_IO_MODE                 0x00
 #define AIO_INPUT                       0x00
 
-bool hall_init(Sensor *s)
+bool hall_init_with_defaults(Sensor *s)
 {
     HallConfig c = {.id = get_next_sensor_id()};
-    return hall_init_with_config(s, *c);
+    return hall_init_with_config(s, &c);
 }
 
 bool hall_init_with_config(Sensor *s, SensorSpecificConfig *c)

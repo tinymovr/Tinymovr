@@ -14,13 +14,13 @@ bool sensor_init_with_config(Sensor *s, SensorConfig *c)
     if (s->initialized == false)
     {
 #ifdef BOARD_REV_R5
-        if (SENSOR_MA7XX == c->type)
+        if (SENSOR_TYPE_MA7XX == c->type)
         {
 #endif
             return ma7xx_init_with_config(s, c);
 #ifdef BOARD_REV_R5
         }
-        else if (SENSOR_HALL == c->type)
+        else if (SENSOR_TYPE_HALL == c->type)
         {
             return hall_init_with_config(s, c);
         }
@@ -36,13 +36,13 @@ bool sensor_init_with_config(Sensor *s, SensorConfig *c)
 void sensor_deinit(Sensor *s)
 {
 #ifdef BOARD_REV_R5
-    if (SENSOR_MA7XX == s->type)
+    if (SENSOR_TYPE_MA7XX == s->type)
     {
 #endif
         ma7xx_deinit(s);
 #ifdef BOARD_REV_R5
     }
-    else if (SENSOR_HALL == s->type)
+    else if (SENSOR_TYPE_HALL == s->type)
     {
         hall_deinit(s);
     }
@@ -55,9 +55,9 @@ void sensor_reset(Sensor *s)
     s->reset_func();
 }
 
-void make_default_sensor_config(void)
+void sensors_init_with_defaults(void)
 {
-    ma7xx_init(&(sensors[0]));
+    ma7xx_init_with_defaults(&(sensors[0]));
     sensor_commutation = &(sensors[0]);
     sensor_position = &(sensors[0]);
 }
@@ -102,7 +102,7 @@ bool sensors_serialize_config_to_buffer(uint8_t *buffer, uint32_t *len)
     return true;
 }
 
-bool sensors_initialize_with_config_buffer(const uint8_t *buffer, const uint32_t len)
+bool sensors_init_with_config_buffer(const uint8_t *buffer, const uint32_t len)
 {
     uint8_t *buffer_pos = buffer;
     uint32_t commutation_id, position_id;
