@@ -643,48 +643,118 @@ Flags:
 - INVALID_POLE_PAIRS
 
 
-encoder.position_estimate
+sensors.setup.onboard.calibrated
 -------------------------------------------------------------------
 
 ID: 53
-Type: float
-Units: tick
-
-The filtered encoder position estimate.
+Type: bool
 
 
+Whether the sensor has been calibrated.
 
 
-encoder.velocity_estimate
+
+
+sensors.setup.onboard.errors
 -------------------------------------------------------------------
 
 ID: 54
-Type: float
-Units: tick / second
-
-The filtered encoder velocity estimate.
+Type: uint8
 
 
+Any sensor errors, as a bitmask
+
+Flags: 
+- CALIBRATION_FAILED
+- READING_UNSTABLE
 
 
-encoder.type
+sensors.setup.external_spi.type
 -------------------------------------------------------------------
 
 ID: 55
 Type: uint8
 
 
-The encoder type. Either INTERNAL or HALL.
+The type of external sensor type. Either MA7XX, AS5047 or AMT22.
 
 Options: 
-- INTERNAL
-- HALL
+- MA7XX
+- AS5047
+- AMT22
 
 
-encoder.bandwidth
+sensors.setup.external_spi.calibrated
 -------------------------------------------------------------------
 
 ID: 56
+Type: bool
+
+
+Whether the sensor has been calibrated.
+
+
+
+
+sensors.setup.external_spi.errors
+-------------------------------------------------------------------
+
+ID: 57
+Type: uint8
+
+
+Any sensor errors, as a bitmask
+
+Flags: 
+- CALIBRATION_FAILED
+- READING_UNSTABLE
+
+
+sensors.setup.hall.calibrated
+-------------------------------------------------------------------
+
+ID: 58
+Type: bool
+
+
+Whether the sensor has been calibrated.
+
+
+
+
+sensors.setup.hall.errors
+-------------------------------------------------------------------
+
+ID: 59
+Type: uint8
+
+
+Any sensor errors, as a bitmask
+
+Flags: 
+- CALIBRATION_FAILED
+- READING_UNSTABLE
+
+
+sensors.select.position.type
+-------------------------------------------------------------------
+
+ID: 60
+Type: uint8
+
+
+The encoder type. Either ONBOARD, SPI or HALL.
+
+Options: 
+- ONBOARD
+- SPI
+- HALL
+
+
+sensors.select.position.bandwidth
+-------------------------------------------------------------------
+
+ID: 61
 Type: float
 Units: hertz
 
@@ -693,36 +763,85 @@ The encoder observer bandwidth.
 
 
 
-encoder.calibrated
+sensors.select.position.position_estimate
 -------------------------------------------------------------------
 
-ID: 57
-Type: bool
+ID: 62
+Type: float
+Units: tick
+
+The filtered encoder position estimate.
 
 
-Whether the encoder has been calibrated.
 
 
-
-
-encoder.errors
+sensors.select.position.velocity_estimate
 -------------------------------------------------------------------
 
-ID: 58
+ID: 63
+Type: float
+Units: tick / second
+
+The filtered encoder velocity estimate.
+
+
+
+
+sensors.select.commutation.type
+-------------------------------------------------------------------
+
+ID: 64
 Type: uint8
 
 
-Any encoder errors, as a bitmask
+The encoder type. Either ONBOARD, SPI or HALL.
 
-Flags: 
-- CALIBRATION_FAILED
-- READING_UNSTABLE
+Options: 
+- ONBOARD
+- SPI
+- HALL
+
+
+sensors.select.commutation.bandwidth
+-------------------------------------------------------------------
+
+ID: 65
+Type: float
+Units: hertz
+
+The encoder observer bandwidth.
+
+
+
+
+sensors.select.commutation.position_estimate
+-------------------------------------------------------------------
+
+ID: 66
+Type: float
+Units: tick
+
+The filtered encoder position estimate.
+
+
+
+
+sensors.select.commutation.velocity_estimate
+-------------------------------------------------------------------
+
+ID: 67
+Type: float
+Units: tick / second
+
+The filtered encoder velocity estimate.
+
+
 
 
 traj_planner.max_accel
 -------------------------------------------------------------------
 
-ID: 59
+ID: 68
 Type: float
 Units: tick / second
 
@@ -734,7 +853,7 @@ The max allowed acceleration of the generated trajectory.
 traj_planner.max_decel
 -------------------------------------------------------------------
 
-ID: 60
+ID: 69
 Type: float
 Units: tick / second ** 2
 
@@ -746,7 +865,7 @@ The max allowed deceleration of the generated trajectory.
 traj_planner.max_vel
 -------------------------------------------------------------------
 
-ID: 61
+ID: 70
 Type: float
 Units: tick / second
 
@@ -758,7 +877,7 @@ The max allowed cruise velocity of the generated trajectory.
 traj_planner.t_accel
 -------------------------------------------------------------------
 
-ID: 62
+ID: 71
 Type: float
 Units: second
 
@@ -770,7 +889,7 @@ In time mode, the acceleration time of the generated trajectory.
 traj_planner.t_decel
 -------------------------------------------------------------------
 
-ID: 63
+ID: 72
 Type: float
 Units: second
 
@@ -782,7 +901,7 @@ In time mode, the deceleration time of the generated trajectory.
 traj_planner.t_total
 -------------------------------------------------------------------
 
-ID: 64
+ID: 73
 Type: float
 Units: second
 
@@ -794,7 +913,7 @@ In time mode, the total time of the generated trajectory.
 move_to(pos_setpoint) -> void
 -------------------------------------------------------------------
 
-ID: 65
+ID: 74
 Return Type: void
 
 
@@ -804,7 +923,7 @@ Move to target position respecting velocity and acceleration limits.
 move_to_tlimit(pos_setpoint) -> void
 -------------------------------------------------------------------
 
-ID: 66
+ID: 75
 Return Type: void
 
 
@@ -814,7 +933,7 @@ Move to target position respecting time limits for each sector.
 traj_planner.errors
 -------------------------------------------------------------------
 
-ID: 67
+ID: 76
 Type: uint8
 
 
@@ -828,7 +947,7 @@ Flags:
 homing.velocity
 -------------------------------------------------------------------
 
-ID: 68
+ID: 77
 Type: float
 Units: tick / second
 
@@ -840,7 +959,7 @@ The velocity at which the motor performs homing.
 homing.max_homing_t
 -------------------------------------------------------------------
 
-ID: 69
+ID: 78
 Type: float
 Units: second
 
@@ -852,7 +971,7 @@ The maximum time the motor is allowed to travel before homing times out and abor
 homing.retract_dist
 -------------------------------------------------------------------
 
-ID: 70
+ID: 79
 Type: float
 Units: tick
 
@@ -864,7 +983,7 @@ The retraction distance the motor travels after the endstop has been found.
 homing.warnings
 -------------------------------------------------------------------
 
-ID: 71
+ID: 80
 Type: uint8
 
 
@@ -877,7 +996,7 @@ Flags:
 homing.stall_detect.velocity
 -------------------------------------------------------------------
 
-ID: 72
+ID: 81
 Type: float
 Units: tick / second
 
@@ -889,7 +1008,7 @@ The velocity below which (and together with `stall_detect.delta_pos`) stall dete
 homing.stall_detect.delta_pos
 -------------------------------------------------------------------
 
-ID: 73
+ID: 82
 Type: float
 Units: tick
 
@@ -901,7 +1020,7 @@ The velocity below which (and together with `stall_detect.delta_pos`) stall dete
 homing.stall_detect.t
 -------------------------------------------------------------------
 
-ID: 74
+ID: 83
 Type: float
 Units: second
 
@@ -913,7 +1032,7 @@ The time to remain in stall detection mode before the motor is considered stalle
 home() -> void
 -------------------------------------------------------------------
 
-ID: 75
+ID: 84
 Return Type: void
 
 
@@ -923,7 +1042,7 @@ Perform the homing operation.
 watchdog.enabled
 -------------------------------------------------------------------
 
-ID: 76
+ID: 85
 Type: bool
 
 
@@ -935,7 +1054,7 @@ Whether the watchdog is enabled or not.
 watchdog.triggered
 -------------------------------------------------------------------
 
-ID: 77
+ID: 86
 Type: bool
 
 
@@ -947,7 +1066,7 @@ Whether the watchdog has been triggered or not.
 watchdog.timeout
 -------------------------------------------------------------------
 
-ID: 78
+ID: 87
 Type: float
 Units: second
 

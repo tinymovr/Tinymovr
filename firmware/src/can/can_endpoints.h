@@ -65,10 +65,24 @@ typedef enum
 
 typedef enum
 {
-    ENCODER_ERRORS_NONE = 0,
-    ENCODER_ERRORS_CALIBRATION_FAILED = (1 << 0), 
-    ENCODER_ERRORS_READING_UNSTABLE = (1 << 1)
-} encoder_errors_flags;
+    SENSORS_SETUP_ONBOARD_ERRORS_NONE = 0,
+    SENSORS_SETUP_ONBOARD_ERRORS_CALIBRATION_FAILED = (1 << 0), 
+    SENSORS_SETUP_ONBOARD_ERRORS_READING_UNSTABLE = (1 << 1)
+} sensors_setup_onboard_errors_flags;
+
+typedef enum
+{
+    SENSORS_SETUP_EXTERNAL_SPI_ERRORS_NONE = 0,
+    SENSORS_SETUP_EXTERNAL_SPI_ERRORS_CALIBRATION_FAILED = (1 << 0), 
+    SENSORS_SETUP_EXTERNAL_SPI_ERRORS_READING_UNSTABLE = (1 << 1)
+} sensors_setup_external_spi_errors_flags;
+
+typedef enum
+{
+    SENSORS_SETUP_HALL_ERRORS_NONE = 0,
+    SENSORS_SETUP_HALL_ERRORS_CALIBRATION_FAILED = (1 << 0), 
+    SENSORS_SETUP_HALL_ERRORS_READING_UNSTABLE = (1 << 1)
+} sensors_setup_hall_errors_flags;
 
 typedef enum
 {
@@ -91,12 +105,27 @@ typedef enum
 
 typedef enum
 {
-    ENCODER_TYPE_INTERNAL = 0, 
-    ENCODER_TYPE_HALL = 1
-} encoder_type_options;
+    SENSORS_SETUP_EXTERNAL_SPI_TYPE_MA7XX = 0, 
+    SENSORS_SETUP_EXTERNAL_SPI_TYPE_AS5047 = 1, 
+    SENSORS_SETUP_EXTERNAL_SPI_TYPE_AMT22 = 2
+} sensors_setup_external_spi_type_options;
+
+typedef enum
+{
+    SENSORS_SELECT_POSITION_TYPE_ONBOARD = 0, 
+    SENSORS_SELECT_POSITION_TYPE_SPI = 1, 
+    SENSORS_SELECT_POSITION_TYPE_HALL = 2
+} sensors_select_position_type_options;
+
+typedef enum
+{
+    SENSORS_SELECT_COMMUTATION_TYPE_ONBOARD = 0, 
+    SENSORS_SELECT_COMMUTATION_TYPE_SPI = 1, 
+    SENSORS_SELECT_COMMUTATION_TYPE_HALL = 2
+} sensors_select_commutation_type_options;
 
 extern uint32_t avlos_proto_hash;
-extern uint8_t (*avlos_endpoints[79])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+extern uint8_t (*avlos_endpoints[88])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
 /*
@@ -630,64 +659,154 @@ uint8_t avlos_motor_I_cal(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command 
 uint8_t avlos_motor_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_encoder_position_estimate
+* avlos_sensors_setup_onboard_calibrated
 *
-* The filtered encoder position estimate.
-*
-* @param buffer
-* @param buffer_len
-*/
-uint8_t avlos_encoder_position_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
-
-/*
-* avlos_encoder_velocity_estimate
-*
-* The filtered encoder velocity estimate.
+* Whether the sensor has been calibrated.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_encoder_velocity_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t avlos_sensors_setup_onboard_calibrated(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_encoder_type
+* avlos_sensors_setup_onboard_errors
 *
-* The encoder type. Either INTERNAL or HALL.
+* Any sensor errors, as a bitmask
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_encoder_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t avlos_sensors_setup_onboard_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_encoder_bandwidth
+* avlos_sensors_setup_external_spi_type
+*
+* The type of external sensor type. Either MA7XX, AS5047 or AMT22.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_sensors_setup_external_spi_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_sensors_setup_external_spi_calibrated
+*
+* Whether the sensor has been calibrated.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_sensors_setup_external_spi_calibrated(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_sensors_setup_external_spi_errors
+*
+* Any sensor errors, as a bitmask
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_sensors_setup_external_spi_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_sensors_setup_hall_calibrated
+*
+* Whether the sensor has been calibrated.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_sensors_setup_hall_calibrated(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_sensors_setup_hall_errors
+*
+* Any sensor errors, as a bitmask
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_sensors_setup_hall_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_sensors_select_position_type
+*
+* The encoder type. Either ONBOARD, SPI or HALL.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_sensors_select_position_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_sensors_select_position_bandwidth
 *
 * The encoder observer bandwidth.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_encoder_bandwidth(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t avlos_sensors_select_position_bandwidth(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_encoder_calibrated
+* avlos_sensors_select_position_position_estimate
 *
-* Whether the encoder has been calibrated.
+* The filtered encoder position estimate.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_encoder_calibrated(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t avlos_sensors_select_position_position_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_encoder_errors
+* avlos_sensors_select_position_velocity_estimate
 *
-* Any encoder errors, as a bitmask
+* The filtered encoder velocity estimate.
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_encoder_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t avlos_sensors_select_position_velocity_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_sensors_select_commutation_type
+*
+* The encoder type. Either ONBOARD, SPI or HALL.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_sensors_select_commutation_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_sensors_select_commutation_bandwidth
+*
+* The encoder observer bandwidth.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_sensors_select_commutation_bandwidth(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_sensors_select_commutation_position_estimate
+*
+* The filtered encoder position estimate.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_sensors_select_commutation_position_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+
+/*
+* avlos_sensors_select_commutation_velocity_estimate
+*
+* The filtered encoder velocity estimate.
+*
+* @param buffer
+* @param buffer_len
+*/
+uint8_t avlos_sensors_select_commutation_velocity_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_traj_planner_max_accel

@@ -333,66 +333,66 @@ remote_attributes:
         summary: Any motor/calibration errors, as a bitmask
   - name: sensors
     remote_attributes:
-      - setup:
+      - name: setup
         remote_attributes:
           - name: onboard
             remote_attributes:
               - name: calibrated
                 dtype: bool
                 meta: {dynamic: True}
-                getter_name: 
-                summary: Whether the encoder has been calibrated.
+                getter_name: sensor_onboard_get_calibrated
+                summary: Whether the sensor has been calibrated.
               - name: errors
                 flags: [CALIBRATION_FAILED, READING_UNSTABLE]
                 meta: {dynamic: True}
-                getter_name: 
-                summary: Any encoder errors, as a bitmask
+                getter_name: sensor_onboard_get_errors
+                summary: Any sensor errors, as a bitmask
           - name: external_spi
             remote_attributes:
               - name: type
                 options: [MA7XX, AS5047, AMT22]
                 meta: {export: True}
-                getter_name: get_external_spi_sensor_type
-                setter_name: set_external_spi_sensor_type
+                getter_name: sensor_external_spi_get_type
+                setter_name: sensor_external_spi_set_type
                 summary: The type of external sensor type. Either MA7XX, AS5047 or AMT22.
               - name: calibrated
                 dtype: bool
                 meta: {dynamic: True}
-                getter_name: 
-                summary: Whether the encoder has been calibrated.
+                getter_name: sensor_external_spi_get_calibrated
+                summary: Whether the sensor has been calibrated.
               - name: errors
                 flags: [CALIBRATION_FAILED, READING_UNSTABLE]
                 meta: {dynamic: True}
-                getter_name: 
-                summary: Any encoder errors, as a bitmask
+                getter_name: sensor_external_spi_get_calibrated
+                summary: Any sensor errors, as a bitmask
           - name: hall
             remote_attributes:
               - name: calibrated
                 dtype: bool
                 meta: {dynamic: True}
-                getter_name: 
-                summary: Whether the encoder has been calibrated.
+                getter_name: sensor_hall_get_calibrated
+                summary: Whether the sensor has been calibrated.
               - name: errors
                 flags: [CALIBRATION_FAILED, READING_UNSTABLE]
                 meta: {dynamic: True}
-                getter_name: 
-                summary: Any encoder errors, as a bitmask
-      - select:
+                getter_name: sensor_hall_get_calibrated
+                summary: Any sensor errors, as a bitmask
+      - name: select
         remote_attributes:
-          - position:
+          - name: position
             remote_attributes:
               - name: type
                 options: [ONBOARD, SPI, HALL]
                 meta: {export: True}
-                getter_name: get_position_sensor_type
-                setter_name: set_position_sensor_type
+                getter_name: position_sensor_get_type
+                setter_name: position_sensor_set_type
                 summary: The encoder type. Either ONBOARD, SPI or HALL.
               - name: bandwidth
                 dtype: float
                 unit: Hz
                 meta: {export: True}
-                getter_name: get_position_sensor_bandwidth
-                setter_name: set_position_sensor_bandwidth
+                getter_name: position_sensor_get_bandwidth
+                setter_name: position_sensor_set_bandwidth
                 summary: The encoder observer bandwidth.
               - name: position_estimate
                 dtype: float
@@ -406,20 +406,20 @@ remote_attributes:
                 meta: {dynamic: True}
                 getter_name: observer_get_vel_estimate_user_frame
                 summary: The filtered encoder velocity estimate.
-          - commutation:
+          - name: commutation
             remote_attributes:
               - name: type
                 options: [ONBOARD, SPI, HALL]
                 meta: {export: True}
-                getter_name: get_commutation_sensor_type
-                setter_name: set_commutation_sensor_type
+                getter_name: commutation_sensor_get_type
+                setter_name: commutation_sensor_set_type
                 summary: The encoder type. Either ONBOARD, SPI or HALL.
               - name: bandwidth
                 dtype: float
                 unit: Hz
                 meta: {export: True}
-                getter_name: get_commutation_sensor_bandwidth
-                setter_name: set_commutation_sensor_bandwidth
+                getter_name: commutation_sensor_get_bandwidth
+                setter_name: commutation_sensor_set_bandwidth
                 summary: The encoder observer bandwidth.
               - name: position_estimate
                 dtype: float
