@@ -386,26 +386,26 @@ remote_attributes:
                 meta: {export: True}
                 getter_name: position_sensor_get_type
                 setter_name: position_sensor_set_type
-                summary: The encoder type. Either ONBOARD, SPI or HALL.
+                summary: The angle sensor type. Either ONBOARD, SPI or HALL.
               - name: bandwidth
                 dtype: float
                 unit: Hz
                 meta: {export: True}
                 getter_name: position_sensor_get_bandwidth
                 setter_name: position_sensor_set_bandwidth
-                summary: The encoder observer bandwidth.
+                summary: The sensor observer bandwidth.
               - name: position_estimate
                 dtype: float
                 unit: ticks
                 meta: {dynamic: True}
                 getter_name: observer_get_pos_estimate_user_frame
-                summary: The filtered encoder position estimate.
+                summary: The filtered sensor position estimate.
               - name: velocity_estimate
                 dtype: float
                 unit: ticks/second
                 meta: {dynamic: True}
                 getter_name: observer_get_vel_estimate_user_frame
-                summary: The filtered encoder velocity estimate.
+                summary: The filtered sensor velocity estimate.
           - name: commutation
             remote_attributes:
               - name: type
@@ -413,26 +413,26 @@ remote_attributes:
                 meta: {export: True}
                 getter_name: commutation_sensor_get_type
                 setter_name: commutation_sensor_set_type
-                summary: The encoder type. Either ONBOARD, SPI or HALL.
+                summary: The angle sensor type. Either ONBOARD, SPI or HALL.
               - name: bandwidth
                 dtype: float
                 unit: Hz
                 meta: {export: True}
                 getter_name: commutation_sensor_get_bandwidth
                 setter_name: commutation_sensor_set_bandwidth
-                summary: The encoder observer bandwidth.
+                summary: The sensor observer bandwidth.
               - name: position_estimate
                 dtype: float
                 unit: ticks
                 meta: {dynamic: True}
                 getter_name: observer_get_pos_estimate_user_frame
-                summary: The filtered encoder position estimate.
+                summary: The filtered sensor position estimate.
               - name: velocity_estimate
                 dtype: float
                 unit: ticks/second
                 meta: {dynamic: True}
                 getter_name: observer_get_vel_estimate_user_frame
-                summary: The filtered encoder velocity estimate.    
+                summary: The filtered sensor velocity estimate.    
   - name: traj_planner
     remote_attributes:
       - name: max_accel
