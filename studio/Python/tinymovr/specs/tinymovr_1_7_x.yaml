@@ -39,7 +39,7 @@ remote_attributes:
     dtype: float
     unit: degC
     meta: {dynamic: True}
-    getter_name: adc_get_mcu_temp
+    getter_name: ADC_get_mcu_temp
     summary: The internal temperature of the PAC55xx MCU.
   - name: calibrated
     dtype: bool
@@ -382,11 +382,11 @@ remote_attributes:
           - name: position
             remote_attributes:
               - name: type
-                options: [ONBOARD, SPI, HALL]
+                options: [ONBOARD, EXTERNAL_SPI, HALL]
                 meta: {export: True}
                 getter_name: position_sensor_get_type
                 setter_name: position_sensor_set_type
-                summary: The angle sensor type. Either ONBOARD, SPI or HALL.
+                summary: The angle sensor type. Either ONBOARD, EXTERNAL_SPI or HALL.
               - name: bandwidth
                 dtype: float
                 unit: Hz
@@ -409,11 +409,11 @@ remote_attributes:
           - name: commutation
             remote_attributes:
               - name: type
-                options: [ONBOARD, SPI, HALL]
+                options: [ONBOARD, EXTERNAL_SPI, HALL]
                 meta: {export: True}
                 getter_name: commutation_sensor_get_type
                 setter_name: commutation_sensor_set_type
-                summary: The angle sensor type. Either ONBOARD, SPI or HALL.
+                summary: The angle sensor type. Either ONBOARD, EXTERNAL_SPI or HALL.
               - name: bandwidth
                 dtype: float
                 unit: Hz

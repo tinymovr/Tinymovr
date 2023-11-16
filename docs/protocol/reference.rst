@@ -743,11 +743,11 @@ ID: 60
 Type: uint8
 
 
-The encoder type. Either ONBOARD, SPI or HALL.
+The angle sensor type. Either ONBOARD, EXTERNAL_SPI or HALL.
 
 Options: 
 - ONBOARD
-- SPI
+- EXTERNAL_SPI
 - HALL
 
 
@@ -758,7 +758,7 @@ ID: 61
 Type: float
 Units: hertz
 
-The encoder observer bandwidth.
+The sensor observer bandwidth.
 
 
 
@@ -770,7 +770,7 @@ ID: 62
 Type: float
 Units: tick
 
-The filtered encoder position estimate.
+The filtered sensor position estimate.
 
 
 
@@ -782,7 +782,7 @@ ID: 63
 Type: float
 Units: tick / second
 
-The filtered encoder velocity estimate.
+The filtered sensor velocity estimate.
 
 
 
@@ -794,11 +794,11 @@ ID: 64
 Type: uint8
 
 
-The encoder type. Either ONBOARD, SPI or HALL.
+The angle sensor type. Either ONBOARD, EXTERNAL_SPI or HALL.
 
 Options: 
 - ONBOARD
-- SPI
+- EXTERNAL_SPI
 - HALL
 
 
@@ -809,7 +809,7 @@ ID: 65
 Type: float
 Units: hertz
 
-The encoder observer bandwidth.
+The sensor observer bandwidth.
 
 
 
@@ -821,7 +821,7 @@ ID: 66
 Type: float
 Units: tick
 
-The filtered encoder position estimate.
+The filtered sensor position estimate.
 
 
 
@@ -833,7 +833,7 @@ ID: 67
 Type: float
 Units: tick / second
 
-The filtered encoder velocity estimate.
+The filtered sensor velocity estimate.
 
 
 

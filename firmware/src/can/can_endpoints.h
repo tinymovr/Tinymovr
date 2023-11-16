@@ -113,14 +113,14 @@ typedef enum
 typedef enum
 {
     SENSORS_SELECT_POSITION_TYPE_ONBOARD = 0, 
-    SENSORS_SELECT_POSITION_TYPE_SPI = 1, 
+    SENSORS_SELECT_POSITION_TYPE_EXTERNAL_SPI = 1, 
     SENSORS_SELECT_POSITION_TYPE_HALL = 2
 } sensors_select_position_type_options;
 
 typedef enum
 {
     SENSORS_SELECT_COMMUTATION_TYPE_ONBOARD = 0, 
-    SENSORS_SELECT_COMMUTATION_TYPE_SPI = 1, 
+    SENSORS_SELECT_COMMUTATION_TYPE_EXTERNAL_SPI = 1, 
     SENSORS_SELECT_COMMUTATION_TYPE_HALL = 2
 } sensors_select_commutation_type_options;
 
@@ -133,6 +133,8 @@ extern uint32_t _avlos_get_proto_hash(void);
 *
 * The Avlos protocol hash.
 *
+* Endpoint ID: 0
+*
 * @param buffer
 * @param buffer_len
 */
@@ -142,6 +144,8 @@ uint8_t avlos_protocol_hash(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comman
 * avlos_uid
 *
 * The unique device ID, unique to each PAC55xx chip produced.
+*
+* Endpoint ID: 1
 *
 * @param buffer
 * @param buffer_len
@@ -153,6 +157,8 @@ uint8_t avlos_uid(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 *
 * The firmware version.
 *
+* Endpoint ID: 2
+*
 * @param buffer
 * @param buffer_len
 */
@@ -162,6 +168,8 @@ uint8_t avlos_fw_version(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command c
 * avlos_hw_revision
 *
 * The hardware revision.
+*
+* Endpoint ID: 3
 *
 * @param buffer
 * @param buffer_len
@@ -173,6 +181,8 @@ uint8_t avlos_hw_revision(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command 
 *
 * The measured bus voltage.
 *
+* Endpoint ID: 4
+*
 * @param buffer
 * @param buffer_len
 */
@@ -182,6 +192,8 @@ uint8_t avlos_Vbus(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 * avlos_Ibus
 *
 * The estimated bus current. Only estimates current drawn by motor.
+*
+* Endpoint ID: 5
 *
 * @param buffer
 * @param buffer_len
@@ -193,6 +205,8 @@ uint8_t avlos_Ibus(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 *
 * The estimated power. Only estimates power drawn by motor.
 *
+* Endpoint ID: 6
+*
 * @param buffer
 * @param buffer_len
 */
@@ -202,6 +216,8 @@ uint8_t avlos_power(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 * avlos_temp
 *
 * The internal temperature of the PAC55xx MCU.
+*
+* Endpoint ID: 7
 *
 * @param buffer
 * @param buffer_len
@@ -213,6 +229,8 @@ uint8_t avlos_temp(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 *
 * Whether the system has been calibrated.
 *
+* Endpoint ID: 8
+*
 * @param buffer
 * @param buffer_len
 */
@@ -222,6 +240,8 @@ uint8_t avlos_calibrated(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command c
 * avlos_errors
 *
 * Any system errors, as a bitmask
+*
+* Endpoint ID: 9
 *
 * @param buffer
 * @param buffer_len
@@ -233,6 +253,8 @@ uint8_t avlos_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 *
 * Save configuration to non-volatile memory.
 *
+* Endpoint ID: 10
+*
 * @param buffer
 * @param buffer_len
 */
@@ -242,6 +264,8 @@ uint8_t avlos_save_config(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command 
 * avlos_erase_config
 *
 * Erase the config stored in non-volatile memory and reset the device.
+*
+* Endpoint ID: 11
 *
 * @param buffer
 * @param buffer_len
@@ -253,6 +277,8 @@ uint8_t avlos_erase_config(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command
 *
 * Reset the device.
 *
+* Endpoint ID: 12
+*
 * @param buffer
 * @param buffer_len
 */
@@ -262,6 +288,8 @@ uint8_t avlos_reset(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 * avlos_enter_dfu
 *
 * Enter DFU mode.
+*
+* Endpoint ID: 13
 *
 * @param buffer
 * @param buffer_len
@@ -273,6 +301,8 @@ uint8_t avlos_enter_dfu(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cm
 *
 * Any scheduler errors, as a bitmask
 *
+* Endpoint ID: 14
+*
 * @param buffer
 * @param buffer_len
 */
@@ -282,6 +312,8 @@ uint8_t avlos_scheduler_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Com
 * avlos_controller_state
 *
 * The state of the controller.
+*
+* Endpoint ID: 15
 *
 * @param buffer
 * @param buffer_len
@@ -293,6 +325,8 @@ uint8_t avlos_controller_state(uint8_t * buffer, uint8_t * buffer_len, Avlos_Com
 *
 * The control mode of the controller.
 *
+* Endpoint ID: 16
+*
 * @param buffer
 * @param buffer_len
 */
@@ -302,6 +336,8 @@ uint8_t avlos_controller_mode(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comm
 * avlos_controller_warnings
 *
 * Any controller warnings, as a bitmask
+*
+* Endpoint ID: 17
 *
 * @param buffer
 * @param buffer_len
@@ -313,6 +349,8 @@ uint8_t avlos_controller_warnings(uint8_t * buffer, uint8_t * buffer_len, Avlos_
 *
 * Any controller errors, as a bitmask
 *
+* Endpoint ID: 18
+*
 * @param buffer
 * @param buffer_len
 */
@@ -322,6 +360,8 @@ uint8_t avlos_controller_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Co
 * avlos_controller_position_setpoint
 *
 * The position setpoint.
+*
+* Endpoint ID: 19
 *
 * @param buffer
 * @param buffer_len
@@ -333,6 +373,8 @@ uint8_t avlos_controller_position_setpoint(uint8_t * buffer, uint8_t * buffer_le
 *
 * The proportional gain of the position controller.
 *
+* Endpoint ID: 20
+*
 * @param buffer
 * @param buffer_len
 */
@@ -342,6 +384,8 @@ uint8_t avlos_controller_position_p_gain(uint8_t * buffer, uint8_t * buffer_len,
 * avlos_controller_velocity_setpoint
 *
 * The velocity setpoint.
+*
+* Endpoint ID: 21
 *
 * @param buffer
 * @param buffer_len
@@ -353,6 +397,8 @@ uint8_t avlos_controller_velocity_setpoint(uint8_t * buffer, uint8_t * buffer_le
 *
 * The velocity limit.
 *
+* Endpoint ID: 22
+*
 * @param buffer
 * @param buffer_len
 */
@@ -362,6 +408,8 @@ uint8_t avlos_controller_velocity_limit(uint8_t * buffer, uint8_t * buffer_len, 
 * avlos_controller_velocity_p_gain
 *
 * The proportional gain of the velocity controller.
+*
+* Endpoint ID: 23
 *
 * @param buffer
 * @param buffer_len
@@ -373,6 +421,8 @@ uint8_t avlos_controller_velocity_p_gain(uint8_t * buffer, uint8_t * buffer_len,
 *
 * The integral gain of the velocity controller.
 *
+* Endpoint ID: 24
+*
 * @param buffer
 * @param buffer_len
 */
@@ -382,6 +432,8 @@ uint8_t avlos_controller_velocity_i_gain(uint8_t * buffer, uint8_t * buffer_len,
 * avlos_controller_velocity_deadband
 *
 * The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
+*
+* Endpoint ID: 25
 *
 * @param buffer
 * @param buffer_len
@@ -393,6 +445,8 @@ uint8_t avlos_controller_velocity_deadband(uint8_t * buffer, uint8_t * buffer_le
 *
 * Max velocity setpoint increment (ramping) rate. Set to 0 to disable.
 *
+* Endpoint ID: 26
+*
 * @param buffer
 * @param buffer_len
 */
@@ -402,6 +456,8 @@ uint8_t avlos_controller_velocity_increment(uint8_t * buffer, uint8_t * buffer_l
 * avlos_controller_current_Iq_setpoint
 *
 * The Iq setpoint.
+*
+* Endpoint ID: 27
 *
 * @param buffer
 * @param buffer_len
@@ -413,6 +469,8 @@ uint8_t avlos_controller_current_Iq_setpoint(uint8_t * buffer, uint8_t * buffer_
 *
 * The Id setpoint.
 *
+* Endpoint ID: 28
+*
 * @param buffer
 * @param buffer_len
 */
@@ -422,6 +480,8 @@ uint8_t avlos_controller_current_Id_setpoint(uint8_t * buffer, uint8_t * buffer_
 * avlos_controller_current_Iq_limit
 *
 * The Iq limit.
+*
+* Endpoint ID: 29
 *
 * @param buffer
 * @param buffer_len
@@ -433,6 +493,8 @@ uint8_t avlos_controller_current_Iq_limit(uint8_t * buffer, uint8_t * buffer_len
 *
 * The Iq estimate.
 *
+* Endpoint ID: 30
+*
 * @param buffer
 * @param buffer_len
 */
@@ -442,6 +504,8 @@ uint8_t avlos_controller_current_Iq_estimate(uint8_t * buffer, uint8_t * buffer_
 * avlos_controller_current_bandwidth
 *
 * The current controller bandwidth.
+*
+* Endpoint ID: 31
 *
 * @param buffer
 * @param buffer_len
@@ -453,6 +517,8 @@ uint8_t avlos_controller_current_bandwidth(uint8_t * buffer, uint8_t * buffer_le
 *
 * The current controller proportional gain.
 *
+* Endpoint ID: 32
+*
 * @param buffer
 * @param buffer_len
 */
@@ -462,6 +528,8 @@ uint8_t avlos_controller_current_Iq_p_gain(uint8_t * buffer, uint8_t * buffer_le
 * avlos_controller_current_max_Ibus_regen
 *
 * The max current allowed to be fed back to the power source before flux braking activates.
+*
+* Endpoint ID: 33
 *
 * @param buffer
 * @param buffer_len
@@ -473,6 +541,8 @@ uint8_t avlos_controller_current_max_Ibus_regen(uint8_t * buffer, uint8_t * buff
 *
 * The max current allowed to be dumped to the motor windings during flux braking. Set to zero to deactivate flux braking.
 *
+* Endpoint ID: 34
+*
 * @param buffer
 * @param buffer_len
 */
@@ -482,6 +552,8 @@ uint8_t avlos_controller_current_max_Ibrake(uint8_t * buffer, uint8_t * buffer_l
 * avlos_controller_voltage_Vq_setpoint
 *
 * The Vq setpoint.
+*
+* Endpoint ID: 35
 *
 * @param buffer
 * @param buffer_len
@@ -493,6 +565,8 @@ uint8_t avlos_controller_voltage_Vq_setpoint(uint8_t * buffer, uint8_t * buffer_
 *
 * Calibrate the device.
 *
+* Endpoint ID: 36
+*
 * @param buffer
 * @param buffer_len
 */
@@ -502,6 +576,8 @@ uint8_t avlos_controller_calibrate(uint8_t * buffer, uint8_t * buffer_len, Avlos
 * avlos_controller_idle
 *
 * Set idle mode, disabling the driver.
+*
+* Endpoint ID: 37
 *
 * @param buffer
 * @param buffer_len
@@ -513,6 +589,8 @@ uint8_t avlos_controller_idle(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comm
 *
 * Set position control mode.
 *
+* Endpoint ID: 38
+*
 * @param buffer
 * @param buffer_len
 */
@@ -522,6 +600,8 @@ uint8_t avlos_controller_position_mode(uint8_t * buffer, uint8_t * buffer_len, A
 * avlos_controller_velocity_mode
 *
 * Set velocity control mode.
+*
+* Endpoint ID: 39
 *
 * @param buffer
 * @param buffer_len
@@ -533,6 +613,8 @@ uint8_t avlos_controller_velocity_mode(uint8_t * buffer, uint8_t * buffer_len, A
 *
 * Set current control mode.
 *
+* Endpoint ID: 40
+*
 * @param buffer
 * @param buffer_len
 */
@@ -542,6 +624,8 @@ uint8_t avlos_controller_current_mode(uint8_t * buffer, uint8_t * buffer_len, Av
 * avlos_controller_set_pos_vel_setpoints
 *
 * Set the position and velocity setpoints in one go, and retrieve the position estimate
+*
+* Endpoint ID: 41
 *
 * @param buffer
 * @param buffer_len
@@ -553,6 +637,8 @@ uint8_t avlos_controller_set_pos_vel_setpoints(uint8_t * buffer, uint8_t * buffe
 *
 * The baud rate of the CAN interface.
 *
+* Endpoint ID: 42
+*
 * @param buffer
 * @param buffer_len
 */
@@ -562,6 +648,8 @@ uint8_t avlos_comms_can_rate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comma
 * avlos_comms_can_id
 *
 * The ID of the CAN interface.
+*
+* Endpoint ID: 43
 *
 * @param buffer
 * @param buffer_len
@@ -573,6 +661,8 @@ uint8_t avlos_comms_can_id(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command
 *
 * The motor Resistance value.
 *
+* Endpoint ID: 44
+*
 * @param buffer
 * @param buffer_len
 */
@@ -582,6 +672,8 @@ uint8_t avlos_motor_R(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 * avlos_motor_L
 *
 * The motor Inductance value.
+*
+* Endpoint ID: 45
 *
 * @param buffer
 * @param buffer_len
@@ -593,6 +685,8 @@ uint8_t avlos_motor_L(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 *
 * The motor pole pair count.
 *
+* Endpoint ID: 46
+*
 * @param buffer
 * @param buffer_len
 */
@@ -602,6 +696,8 @@ uint8_t avlos_motor_pole_pairs(uint8_t * buffer, uint8_t * buffer_len, Avlos_Com
 * avlos_motor_type
 *
 * The type of the motor. Either high current or gimbal.
+*
+* Endpoint ID: 47
 *
 * @param buffer
 * @param buffer_len
@@ -613,6 +709,8 @@ uint8_t avlos_motor_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command c
 *
 * User-defined offset of the motor.
 *
+* Endpoint ID: 48
+*
 * @param buffer
 * @param buffer_len
 */
@@ -622,6 +720,8 @@ uint8_t avlos_motor_offset(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command
 * avlos_motor_direction
 *
 * User-defined direction of the motor.
+*
+* Endpoint ID: 49
 *
 * @param buffer
 * @param buffer_len
@@ -633,6 +733,8 @@ uint8_t avlos_motor_direction(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comm
 *
 * Whether the motor has been calibrated.
 *
+* Endpoint ID: 50
+*
 * @param buffer
 * @param buffer_len
 */
@@ -642,6 +744,8 @@ uint8_t avlos_motor_calibrated(uint8_t * buffer, uint8_t * buffer_len, Avlos_Com
 * avlos_motor_I_cal
 *
 * The calibration current.
+*
+* Endpoint ID: 51
 *
 * @param buffer
 * @param buffer_len
@@ -653,6 +757,8 @@ uint8_t avlos_motor_I_cal(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command 
 *
 * Any motor/calibration errors, as a bitmask
 *
+* Endpoint ID: 52
+*
 * @param buffer
 * @param buffer_len
 */
@@ -662,6 +768,8 @@ uint8_t avlos_motor_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command
 * avlos_sensors_setup_onboard_calibrated
 *
 * Whether the sensor has been calibrated.
+*
+* Endpoint ID: 53
 *
 * @param buffer
 * @param buffer_len
@@ -673,6 +781,8 @@ uint8_t avlos_sensors_setup_onboard_calibrated(uint8_t * buffer, uint8_t * buffe
 *
 * Any sensor errors, as a bitmask
 *
+* Endpoint ID: 54
+*
 * @param buffer
 * @param buffer_len
 */
@@ -682,6 +792,8 @@ uint8_t avlos_sensors_setup_onboard_errors(uint8_t * buffer, uint8_t * buffer_le
 * avlos_sensors_setup_external_spi_type
 *
 * The type of external sensor type. Either MA7XX, AS5047 or AMT22.
+*
+* Endpoint ID: 55
 *
 * @param buffer
 * @param buffer_len
@@ -693,6 +805,8 @@ uint8_t avlos_sensors_setup_external_spi_type(uint8_t * buffer, uint8_t * buffer
 *
 * Whether the sensor has been calibrated.
 *
+* Endpoint ID: 56
+*
 * @param buffer
 * @param buffer_len
 */
@@ -702,6 +816,8 @@ uint8_t avlos_sensors_setup_external_spi_calibrated(uint8_t * buffer, uint8_t * 
 * avlos_sensors_setup_external_spi_errors
 *
 * Any sensor errors, as a bitmask
+*
+* Endpoint ID: 57
 *
 * @param buffer
 * @param buffer_len
@@ -713,6 +829,8 @@ uint8_t avlos_sensors_setup_external_spi_errors(uint8_t * buffer, uint8_t * buff
 *
 * Whether the sensor has been calibrated.
 *
+* Endpoint ID: 58
+*
 * @param buffer
 * @param buffer_len
 */
@@ -723,6 +841,8 @@ uint8_t avlos_sensors_setup_hall_calibrated(uint8_t * buffer, uint8_t * buffer_l
 *
 * Any sensor errors, as a bitmask
 *
+* Endpoint ID: 59
+*
 * @param buffer
 * @param buffer_len
 */
@@ -731,7 +851,9 @@ uint8_t avlos_sensors_setup_hall_errors(uint8_t * buffer, uint8_t * buffer_len, 
 /*
 * avlos_sensors_select_position_type
 *
-* The encoder type. Either ONBOARD, SPI or HALL.
+* The angle sensor type. Either ONBOARD, EXTERNAL_SPI or HALL.
+*
+* Endpoint ID: 60
 *
 * @param buffer
 * @param buffer_len
@@ -741,7 +863,9 @@ uint8_t avlos_sensors_select_position_type(uint8_t * buffer, uint8_t * buffer_le
 /*
 * avlos_sensors_select_position_bandwidth
 *
-* The encoder observer bandwidth.
+* The sensor observer bandwidth.
+*
+* Endpoint ID: 61
 *
 * @param buffer
 * @param buffer_len
@@ -751,7 +875,9 @@ uint8_t avlos_sensors_select_position_bandwidth(uint8_t * buffer, uint8_t * buff
 /*
 * avlos_sensors_select_position_position_estimate
 *
-* The filtered encoder position estimate.
+* The filtered sensor position estimate.
+*
+* Endpoint ID: 62
 *
 * @param buffer
 * @param buffer_len
@@ -761,7 +887,9 @@ uint8_t avlos_sensors_select_position_position_estimate(uint8_t * buffer, uint8_
 /*
 * avlos_sensors_select_position_velocity_estimate
 *
-* The filtered encoder velocity estimate.
+* The filtered sensor velocity estimate.
+*
+* Endpoint ID: 63
 *
 * @param buffer
 * @param buffer_len
@@ -771,7 +899,9 @@ uint8_t avlos_sensors_select_position_velocity_estimate(uint8_t * buffer, uint8_
 /*
 * avlos_sensors_select_commutation_type
 *
-* The encoder type. Either ONBOARD, SPI or HALL.
+* The angle sensor type. Either ONBOARD, EXTERNAL_SPI or HALL.
+*
+* Endpoint ID: 64
 *
 * @param buffer
 * @param buffer_len
@@ -781,7 +911,9 @@ uint8_t avlos_sensors_select_commutation_type(uint8_t * buffer, uint8_t * buffer
 /*
 * avlos_sensors_select_commutation_bandwidth
 *
-* The encoder observer bandwidth.
+* The sensor observer bandwidth.
+*
+* Endpoint ID: 65
 *
 * @param buffer
 * @param buffer_len
@@ -791,7 +923,9 @@ uint8_t avlos_sensors_select_commutation_bandwidth(uint8_t * buffer, uint8_t * b
 /*
 * avlos_sensors_select_commutation_position_estimate
 *
-* The filtered encoder position estimate.
+* The filtered sensor position estimate.
+*
+* Endpoint ID: 66
 *
 * @param buffer
 * @param buffer_len
@@ -801,7 +935,9 @@ uint8_t avlos_sensors_select_commutation_position_estimate(uint8_t * buffer, uin
 /*
 * avlos_sensors_select_commutation_velocity_estimate
 *
-* The filtered encoder velocity estimate.
+* The filtered sensor velocity estimate.
+*
+* Endpoint ID: 67
 *
 * @param buffer
 * @param buffer_len
@@ -813,6 +949,8 @@ uint8_t avlos_sensors_select_commutation_velocity_estimate(uint8_t * buffer, uin
 *
 * The max allowed acceleration of the generated trajectory.
 *
+* Endpoint ID: 68
+*
 * @param buffer
 * @param buffer_len
 */
@@ -822,6 +960,8 @@ uint8_t avlos_traj_planner_max_accel(uint8_t * buffer, uint8_t * buffer_len, Avl
 * avlos_traj_planner_max_decel
 *
 * The max allowed deceleration of the generated trajectory.
+*
+* Endpoint ID: 69
 *
 * @param buffer
 * @param buffer_len
@@ -833,6 +973,8 @@ uint8_t avlos_traj_planner_max_decel(uint8_t * buffer, uint8_t * buffer_len, Avl
 *
 * The max allowed cruise velocity of the generated trajectory.
 *
+* Endpoint ID: 70
+*
 * @param buffer
 * @param buffer_len
 */
@@ -842,6 +984,8 @@ uint8_t avlos_traj_planner_max_vel(uint8_t * buffer, uint8_t * buffer_len, Avlos
 * avlos_traj_planner_t_accel
 *
 * In time mode, the acceleration time of the generated trajectory.
+*
+* Endpoint ID: 71
 *
 * @param buffer
 * @param buffer_len
@@ -853,6 +997,8 @@ uint8_t avlos_traj_planner_t_accel(uint8_t * buffer, uint8_t * buffer_len, Avlos
 *
 * In time mode, the deceleration time of the generated trajectory.
 *
+* Endpoint ID: 72
+*
 * @param buffer
 * @param buffer_len
 */
@@ -862,6 +1008,8 @@ uint8_t avlos_traj_planner_t_decel(uint8_t * buffer, uint8_t * buffer_len, Avlos
 * avlos_traj_planner_t_total
 *
 * In time mode, the total time of the generated trajectory.
+*
+* Endpoint ID: 73
 *
 * @param buffer
 * @param buffer_len
@@ -873,6 +1021,8 @@ uint8_t avlos_traj_planner_t_total(uint8_t * buffer, uint8_t * buffer_len, Avlos
 *
 * Move to target position respecting velocity and acceleration limits.
 *
+* Endpoint ID: 74
+*
 * @param buffer
 * @param buffer_len
 */
@@ -882,6 +1032,8 @@ uint8_t avlos_traj_planner_move_to(uint8_t * buffer, uint8_t * buffer_len, Avlos
 * avlos_traj_planner_move_to_tlimit
 *
 * Move to target position respecting time limits for each sector.
+*
+* Endpoint ID: 75
 *
 * @param buffer
 * @param buffer_len
@@ -893,6 +1045,8 @@ uint8_t avlos_traj_planner_move_to_tlimit(uint8_t * buffer, uint8_t * buffer_len
 *
 * Any errors in the trajectory planner, as a bitmask
 *
+* Endpoint ID: 76
+*
 * @param buffer
 * @param buffer_len
 */
@@ -902,6 +1056,8 @@ uint8_t avlos_traj_planner_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_
 * avlos_homing_velocity
 *
 * The velocity at which the motor performs homing.
+*
+* Endpoint ID: 77
 *
 * @param buffer
 * @param buffer_len
@@ -913,6 +1069,8 @@ uint8_t avlos_homing_velocity(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comm
 *
 * The maximum time the motor is allowed to travel before homing times out and aborts.
 *
+* Endpoint ID: 78
+*
 * @param buffer
 * @param buffer_len
 */
@@ -922,6 +1080,8 @@ uint8_t avlos_homing_max_homing_t(uint8_t * buffer, uint8_t * buffer_len, Avlos_
 * avlos_homing_retract_dist
 *
 * The retraction distance the motor travels after the endstop has been found.
+*
+* Endpoint ID: 79
 *
 * @param buffer
 * @param buffer_len
@@ -933,6 +1093,8 @@ uint8_t avlos_homing_retract_dist(uint8_t * buffer, uint8_t * buffer_len, Avlos_
 *
 * Any homing warnings, as a bitmask
 *
+* Endpoint ID: 80
+*
 * @param buffer
 * @param buffer_len
 */
@@ -942,6 +1104,8 @@ uint8_t avlos_homing_warnings(uint8_t * buffer, uint8_t * buffer_len, Avlos_Comm
 * avlos_homing_stall_detect_velocity
 *
 * The velocity below which (and together with `stall_detect.delta_pos`) stall detection mode is triggered.
+*
+* Endpoint ID: 81
 *
 * @param buffer
 * @param buffer_len
@@ -953,6 +1117,8 @@ uint8_t avlos_homing_stall_detect_velocity(uint8_t * buffer, uint8_t * buffer_le
 *
 * The velocity below which (and together with `stall_detect.delta_pos`) stall detection mode is triggered.
 *
+* Endpoint ID: 82
+*
 * @param buffer
 * @param buffer_len
 */
@@ -962,6 +1128,8 @@ uint8_t avlos_homing_stall_detect_delta_pos(uint8_t * buffer, uint8_t * buffer_l
 * avlos_homing_stall_detect_t
 *
 * The time to remain in stall detection mode before the motor is considered stalled.
+*
+* Endpoint ID: 83
 *
 * @param buffer
 * @param buffer_len
@@ -973,6 +1141,8 @@ uint8_t avlos_homing_stall_detect_t(uint8_t * buffer, uint8_t * buffer_len, Avlo
 *
 * Perform the homing operation.
 *
+* Endpoint ID: 84
+*
 * @param buffer
 * @param buffer_len
 */
@@ -982,6 +1152,8 @@ uint8_t avlos_homing_home(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command 
 * avlos_watchdog_enabled
 *
 * Whether the watchdog is enabled or not.
+*
+* Endpoint ID: 85
 *
 * @param buffer
 * @param buffer_len
@@ -993,6 +1165,8 @@ uint8_t avlos_watchdog_enabled(uint8_t * buffer, uint8_t * buffer_len, Avlos_Com
 *
 * Whether the watchdog has been triggered or not.
 *
+* Endpoint ID: 86
+*
 * @param buffer
 * @param buffer_len
 */
@@ -1002,6 +1176,8 @@ uint8_t avlos_watchdog_triggered(uint8_t * buffer, uint8_t * buffer_len, Avlos_C
 * avlos_watchdog_timeout
 *
 * The watchdog timeout period.
+*
+* Endpoint ID: 87
 *
 * @param buffer
 * @param buffer_len
