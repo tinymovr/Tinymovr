@@ -20,7 +20,8 @@
 #include <src/ssp/ssp_func.h>
 #include <src/utils/utils.h>
 #include <src/can/can_endpoints.h>
-#include <src/sensors/ma7xx.h>
+#include <src/sensor/sensor.h>
+#include <src/sensor/ma7xx.h>
 
 bool ma7xx_init_with_defaults(Sensor *s)
 {
@@ -90,7 +91,7 @@ bool ma7xx_calibrate_offset_and_rectification(Sensor *s)
             e_pos_ref += delta;
             set_epos_and_wait(e_pos_ref, I_setpoint);
         }
-        WaitForControlLoopInterrupt();
+        wait_for_control_loop_interrupt();
         const float pos_meas = observer_get_pos_estimate(observers[s->idx]);
         error_ticks[i] = (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
     }
@@ -101,7 +102,7 @@ bool ma7xx_calibrate_offset_and_rectification(Sensor *s)
             e_pos_ref -= delta;
             set_epos_and_wait(e_pos_ref, I_setpoint);
         }
-        WaitForControlLoopInterrupt();
+        wait_for_control_loop_interrupt();
         const float pos_meas = observer_get_pos_estimate(observers[s->idx]);
         error_ticks[n - i - 1] += (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
     }
@@ -176,6 +177,53 @@ bool ma7xx_calibrate_direction_and_pole_pair_count(Sensor *s)
         motor_set_phases_swapped(true);
     }
     return success;
+}
+
+ALWAYS_INLINE uint8_t ma7xx_get_errors(Sensor *s)
+{
+    return s->state.ma7xx_state.errors;
+}
+
+ALWAYS_INLINE void ma7xx_send_angle_cmd(Sensor *s)
+{
+	ssp_write_one(s->config.ma7xx_config.ssp_struct, MA_CMD_ANGLE);
+}
+
+ALWAYS_INLINE int16_t ma7xx_get_angle_raw(Sensor *s)
+{
+    return s->state.ma7xx_state.angle;
+}
+
+ALWAYS_INLINE int16_t ma7xx_get_angle_rectified(Sensor *s)
+{
+    const uint8_t offset_bits = (ENCODER_BITS - ECN_BITS);
+    const int16_t angle = s->state.ma7xx_state.angle;
+    const int16_t off_1 = s->config.ma7xx_config.rec_table[angle>>offset_bits];
+	const int16_t off_2 = s->config.ma7xx_config.rec_table[((angle>>offset_bits) + 1) % ECN_SIZE];
+	const int16_t off_interp = off_1 + ((off_2 - off_1)* (angle - ((angle>>offset_bits)<<offset_bits))>>offset_bits);
+	return angle + off_interp;
+}
+
+ALWAYS_INLINE void ma7xx_update(Sensor *s, bool check_error)
+{
+    const int16_t angle = ssp_read_one(s->config.ma7xx_config.ssp_struct) >> 3;
+
+    if (check_error)
+    {
+    	const int16_t delta = state.angle - angle;
+		if ( ((delta > MAX_ALLOWED_DELTA) || (delta < -MAX_ALLOWED_DELTA)) &&
+		     ((delta > MAX_ALLOWED_DELTA_ADD) || (delta < MIN_ALLOWED_DELTA_ADD)) &&
+		     ((delta > MAX_ALLOWED_DELTA_SUB) || (delta < MIN_ALLOWED_DELTA_SUB)) )
+		{
+            state.errors |= ENCODER_ERRORS_READING_UNSTABLE;
+		}
+    }
+    state.angle = angle;
+}
+
+ALWAYS_INLINE void ma7xx_calibrate(Sensor *s)
+{
+    return ma7xx_calibrate_direction_and_pole_pair_count() && ma7xx_calibrate_offset_and_rectification();
 }
 
 /**

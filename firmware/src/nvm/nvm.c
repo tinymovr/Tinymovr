@@ -31,10 +31,8 @@ bool nvm_save_config(void)
 	s.node_id_2 = CAN_get_ID();
 	s.adc_config = *ADC_get_config();
 	s.motor_config = *motor_get_config();
-	s.hall_config = *hall_get_config();
-	s.ma7xx_config = *ma7xx_get_config();
-	s.encoder_config = *encoder_get_config();
-	s.observer_config = *observer_get_config();
+	encoders_get_config(&(s.encoders_config));
+	observers_get_config(&(s.observers_config));
 	s.controller_config = *controller_get_config();
 	s.can_config = *CAN_get_config();
 	s.traj_planner_config = *traj_planner_get_config();
@@ -63,10 +61,8 @@ bool nvm_load_config(void)
 	{
 		ADC_restore_config(&s.adc_config);
 		motor_restore_config(&s.motor_config);
-		hall_restore_config(&s.hall_config);
-		ma7xx_restore_config(&s.ma7xx_config);
-		encoder_restore_config(&s.encoder_config);
-		observer_restore_config(&s.observer_config);
+		encoders_restore_config(&s.encoders_config);
+		observers_restore_config(&s.observers_config);
 		controller_restore_config(&s.controller_config);
 		CAN_restore_config(&s.can_config);
 		traj_planner_restore_config(&s.traj_planner_config);

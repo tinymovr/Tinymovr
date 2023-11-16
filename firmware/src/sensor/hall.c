@@ -17,7 +17,7 @@
 
 #include <string.h>
 #include <src/system/system.h>
-#include <src/sensors/hall.h>
+#include <src/sensor/hall.h>
 
 #define AIO6789_IO_MODE                 0x00
 #define AIO_INPUT                       0x00
@@ -52,6 +52,28 @@ void hall_deinit(Sensor *s)
     pac5xxx_tile_register_write(ADDR_CFGAIO7, s->state.hall_state.hw_defaults[0]);
     pac5xxx_tile_register_write(ADDR_CFGAIO8, s->state.hall_state.hw_defaults[1]);
     pac5xxx_tile_register_write(ADDR_CFGAIO9, s->state.hall_state.hw_defaults[2]);
+}
+
+ALWAYS_INLINE uint8_t hall_get_errors(Sensor *s)
+{
+    return s->state.hall_state.errors;
+}
+
+ALWAYS_INLINE int16_t hall_get_angle(Sensor *s)
+{
+    return s->state.hall_state.angle;
+}
+
+ALWAYS_INLINE void hall_update(Sensor *s, bool check_error)
+{
+    const uint8_t sector = (pac5xxx_tile_register_read(ADDR_DINSIG1) >> 1) & 0x07;
+    s->state.hall_state.sector = sector;
+    s->state.hall_state.angle = config.sector_map[state.sector];
+}
+
+ALWAYS_INLINE uint8_t hall_get_sector(Sensor *s)
+{
+    return s->state.hall_state.sector;
 }
 
 bool hall_sector_map_is_calibrated(Sensor *s)

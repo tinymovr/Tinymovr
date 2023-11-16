@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include <src/sensor/sensor.h>
+typedef struct Sensor Sensor;
+typedef union SensorSpecificConfig SensorSpecificConfig;
 
 typedef struct
 {
@@ -36,28 +37,12 @@ typedef struct
 bool hall_init_with_defaults(Sensor *s);
 bool hall_init_with_config(Sensor *s, SensorSpecificConfig *c);
 void hall_deinit(Sensor *s);
+uint8_t hall_get_errors(Sensor *s);
+int16_t hall_get_angle(Sensor *s);
+void hall_update(Sensor *s, bool check_error);
+uint8_t hall_get_sector(Sensor *s);
 
 bool hall_sector_map_is_calibrated(Sensor *s);
 bool hall_calibrate_sequence(Sensor *s);
 
-inline uint8_t hall_get_errors(Sensor *s)
-{
-    return s->state.hall_state.errors;
-}
 
-inline int16_t hall_get_angle(Sensor *s)
-{
-    return s->state.hall_state.angle;
-}
-
-inline void hall_update(Sensor *s, bool check_error)
-{
-    const uint8_t sector = (pac5xxx_tile_register_read(ADDR_DINSIG1) >> 1) & 0x07;
-    s->state.hall_state.sector = sector;
-    s->state.hall_state.angle = config.sector_map[state.sector];
-}
-
-inline uint8_t hall_get_sector(Sensor *s)
-{
-    return s->state.hall_state.sector;
-}

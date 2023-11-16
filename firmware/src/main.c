@@ -15,11 +15,11 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <src/sensors/sensor.h>
+
 #include "src/common.h"
 #include "src/system/system.h"
-
 #include "src/uart/uart_lowlevel.h"
+#include <src/sensor/sensor.h>
 #include "src/observer/observer.h"
 #include "src/adc/adc.h"
 #include "src/motor/motor.h"
@@ -34,10 +34,12 @@ int main(void)
 {
   	__disable_irq();
     system_init();
-    nvm_load_config(); // This will TRY to deserialize and import config
-    encoder_init();
+    if (!nvm_load_config())
+    {
+        sensors_init_with_defaults();
+        observer_init_with_defaults();
+    }
     UART_Init();
-	observer_init();
 	ADC_init();
     CAN_init();
     Timer_Init();

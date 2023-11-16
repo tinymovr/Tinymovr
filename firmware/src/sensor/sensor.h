@@ -19,20 +19,24 @@
 
 #include <src/common.h>
 #include <src/motor/motor.h>
-#include <src/sensors/ma7xx.h>
-#include <src/sensors/hall.h>
-#include <src/sensors/sensor.h>
+#include <src/sensor/ma7xx.h>
+#include <src/sensor/hall.h>
+#include <src/sensor/sensor.h>
 
-#define SENSOR_CNT_BITS 2
-#define SENSOR_COUNT (1 << SENSOR_CNT_BITS)
-static_assert((SENSOR_COUNT & (SENSOR_COUNT - 1)) == 0, "SENSOR_COUNT must be a power of 2");
+#define SENSOR_COUNT 3
 
-typedef Sensor (*sensor_init_func_t)(void);
+typedef struct Sensor Sensor;
+typedef union SensorSpecificConfig SensorSpecificConfig;
+typedef struct SensorConfig SensorConfig;
+typedef union SensorSpecificState SensorSpecificState;
+typedef struct SensorsConfig SensorsConfig;
+
+typedef void (*sensor_init_func_t)(Sensor *);
 typedef bool (*sensor_is_calibrated_func_t)(Sensor *);
 typedef bool (*sensor_calibrate_func_t)(Sensor *);
 typedef int16_t (*sensor_get_angle_func_t)(Sensor *);
 typedef void (*sensor_reset_func_t)(Sensor *);
-typedef void (*sensor_update_func_t)(Sensor *);
+typedef void (*sensor_update_func_t)(Sensor *, bool);
 typedef uint8_t (*sensor_get_error_func_t)(Sensor *);
 
 typedef enum {
@@ -43,27 +47,34 @@ typedef enum {
     SENSOR_TYPE_AMT22 = 4
 } sensor_type_t;
 
-typedef union {
+// The 
+typedef enum {
+    SENSOR_LOCATION_ONBOARD = 0,
+    SENSOR_LOCATION_EXTERNAL_SPI = 1,
+    SENSOR_LOCATION_HALL = 2
+} sensor_location_t;
+
+union SensorSpecificConfig {
     MA7xxSensorConfig ma7xx_config;
     HallSensorConfig hall_config;
-    AS5047SensorConfig as5047_config;
-    AMT22SensorConfig amt22_config;
-} SensorSpecificConfig;
+    // AS504xSensorConfig as5047_config;
+    // AMT22SensorConfig amt22_config;
+};
 
-typedef struct {
+struct SensorConfig {
     SensorSpecificConfig ss_config;
     uint32_t id;
     sensor_type_t type;
-} SensorConfig;
+};
 
-typedef union {
+union SensorSpecificState{
     MA7xxSensorState ma7xx_state;
     HallSensorState hall_state;
-    AS5047SensorState as5047_state;
-    AMT22SensorState amt22_state;
-} SensorSpecificState;
+    // AS504xSensorState as5047_state;
+    // AMT22SensorState amt22_state;
+};
 
-typedef struct {
+struct Sensor { // typedefd earlier
     SensorConfig config;
     SensorSpecificState state;
     sensor_init_func_t init_func;
@@ -75,12 +86,21 @@ typedef struct {
     sensor_get_error_func_t get_error_func;
     bool initialized : 1;
     bool current : 1;
-} Sensor;
+};
 
+struct SensorsConfig {
+    SensorConfig config[SENSOR_COUNT];
+    uint32_t commutation_id;
+    uint32_t position_id;
+}
+
+// The sequence in the `sensors` array is determined so that
+// 0: onboard sensor, 1: external spi and 3: hall sensor
+// index same as the members of `sensor_location_t`
 Sensor sensors[SENSOR_COUNT];
+
 Sensor *sensor_commutation;
 Sensor *sensor_position;
-
 
 uint32_t get_next_sensor_id(void);
 bool sensor_init_with_config(Sensor *s, SensorConfig *c);
@@ -88,27 +108,26 @@ void sensor_deinit(Sensor *s);
 void sensor_reset(Sensor *s);
 
 void sensors_init_with_defaults(void);
-uint32_t sensors_config_length(void);
-bool sensors_serialize_config_to_buffer(uint8_t *buffer, uint32_t *len);
-bool sensors_init_with_config_buffer(const uint8_t *buffer, const uint32_t len);
+void sensors_get_config(SensorsConfig *config_);
+void sensors_restore_config(SensorsConfig *config_);
 
-inline int16_t sensor_get_angle(Sensor *s)
+static inline int16_t sensor_get_angle(Sensor *s)
 {
-    return s->get_angle_func();
+    return s->get_angle_func(s);
 }
 
-inline void sensor_update(Sensor *s, bool check_error)
+static inline void sensor_update(Sensor *s, bool check_error)
 {
     if (s->current == false)
     {
-        s->update_func(check_error);
+        s->update_func(s, check_error);
         s->current = true;
     }
 }
 
-inline uint16_t sensor_get_ticks(Sensor *s) {
+static inline uint16_t sensor_get_ticks(Sensor *s) {
 #ifdef BOARD_REV_R5
-    if (SENSOR_MA7XX == s->type) {
+    if (SENSOR_TYPE_MA7XX == s->config.type) {
 #endif
         // We need to derive this during call, because the motor pole pairs
         // may change after calibration, or after user input
@@ -119,10 +138,10 @@ inline uint16_t sensor_get_ticks(Sensor *s) {
 #endif
 }
 
-inline float sensor_ticks_to_eangle(Sensor *s)
+static inline float sensor_ticks_to_eangle(Sensor *s)
 {
 #ifdef BOARD_REV_R5
-    if (SENSOR_MA7XX == s->type) {
+    if (SENSOR_TYPE_MA7XX == s->config.type) {
 #endif
         // We need to derive this during call, because the motor pole pairs
         // may change after calibration, or after user input
@@ -133,35 +152,23 @@ inline float sensor_ticks_to_eangle(Sensor *s)
 #endif
 }
 
-inline SensorType sensor_get_type(Sensor *s)
+static inline sensor_type_t sensor_get_type(Sensor *s)
 {
-    return s->type;
+    return s->config.type;
 }
 
-inline void sensor_set_type(Sensor *s, SensorType sensor_type)
+static inline bool sensor_get_calibrated(Sensor *s)
 {
-#ifdef BOARD_REV_R5
-    if (SENSOR_MA7XX == sensor_type || SENSOR_HALL == sensor_type) {
-#endif
-        s->type = sensor_type;
-        sensor_init(s);  // Re-initialize sensor with new type
-#ifdef BOARD_REV_R5
-    }
-#endif
+    return s->is_calibrated_func(s);
 }
 
-inline bool sensor_get_calibrated(Sensor *s)
-{
-    return s->is_calibrated_func();
-}
-
-inline bool sensor_calibrate(Sensor *s)
+static inline bool sensor_calibrate(Sensor *s)
 {
     return s->calibrate_func(s);
 }
 
-inline uint8_t sensor_get_errors(Sensor *s)
+static inline uint8_t sensor_get_errors(Sensor *s)
 {
-    return s->get_error_func();
+    return s->get_error_func(s);
 }
 

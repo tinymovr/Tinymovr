@@ -54,6 +54,8 @@
 #include "pac5xxx_tile_signal_manager.h"
 #include "config.h"
 
+#define ALWAYS_INLINE __attribute__((always_inline)) 
+
 #ifndef PAC5XXX_OK
 #define PAC5XXX_OK 0
 #endif
@@ -140,7 +142,7 @@ static const float quarterpi = PI * 0.25f;
 static const float twopi_by_enc_ticks = TWOPI / ENCODER_TICKS;
 static const float twopi_by_hall_sectors = TWOPI / HALL_SECTORS;
 
-_Static_assert (TIMER_FREQ_HZ % (2*PWM_FREQ_HZ) == 0, "Timer frequency not an integer multiple of PWM frequency");
+_Static_assert(TIMER_FREQ_HZ % (2*PWM_FREQ_HZ) == 0, "Timer frequency not an integer multiple of PWM frequency");
 
 typedef struct 
 {
