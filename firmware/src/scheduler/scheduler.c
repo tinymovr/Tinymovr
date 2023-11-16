@@ -22,8 +22,8 @@
 #include <src/can/can.h>
 #include <src/uart/uart_interface.h>
 #include <src/uart/uart_lowlevel.h>
-#include <src/sensors/sensor.h>
-#include <src/sensors/ma7xx.h>
+#include <src/sensor/sensor.h>
+#include <src/sensor/ma7xx.h>
 #include <src/observer/observer.h>
 #include <src/can/can_endpoints.h>
 #include <src/scheduler/scheduler.h>
@@ -33,7 +33,7 @@ volatile uint32_t msTicks = 0;
 
 SchedulerState state = {0};
 
-void WaitForControlLoopInterrupt(void)
+void wait_for_control_loop_interrupt(void)
 {
 	
 	while (!state.adc_interrupt)

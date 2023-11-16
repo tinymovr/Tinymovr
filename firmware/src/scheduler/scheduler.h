@@ -28,6 +28,6 @@ typedef struct
     uint8_t errors;
 } SchedulerState;
 
-void WaitForControlLoopInterrupt(void);
+void wait_for_control_loop_interrupt(void);
 
 uint8_t scheduler_get_errors(void);

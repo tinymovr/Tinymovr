@@ -22,6 +22,8 @@
 
 #include "src/common.h"
 
+extern void wait_for_control_loop_interrupt(void);
+
 #if __ARM_FEATURE_FMA && __ARM_FP&4 && !__SOFTFP__ && !BROKEN_VFP_ASM
 
 static inline float fast_sqrt(float x)
@@ -46,7 +48,7 @@ static inline void wait_pwm_cycles(uint32_t cycles)
 {
     for (uint32_t i = 0; i < cycles; i++)
     {
-        WaitForControlLoopInterrupt();
+        wait_for_control_loop_interrupt();
     }
 }
 

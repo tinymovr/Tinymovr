@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include <src/utils/utils.h>
+#include <src/gatedriver/gatedriver.h>
+#include <src/system/system.h>
 #include <src/common.h>
 
 #if defined BOARD_REV_R32 || BOARD_REV_R33 || defined BOARD_REV_R5
@@ -118,6 +121,6 @@ static inline void set_epos_and_wait(float angle, float I_setpoint)
     SVM(pwm_setpoint * fast_cos(angle), pwm_setpoint * fast_sin(angle),
         &modulation_values.A, &modulation_values.B, &modulation_values.C);
     gate_driver_set_duty_cycle(&modulation_values);
-    WaitForControlLoopInterrupt();
+    wait_for_control_loop_interrupt();
 }
 

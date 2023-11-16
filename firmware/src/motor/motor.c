@@ -17,11 +17,9 @@
 
 #include <src/controller/controller.h>
 #include <src/observer/observer.h>
-#include <src/gatedriver/gatedriver.h>
 #include <src/scheduler/scheduler.h>
 #include <src/utils/utils.h>
 #include <src/can/can_endpoints.h>
-#include <src/system/system.h>
 #include <src/motor/motor.h>
 
 #if defined BOARD_REV_R32 || defined BOARD_REV_R33 || defined BOARD_REV_R5
@@ -102,7 +100,7 @@ bool motor_calibrate_resistance(void)
             const float pwm_setpoint = V_setpoint / system_get_Vbus();
             SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
             gate_driver_set_duty_cycle(&modulation_values);
-            WaitForControlLoopInterrupt();
+            wait_for_control_loop_interrupt();
         }
         const float R = our_fabsf(V_setpoint / I_cal);
         gate_driver_set_duty_cycle(&three_phase_zero);
@@ -146,7 +144,7 @@ bool motor_calibrate_inductance(void)
             const float pwm_setpoint = V_setpoint / system_get_Vbus();
             SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
             gate_driver_set_duty_cycle(&modulation_values);
-            WaitForControlLoopInterrupt();
+            wait_for_control_loop_interrupt();
         }
         const float num_cycles = CAL_L_LEN / 2;
         const float dI_by_dt = (I_high - I_low) / (PWM_PERIOD_S * num_cycles);
