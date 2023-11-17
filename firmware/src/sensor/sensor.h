@@ -92,7 +92,7 @@ struct SensorsConfig {
     SensorConfig config[SENSOR_COUNT];
     uint32_t commutation_id;
     uint32_t position_id;
-}
+};
 
 // The sequence in the `sensors` array is determined so that
 // 0: onboard sensor, 1: external spi and 3: hall sensor
