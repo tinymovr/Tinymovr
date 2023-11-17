@@ -73,14 +73,16 @@ void wait_for_control_loop_interrupt(void)
 	state.adc_interrupt = false;
 	// We have to service the control loop by updating
 	// current measurements and encoder estimates.
-	if (SENSOR_MA7XX == encoder_get_type())
-	{
-		ma7xx_send_angle_cmd();
-	}
+	sensor_invalidate(sensor_commutation);
+	sensor_invalidate(sensor_position);
+	// If both pointers point to the same sensor, it will only br prepared and updated once
+	sensor_prepare(sensor_commutation);
+	sensor_prepare(sensor_position);
 	ADC_update();
-	
-	encoder_update(true);
-	observer_update();
+	sensor_update(sensor_commutation, true);
+	sensor_update(sensor_position, true);
+	observer_update(observer_commutation);
+	observer_update(observer_position);
 	// At this point control is returned to main loop.
 }
 
