@@ -43,6 +43,11 @@ typedef struct {
 	bool current : 1;
 } Observer;
 
+typedef struct {
+    ObserverConfig config_commutation;
+	ObserverConfig config_position;
+} ObserversConfig;
+
 Observer observer_commutation;
 Observer observer_position;
 
