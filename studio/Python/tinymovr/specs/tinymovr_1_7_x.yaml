@@ -340,7 +340,7 @@ remote_attributes:
               - name: calibrated
                 dtype: bool
                 meta: {dynamic: True}
-                getter_name: sensor_onboard_get_calibrated
+                getter_name: sensor_onboard_get_is_calibrated
                 summary: Whether the sensor has been calibrated.
               - name: errors
                 flags: [CALIBRATION_FAILED, READING_UNSTABLE]
@@ -358,81 +358,81 @@ remote_attributes:
               - name: calibrated
                 dtype: bool
                 meta: {dynamic: True}
-                getter_name: sensor_external_spi_get_calibrated
+                getter_name: sensor_external_spi_get_is_calibrated
                 summary: Whether the sensor has been calibrated.
               - name: errors
                 flags: [CALIBRATION_FAILED, READING_UNSTABLE]
                 meta: {dynamic: True}
-                getter_name: sensor_external_spi_get_calibrated
+                getter_name: sensor_external_spi_get_errors
                 summary: Any sensor errors, as a bitmask
           - name: hall
             remote_attributes:
               - name: calibrated
                 dtype: bool
                 meta: {dynamic: True}
-                getter_name: sensor_hall_get_calibrated
+                getter_name: sensor_hall_get_is_calibrated
                 summary: Whether the sensor has been calibrated.
               - name: errors
                 flags: [CALIBRATION_FAILED, READING_UNSTABLE]
                 meta: {dynamic: True}
-                getter_name: sensor_hall_get_calibrated
+                getter_name: sensor_hall_get_errors
                 summary: Any sensor errors, as a bitmask
       - name: select
         remote_attributes:
           - name: position
             remote_attributes:
-              - name: type
+              - name: connection
                 options: [ONBOARD, EXTERNAL_SPI, HALL]
                 meta: {export: True}
-                getter_name: position_sensor_get_type
-                setter_name: position_sensor_set_type
-                summary: The angle sensor type. Either ONBOARD, EXTERNAL_SPI or HALL.
+                getter_name: position_sensor_get_connection
+                setter_name: position_sensor_set_connection
+                summary: The position sensor connection. Either ONBOARD, EXTERNAL_SPI or HALL.
               - name: bandwidth
                 dtype: float
                 unit: Hz
                 meta: {export: True}
                 getter_name: position_sensor_get_bandwidth
                 setter_name: position_sensor_set_bandwidth
-                summary: The sensor observer bandwidth.
+                summary: The position sensor observer bandwidth.
               - name: position_estimate
                 dtype: float
                 unit: ticks
                 meta: {dynamic: True}
-                getter_name: observer_get_pos_estimate_user_frame
-                summary: The filtered sensor position estimate.
+                getter_name: position_observer_get_pos_estimate_user_frame
+                summary: The filtered position sensor position estimate.
               - name: velocity_estimate
                 dtype: float
                 unit: ticks/second
                 meta: {dynamic: True}
-                getter_name: observer_get_vel_estimate_user_frame
-                summary: The filtered sensor velocity estimate.
+                getter_name: position_observer_get_vel_estimate_user_frame
+                summary: The filtered position sensor velocity estimate.
           - name: commutation
             remote_attributes:
-              - name: type
+              - name: connection
                 options: [ONBOARD, EXTERNAL_SPI, HALL]
                 meta: {export: True}
-                getter_name: commutation_sensor_get_type
-                setter_name: commutation_sensor_set_type
-                summary: The angle sensor type. Either ONBOARD, EXTERNAL_SPI or HALL.
+                getter_name: commutation_sensor_get_connection
+                setter_name: commutation_sensor_set_connection
+                summary: The commutation sensor connection. Either ONBOARD, EXTERNAL_SPI or HALL.
               - name: bandwidth
                 dtype: float
                 unit: Hz
                 meta: {export: True}
                 getter_name: commutation_sensor_get_bandwidth
                 setter_name: commutation_sensor_set_bandwidth
-                summary: The sensor observer bandwidth.
+                summary: The commutation sensor observer bandwidth.
               - name: position_estimate
                 dtype: float
                 unit: ticks
                 meta: {dynamic: True}
-                getter_name: observer_get_pos_estimate_user_frame
-                summary: The filtered sensor position estimate.
+                getter_name: commutation_observer_get_pos_estimate_user_frame
+                summary: The filtered commutation sensor position estimate.
               - name: velocity_estimate
                 dtype: float
                 unit: ticks/second
                 meta: {dynamic: True}
-                getter_name: observer_get_vel_estimate_user_frame
-                summary: The filtered sensor velocity estimate.    
+                getter_name: commutation_observer_get_vel_estimate_user_frame
+                summary: The filtered commutation sensor velocity estimate.    
   - name: traj_planner
     remote_attributes:
       - name: max_accel
