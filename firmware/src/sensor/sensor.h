@@ -37,22 +37,24 @@ typedef bool (*sensor_calibrate_func_t)(Sensor *);
 typedef int16_t (*sensor_get_angle_func_t)(Sensor *);
 typedef void (*sensor_reset_func_t)(Sensor *);
 typedef void (*sensor_update_func_t)(Sensor *, bool);
-typedef uint8_t (*sensor_get_error_func_t)(Sensor *);
+typedef uint8_t (*sensor_get_errors_func_t)(Sensor *);
 
 typedef enum {
     SENSOR_TYPE_INVALID = 0,
     SENSOR_TYPE_MA7XX = 1,
     SENSOR_TYPE_HALL = 2,
     SENSOR_TYPE_AS5047 = 3,
-    SENSOR_TYPE_AMT22 = 4
+    SENSOR_TYPE_AMT22 = 4,
+    SENSOR_TYPE_MAX
 } sensor_type_t;
 
 // The 
 typedef enum {
-    SENSOR_LOCATION_ONBOARD = 0,
-    SENSOR_LOCATION_EXTERNAL_SPI = 1,
-    SENSOR_LOCATION_HALL = 2
-} sensor_location_t;
+    SENSOR_CONNECTION_ONBOARD_SPI = 0,
+    SENSOR_CONNECTION_EXTERNAL_SPI = 1,
+    SENSOR_CONNECTION_HALL = 2,
+    SENSOR_CONNECTION_MAX
+} sensor_connection_t;
 
 union SensorSpecificConfig {
     MA7xxSensorConfig ma7xx_config;
@@ -83,7 +85,7 @@ struct Sensor { // typedefd earlier
     sensor_get_angle_func_t get_angle_func;
     sensor_reset_func_t reset_func;
     sensor_update_func_t update_func;
-    sensor_get_error_func_t get_error_func;
+    sensor_get_errors_func_t get_errors_func;
     bool initialized : 1;
     bool current : 1;
 };
@@ -96,7 +98,7 @@ struct SensorsConfig {
 
 // The sequence in the `sensors` array is determined so that
 // 0: onboard sensor, 1: external spi and 3: hall sensor
-// index same as the members of `sensor_location_t`
+// index same as the members of `sensor_connection_t`
 Sensor sensors[SENSOR_COUNT];
 
 Sensor *sensor_commutation;
@@ -169,6 +171,49 @@ static inline bool sensor_calibrate(Sensor *s)
 
 static inline uint8_t sensor_get_errors(Sensor *s)
 {
-    return s->get_error_func(s);
+    return s->get_errors_func(s);
 }
+
+sensor_connection_t commutation_sensor_get_connection(void);
+void commutation_sensor_set_connection(sensor_connection_t new_connection);
+sensor_connection_t position_sensor_get_connection(void);
+void position_sensor_set_type(sensor_connection_t new_connection);
+
+static inline sensor_type_t sensor_external_spi_get_type(void)
+{
+    return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].config.type;
+}
+
+void sensor_external_spi_set_type(sensor_type_t type);
+
+static inline bool sensor_onboard_get_is_calibrated(void)
+{
+    return sensors[SENSOR_CONNECTION_ONBOARD_SPI].is_calibrated_func();
+}
+
+static inline bool sensor_external_spi_get_is_calibrated(void)
+{
+    return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].is_calibrated_func();
+}
+
+static inline bool sensor_hall_get_is_calibrated(void)
+{
+    return sensors[SENSOR_CONNECTION_HALL].is_calibrated_func();
+}
+
+static inline uint8_t sensor_onboard_get_errors(void)
+{
+    return sensors[SENSOR_CONNECTION_ONBOARD_SPI].get_errors_func();
+}
+
+static inline uint8_t sensor_external_spi_get_errors(void)
+{
+    return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].get_errors_func();
+}
+
+static inline uint8_t sensor_hall_get_errors(void)
+{
+    return sensors[SENSOR_CONNECTION_HALL].get_errors_func();
+}
+
 
