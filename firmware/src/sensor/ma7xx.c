@@ -34,7 +34,7 @@ bool ma7xx_init_with_config(Sensor *s, SensorSpecificConfig *c)
     s->get_angle_func = ma7xx_get_angle_rectified;
     s->update_func = ma7xx_update;
     s->reset_func = ma7xx_clear_rec_table;
-    s->get_error_func = ma7xx_get_errors;
+    s->get_errors_func = ma7xx_get_errors;
     s->is_calibrated_func = ma7xx_rec_is_calibrated;
     s->calibrate_func = ma7xx_calibrate;
     s->config.type = SENSOR_TYPE_MA7XX;

@@ -33,7 +33,7 @@ bool hall_init_with_config(Sensor *s, SensorSpecificConfig *c)
     s->get_angle_func = hall_get_angle;
     s->update_func = hall_update;
     s->reset_func = hall_clear_sector_map;
-    s->get_error_func = hall_get_errors;
+    s->get_errors_func = hall_get_errors;
     s->is_calibrated_func = hall_sector_map_is_calibrated;
     s->calibrate_func = hall_calibrate_sequence;
     s->config.type = SENSOR_HALL;
