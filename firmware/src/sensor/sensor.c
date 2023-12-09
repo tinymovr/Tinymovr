@@ -72,7 +72,7 @@ void sensors_restore_config(SensorsConfig *config_)
 
 }
 
-// These are the actual interface functions
+// Interface functions
 
 static inline int sensor_get_connection(Sensor *sensor)
 {
@@ -115,7 +115,7 @@ sensor_connection_t position_sensor_get_connection(void)
     return ssensor_get_connection(sensor_position);
 }
 
-void position_sensor_set_type(sensor_connection_t new_connection)
+void position_sensor_set_connection(sensor_connection_t new_connection)
 {
     sensor_set_connection(&(sensor_position), &(sensor_commutation), new_connection);
 }

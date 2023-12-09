@@ -23,7 +23,6 @@
 #include <src/gatedriver/gatedriver.h>
 #include <src/utils/utils.h>
 #include <src/scheduler/scheduler.h>
-#include <src/motor/calibration.h>
 #include <src/can/can_endpoints.h>
 #include <src/controller/controller.h>
 #include "src/watchdog/watchdog.h"
@@ -122,7 +121,7 @@ void Controller_ControlLoop(void)
         {
             state.is_calibrating = true;
             reset_calibration();
-            (void)(ADC_calibrate_offset() && motor_calibrate_resistance() && motor_calibrate_inductance())
+            (void)(ADC_calibrate_offset() && motor_calibrate_resistance() && motor_calibrate_inductance());
             if (SENSOR_MA7XX == encoder_get_type())
             {
                 (void)(calibrate_direction_and_pole_pair_count() && calibrate_offset_and_rectification());
@@ -132,7 +131,7 @@ void Controller_ControlLoop(void)
                 (void)calibrate_hall_sequence();
             }
             state.is_calibrating = false;
-            controller_set_state(STATE_IDLE);
+            controller_set_state(STATE_IDLE); 
         }
         else if (state.state == STATE_CL_CONTROL)
         {

@@ -48,7 +48,6 @@ typedef enum {
     SENSOR_TYPE_MAX
 } sensor_type_t;
 
-// The 
 typedef enum {
     SENSOR_CONNECTION_ONBOARD_SPI = 0,
     SENSOR_CONNECTION_EXTERNAL_SPI = 1,
@@ -174,10 +173,12 @@ static inline uint8_t sensor_get_errors(Sensor *s)
     return s->get_errors_func(s);
 }
 
+// Interface functions
+
 sensor_connection_t commutation_sensor_get_connection(void);
 void commutation_sensor_set_connection(sensor_connection_t new_connection);
 sensor_connection_t position_sensor_get_connection(void);
-void position_sensor_set_type(sensor_connection_t new_connection);
+void position_sensor_set_connection(sensor_connection_t new_connection);
 
 static inline sensor_type_t sensor_external_spi_get_type(void)
 {
@@ -188,32 +189,32 @@ void sensor_external_spi_set_type(sensor_type_t type);
 
 static inline bool sensor_onboard_get_is_calibrated(void)
 {
-    return sensors[SENSOR_CONNECTION_ONBOARD_SPI].is_calibrated_func();
+    return sensors[SENSOR_CONNECTION_ONBOARD_SPI].is_calibrated_func(&(sensors[SENSOR_CONNECTION_ONBOARD_SPI]));
 }
 
 static inline bool sensor_external_spi_get_is_calibrated(void)
 {
-    return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].is_calibrated_func();
+    return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].is_calibrated_func(&(sensors[SENSOR_CONNECTION_EXTERNAL_SPI]));
 }
 
 static inline bool sensor_hall_get_is_calibrated(void)
 {
-    return sensors[SENSOR_CONNECTION_HALL].is_calibrated_func();
+    return sensors[SENSOR_CONNECTION_HALL].is_calibrated_func(&(sensors[SENSOR_CONNECTION_HALL]));
 }
 
 static inline uint8_t sensor_onboard_get_errors(void)
 {
-    return sensors[SENSOR_CONNECTION_ONBOARD_SPI].get_errors_func();
+    return sensors[SENSOR_CONNECTION_ONBOARD_SPI].get_errors_func(&(sensors[SENSOR_CONNECTION_ONBOARD_SPI]));
 }
 
 static inline uint8_t sensor_external_spi_get_errors(void)
 {
-    return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].get_errors_func();
+    return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].get_errors_func(&(sensors[SENSOR_CONNECTION_EXTERNAL_SPI]));
 }
 
 static inline uint8_t sensor_hall_get_errors(void)
 {
-    return sensors[SENSOR_CONNECTION_HALL].get_errors_func();
+    return sensors[SENSOR_CONNECTION_HALL].get_errors_func(&(sensors[SENSOR_CONNECTION_HALL]));
 }
 
 

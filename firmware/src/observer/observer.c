@@ -37,7 +37,7 @@ bool observer_init_with_config(Observer *o, Sensor *s, ObserverConfig *c)
 {
 	o->sensor_ptr = &(sensors[sensor_id]);
 	o->config = *c;
-    observer_set_bw(o, config->track_bw);
+    observer_set_bandwidth(o, config->track_bw);
 	// We keep local copies of a few key variables from
 	// the encoder, because it is faster than calling
 	// the encoder function pointer
@@ -53,12 +53,12 @@ void observer_reset(Observer *o)
 	o->vel_estimate = 0;
 }
 
-float observer_get_bw(Observer *o)
+float observer_get_bandwidth(Observer *o)
 {
     return o->config.track_bw;
 }
 
-void observer_set_bw(Observer *o, float bw)
+void observer_set_bandwidth(Observer *o, float bw)
 {
     if (bw > 0.0f)
     {
@@ -70,9 +70,8 @@ void observer_set_bw(Observer *o, float bw)
 
 void observers_init_with_defaults(void)
 {
-    observer_init(observers[0], sensor_commutation);
-	observer_commutation = &(observers[0]);
-	observer_position = &(observers[0]);
+    observer_init(observer_commutation, sensor_commutation);
+	observer_init(observer_position, sensor_position);
 }
 
 uint32_t observers_config_length(void)

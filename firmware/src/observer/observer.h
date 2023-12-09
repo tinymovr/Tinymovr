@@ -55,14 +55,14 @@ bool observer_init_with_defaults(Observer *o, Sensor *s);
 bool observer_init_with_config(Observer *o, Sensor *s, ObserverConfig *c);
 void observer_reset(Observer *o);
 
-float observer_get_bw(Observer *o);
-void observer_set_bw(Observer *o, float bw);
+float observer_get_bandwidth(Observer *o);
+void observer_set_bandwidth(Observer *o, float bw);
 
 void observers_init_with_defaults(void);
 void observers_get_config(ObserversConfig *config_);
 void observers_restore_config(ObserversConfig *config_);
  
-inline void observer_update(Observer *o)
+static inline void observer_update(Observer *o)
 {
 	if (o->current == false)
 	{
@@ -95,25 +95,25 @@ inline void observer_update(Observer *o)
 	}
 }
 
-inline void observer_invalidate(Observer *o)
+static inline void observer_invalidate(Observer *o)
 {
 	o->current = false;
 }
 
-inline float observer_get_pos_estimate(Observer *o)
+static inline float observer_get_pos_estimate(Observer *o)
 {
 	const float primary = o->sensor_ticks * o->pos_sector;
 	return primary + o->pos_estimate_wrapped;
 }
 
-inline float observer_get_diff(Observer *o, float target)
+static inline float observer_get_diff(Observer *o, float target)
 {
 	const float primary = o->sensor_ticks * o->pos_sector;
 	const float diff_sector = target - primary;
 	return diff_sector - o->pos_estimate_wrapped;
 }
 
-inline float observer_get_vel_estimate(Observer *o)
+static inline float observer_get_vel_estimate(Observer *o)
 {
 	return o->vel_estimate;
 }
@@ -136,12 +136,44 @@ static inline float observer_get_evel(Observer *o)
 	return o->vel_estimate * twopi_by_hall_sectors;
 }
 
-inline float observer_get_pos_estimate_user_frame(Observer *o)
+static inline float observer_get_pos_estimate_user_frame(Observer *o)
 {
 	return (observer_get_pos_estimate(o) - motor_get_user_offset()) * motor_get_user_direction();
 }
 
-inline float observer_get_vel_estimate_user_frame(Observer *o)
+static inline float observer_get_vel_estimate_user_frame(Observer *o)
 {
 	return o->vel_estimate * motor_get_user_direction();
+}
+
+// Interface functions
+
+static inline float commutation_observer_get_bandwidth(void)
+{
+	return observer_get_bandwidth(&observer_commutation);
+}
+
+static inline void commutation_observer_set_bandwidth(float bw)
+{
+	observer_set_bandwidth(&observer_commutation, bw);
+}
+
+static inline float position_observer_get_bandwidth(void)
+{
+	return observer_get_bandwidth(&observer_position);
+}
+
+static inline void position_observer_set_bandwidth(float bw)
+{
+	observer_set_bandwidth(&observer_position, bw);
+}
+
+static inline float position_observer_get_pos_estimate_user_frame(void)
+{
+	return observer_get_pos_estimate_user_frame(&observer_position);
+}
+
+static inline float position_observer_get_vel_estimate_user_frame(void)
+{
+	return observer_get_vel_estimate_user_frame(&observer_position);
 }
