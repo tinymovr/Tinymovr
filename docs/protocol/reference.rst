@@ -736,14 +736,14 @@ Flags:
 - READING_UNSTABLE
 
 
-sensors.select.position.type
+sensors.select.position.connection
 -------------------------------------------------------------------
 
 ID: 60
 Type: uint8
 
 
-The angle sensor type. Either ONBOARD, EXTERNAL_SPI or HALL.
+The position sensor connection. Either ONBOARD, EXTERNAL_SPI or HALL.
 
 Options: 
 - ONBOARD
@@ -758,7 +758,7 @@ ID: 61
 Type: float
 Units: hertz
 
-The sensor observer bandwidth.
+The position sensor observer bandwidth.
 
 
 
@@ -770,7 +770,7 @@ ID: 62
 Type: float
 Units: tick
 
-The filtered sensor position estimate.
+The filtered position sensor position estimate.
 
 
 
@@ -782,19 +782,19 @@ ID: 63
 Type: float
 Units: tick / second
 
-The filtered sensor velocity estimate.
+The filtered position sensor velocity estimate.
 
 
 
 
-sensors.select.commutation.type
+sensors.select.commutation.connection
 -------------------------------------------------------------------
 
 ID: 64
 Type: uint8
 
 
-The angle sensor type. Either ONBOARD, EXTERNAL_SPI or HALL.
+The commutation sensor connection. Either ONBOARD, EXTERNAL_SPI or HALL.
 
 Options: 
 - ONBOARD
@@ -809,7 +809,7 @@ ID: 65
 Type: float
 Units: hertz
 
-The sensor observer bandwidth.
+The commutation sensor observer bandwidth.
 
 
 
@@ -821,7 +821,7 @@ ID: 66
 Type: float
 Units: tick
 
-The filtered sensor position estimate.
+The filtered commutation sensor position estimate.
 
 
 
@@ -833,7 +833,7 @@ ID: 67
 Type: float
 Units: tick / second
 
-The filtered sensor velocity estimate.
+The filtered commutation sensor velocity estimate.
 
 
 

@@ -112,17 +112,17 @@ typedef enum
 
 typedef enum
 {
-    SENSORS_SELECT_POSITION_TYPE_ONBOARD = 0, 
-    SENSORS_SELECT_POSITION_TYPE_EXTERNAL_SPI = 1, 
-    SENSORS_SELECT_POSITION_TYPE_HALL = 2
-} sensors_select_position_type_options;
+    SENSORS_SELECT_POSITION_CONNECTION_ONBOARD = 0, 
+    SENSORS_SELECT_POSITION_CONNECTION_EXTERNAL_SPI = 1, 
+    SENSORS_SELECT_POSITION_CONNECTION_HALL = 2
+} sensors_select_position_connection_options;
 
 typedef enum
 {
-    SENSORS_SELECT_COMMUTATION_TYPE_ONBOARD = 0, 
-    SENSORS_SELECT_COMMUTATION_TYPE_EXTERNAL_SPI = 1, 
-    SENSORS_SELECT_COMMUTATION_TYPE_HALL = 2
-} sensors_select_commutation_type_options;
+    SENSORS_SELECT_COMMUTATION_CONNECTION_ONBOARD = 0, 
+    SENSORS_SELECT_COMMUTATION_CONNECTION_EXTERNAL_SPI = 1, 
+    SENSORS_SELECT_COMMUTATION_CONNECTION_HALL = 2
+} sensors_select_commutation_connection_options;
 
 extern uint32_t avlos_proto_hash;
 extern uint8_t (*avlos_endpoints[88])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
@@ -849,21 +849,21 @@ uint8_t avlos_sensors_setup_hall_calibrated(uint8_t * buffer, uint8_t * buffer_l
 uint8_t avlos_sensors_setup_hall_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_sensors_select_position_type
+* avlos_sensors_select_position_connection
 *
-* The angle sensor type. Either ONBOARD, EXTERNAL_SPI or HALL.
+* The position sensor connection. Either ONBOARD, EXTERNAL_SPI or HALL.
 *
 * Endpoint ID: 60
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_sensors_select_position_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t avlos_sensors_select_position_connection(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_sensors_select_position_bandwidth
 *
-* The sensor observer bandwidth.
+* The position sensor observer bandwidth.
 *
 * Endpoint ID: 61
 *
@@ -875,7 +875,7 @@ uint8_t avlos_sensors_select_position_bandwidth(uint8_t * buffer, uint8_t * buff
 /*
 * avlos_sensors_select_position_position_estimate
 *
-* The filtered sensor position estimate.
+* The filtered position sensor position estimate.
 *
 * Endpoint ID: 62
 *
@@ -887,7 +887,7 @@ uint8_t avlos_sensors_select_position_position_estimate(uint8_t * buffer, uint8_
 /*
 * avlos_sensors_select_position_velocity_estimate
 *
-* The filtered sensor velocity estimate.
+* The filtered position sensor velocity estimate.
 *
 * Endpoint ID: 63
 *
@@ -897,21 +897,21 @@ uint8_t avlos_sensors_select_position_position_estimate(uint8_t * buffer, uint8_
 uint8_t avlos_sensors_select_position_velocity_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_sensors_select_commutation_type
+* avlos_sensors_select_commutation_connection
 *
-* The angle sensor type. Either ONBOARD, EXTERNAL_SPI or HALL.
+* The commutation sensor connection. Either ONBOARD, EXTERNAL_SPI or HALL.
 *
 * Endpoint ID: 64
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_sensors_select_commutation_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t avlos_sensors_select_commutation_connection(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_sensors_select_commutation_bandwidth
 *
-* The sensor observer bandwidth.
+* The commutation sensor observer bandwidth.
 *
 * Endpoint ID: 65
 *
@@ -923,7 +923,7 @@ uint8_t avlos_sensors_select_commutation_bandwidth(uint8_t * buffer, uint8_t * b
 /*
 * avlos_sensors_select_commutation_position_estimate
 *
-* The filtered sensor position estimate.
+* The filtered commutation sensor position estimate.
 *
 * Endpoint ID: 66
 *
@@ -935,7 +935,7 @@ uint8_t avlos_sensors_select_commutation_position_estimate(uint8_t * buffer, uin
 /*
 * avlos_sensors_select_commutation_velocity_estimate
 *
-* The filtered sensor velocity estimate.
+* The filtered commutation sensor velocity estimate.
 *
 * Endpoint ID: 67
 *

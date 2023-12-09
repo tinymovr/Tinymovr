@@ -391,8 +391,8 @@ remote_attributes:
                 dtype: float
                 unit: Hz
                 meta: {export: True}
-                getter_name: position_sensor_get_bandwidth
-                setter_name: position_sensor_set_bandwidth
+                getter_name: position_observer_get_bandwidth
+                setter_name: position_observer_set_bandwidth
                 summary: The position sensor observer bandwidth.
               - name: position_estimate
                 dtype: float
@@ -418,8 +418,8 @@ remote_attributes:
                 dtype: float
                 unit: Hz
                 meta: {export: True}
-                getter_name: commutation_sensor_get_bandwidth
-                setter_name: commutation_sensor_set_bandwidth
+                getter_name: commutation_observer_get_bandwidth
+                setter_name: commutation_observer_set_bandwidth
                 summary: The commutation sensor observer bandwidth.
               - name: position_estimate
                 dtype: float
