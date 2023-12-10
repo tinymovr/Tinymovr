@@ -13,7 +13,8 @@
         "variant": "c",
         "chrono": "c",
         "compare": "c",
-        "cstddef": "c"
+        "cstddef": "c",
+        "__locale": "c"
     },
     "python.testing.unittestArgs": [
         "-v",
