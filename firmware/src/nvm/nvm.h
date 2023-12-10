@@ -33,7 +33,7 @@ struct NVMStruct {
     uint8_t node_id_2;
     ADCConfig adc_config;
     MotorConfig motor_config;
-    SensorsConfig encoders_config;
+    SensorsConfig sensors_config;
     ObserversConfig observers_config;
     ControllerConfig controller_config;
     CANConfig can_config;

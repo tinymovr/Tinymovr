@@ -37,7 +37,7 @@ int main(void)
     if (!nvm_load_config())
     {
         sensors_init_with_defaults();
-        observer_init_with_defaults();
+        observers_init_with_defaults();
     }
     UART_Init();
 	ADC_init();

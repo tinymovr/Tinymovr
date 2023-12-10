@@ -120,16 +120,17 @@ void Controller_ControlLoop(void)
         if (state.state == STATE_CALIBRATE)
         {
             state.is_calibrating = true;
-            reset_calibration();
-            (void)(ADC_calibrate_offset() && motor_calibrate_resistance() && motor_calibrate_inductance());
-            if (SENSOR_MA7XX == encoder_get_type())
-            {
-                (void)(calibrate_direction_and_pole_pair_count() && calibrate_offset_and_rectification());
-            }
-            else if (SENSOR_HALL == encoder_get_type())
-            {
-                (void)calibrate_hall_sequence();
-            }
+            system_reset_calibration();
+            #warning "Update implementation"
+            // (void)(ADC_calibrate_offset() && motor_calibrate_resistance() && motor_calibrate_inductance());
+            // if (SENSOR_MA7XX == encoder_get_type())
+            // {
+            //     (void)(calibrate_direction_and_pole_pair_count() && calibrate_offset_and_rectification());
+            // }
+            // else if (SENSOR_HALL == encoder_get_type())
+            // {
+            //     (void)calibrate_hall_sequence();
+            // }
             state.is_calibrating = false;
             controller_set_state(STATE_IDLE); 
         }
@@ -199,13 +200,13 @@ TM_RAMFUNC void CLControlStep(void)
 
     if (state.mode >= CTRL_POSITION)
     {
-        const float delta_pos = observer_get_diff(state.pos_setpoint);
+        const float delta_pos = observer_get_diff(&position_observer, state.pos_setpoint);
         const float delta_pos_integrator = sgnf(delta_pos) * our_fmaxf(0, fabsf(delta_pos) - config.vel_integrator_deadband);
         vel_setpoint += delta_pos * config.pos_gain;
         vel_setpoint_integrator += delta_pos_integrator * config.pos_gain;
     }
 
-    const float vel_estimate = observer_get_vel_estimate();
+    const float vel_estimate = observer_get_vel_estimate(&position_observer);
     float Iq_setpoint = state.Iq_setpoint;
 
     if (state.mode >= CTRL_VELOCITY)
@@ -247,7 +248,7 @@ TM_RAMFUNC void CLControlStep(void)
         state.Id_setpoint = 0.0f;
     }
 
-    const float e_phase = observer_get_epos();
+    const float e_phase = observer_get_epos(&commutation_observer);
     const float c_I = fast_cos(e_phase);
     const float s_I = fast_sin(e_phase);
 
@@ -255,7 +256,7 @@ TM_RAMFUNC void CLControlStep(void)
     float Vq;
     if (motor_get_is_gimbal() == true)
     {
-        const float e_phase_vel = observer_get_evel();
+        const float e_phase_vel = observer_get_evel(&commutation_observer);
         Vd = -e_phase_vel * motor_get_phase_inductance() * Iq_setpoint;
         Vq = motor_get_phase_resistance() * Iq_setpoint;
     }
@@ -323,7 +324,7 @@ TM_RAMFUNC void controller_set_state(ControlState new_state)
     {
         if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE) && (!errors_exist()) && motor_get_calibrated())
         {
-            state.pos_setpoint = observer_get_pos_estimate();
+            state.pos_setpoint = observer_get_pos_estimate(&position_observer);
             gate_driver_enable();
             state.state = STATE_CL_CONTROL;
         }
@@ -444,7 +445,7 @@ TM_RAMFUNC float controller_set_pos_vel_setpoints(float pos_setpoint, float vel_
 {
     controller_set_pos_setpoint_user_frame(pos_setpoint);
     controller_set_vel_setpoint_user_frame(vel_setpoint);
-    return observer_get_pos_estimate_user_frame();
+    return observer_get_pos_estimate_user_frame(&position_observer);
 }
 
 void controller_get_modulation_values(FloatTriplet *dc)

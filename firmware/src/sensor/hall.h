@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <src/common.h>
+
 typedef struct Sensor Sensor;
 typedef union SensorSpecificConfig SensorSpecificConfig;
 
@@ -37,6 +39,7 @@ typedef struct
 bool hall_init_with_defaults(Sensor *s);
 bool hall_init_with_config(Sensor *s, SensorSpecificConfig *c);
 void hall_deinit(Sensor *s);
+void hall_reset(Sensor *s);
 uint8_t hall_get_errors(Sensor *s);
 int16_t hall_get_angle(Sensor *s);
 void hall_update(Sensor *s, bool check_error);

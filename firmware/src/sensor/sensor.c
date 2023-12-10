@@ -52,35 +52,27 @@ void sensor_deinit(Sensor *s)
 
 void sensor_reset(Sensor *s)
 {
-    s->reset_func();
+    s->reset_func(s);
 }
 
 void sensors_init_with_defaults(void)
 {
     ma7xx_init_with_defaults(&(sensors[0]));
-    sensor_commutation = &(sensors[0]);
-    sensor_position = &(sensors[0]);
+    commutation_sensor_p = &(sensors[0]);
+    position_sensor_p = &(sensors[0]);
 }
 
 void sensors_get_config(SensorsConfig *config_)
 {
-
+#warning "Update implementation"
 }
 
 void sensors_restore_config(SensorsConfig *config_)
 {
-
+#warning "Update implementation"
 }
 
-// Interface functions
-
-static inline int sensor_get_connection(Sensor *sensor)
-{
-    // Derive pointer array offset
-    return sensor - sensors;
-}
-
-static inline void sensor_set_connection(Sensor** target_sensor, Sensor** other_sensor, sensor_connection_t new_connection)
+void sensor_set_connection(Sensor** target_sensor, Sensor** other_sensor, sensor_connection_t new_connection)
 {
     if (controller_get_state() == STATE_IDLE
         && new_connection != sensor_get_connection(*target_sensor) 
@@ -100,24 +92,26 @@ static inline void sensor_set_connection(Sensor** target_sensor, Sensor** other_
     }
 }
 
-sensor_connection_t commutation_sensor_get_connection(void)
+// Interface functions
+
+static inline sensor_connection_t commutation_sensor_get_connection(void)
 {
-    return sensor_get_connection(sensor_commutation);
+    return sensor_get_connection(commutation_sensor_p);
 }
 
 void commutation_sensor_set_connection(sensor_connection_t new_connection)
 {
-    sensor_set_connection(&(sensor_commutation), &(sensor_position), new_connection);
+    sensor_set_connection(&(commutation_sensor_p), &(position_sensor_p), new_connection);
 }
 
-sensor_connection_t position_sensor_get_connection(void)
+inline sensor_connection_t position_sensor_get_connection(void)
 {
-    return ssensor_get_connection(sensor_position);
+    return ssensor_get_connection(position_sensor_p);
 }
 
 void position_sensor_set_connection(sensor_connection_t new_connection)
 {
-    sensor_set_connection(&(sensor_position), &(sensor_commutation), new_connection);
+    sensor_set_connection(&(position_sensor_p), &(commutation_sensor_p), new_connection);
 }
 
 void sensor_external_spi_set_type(sensor_type_t type)
@@ -128,7 +122,7 @@ void sensor_external_spi_set_type(sensor_type_t type)
     {
         sensor_deinit(&(sensors[SENSOR_CONNECTION_EXTERNAL_SPI]));
         sensors[SENSOR_CONNECTION_EXTERNAL_SPI].config.type = type;
-        sensors_init_with_defaults(&(sensors[SENSOR_CONNECTION_EXTERNAL_SPI]));
+        sensors_init_with_defaults();
     }
 }
 

@@ -31,7 +31,7 @@ bool nvm_save_config(void)
 	s.node_id_2 = CAN_get_ID();
 	s.adc_config = *ADC_get_config();
 	s.motor_config = *motor_get_config();
-	encoders_get_config(&(s.encoders_config));
+	sensors_get_config(&(s.sensors_config));
 	observers_get_config(&(s.observers_config));
 	s.controller_config = *controller_get_config();
 	s.can_config = *CAN_get_config();
@@ -61,7 +61,7 @@ bool nvm_load_config(void)
 	{
 		ADC_restore_config(&s.adc_config);
 		motor_restore_config(&s.motor_config);
-		encoders_restore_config(&s.encoders_config);
+		sensors_restore_config(&s.sensors_config);
 		observers_restore_config(&s.observers_config);
 		controller_restore_config(&s.controller_config);
 		CAN_restore_config(&s.can_config);

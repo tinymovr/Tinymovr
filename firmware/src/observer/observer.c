@@ -35,22 +35,10 @@ bool observer_init_with_defaults(Observer *o, Sensor *s)
 
 bool observer_init_with_config(Observer *o, Sensor *s, ObserverConfig *c)
 {
-	o->sensor_ptr = &(sensors[sensor_id]);
+	o->sensor_ptr = s;
 	o->config = *c;
-    observer_set_bandwidth(o, config->track_bw);
-	// We keep local copies of a few key variables from
-	// the encoder, because it is faster than calling
-	// the encoder function pointer
-	o->encoder_type = sensor_get_type(s);
-	o->encoder_ticks = sensor_get_ticks(s);
-	o->encoder_half_ticks = state.encoder_ticks/2;
-}
-
-void observer_reset(Observer *o)
-{
-	o->pos_sector = 0;
-	o->pos_estimate_wrapped = 0;
-	o->vel_estimate = 0;
+    observer_set_bandwidth(o, c->track_bw);
+	return true;
 }
 
 float observer_get_bandwidth(Observer *o)
@@ -70,29 +58,26 @@ void observer_set_bandwidth(Observer *o, float bw)
 
 void observers_init_with_defaults(void)
 {
-    observer_init(observer_commutation, sensor_commutation);
-	observer_init(observer_position, sensor_position);
-}
-
-uint32_t observers_config_length(void)
-{
-	uint32_t config_length = 0;
-    for (uint8_t i=0; i<OBSERVER_COUNT; i++)
-    {
-        if (sensors[i].initialized)
-        {
-            config_length += len(SensorConfig);
-        }
-    }
-    return config_length;
+    observer_init_with_defaults(&commutation_observer, commutation_sensor_p);
+	observer_init_with_defaults(&position_observer, position_sensor_p);
 }
 
 void observers_get_config(ObserversConfig *config_)
 {
-
+#warning "Update implementation"
 }
 
 void observers_restore_config(ObserversConfig *config_)
 {
-	 
+#warning "Update implementation"
+}
+
+void commutation_observer_set_bandwidth(float bw)
+{
+	observer_set_bandwidth(&commutation_observer, bw);
+}
+
+void position_observer_set_bandwidth(float bw)
+{
+	observer_set_bandwidth(&position_observer, bw);
 }

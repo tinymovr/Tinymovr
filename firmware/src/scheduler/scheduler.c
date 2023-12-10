@@ -73,16 +73,18 @@ void wait_for_control_loop_interrupt(void)
 	state.adc_interrupt = false;
 	// We have to service the control loop by updating
 	// current measurements and encoder estimates.
-	sensor_invalidate(sensor_commutation);
-	sensor_invalidate(sensor_position);
+	sensor_invalidate(commutation_sensor_p);
+	sensor_invalidate(position_sensor_p);
+	observer_invalidate(&commutation_observer);
+	observer_invalidate(&position_observer);
 	// If both pointers point to the same sensor, it will only br prepared and updated once
-	sensor_prepare(sensor_commutation);
-	sensor_prepare(sensor_position);
+	sensor_prepare(commutation_sensor_p);
+	sensor_prepare(position_sensor_p);
 	ADC_update();
-	sensor_update(sensor_commutation, true);
-	sensor_update(sensor_position, true);
-	observer_update(observer_commutation);
-	observer_update(observer_position);
+	sensor_update(commutation_sensor_p, true);
+	sensor_update(position_sensor_p, true);
+	observer_update(&commutation_observer);
+	observer_update(&position_observer);
 	// At this point control is returned to main loop.
 }
 

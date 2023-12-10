@@ -134,10 +134,17 @@ void system_enter_dfu(void)
 void system_reset_calibration(void)
 {
     ADC_reset();
-    encoder_reset();
-    observer_reset();
+    sensors_reset();
+    observers_init_with_defaults();
     motor_reset_calibration();
     wait_pwm_cycles(5000);
+}
+
+void system_reset_calibration(void)
+{
+    motor_reset_calibration();
+    sensor_reset(commutation_sensor);
+    sensor_reset(position_sensor);
 }
 
 TM_RAMFUNC float system_get_Vbus(void)

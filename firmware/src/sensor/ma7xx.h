@@ -21,6 +21,7 @@
 #include <src/ssp/ssp_func.h>
 
 typedef struct Sensor Sensor;
+typedef struct Observer Observer;
 typedef union SensorSpecificConfig SensorSpecificConfig;
 
 #if defined BOARD_REV_R3
@@ -61,16 +62,16 @@ typedef struct
 bool ma7xx_init_with_defaults(Sensor *s);
 bool ma7xx_init_with_config(Sensor *s, SensorSpecificConfig *c);
 void ma7xx_deinit(Sensor *s);
-void ma7xx_clear_rec_table(Sensor *s);
+void ma7xx_reset(Sensor *s);
 bool ma7xx_rec_is_calibrated(Sensor *s);
 int16_t *ma7xx_get_rec_table_ptr(Sensor *s);
 uint8_t ma7xx_get_errors(Sensor *s);
 void ma7xx_send_angle_cmd(Sensor *s);
 int16_t ma7xx_get_angle_raw(Sensor *s);
 int16_t ma7xx_get_angle_rectified(Sensor *s);
-void ma7xx_calibrate(Sensor *s);
+void ma7xx_calibrate(Sensor *s, Observer *o);
 void ma7xx_update(Sensor *s, bool check_error);
 uint16_t ma7xx_write_reg(Sensor *s, uint8_t, uint8_t);
 uint8_t ma7xx_read_reg(Sensor *s, uint8_t);
-bool ma7xx_calibrate_offset_and_rectification(Sensor *s);
-bool ma7xx_calibrate_direction_and_pole_pair_count(Sensor *s);
+bool ma7xx_calibrate_offset_and_rectification(Sensor *s, Observer *o);
+bool ma7xx_calibrate_direction_and_pole_pair_count(Sensor *s, Observer *o);

@@ -39,22 +39,23 @@ void system_reset(void);
 void system_enter_dfu(void);
 void system_reset_calibration(void);
 
-inline uint8_t system_get_fw_version_string(char *buffer)
+static inline uint8_t system_get_fw_version_string(char *buffer)
 {
     memcpy(buffer, GIT_VERSION, 4);
     return 4;
 }
 
-inline uint32_t system_get_uid(void)
+static inline uint32_t system_get_uid(void)
 {
     return PAC55XX_INFO1->UNIQUEID[0] ^ PAC55XX_INFO1->UNIQUEID[1] ^ PAC55XX_INFO1->UNIQUEID[2];
 }
 
-inline uint32_t system_get_hw_revision(void)
+static inline uint32_t system_get_hw_revision(void)
 {
     return BOARD_REV_IDX;
 }
 
+void system_reset_calibration(void);
 float system_get_Vbus(void);
 bool system_get_calibrated(void);
 uint8_t system_get_errors(void);

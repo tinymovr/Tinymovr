@@ -100,8 +100,8 @@ struct SensorsConfig {
 // index same as the members of `sensor_connection_t`
 Sensor sensors[SENSOR_COUNT];
 
-Sensor *sensor_commutation;
-Sensor *sensor_position;
+Sensor *commutation_sensor_p;
+Sensor *position_sensor_p;
 
 uint32_t get_next_sensor_id(void);
 bool sensor_init_with_config(Sensor *s, SensorConfig *c);
@@ -111,6 +111,14 @@ void sensor_reset(Sensor *s);
 void sensors_init_with_defaults(void);
 void sensors_get_config(SensorsConfig *config_);
 void sensors_restore_config(SensorsConfig *config_);
+
+static inline sensor_connection_t sensor_get_connection(Sensor *sensor)
+{
+    // Derive pointer array offset
+    return sensor - sensors;
+}
+
+void sensor_set_connection(Sensor** target_sensor, Sensor** other_sensor, sensor_connection_t new_connection);
 
 static inline int16_t sensor_get_angle(Sensor *s)
 {
@@ -171,6 +179,11 @@ static inline bool sensor_calibrate(Sensor *s)
 static inline uint8_t sensor_get_errors(Sensor *s)
 {
     return s->get_errors_func(s);
+}
+
+static inline void sensor_invalidate(Sensor *s)
+{
+    s->current = false;
 }
 
 // Interface functions
