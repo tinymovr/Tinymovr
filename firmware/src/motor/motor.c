@@ -15,6 +15,7 @@
 //  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#include <src/adc/adc.h>
 #include <src/controller/controller.h>
 #include <src/observer/observer.h>
 #include <src/scheduler/scheduler.h>
@@ -95,7 +96,7 @@ bool motor_calibrate_resistance(void)
         FloatTriplet modulation_values = {0.0f};
         for (uint32_t i = 0; i < CAL_R_LEN; i++)
         {
-            ADC_GetPhaseCurrents(&I_phase_meas);
+            ADC_get_phase_currents(&I_phase_meas);
             V_setpoint += CAL_V_GAIN * (I_cal - I_phase_meas.A);
             const float pwm_setpoint = V_setpoint / system_get_Vbus();
             SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
@@ -130,7 +131,7 @@ bool motor_calibrate_inductance(void)
 
         for (uint32_t i = 0; i < CAL_L_LEN; i++)
         {
-            ADC_GetPhaseCurrents(&I_phase_meas);
+            ADC_get_phase_currents(&I_phase_meas);
             if ((i & 0x2u) == 0x2u)
             {
                 I_high += I_phase_meas.A;

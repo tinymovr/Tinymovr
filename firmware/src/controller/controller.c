@@ -261,7 +261,7 @@ TM_RAMFUNC void CLControlStep(void)
     }
     else
     {
-        ADC_GetPhaseCurrents(&(state.I_phase_meas));
+        ADC_get_phase_currents(&(state.I_phase_meas));
 
         // Clarke transform
         const float Ialpha = state.I_phase_meas.A;
