@@ -140,13 +140,6 @@ void system_reset_calibration(void)
     wait_pwm_cycles(5000);
 }
 
-void system_reset_calibration(void)
-{
-    motor_reset_calibration();
-    sensor_reset(commutation_sensor);
-    sensor_reset(position_sensor);
-}
-
 TM_RAMFUNC float system_get_Vbus(void)
 {
     return state.Vbus;
