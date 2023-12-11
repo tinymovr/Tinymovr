@@ -787,7 +787,7 @@ void ssp_deinit(SSP_TYPE ssp)
             break;
     }
     ssp_interrupt_disable(ssp);
-    ssp_ptr->CON.SSPEN = SSP_CONTROL_DISNABLE;
+    ssp_ptr->CON.SSPEN = SSP_CONTROL_DISABLE;
 }
 
 //==============================================================================

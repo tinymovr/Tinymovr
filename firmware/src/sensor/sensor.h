@@ -188,9 +188,9 @@ static inline void sensor_invalidate(Sensor *s)
 
 // Interface functions
 
-sensor_connection_t commutation_sensor_get_connection(void);
+static inline sensor_connection_t commutation_sensor_get_connection(void);
 void commutation_sensor_set_connection(sensor_connection_t new_connection);
-sensor_connection_t position_sensor_get_connection(void);
+static inline sensor_connection_t position_sensor_get_connection(void);
 void position_sensor_set_connection(sensor_connection_t new_connection);
 
 static inline sensor_type_t sensor_external_spi_get_type(void)

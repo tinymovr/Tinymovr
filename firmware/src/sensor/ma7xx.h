@@ -69,7 +69,7 @@ uint8_t ma7xx_get_errors(Sensor *s);
 void ma7xx_send_angle_cmd(Sensor *s);
 int16_t ma7xx_get_angle_raw(Sensor *s);
 int16_t ma7xx_get_angle_rectified(Sensor *s);
-void ma7xx_calibrate(Sensor *s, Observer *o);
+bool ma7xx_calibrate(Sensor *s, Observer *o);
 void ma7xx_update(Sensor *s, bool check_error);
 uint16_t ma7xx_write_reg(Sensor *s, uint8_t, uint8_t);
 uint8_t ma7xx_read_reg(Sensor *s, uint8_t);

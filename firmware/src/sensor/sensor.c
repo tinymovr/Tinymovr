@@ -17,7 +17,7 @@ bool sensor_init_with_config(Sensor *s, SensorConfig *c)
         if (SENSOR_TYPE_MA7XX == c->type)
         {
 #endif
-            return ma7xx_init_with_config(s, c);
+            return ma7xx_init_with_config(s, &(c->ss_config));
 #ifdef BOARD_REV_R5
         }
         else if (SENSOR_TYPE_HALL == c->type)
@@ -36,13 +36,13 @@ bool sensor_init_with_config(Sensor *s, SensorConfig *c)
 void sensor_deinit(Sensor *s)
 {
 #ifdef BOARD_REV_R5
-    if (SENSOR_TYPE_MA7XX == s->type)
+    if (SENSOR_TYPE_MA7XX == s->config.type)
     {
 #endif
         ma7xx_deinit(s);
 #ifdef BOARD_REV_R5
     }
-    else if (SENSOR_TYPE_HALL == s->type)
+    else if (SENSOR_TYPE_HALL == s->config.type)
     {
         hall_deinit(s);
     }
@@ -104,7 +104,7 @@ void commutation_sensor_set_connection(sensor_connection_t new_connection)
     sensor_set_connection(&(commutation_sensor_p), &(position_sensor_p), new_connection);
 }
 
-inline sensor_connection_t position_sensor_get_connection(void)
+static inline sensor_connection_t position_sensor_get_connection(void)
 {
     return ssensor_get_connection(position_sensor_p);
 }

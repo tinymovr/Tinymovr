@@ -125,7 +125,7 @@ int32_t UART_ReadAddr(uint8_t addr)
     break;
 
     case 'p': // pos estimate
-        ret_val = observer_get_pos_estimate_user_frame();
+        ret_val = position_observer_get_pos_estimate_user_frame();
         break;
 
     case 'P': // pos setpoint
@@ -133,7 +133,7 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
     case 'v': // vel estimate
-        ret_val = (int32_t)observer_get_vel_estimate_user_frame();
+        ret_val = (int32_t)position_observer_get_vel_estimate_user_frame();
         break;
 
     case 'V': // vel setpoint

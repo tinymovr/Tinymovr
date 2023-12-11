@@ -43,7 +43,7 @@ bool ma7xx_init_with_config(Sensor *s, SensorSpecificConfig *c)
     s->config.ss_config = *c;
     ssp_init(s->config.ss_config.ma7xx_config.ssp_port, SSP_MS_MASTER, 0, 0);
     delay_us(16000); // ensure 16ms sensor startup time as per the datasheet
-    ma7xx_send_angle_cmd(&s);
+    ma7xx_send_angle_cmd(s);
     ma7xx_update(&s, false);
     return true;
 }
@@ -225,7 +225,7 @@ ALWAYS_INLINE void ma7xx_update(Sensor *s, bool check_error)
     s->state.ma7xx_state.angle = angle;
 }
 
-ALWAYS_INLINE void ma7xx_calibrate(Sensor *s, Observer *o)
+ALWAYS_INLINE bool ma7xx_calibrate(Sensor *s, Observer *o)
 {
     return ma7xx_calibrate_direction_and_pole_pair_count(s, o) && ma7xx_calibrate_offset_and_rectification(s, o);
 }
