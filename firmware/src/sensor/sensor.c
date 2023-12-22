@@ -9,6 +9,28 @@ uint32_t get_next_sensor_id(void)
     return sensor_id++;
 }
 
+bool sensor_init_with_connection(Sensor *s, sensor_connection_t connection)
+{
+    SensorConfig c;
+    if (connection == SENSOR_CONNECTION_ONBOARD_SPI)
+    {
+
+    }
+    else if (connection == SENSOR_CONNECTION_EXTERNAL_SPI)
+    {
+
+    }
+    else if (connection == SENSOR_CONNECTION_HALL)
+    {
+        
+    }
+    else
+    {
+        return false;
+    }
+    return sensor_init_with_config(s, &c);
+}
+
 bool sensor_init_with_config(Sensor *s, SensorConfig *c)
 {
     if (s->initialized == false)
@@ -22,15 +44,12 @@ bool sensor_init_with_config(Sensor *s, SensorConfig *c)
         }
         else if (SENSOR_TYPE_HALL == c->type)
         {
-            return hall_init_with_config(s, c);
+            return hall_init_with_config(s, &(c->ss_config));
         }
 #endif
     // ... (similar branches for other sensor types)
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 void sensor_deinit(Sensor *s)
@@ -94,19 +113,11 @@ void sensor_set_connection(Sensor** target_sensor, Sensor** other_sensor, sensor
 
 // Interface functions
 
-static inline sensor_connection_t commutation_sensor_get_connection(void)
-{
-    return sensor_get_connection(commutation_sensor_p);
-}
+
 
 void commutation_sensor_set_connection(sensor_connection_t new_connection)
 {
     sensor_set_connection(&(commutation_sensor_p), &(position_sensor_p), new_connection);
-}
-
-static inline sensor_connection_t position_sensor_get_connection(void)
-{
-    return ssensor_get_connection(position_sensor_p);
 }
 
 void position_sensor_set_connection(sensor_connection_t new_connection)

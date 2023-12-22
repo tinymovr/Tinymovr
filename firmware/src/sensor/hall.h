@@ -20,6 +20,7 @@
 #include <src/common.h>
 
 typedef struct Sensor Sensor;
+typedef struct Observer Observer;
 typedef union SensorSpecificConfig SensorSpecificConfig;
 
 typedef struct
@@ -46,6 +47,6 @@ void hall_update(Sensor *s, bool check_error);
 uint8_t hall_get_sector(Sensor *s);
 
 bool hall_sector_map_is_calibrated(Sensor *s);
-bool hall_calibrate_sequence(Sensor *s);
+bool hall_calibrate_sequence(Sensor *s, Observer *o);
 
 

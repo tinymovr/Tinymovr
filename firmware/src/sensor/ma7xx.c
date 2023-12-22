@@ -35,6 +35,7 @@ bool ma7xx_init_with_config(Sensor *s, SensorSpecificConfig *c)
 {
     s->get_angle_func = ma7xx_get_angle_rectified;
     s->update_func = ma7xx_update;
+    s->prepare_func = ma7xx_send_angle_cmd;
     s->reset_func = ma7xx_reset;
     s->get_errors_func = ma7xx_get_errors;
     s->is_calibrated_func = ma7xx_rec_is_calibrated;
@@ -44,7 +45,7 @@ bool ma7xx_init_with_config(Sensor *s, SensorSpecificConfig *c)
     ssp_init(s->config.ss_config.ma7xx_config.ssp_port, SSP_MS_MASTER, 0, 0);
     delay_us(16000); // ensure 16ms sensor startup time as per the datasheet
     ma7xx_send_angle_cmd(s);
-    ma7xx_update(&s, false);
+    ma7xx_update(s, false);
     return true;
 }
 
@@ -182,22 +183,22 @@ bool ma7xx_calibrate_direction_and_pole_pair_count(Sensor *s, Observer *o)
     return success;
 }
 
-ALWAYS_INLINE uint8_t ma7xx_get_errors(Sensor *s)
+uint8_t ma7xx_get_errors(Sensor *s)
 {
     return s->state.ma7xx_state.errors;
 }
 
-ALWAYS_INLINE void ma7xx_send_angle_cmd(Sensor *s)
+void ma7xx_send_angle_cmd(Sensor *s)
 {
 	ssp_write_one(s->config.ss_config.ma7xx_config.ssp_struct, MA_CMD_ANGLE);
 }
 
-ALWAYS_INLINE int16_t ma7xx_get_angle_raw(Sensor *s)
+int16_t ma7xx_get_angle_raw(Sensor *s)
 {
     return s->state.ma7xx_state.angle;
 }
 
-ALWAYS_INLINE int16_t ma7xx_get_angle_rectified(Sensor *s)
+int16_t ma7xx_get_angle_rectified(Sensor *s)
 {
     const MA7xxSensorConfig *sc = &(s->config.ss_config.ma7xx_config);
     const uint8_t offset_bits = (ENCODER_BITS - ECN_BITS);
@@ -208,7 +209,7 @@ ALWAYS_INLINE int16_t ma7xx_get_angle_rectified(Sensor *s)
 	return angle + off_interp;
 }
 
-ALWAYS_INLINE void ma7xx_update(Sensor *s, bool check_error)
+void ma7xx_update(Sensor *s, bool check_error)
 {
     const int16_t angle = ssp_read_one(s->config.ss_config.ma7xx_config.ssp_struct) >> 3;
 
@@ -225,7 +226,7 @@ ALWAYS_INLINE void ma7xx_update(Sensor *s, bool check_error)
     s->state.ma7xx_state.angle = angle;
 }
 
-ALWAYS_INLINE bool ma7xx_calibrate(Sensor *s, Observer *o)
+bool ma7xx_calibrate(Sensor *s, Observer *o)
 {
     return ma7xx_calibrate_direction_and_pole_pair_count(s, o) && ma7xx_calibrate_offset_and_rectification(s, o);
 }

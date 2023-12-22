@@ -30,12 +30,14 @@ typedef union SensorSpecificConfig SensorSpecificConfig;
 typedef struct SensorConfig SensorConfig;
 typedef union SensorSpecificState SensorSpecificState;
 typedef struct SensorsConfig SensorsConfig;
+typedef struct Observer Observer;
 
 typedef void (*sensor_init_func_t)(Sensor *);
 typedef bool (*sensor_is_calibrated_func_t)(Sensor *);
-typedef bool (*sensor_calibrate_func_t)(Sensor *);
+typedef bool (*sensor_calibrate_func_t)(Sensor *, Observer *);
 typedef int16_t (*sensor_get_angle_func_t)(Sensor *);
 typedef void (*sensor_reset_func_t)(Sensor *);
+typedef void (*sensor_prepare_func_t)(Sensor *);
 typedef void (*sensor_update_func_t)(Sensor *, bool);
 typedef uint8_t (*sensor_get_errors_func_t)(Sensor *);
 
@@ -84,6 +86,7 @@ struct Sensor { // typedefd earlier
     sensor_get_angle_func_t get_angle_func;
     sensor_reset_func_t reset_func;
     sensor_update_func_t update_func;
+    sensor_prepare_func_t prepare_func;
     sensor_get_errors_func_t get_errors_func;
     bool initialized : 1;
     bool current : 1;
@@ -171,9 +174,9 @@ static inline bool sensor_get_calibrated(Sensor *s)
     return s->is_calibrated_func(s);
 }
 
-static inline bool sensor_calibrate(Sensor *s)
+static inline bool sensor_calibrate(Sensor *s, Observer *o)
 {
-    return s->calibrate_func(s);
+    return s->calibrate_func(s, o);
 }
 
 static inline uint8_t sensor_get_errors(Sensor *s)
@@ -186,12 +189,37 @@ static inline void sensor_invalidate(Sensor *s)
     s->current = false;
 }
 
+static inline void sensor_prepare(Sensor *s)
+{
+    if (s->prepare_func && s->current == false)
+    {
+        s->prepare_func(s);
+    }
+}
+
 // Interface functions
 
-static inline sensor_connection_t commutation_sensor_get_connection(void);
+static inline sensor_connection_t commutation_sensor_get_connection(void)
+{
+    return sensor_get_connection(commutation_sensor_p);
+}
+
 void commutation_sensor_set_connection(sensor_connection_t new_connection);
-static inline sensor_connection_t position_sensor_get_connection(void);
+
+static inline sensor_connection_t position_sensor_get_connection(void)
+{
+    return sensor_get_connection(position_sensor_p);
+}
+
 void position_sensor_set_connection(sensor_connection_t new_connection);
+
+static inline void sensors_reset(void)
+{
+    for (int i=0; i<SENSOR_COUNT; i++)
+    {
+        sensor_reset(&(sensors[i]));
+    }
+}
 
 static inline sensor_type_t sensor_external_spi_get_type(void)
 {

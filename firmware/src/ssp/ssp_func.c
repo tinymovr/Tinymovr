@@ -698,6 +698,47 @@ void ssp_interrupt_enable(SSP_TYPE ssp)
     }
 }
 
+//==============================================================================
+///@brief
+///     disable the interrupt
+///
+///@param[in]
+///     SSP Type:
+///         SSPA
+///         SSPB
+///         SSPC
+///         SSPD
+///
+//==============================================================================
+void ssp_interrupt_disable(SSP_TYPE ssp)
+{
+    switch (ssp)
+    {
+        case SSPA:
+            NVIC_ClearPendingIRQ(USARTA_IRQn);
+            NVIC_DisableIRQ(USARTA_IRQn);
+            break;
+
+        case SSPB:
+            NVIC_ClearPendingIRQ(USARTB_IRQn);
+            NVIC_DisableIRQ(USARTB_IRQn);
+            break;
+
+        case SSPC:
+            NVIC_ClearPendingIRQ(USARTC_IRQn);
+            NVIC_DisableIRQ(USARTC_IRQn);
+            break;
+
+        case SSPD:
+            NVIC_ClearPendingIRQ(USARTD_IRQn);
+            NVIC_DisableIRQ(USARTD_IRQn);
+            break;
+
+        default:
+            break;
+    }
+}
+
 void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t cph, uint8_t cpol)
 {
     PAC55XX_SSP_TYPEDEF *ssp_ptr;

@@ -61,24 +61,24 @@ void hall_reset(Sensor *s)
 
 }
 
-ALWAYS_INLINE uint8_t hall_get_errors(Sensor *s)
+uint8_t hall_get_errors(Sensor *s)
 {
     return s->state.hall_state.errors;
 }
 
-ALWAYS_INLINE int16_t hall_get_angle(Sensor *s)
+int16_t hall_get_angle(Sensor *s)
 {
     return s->state.hall_state.angle;
 }
 
-ALWAYS_INLINE void hall_update(Sensor *s, bool check_error)
+void hall_update(Sensor *s, bool check_error)
 {
     const uint8_t sector = (pac5xxx_tile_register_read(ADDR_DINSIG1) >> 1) & 0x07;
     s->state.hall_state.sector = sector;
     s->state.hall_state.angle = s->config.ss_config.hall_config.sector_map[s->state.hall_state.sector];
 }
 
-ALWAYS_INLINE uint8_t hall_get_sector(Sensor *s)
+uint8_t hall_get_sector(Sensor *s)
 {
     return s->state.hall_state.sector;
 }
@@ -88,7 +88,7 @@ bool hall_sector_map_is_calibrated(Sensor *s)
     return s->config.ss_config.hall_config.sector_map_calibrated;
 }
 
-bool hall_calibrate_sequence(Sensor *s)
+bool hall_calibrate_sequence(Sensor *s, Observer *o)
 {
     HallSensorConfig *c = &(s->config.ss_config.hall_config);
     (void)memset(c->sector_map, 0, sizeof(c->sector_map));

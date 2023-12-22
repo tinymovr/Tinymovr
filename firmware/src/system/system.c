@@ -21,6 +21,7 @@
 #include <src/controller/controller.h>
 #include <src/motor/motor.h>
 #include <src/can/can_endpoints.h>
+#include <src/sensor/sensor.h>
 #include <src/system/system.h>
 
 extern char _eram;
@@ -147,7 +148,9 @@ TM_RAMFUNC float system_get_Vbus(void)
 
 TM_RAMFUNC bool system_get_calibrated(void)
 {
-    return motor_get_calibrated() & encoder_get_calibrated();
+    return (motor_get_calibrated() &&
+            sensor_get_calibrated(commutation_sensor_p) &&
+            sensor_get_calibrated(position_sensor_p));
 }
 
 TM_RAMFUNC uint8_t system_get_errors(void)
@@ -157,10 +160,11 @@ TM_RAMFUNC uint8_t system_get_errors(void)
 
 TM_RAMFUNC bool errors_exist(void)
 {
-    return (controller_get_errors() | 
-            encoder_get_errors() | 
-            motor_get_errors() | 
-            planner_get_errors() | 
+    return (controller_get_errors() ||
+            sensor_get_errors(commutation_sensor_p) ||
+            sensor_get_errors(position_sensor_p) |
+            motor_get_errors() ||
+            planner_get_errors() ||
             system_get_errors());
 }
 
