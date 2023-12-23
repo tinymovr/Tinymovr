@@ -22,6 +22,7 @@
 #include <src/motor/motor.h>
 #include <src/can/can_endpoints.h>
 #include <src/sensor/sensor.h>
+#include <src/observer/observer.h>
 #include <src/system/system.h>
 
 extern char _eram;

@@ -9,9 +9,10 @@ uint32_t get_next_sensor_id(void)
     return sensor_id++;
 }
 
-bool sensor_init_with_connection(Sensor *s, sensor_connection_t connection)
+bool sensor_init_with_defaults(Sensor *s)
 {
     SensorConfig c;
+    sensor_connection_t connection = sensor_get_connection(s);
     if (connection == SENSOR_CONNECTION_ONBOARD_SPI)
     {
 
@@ -112,8 +113,6 @@ void sensor_set_connection(Sensor** target_sensor, Sensor** other_sensor, sensor
 }
 
 // Interface functions
-
-
 
 void commutation_sensor_set_connection(sensor_connection_t new_connection)
 {

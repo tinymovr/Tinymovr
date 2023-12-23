@@ -107,6 +107,7 @@ Sensor *commutation_sensor_p;
 Sensor *position_sensor_p;
 
 uint32_t get_next_sensor_id(void);
+bool sensor_init_with_defaults(Sensor *s);
 bool sensor_init_with_config(Sensor *s, SensorConfig *c);
 void sensor_deinit(Sensor *s);
 void sensor_reset(Sensor *s);
