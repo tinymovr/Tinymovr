@@ -42,7 +42,7 @@ int main(void)
     UART_Init();
 	ADC_init();
     CAN_init();
-    Timer_Init();
+    timers_init();
     Watchdog_init();
     __enable_irq();
 

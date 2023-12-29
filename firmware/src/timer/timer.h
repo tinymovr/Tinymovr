@@ -15,8 +15,7 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef TIMER_TIMER_H_
-#define TIMER_TIMER_H_
+#pragma once
 
 #define RED_DEATH_TIMET                 250         //Set rising edge death-time, if TACTL.DTGCLK is 0b, 50--> 1us
 #define FED_DEATH_TIMET                 250         //Set failling edge death-time, if TACTL.DTGCLK is 0b, 50--> 1us
@@ -39,6 +38,4 @@ typedef enum
     SINGLE_SHOT                         = 1,        // The timer single shot
 }TXCTL_SINGLE_Type;
 
-void Timer_Init(void);
-
-#endif /* TIMER_TIMER_H_ */
+void timers_init(void);
