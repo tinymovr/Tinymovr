@@ -64,12 +64,14 @@ void observers_init_with_defaults(void)
 
 void observers_get_config(ObserversConfig *config_)
 {
-#warning "Update implementation"
+	config_->config_commutation = commutation_observer.config;
+	config_->config_position = position_observer.config;
 }
 
 void observers_restore_config(ObserversConfig *config_)
 {
-#warning "Update implementation"
+	commutation_observer.config = config_->config_commutation;
+	position_observer.config = config_->config_position;
 }
 
 void commutation_observer_set_bandwidth(float bw)

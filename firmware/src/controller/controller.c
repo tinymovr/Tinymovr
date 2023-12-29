@@ -16,7 +16,7 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "src/system/system.h"
-#include <src/sensor/sensor.h>
+#include <src/sensor/iface.h>
 #include <src/observer/observer.h>
 #include "src/adc/adc.h"
 #include "src/motor/motor.h"
@@ -121,16 +121,8 @@ void Controller_ControlLoop(void)
         {
             state.is_calibrating = true;
             system_reset_calibration();
-            #warning "Update implementation"
-            // (void)(ADC_calibrate_offset() && motor_calibrate_resistance() && motor_calibrate_inductance());
-            // if (SENSOR_MA7XX == encoder_get_type())
-            // {
-            //     (void)(calibrate_direction_and_pole_pair_count() && calibrate_offset_and_rectification());
-            // }
-            // else if (SENSOR_HALL == encoder_get_type())
-            // {
-            //     (void)calibrate_hall_sequence();
-            // }
+            (void)(ADC_calibrate_offset() && motor_calibrate_resistance() && motor_calibrate_inductance());
+            (void)(sensors_calibrate());
             state.is_calibrating = false;
             controller_set_state(STATE_IDLE); 
         }

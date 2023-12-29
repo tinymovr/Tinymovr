@@ -58,7 +58,8 @@ void hall_deinit(Sensor *s)
 
 void hall_reset(Sensor *s)
 {
-
+    memset(s->config.ss_config.hall_config.sector_map, 0, sizeof(s->config.ss_config.hall_config.sector_map));
+    s->config.ss_config.hall_config.sector_map_calibrated = false;
 }
 
 uint8_t hall_get_errors(Sensor *s)

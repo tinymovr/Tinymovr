@@ -21,9 +21,18 @@
 #include <src/motor/motor.h>
 #include <src/sensor/ma7xx.h>
 #include <src/sensor/hall.h>
-#include <src/sensor/sensor.h>
 
 #define SENSOR_COUNT 3
+
+#if defined BOARD_REV_R3
+#define ONB§OARD_SENSOR_SSP_PORT SSPD
+#define ONBOARD_SENSOR_SSP_STRUCT PAC55XX_SSPD
+#elif defined BOARD_REV_R5 || defined BOARD_REV_M5
+#define ONBOARD_SENSOR_SSP_PORT SSPC
+#define ONBOARD_SENSOR_SSP_STRUCT PAC55XX_SSPC
+#define EXTERNAL_SENSOR_SSP_PORT SSPC
+#define EXTERNAL_SENSOR_SSP_STRUCT PAC55XX_SSPC
+#endif
 
 typedef struct Sensor Sensor;
 typedef union SensorSpecificConfig SensorSpecificConfig;
@@ -32,7 +41,6 @@ typedef union SensorSpecificState SensorSpecificState;
 typedef struct SensorsConfig SensorsConfig;
 typedef struct Observer Observer;
 
-typedef void (*sensor_init_func_t)(Sensor *);
 typedef bool (*sensor_is_calibrated_func_t)(Sensor *);
 typedef bool (*sensor_calibrate_func_t)(Sensor *, Observer *);
 typedef int16_t (*sensor_get_angle_func_t)(Sensor *);
@@ -80,7 +88,6 @@ union SensorSpecificState{
 struct Sensor { // typedefd earlier
     SensorConfig config;
     SensorSpecificState state;
-    sensor_init_func_t init_func;
     sensor_is_calibrated_func_t is_calibrated_func;
     sensor_calibrate_func_t calibrate_func;
     sensor_get_angle_func_t get_angle_func;
@@ -94,8 +101,8 @@ struct Sensor { // typedefd earlier
 
 struct SensorsConfig {
     SensorConfig config[SENSOR_COUNT];
-    uint32_t commutation_id;
-    uint32_t position_id;
+    sensor_connection_t commutation_connection;
+    sensor_connection_t position_connection;
 };
 
 // The sequence in the `sensors` array is determined so that
@@ -197,66 +204,3 @@ static inline void sensor_prepare(Sensor *s)
         s->prepare_func(s);
     }
 }
-
-// Interface functions
-
-static inline sensor_connection_t commutation_sensor_get_connection(void)
-{
-    return sensor_get_connection(commutation_sensor_p);
-}
-
-void commutation_sensor_set_connection(sensor_connection_t new_connection);
-
-static inline sensor_connection_t position_sensor_get_connection(void)
-{
-    return sensor_get_connection(position_sensor_p);
-}
-
-void position_sensor_set_connection(sensor_connection_t new_connection);
-
-static inline void sensors_reset(void)
-{
-    for (int i=0; i<SENSOR_COUNT; i++)
-    {
-        sensor_reset(&(sensors[i]));
-    }
-}
-
-static inline sensor_type_t sensor_external_spi_get_type(void)
-{
-    return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].config.type;
-}
-
-void sensor_external_spi_set_type(sensor_type_t type);
-
-static inline bool sensor_onboard_get_is_calibrated(void)
-{
-    return sensors[SENSOR_CONNECTION_ONBOARD_SPI].is_calibrated_func(&(sensors[SENSOR_CONNECTION_ONBOARD_SPI]));
-}
-
-static inline bool sensor_external_spi_get_is_calibrated(void)
-{
-    return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].is_calibrated_func(&(sensors[SENSOR_CONNECTION_EXTERNAL_SPI]));
-}
-
-static inline bool sensor_hall_get_is_calibrated(void)
-{
-    return sensors[SENSOR_CONNECTION_HALL].is_calibrated_func(&(sensors[SENSOR_CONNECTION_HALL]));
-}
-
-static inline uint8_t sensor_onboard_get_errors(void)
-{
-    return sensors[SENSOR_CONNECTION_ONBOARD_SPI].get_errors_func(&(sensors[SENSOR_CONNECTION_ONBOARD_SPI]));
-}
-
-static inline uint8_t sensor_external_spi_get_errors(void)
-{
-    return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].get_errors_func(&(sensors[SENSOR_CONNECTION_EXTERNAL_SPI]));
-}
-
-static inline uint8_t sensor_hall_get_errors(void)
-{
-    return sensors[SENSOR_CONNECTION_HALL].get_errors_func(&(sensors[SENSOR_CONNECTION_HALL]));
-}
-
-

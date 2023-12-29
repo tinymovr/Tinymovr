@@ -24,14 +24,6 @@ typedef struct Sensor Sensor;
 typedef struct Observer Observer;
 typedef union SensorSpecificConfig SensorSpecificConfig;
 
-#if defined BOARD_REV_R3
-#define ONBOARD_SENSOR_SSP_PORT SSPD
-#define ONBOARD_SENSOR_SSP_STRUCT PAC55XX_SSPD
-#elif defined BOARD_REV_R5 || defined BOARD_REV_M5
-#define ONBOARD_SENSOR_SSP_PORT SSPC
-#define ONBOARD_SENSOR_SSP_STRUCT PAC55XX_SSPC
-#endif
-
 #define MAX_ALLOWED_DELTA     (ENCODER_TICKS / 6)
 #define MAX_ALLOWED_DELTA_ADD (MAX_ALLOWED_DELTA + ENCODER_TICKS)
 #define MAX_ALLOWED_DELTA_SUB (MAX_ALLOWED_DELTA - ENCODER_TICKS)
@@ -59,7 +51,6 @@ typedef struct
 	int16_t angle;
 } MA7xxSensorState;
 
-bool ma7xx_init_with_defaults(Sensor *s);
 bool ma7xx_init_with_config(Sensor *s, SensorSpecificConfig *c);
 void ma7xx_deinit(Sensor *s);
 void ma7xx_reset(Sensor *s);
