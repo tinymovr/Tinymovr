@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 #include <src/common.h>
-#include <src/sensor/sensor.h>
+#include <src/sensor/sensors.h>
 
 typedef struct Observer Observer;
 

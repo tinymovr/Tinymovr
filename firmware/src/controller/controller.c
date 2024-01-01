@@ -16,7 +16,7 @@
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "src/system/system.h"
-#include <src/sensor/iface.h>
+#include <src/sensor/sensor.h>
 #include <src/observer/observer.h>
 #include "src/adc/adc.h"
 #include "src/motor/motor.h"

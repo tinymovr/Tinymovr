@@ -19,7 +19,7 @@
 
 #include <src/adc/adc.h>
 #include <src/motor/motor.h>
-#include <src/sensor/sensor.h>
+#include <src/sensor/sensors.h>
 #include <src/observer/observer.h>
 #include <src/controller/controller.h>
 #include <src/controller/trajectory_planner.h>

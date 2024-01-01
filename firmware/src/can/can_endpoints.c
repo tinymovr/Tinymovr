@@ -8,7 +8,7 @@
 #include <string.h>
 #include <src/adc/adc.h>
 #include <src/system/system.h>
-#include <src/sensor/iface.h>
+#include <src/sensor/sensors.h>
 #include <src/observer/observer.h>
 #include <src/motor/motor.h>
 #include <src/scheduler/scheduler.h>
