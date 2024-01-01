@@ -17,25 +17,33 @@
 
 #include <string.h>
 #include <src/system/system.h>
-#include <src/ssp/ssp_func.h>
 #include <src/utils/utils.h>
 #include <src/can/can_endpoints.h>
 #include <src/sensor/sensor.h>
 #include <src/observer/observer.h>
 #include <src/sensor/ma7xx.h>
 
-bool ma7xx_init_with_config(Sensor *s, SensorSpecificConfig *c)
+bool ma7xx_init_with_port(Sensor *s, const SSP_TYPE port)
 {
-    s->get_angle_func = ma7xx_get_angle_rectified;
-    s->update_func = ma7xx_update;
-    s->prepare_func = ma7xx_send_angle_cmd;
-    s->reset_func = ma7xx_reset;
-    s->get_errors_func = ma7xx_get_errors;
-    s->is_calibrated_func = ma7xx_rec_is_calibrated;
-    s->calibrate_func = ma7xx_calibrate;
-    s->config.type = SENSOR_TYPE_MA7XX;
-    s->config.ss_config = *c;
-    ssp_init(s->config.ss_config.ma7xx_config.ssp_port, SSP_MS_MASTER, 0, 0);
+    MA7xxSensorConfig c = {0};
+    c.ssp_port = port;
+    return ma7xx_init_with_config(s, &c);
+}
+
+ bool ma7xx_init_with_config(Sensor *s, const MA7xxSensorConfig *c)
+{
+    MA7xxSensor *ms = (MA7xxSensor *)s;
+    ms->base.get_angle_func = ma7xx_get_angle_rectified;
+    ms->base.update_func = ma7xx_update;
+    ms->base.prepare_func = ma7xx_send_angle_cmd;
+    ms->base.reset_func = ma7xx_reset;
+    ms->base.deinit_func = ma7xx_deinit;
+    ms->base.get_errors_func = ma7xx_get_errors;
+    ms->base.is_calibrated_func = ma7xx_rec_is_calibrated;
+    ms->base.calibrate_func = ma7xx_calibrate;
+    ms->base.config.type = SENSOR_TYPE_MA7XX;
+    ms->config = *c;
+    ssp_init(ms->config.ssp_port, SSP_MS_MASTER, 0, 0);
     delay_us(16000); // ensure 16ms sensor startup time as per the datasheet
     ma7xx_send_angle_cmd(s);
     ma7xx_update(s, false);
@@ -44,28 +52,19 @@ bool ma7xx_init_with_config(Sensor *s, SensorSpecificConfig *c)
 
 void ma7xx_deinit(Sensor *s)
 {
-    ssp_deinit(s->config.ss_config.ma7xx_config.ssp_port);
+    ssp_deinit(((MA7xxSensor *)s)->config.ssp_port);
 }
 
 void ma7xx_reset(Sensor *s)
 {
-    MA7xxSensorConfig *c = &(s->config.ss_config.ma7xx_config);
+    MA7xxSensorConfig *c = &(((MA7xxSensor *)s)->config);
     (void)memset(c->rec_table, 0, sizeof(c->rec_table));
 	c->rec_calibrated = false;
 }
 
-bool ma7xx_rec_is_calibrated(Sensor *s)
-{
-    return s->config.ss_config.ma7xx_config.rec_calibrated;
-}
-
-int16_t *ma7xx_get_rec_table_ptr(Sensor *s)
-{
-    return s->config.ss_config.ma7xx_config.rec_table;
-}
-
 bool ma7xx_calibrate_offset_and_rectification(Sensor *s, Observer *o)
 {
+    MA7xxSensor *ms = (MA7xxSensor *)s;
     // Size below is an arbitrary large number ie > ECN_SIZE * npp
     float error_ticks[ECN_SIZE * 20];
     const int16_t npp = motor_get_pole_pairs();
@@ -75,7 +74,7 @@ bool ma7xx_calibrate_offset_and_rectification(Sensor *s, Observer *o)
     const float e_pos_to_ticks = ((float)ENCODER_TICKS) / (2 * PI * npp);
     float e_pos_ref = 0.f;
     const float I_setpoint = motor_get_I_cal();
-    int16_t *lut = s->config.ss_config.ma7xx_config.rec_table;
+    int16_t *lut = ms->config.rec_table;
     set_epos_and_wait(e_pos_ref, I_setpoint);
     wait_pwm_cycles(5000);
     const uint16_t offset_idx = ma7xx_get_angle_raw(s) >> (ENCODER_BITS - ECN_BITS);
@@ -131,7 +130,7 @@ bool ma7xx_calibrate_offset_and_rectification(Sensor *s, Observer *o)
         lut[write_idx] = (int16_t)acc;
     }
     wait_pwm_cycles(5000);
-    s->config.ss_config.ma7xx_config.rec_calibrated = true;
+    ms->config.rec_calibrated = true;
     return true;
 }
 
@@ -175,92 +174,7 @@ bool ma7xx_calibrate_direction_and_pole_pair_count(Sensor *s, Observer *o)
     return success;
 }
 
-uint8_t ma7xx_get_errors(Sensor *s)
-{
-    return s->state.ma7xx_state.errors;
-}
-
-void ma7xx_send_angle_cmd(Sensor *s)
-{
-	ssp_write_one(s->config.ss_config.ma7xx_config.ssp_struct, MA_CMD_ANGLE);
-}
-
-int16_t ma7xx_get_angle_raw(Sensor *s)
-{
-    return s->state.ma7xx_state.angle;
-}
-
-int16_t ma7xx_get_angle_rectified(Sensor *s)
-{
-    const MA7xxSensorConfig *sc = &(s->config.ss_config.ma7xx_config);
-    const uint8_t offset_bits = (ENCODER_BITS - ECN_BITS);
-    const int16_t angle = s->state.ma7xx_state.angle;
-    const int16_t off_1 = sc->rec_table[angle>>offset_bits];
-	const int16_t off_2 = sc->rec_table[((angle>>offset_bits) + 1) % ECN_SIZE];
-	const int16_t off_interp = off_1 + ((off_2 - off_1)* (angle - ((angle>>offset_bits)<<offset_bits))>>offset_bits);
-	return angle + off_interp;
-}
-
-void ma7xx_update(Sensor *s, bool check_error)
-{
-    const int16_t angle = ssp_read_one(s->config.ss_config.ma7xx_config.ssp_struct) >> 3;
-
-    if (check_error)
-    {
-    	const int16_t delta = s->state.ma7xx_state.angle - angle;
-		if ( ((delta > MAX_ALLOWED_DELTA) || (delta < -MAX_ALLOWED_DELTA)) &&
-		     ((delta > MAX_ALLOWED_DELTA_ADD) || (delta < MIN_ALLOWED_DELTA_ADD)) &&
-		     ((delta > MAX_ALLOWED_DELTA_SUB) || (delta < MIN_ALLOWED_DELTA_SUB)) )
-		{
-            s->state.ma7xx_state.errors |= SENSORS_SETUP_ONBOARD_ERRORS_READING_UNSTABLE;
-		}
-    }
-    s->state.ma7xx_state.angle = angle;
-}
-
 bool ma7xx_calibrate(Sensor *s, Observer *o)
 {
     return ma7xx_calibrate_direction_and_pole_pair_count(s, o) && ma7xx_calibrate_offset_and_rectification(s, o);
-}
-
-/**
- * @brief Write to a register of the sensor
- * 
- * @param reg The 5-bit register address
- * @param value The value to write
- * @return uint16_t 
- */
-uint16_t ma7xx_write_reg(Sensor *s, uint8_t reg, uint8_t value)
-{
-    uint16_t cmd = MA_CMD_WRITE | reg << 8 | value;
-    uint32_t result = ssp_write_one(s->config.ss_config.ma7xx_config.ssp_struct, cmd);
-
-    // Delay at least 20ms to let the encoder write to memory
-    delay_us(20100);
-    result |= ssp_write_one(s->config.ss_config.ma7xx_config.ssp_struct, 0);
-
-    // The encoder returns the value written to memory, so check that it is the same as what we wrote
-    uint8_t retval =  ssp_read_one(s->config.ss_config.ma7xx_config.ssp_struct) >> 8;
-    if ((retval != value) || (result != 0))
-    {
-        return false;
-    }
-    return true;
-}
-
-/**
- * @brief Read from a register of the sensor
- * 
- * @param register The 5-bit register address
- * @return uint8_t 
- */
-uint8_t ma7xx_read_reg(Sensor *s, uint8_t reg)
-{
-    uint16_t cmd[2] = {MA_CMD_READ  | (reg << 8), 0};
-    uint16_t result = ssp_write_multi(s->config.ss_config.ma7xx_config.ssp_struct, cmd, 2u);
-    if (result != 0)
-    {
-        return false;
-    }
-    return ssp_read_one(s->config.ss_config.ma7xx_config.ssp_struct) >> 8;
 }

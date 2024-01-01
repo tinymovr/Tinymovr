@@ -17,12 +17,11 @@
 
 #pragma once
 
-#include <src/common.h>
 #include <src/ssp/ssp_func.h>
+#include <src/can/can_endpoints.h>
+#include <src/sensor/sensor.h>
 
-typedef struct Sensor Sensor;
 typedef struct Observer Observer;
-typedef union SensorSpecificConfig SensorSpecificConfig;
 
 #define MAX_ALLOWED_DELTA     (ENCODER_TICKS / 6)
 #define MAX_ALLOWED_DELTA_ADD (MAX_ALLOWED_DELTA + ENCODER_TICKS)
@@ -47,22 +46,114 @@ typedef struct
 
 typedef struct
 {
+    Sensor base;
+    MA7xxSensorConfig config;
     uint8_t errors;
 	int16_t angle;
-} MA7xxSensorState;
+} MA7xxSensor;
 
-bool ma7xx_init_with_config(Sensor *s, SensorSpecificConfig *c);
+bool ma7xx_init_with_port(Sensor *s, const SSP_TYPE port);
+bool ma7xx_init_with_config(Sensor *s, const MA7xxSensorConfig *c);
 void ma7xx_deinit(Sensor *s);
 void ma7xx_reset(Sensor *s);
-bool ma7xx_rec_is_calibrated(Sensor *s);
-int16_t *ma7xx_get_rec_table_ptr(Sensor *s);
-uint8_t ma7xx_get_errors(Sensor *s);
-void ma7xx_send_angle_cmd(Sensor *s);
-int16_t ma7xx_get_angle_raw(Sensor *s);
-int16_t ma7xx_get_angle_rectified(Sensor *s);
-bool ma7xx_calibrate(Sensor *s, Observer *o);
-void ma7xx_update(Sensor *s, bool check_error);
-uint16_t ma7xx_write_reg(Sensor *s, uint8_t, uint8_t);
-uint8_t ma7xx_read_reg(Sensor *s, uint8_t);
 bool ma7xx_calibrate_offset_and_rectification(Sensor *s, Observer *o);
 bool ma7xx_calibrate_direction_and_pole_pair_count(Sensor *s, Observer *o);
+bool ma7xx_calibrate(Sensor *s, Observer *o);
+
+static inline bool ma7xx_rec_is_calibrated(const Sensor *s)
+{
+    return ((const MA7xxSensor *)s)->config.rec_calibrated;
+}
+
+static inline int16_t *ma7xx_get_rec_table_ptr(Sensor *s)
+{
+    return ((MA7xxSensor *)s)->config.rec_table;
+}
+
+static inline uint8_t ma7xx_get_errors(const Sensor *s)
+{
+    return ((const MA7xxSensor *)s)->errors;
+}
+
+static inline void ma7xx_send_angle_cmd(const Sensor *s)
+{
+	ssp_write_one(((const MA7xxSensor *)s)->config.ssp_struct, MA_CMD_ANGLE);
+}
+
+static inline int16_t ma7xx_get_angle_raw(const Sensor *s)
+{
+    return ((const MA7xxSensor *)s)->angle;
+}
+
+static inline int16_t ma7xx_get_angle_rectified(const Sensor *s)
+{
+    const MA7xxSensor *ms = (const MA7xxSensor *)s;
+    const uint8_t offset_bits = (ENCODER_BITS - ECN_BITS);
+    const int16_t angle = ms->angle;
+    const int16_t off_1 = ms->config.rec_table[angle>>offset_bits];
+	const int16_t off_2 = ms->config.rec_table[((angle>>offset_bits) + 1) % ECN_SIZE];
+	const int16_t off_interp = off_1 + ((off_2 - off_1)* (angle - ((angle>>offset_bits)<<offset_bits))>>offset_bits);
+	return angle + off_interp;
+}
+
+static inline void ma7xx_update(Sensor *s, bool check_error)
+{
+    MA7xxSensor *ms = (MA7xxSensor *)s;
+    const int16_t angle = ssp_read_one(ms->config.ssp_struct) >> 3;
+
+    if (check_error)
+    {
+    	const int16_t delta = ms->angle - angle;
+		if ( ((delta > MAX_ALLOWED_DELTA) || (delta < -MAX_ALLOWED_DELTA)) &&
+		     ((delta > MAX_ALLOWED_DELTA_ADD) || (delta < MIN_ALLOWED_DELTA_ADD)) &&
+		     ((delta > MAX_ALLOWED_DELTA_SUB) || (delta < MIN_ALLOWED_DELTA_SUB)) )
+		{
+            ms->errors |= SENSORS_SETUP_ONBOARD_ERRORS_READING_UNSTABLE;
+		}
+    }
+    ms->angle = angle;
+}
+
+/**
+ * @brief Write to a register of the sensor
+ * 
+ * @param reg The 5-bit register address
+ * @param value The value to write
+ * @return uint16_t 
+ */
+static inline uint16_t ma7xx_write_reg(const Sensor *s, uint8_t reg, uint8_t value)
+{
+    const MA7xxSensor *ms = (const MA7xxSensor *)s;
+    uint16_t cmd = MA_CMD_WRITE | reg << 8 | value;
+    uint32_t result = ssp_write_one(ms->config.ssp_struct, cmd);
+
+    // Delay at least 20ms to let the encoder write to memory
+    delay_us(20100);
+    result |= ssp_write_one(ms->config.ssp_struct, 0);
+
+    // The encoder returns the value written to memory, so check that it is the same as what we wrote
+    uint8_t retval =  ssp_read_one(ms->config.ssp_struct) >> 8;
+    if ((retval != value) || (result != 0))
+    {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * @brief Read from a register of the sensor
+ * 
+ * @param register The 5-bit register address
+ * @return uint8_t 
+ */
+static inline uint8_t ma7xx_read_reg(const Sensor *s, uint8_t reg)
+{
+    const MA7xxSensor *ms = (const MA7xxSensor *)s;
+    uint16_t cmd[2] = {MA_CMD_READ  | (reg << 8), 0};
+    uint16_t result = ssp_write_multi(ms->config.ssp_struct, cmd, 2u);
+    if (result != 0)
+    {
+        return false;
+    }
+    return ssp_read_one(ms->config.ssp_struct) >> 8;
+}

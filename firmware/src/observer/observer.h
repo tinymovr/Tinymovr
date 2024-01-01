@@ -120,7 +120,7 @@ static inline float observer_get_vel_estimate(Observer *o)
 
 static inline float observer_get_epos(Observer *o)
 {
-	if (SENSOR_TYPE_HALL == sensor_get_type(o->sensor_ptr))
+	if (SENSOR_TYPE_HALL == o->sensor_ptr->config.type)
 	{
 		return o->pos_estimate_wrapped * twopi_by_hall_sectors;
 	}
@@ -129,7 +129,7 @@ static inline float observer_get_epos(Observer *o)
 
 static inline float observer_get_evel(Observer *o)
 {
-	if (SENSOR_TYPE_HALL == sensor_get_type(o->sensor_ptr))
+	if (SENSOR_TYPE_HALL == o->sensor_ptr->config.type)
 	{
 		return o->vel_estimate * twopi_by_hall_sectors;
 	}

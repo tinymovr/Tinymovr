@@ -17,11 +17,9 @@
 
 #pragma once
 
-#include <src/common.h>
+#include <src/sensor/sensor.h>
 
-typedef struct Sensor Sensor;
 typedef struct Observer Observer;
-typedef union SensorSpecificConfig SensorSpecificConfig;
 
 typedef struct
 {
@@ -31,22 +29,45 @@ typedef struct
 
 typedef struct
 {
+    Sensor base;
+    HallSensorConfig config;
     uint8_t errors;
 	uint16_t angle;
     uint8_t sector;
     uint8_t hw_defaults[3];
-} HallSensorState;
+} HallSensor;
 
 bool hall_init_with_defaults(Sensor *s);
-bool hall_init_with_config(Sensor *s, SensorSpecificConfig *c);
+bool hall_init_with_config(Sensor *s, const HallSensorConfig *c);
 void hall_deinit(Sensor *s);
 void hall_reset(Sensor *s);
-uint8_t hall_get_errors(Sensor *s);
-int16_t hall_get_angle(Sensor *s);
-void hall_update(Sensor *s, bool check_error);
-uint8_t hall_get_sector(Sensor *s);
-
-bool hall_sector_map_is_calibrated(Sensor *s);
 bool hall_calibrate_sequence(Sensor *s, Observer *o);
 
+static inline uint8_t hall_get_errors(const Sensor *s)
+{
+    return ((HallSensor *)s)->errors;
+}
+
+static inline int16_t hall_get_angle(const Sensor *s)
+{
+    return ((HallSensor *)s)->angle;
+}
+
+static inline void hall_update(Sensor *s, bool check_error)
+{
+    HallSensor *ms = (HallSensor *)s;
+    const uint8_t sector = (pac5xxx_tile_register_read(ADDR_DINSIG1) >> 1) & 0x07;
+    ms->sector = sector;
+    ms->angle = ms->config.sector_map[ms->sector];
+}
+
+static inline uint8_t hall_get_sector(const Sensor *s)
+{
+    return ((const HallSensor *)s)->sector;
+}
+
+static inline bool hall_sector_map_is_calibrated(const Sensor *s)
+{
+    return ((const HallSensor *)s)->config.sector_map_calibrated;
+}
 

@@ -26,23 +26,25 @@
 
 bool hall_init_with_defaults(Sensor *s)
 {
-    SensorSpecificConfig c = {0};
+    HallSensorConfig c = {0};
     return hall_init_with_config(s, &c);
 }
 
-bool hall_init_with_config(Sensor *s, SensorSpecificConfig *c)
+bool hall_init_with_config(Sensor *s, const HallSensorConfig *c)
 {
-    s->get_angle_func = hall_get_angle;
-    s->update_func = hall_update;
-    s->reset_func = hall_reset;
-    s->get_errors_func = hall_get_errors;
-    s->is_calibrated_func = hall_sector_map_is_calibrated;
-    s->calibrate_func = hall_calibrate_sequence;
-    s->config.type = SENSOR_TYPE_HALL;
-    s->config.ss_config = *c;
-    s->state.hall_state.hw_defaults[0] = pac5xxx_tile_register_read(ADDR_CFGAIO7);
-    s->state.hall_state.hw_defaults[1] = pac5xxx_tile_register_read(ADDR_CFGAIO8);
-    s->state.hall_state.hw_defaults[2] = pac5xxx_tile_register_read(ADDR_CFGAIO9);
+    HallSensor *ms = (HallSensor *)s;
+    ms->base.get_angle_func = hall_get_angle;
+    ms->base.update_func = hall_update;
+    ms->base.reset_func = hall_reset;
+    ms->base.deinit_func = hall_deinit;
+    ms->base.get_errors_func = hall_get_errors;
+    ms->base.is_calibrated_func = hall_sector_map_is_calibrated;
+    ms->base.calibrate_func = hall_calibrate_sequence;
+    ms->base.config.type = SENSOR_TYPE_HALL;
+    ms->config = *c;
+    ms->hw_defaults[0] = pac5xxx_tile_register_read(ADDR_CFGAIO7);
+    ms->hw_defaults[1] = pac5xxx_tile_register_read(ADDR_CFGAIO8);
+    ms->hw_defaults[2] = pac5xxx_tile_register_read(ADDR_CFGAIO9);
     pac5xxx_tile_register_write(ADDR_CFGAIO7, AIO6789_IO_MODE | AIO_INPUT);
     pac5xxx_tile_register_write(ADDR_CFGAIO8, AIO6789_IO_MODE | AIO_INPUT);
     pac5xxx_tile_register_write(ADDR_CFGAIO9, AIO6789_IO_MODE | AIO_INPUT);
@@ -51,47 +53,23 @@ bool hall_init_with_config(Sensor *s, SensorSpecificConfig *c)
 
 void hall_deinit(Sensor *s)
 {
-    pac5xxx_tile_register_write(ADDR_CFGAIO7, s->state.hall_state.hw_defaults[0]);
-    pac5xxx_tile_register_write(ADDR_CFGAIO8, s->state.hall_state.hw_defaults[1]);
-    pac5xxx_tile_register_write(ADDR_CFGAIO9, s->state.hall_state.hw_defaults[2]);
+    HallSensor *ms = (HallSensor *)s;
+    pac5xxx_tile_register_write(ADDR_CFGAIO7, ms->hw_defaults[0]);
+    pac5xxx_tile_register_write(ADDR_CFGAIO8, ms->hw_defaults[1]);
+    pac5xxx_tile_register_write(ADDR_CFGAIO9, ms->hw_defaults[2]);
 }
 
 void hall_reset(Sensor *s)
 {
-    memset(s->config.ss_config.hall_config.sector_map, 0, sizeof(s->config.ss_config.hall_config.sector_map));
-    s->config.ss_config.hall_config.sector_map_calibrated = false;
-}
-
-uint8_t hall_get_errors(Sensor *s)
-{
-    return s->state.hall_state.errors;
-}
-
-int16_t hall_get_angle(Sensor *s)
-{
-    return s->state.hall_state.angle;
-}
-
-void hall_update(Sensor *s, bool check_error)
-{
-    const uint8_t sector = (pac5xxx_tile_register_read(ADDR_DINSIG1) >> 1) & 0x07;
-    s->state.hall_state.sector = sector;
-    s->state.hall_state.angle = s->config.ss_config.hall_config.sector_map[s->state.hall_state.sector];
-}
-
-uint8_t hall_get_sector(Sensor *s)
-{
-    return s->state.hall_state.sector;
-}
-
-bool hall_sector_map_is_calibrated(Sensor *s)
-{
-    return s->config.ss_config.hall_config.sector_map_calibrated;
+    HallSensor *ms = (HallSensor *)s;
+    memset(ms->config.sector_map, 0, sizeof(ms->config.sector_map));
+    ms->config.sector_map_calibrated = false;
 }
 
 bool hall_calibrate_sequence(Sensor *s, Observer *o)
 {
-    HallSensorConfig *c = &(s->config.ss_config.hall_config);
+    HallSensor *ms = (HallSensor *)s;
+    HallSensorConfig *c = &(ms->config);
     (void)memset(c->sector_map, 0, sizeof(c->sector_map));
 	c->sector_map_calibrated = false;
     uint8_t *sector_map = c->sector_map;
@@ -153,7 +131,7 @@ bool hall_calibrate_sequence(Sensor *s, Observer *o)
     }
     else
     {
-        s->state.hall_state.errors |= SENSORS_SETUP_HALL_ERRORS_CALIBRATION_FAILED;
+        ms->errors |= SENSORS_SETUP_HALL_ERRORS_CALIBRATION_FAILED;
     }
     return success;
 }
