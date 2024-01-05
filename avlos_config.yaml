@@ -13,7 +13,7 @@ generators:
     - <string.h>
     - src/adc/adc.h
     - src/system/system.h
-    - src/sensor/iface.h
+    - src/sensor/sensors.h
     - src/observer/observer.h
     - src/motor/motor.h
     - src/scheduler/scheduler.h

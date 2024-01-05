@@ -89,14 +89,6 @@
 
 #define ERROR_FLAG_MAX_SIZE (5u)
 
-#define ENCODER_BITS (13)
-#define ENCODER_TICKS (1 << ENCODER_BITS)
-#define ENCODER_TICKS_FLOAT ((float)(ENCODER_TICKS))
-
-#define HALL_SECTORS (6)
-#define HALL_SECTOR_ANGLE (TWOPI / HALL_SECTORS)
-#define CAL_DIR_LEN_PER_SECTOR (CAL_DIR_LEN / HALL_SECTORS)
-
 #if defined BOARD_REV_R32 || defined BOARD_REV_R33
 #define BOARD_REV_R3
 #elif defined BOARD_REV_R50 || BOARD_REV_R51 || defined BOARD_REV_R52
@@ -132,6 +124,14 @@
 #endif
 
 #define TIMER_FREQ_HZ (ACLK_FREQ_HZ >> TXCTL_PS_DIV)
+
+#define ENCODER_BITS (13)
+#define ENCODER_TICKS (1 << ENCODER_BITS)
+#define ENCODER_TICKS_FLOAT ((float)(ENCODER_TICKS))
+
+#define HALL_SECTORS (6)
+#define HALL_SECTOR_ANGLE (TWOPI / HALL_SECTORS)
+#define CAL_DIR_LEN_PER_SECTOR (CAL_DIR_LEN / HALL_SECTORS)
 
 static const float one_by_sqrt3 = 0.57735026919f;
 static const float two_by_sqrt3 = 1.15470053838f;
