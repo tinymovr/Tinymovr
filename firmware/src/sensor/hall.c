@@ -33,7 +33,7 @@ bool hall_init_with_defaults(Sensor *s)
 bool hall_init_with_config(Sensor *s, const HallSensorConfig *c)
 {
     HallSensor *ms = (HallSensor *)s;
-    ms->base.get_angle_func = hall_get_angle;
+    ms->base.get_raw_angle_func = hall_get_angle;
     ms->base.update_func = hall_update;
     ms->base.reset_func = hall_reset;
     ms->base.deinit_func = hall_deinit;

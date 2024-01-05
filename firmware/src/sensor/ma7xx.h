@@ -23,12 +23,6 @@
 
 typedef struct Observer Observer;
 
-#define MAX_ALLOWED_DELTA     (ENCODER_TICKS / 6)
-#define MAX_ALLOWED_DELTA_ADD (MAX_ALLOWED_DELTA + ENCODER_TICKS)
-#define MAX_ALLOWED_DELTA_SUB (MAX_ALLOWED_DELTA - ENCODER_TICKS)
-#define MIN_ALLOWED_DELTA_ADD (-MAX_ALLOWED_DELTA + ENCODER_TICKS)
-#define MIN_ALLOWED_DELTA_SUB (-MAX_ALLOWED_DELTA - ENCODER_TICKS)
-
 typedef enum {
     MA_CMD_NOP              = 0x0000,
     MA_CMD_ANGLE            = 0x0000,
@@ -40,8 +34,6 @@ typedef struct
 {
     SSP_TYPE ssp_port;
     PAC55XX_SSP_TYPEDEF *ssp_struct;
-	int16_t rec_table[ECN_SIZE];
-    bool rec_calibrated;
 } MA7xxSensorConfig;
 
 typedef struct
@@ -52,22 +44,15 @@ typedef struct
 	int16_t angle;
 } MA7xxSensor;
 
-bool ma7xx_init_with_port(Sensor *s, const SSP_TYPE port);
+bool ma7xx_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct);
 bool ma7xx_init_with_config(Sensor *s, const MA7xxSensorConfig *c);
 void ma7xx_deinit(Sensor *s);
 void ma7xx_reset(Sensor *s);
-bool ma7xx_calibrate_offset_and_rectification(Sensor *s, Observer *o);
-bool ma7xx_calibrate_direction_and_pole_pair_count(Sensor *s, Observer *o);
 bool ma7xx_calibrate(Sensor *s, Observer *o);
 
 static inline bool ma7xx_rec_is_calibrated(const Sensor *s)
 {
-    return ((const MA7xxSensor *)s)->config.rec_calibrated;
-}
-
-static inline int16_t *ma7xx_get_rec_table_ptr(Sensor *s)
-{
-    return ((MA7xxSensor *)s)->config.rec_table;
+    return s->config.rec_calibrated;
 }
 
 static inline uint8_t ma7xx_get_errors(const Sensor *s)
@@ -80,20 +65,9 @@ static inline void ma7xx_send_angle_cmd(const Sensor *s)
 	ssp_write_one(((const MA7xxSensor *)s)->config.ssp_struct, MA_CMD_ANGLE);
 }
 
-static inline int16_t ma7xx_get_angle_raw(const Sensor *s)
+static inline int16_t ma7xx_get_raw_angle(const Sensor *s)
 {
     return ((const MA7xxSensor *)s)->angle;
-}
-
-static inline int16_t ma7xx_get_angle_rectified(const Sensor *s)
-{
-    const MA7xxSensor *ms = (const MA7xxSensor *)s;
-    const uint8_t offset_bits = (ENCODER_BITS - ECN_BITS);
-    const int16_t angle = ms->angle;
-    const int16_t off_1 = ms->config.rec_table[angle>>offset_bits];
-	const int16_t off_2 = ms->config.rec_table[((angle>>offset_bits) + 1) % ECN_SIZE];
-	const int16_t off_interp = off_1 + ((off_2 - off_1)* (angle - ((angle>>offset_bits)<<offset_bits))>>offset_bits);
-	return angle + off_interp;
 }
 
 static inline void ma7xx_update(Sensor *s, bool check_error)

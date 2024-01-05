@@ -21,6 +21,8 @@
 #include <src/sensor/hall.h>
 #include <src/sensor/sensor.h>
 
+#define SENSOR_COUNT 3
+
 typedef struct Observer Observer;
 
 extern Observer commutation_observer;
@@ -89,7 +91,8 @@ static inline void sensors_reset(void)
 {
     for (int i=0; i<SENSOR_COUNT; i++)
     {
-        sensor_reset(&(sensors[i].sensor));
+        Sensor *s = &(sensors[i].sensor);
+        s->reset_func(s);
     }
 }
 

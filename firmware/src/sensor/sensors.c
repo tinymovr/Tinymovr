@@ -27,11 +27,11 @@ bool sensor_init_with_defaults(Sensor *s)
     sensor_connection_t connection = sensor_get_connection(s);
     if (connection == SENSOR_CONNECTION_ONBOARD_SPI)
     {
-        return ma7xx_init_with_port(s, ONBOARD_SENSOR_SSP_PORT);
+        return ma7xx_init_with_port(s, ONBOARD_SENSOR_SSP_PORT, ONBOARD_SENSOR_SSP_STRUCT);
     }
     else if (connection == SENSOR_CONNECTION_EXTERNAL_SPI)
     {
-        return ma7xx_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT);
+        return ma7xx_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT);
     }
     else if (connection == SENSOR_CONNECTION_HALL)
     {
@@ -53,8 +53,8 @@ void sensors_get_config(SensorsConfig *config_)
     // {
     //     config_->config[i] = sensors[i].config;
     // }
-    // config_->commutation_connection = sensor_get_connection(commutation_sensor_p);
-    // config_->position_connection = sensor_get_connection(position_sensor_p);
+    config_->commutation_connection = sensor_get_connection(commutation_sensor_p);
+    config_->position_connection = sensor_get_connection(position_sensor_p);
 }
 
 void sensors_restore_config(SensorsConfig *config_)
@@ -90,7 +90,8 @@ void sensor_external_spi_set_type(sensor_type_t type)
         && type > SENSOR_TYPE_INVALID && type < SENSOR_TYPE_MAX 
         && type != sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type)
     {
-        sensor_deinit(&(sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor));
+        Sensor *s = &(sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor);
+        s->deinit_func(s);
         sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type = type;
         sensors_init_with_defaults();
     }
@@ -104,7 +105,7 @@ void sensor_set_connection(Sensor** target_sensor, Sensor** other_sensor, sensor
     {
         if (sensor_get_connection(*target_sensor) != sensor_get_connection(*other_sensor))
         {
-            sensor_deinit(*target_sensor);
+            (*target_sensor)->deinit_func(*target_sensor);
         }
 
         *target_sensor = &(sensors[new_connection].sensor);

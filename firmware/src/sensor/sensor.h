@@ -21,7 +21,11 @@
 #include <src/ssp/ssp_func.h>
 #include <src/motor/motor.h>
 
-#define SENSOR_COUNT 3
+#define MAX_ALLOWED_DELTA     (ENCODER_TICKS / 6)
+#define MAX_ALLOWED_DELTA_ADD (MAX_ALLOWED_DELTA + ENCODER_TICKS)
+#define MAX_ALLOWED_DELTA_SUB (MAX_ALLOWED_DELTA - ENCODER_TICKS)
+#define MIN_ALLOWED_DELTA_ADD (-MAX_ALLOWED_DELTA + ENCODER_TICKS)
+#define MIN_ALLOWED_DELTA_SUB (-MAX_ALLOWED_DELTA - ENCODER_TICKS)
 
 #if defined BOARD_REV_R3
 #define ONB§OARD_SENSOR_SSP_PORT SSPD
@@ -39,7 +43,7 @@ typedef struct Observer Observer;
 
 typedef bool (*sensor_is_calibrated_func_t)(const Sensor *);
 typedef bool (*sensor_calibrate_func_t)(Sensor *, Observer *);
-typedef int16_t (*sensor_get_angle_func_t)(const Sensor *);
+typedef int16_t (*sensor_get_raw_angle_func_t)(const Sensor *);
 typedef void (*sensor_deinit_func_t)(Sensor *);
 typedef void (*sensor_reset_func_t)(Sensor *);
 typedef void (*sensor_prepare_func_t)(const Sensor *);
@@ -65,13 +69,15 @@ typedef enum {
 struct SensorConfig {
     uint32_t id;
     sensor_type_t type;
+    int16_t rec_table[ECN_SIZE];
+    bool rec_calibrated;
 };
 
 struct Sensor { // typedefd earlier
     SensorConfig config;
     sensor_is_calibrated_func_t is_calibrated_func;
     sensor_calibrate_func_t calibrate_func;
-    sensor_get_angle_func_t get_angle_func;
+    sensor_get_raw_angle_func_t get_raw_angle_func;
     sensor_deinit_func_t deinit_func;
     sensor_reset_func_t reset_func;
     sensor_update_func_t update_func;
@@ -82,8 +88,19 @@ struct Sensor { // typedefd earlier
 };
 
 uint32_t get_next_sensor_id(void);
-void sensor_deinit(Sensor *s);
 void sensor_reset(Sensor *s);
+bool sensor_calibrate_offset_and_rectification(Sensor *s, Observer *o);
+bool sensor_calibrate_direction_and_pole_pair_count(Sensor *s, Observer *o);
+
+static inline int16_t sensor_get_angle_rectified(const Sensor *s)
+{
+    const uint8_t offset_bits = (ENCODER_BITS - ECN_BITS);
+    const int16_t angle = s->get_raw_angle_func(s);
+    const int16_t off_1 = s->config.rec_table[angle>>offset_bits];
+	const int16_t off_2 = s->config.rec_table[((angle>>offset_bits) + 1) % ECN_SIZE];
+	const int16_t off_interp = off_1 + ((off_2 - off_1)* (angle - ((angle>>offset_bits)<<offset_bits))>>offset_bits);
+	return angle + off_interp;
+}
 
 static inline void sensor_update(Sensor *s, bool check_error)
 {
@@ -133,3 +150,4 @@ static inline void sensor_prepare(Sensor *s)
         s->prepare_func(s);
     }
 }
+
