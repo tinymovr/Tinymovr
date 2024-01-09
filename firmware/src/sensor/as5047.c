@@ -47,13 +47,14 @@ bool as5047p_init_with_config(Sensor *s, const AS5047PSensorConfig *c) {
 
     as5047p_send_angle_cmd(s); 
     as5047p_update(s, false); 
-
+    s->initialized = true;
     return true;
 }
 
 void as5047p_deinit(Sensor *s)
 {
     ssp_deinit(((AS5047PSensor *)s)->config.ssp_port);
+    s->initialized = false;
 }
 
 void as5047p_reset(Sensor *s)

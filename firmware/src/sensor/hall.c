@@ -48,6 +48,7 @@ bool hall_init_with_config(Sensor *s, const HallSensorConfig *c)
     pac5xxx_tile_register_write(ADDR_CFGAIO7, AIO6789_IO_MODE | AIO_INPUT);
     pac5xxx_tile_register_write(ADDR_CFGAIO8, AIO6789_IO_MODE | AIO_INPUT);
     pac5xxx_tile_register_write(ADDR_CFGAIO9, AIO6789_IO_MODE | AIO_INPUT);
+    s->initialized = true;
     return true;
 }
 
@@ -57,6 +58,7 @@ void hall_deinit(Sensor *s)
     pac5xxx_tile_register_write(ADDR_CFGAIO7, ms->hw_defaults[0]);
     pac5xxx_tile_register_write(ADDR_CFGAIO8, ms->hw_defaults[1]);
     pac5xxx_tile_register_write(ADDR_CFGAIO9, ms->hw_defaults[2]);
+    s->initialized = false;
 }
 
 void hall_reset(Sensor *s)
