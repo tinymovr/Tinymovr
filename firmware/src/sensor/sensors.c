@@ -18,6 +18,48 @@
 #include <src/sensor/sensors.h>
 #include <src/controller/controller.h>
 
+GenSensor sensors[SENSOR_COUNT] = {
+    {.sensor = {
+        .config = { .type = SENSOR_TYPE_MA7XX },
+        .is_calibrated_func = ma7xx_rec_is_calibrated,
+        .calibrate_func = ma7xx_calibrate,
+        .get_raw_angle_func = ma7xx_get_raw_angle,
+        .deinit_func = ma7xx_deinit,
+        .reset_func = ma7xx_reset,
+        .update_func = ma7xx_update,
+        .prepare_func = ma7xx_send_angle_cmd,
+        .get_errors_func = ma7xx_get_errors,
+        .initialized = false,
+        .current = false
+    }},
+    {.sensor = {
+        .config = { .type = SENSOR_TYPE_MA7XX },
+        .is_calibrated_func = ma7xx_rec_is_calibrated,
+        .calibrate_func = ma7xx_calibrate,
+        .get_raw_angle_func = ma7xx_get_raw_angle,
+        .deinit_func = ma7xx_deinit,
+        .reset_func = ma7xx_reset,
+        .update_func = ma7xx_update,
+        .prepare_func = ma7xx_send_angle_cmd,
+        .get_errors_func = ma7xx_get_errors,
+        .initialized = false,
+        .current = false
+    }},
+    {.sensor = {
+        .config = { .type = SENSOR_TYPE_HALL },
+        .is_calibrated_func = hall_sector_map_is_calibrated,
+        .calibrate_func = hall_calibrate_sequence,
+        .get_raw_angle_func = hall_get_angle,
+        .deinit_func = hall_deinit,
+        .reset_func = hall_reset,
+        .update_func = hall_update,
+        .prepare_func = 0x0,
+        .get_errors_func = hall_get_errors,
+        .initialized = false,
+        .current = false
+    }}
+};
+
 bool sensor_init_with_defaults(Sensor *s)
 {
     // Here we check the sensor connection, either

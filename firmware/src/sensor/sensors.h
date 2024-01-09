@@ -50,9 +50,9 @@ typedef struct
 } SensorsConfig;
 
 // The sequence in the `sensors` array is determined so that
-// 0: onboard sensor, 1: external spi and 3: hall sensor
+// 0: onboard sensor, 1: external spi and 2: hall sensor
 // index same as the members of `sensor_connection_t`
-GenSensor sensors[SENSOR_COUNT];
+extern GenSensor sensors[SENSOR_COUNT];
 
 Sensor *commutation_sensor_p;
 Sensor *position_sensor_p;
