@@ -32,7 +32,7 @@ typedef struct
     Sensor base;
     HallSensorConfig config;
     uint8_t errors;
-	uint16_t angle;
+	int32_t angle;
     uint8_t sector;
     uint8_t hw_defaults[3];
 } HallSensor;
@@ -48,7 +48,7 @@ static inline uint8_t hall_get_errors(const Sensor *s)
     return ((HallSensor *)s)->errors;
 }
 
-static inline int16_t hall_get_angle(const Sensor *s)
+static inline int32_t hall_get_angle(const Sensor *s)
 {
     return ((HallSensor *)s)->angle;
 }

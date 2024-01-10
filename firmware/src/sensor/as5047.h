@@ -40,7 +40,7 @@ typedef struct
     Sensor base;
     AS5047PSensorConfig config;
     uint8_t errors;
-    uint16_t angle;
+    int32_t angle;
 } AS5047PSensor;
 
 bool as5047p_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct);
@@ -64,7 +64,7 @@ static inline void as5047p_send_angle_cmd(const Sensor *s)
     ssp_write_one(((const AS5047PSensor *)s)->config.ssp_struct, AS5047P_CMD_READ_ANGLE);
 }
 
-static inline uint16_t as5047p_get_raw_angle(const Sensor *s)
+static inline int32_t as5047p_get_raw_angle(const Sensor *s)
 {
     return ((const AS5047PSensor *)s)->angle;
 }
@@ -72,10 +72,10 @@ static inline uint16_t as5047p_get_raw_angle(const Sensor *s)
 static inline void as5047p_update(Sensor *s, bool check_error)
 {
     AS5047PSensor *as = (AS5047PSensor *)s;
-    const int16_t angle = ssp_read_one(as->config.ssp_struct) & 0x3FFF; // Mask to get the angle value
+    const int32_t angle = ssp_read_one(as->config.ssp_struct) & 0x3FFF; // Mask to get the angle value
     if (check_error)
     {
-    	const int16_t delta = as->angle - angle;
+    	const int32_t delta = as->angle - angle;
 		if ( ((delta > MAX_ALLOWED_DELTA) || (delta < -MAX_ALLOWED_DELTA)) &&
 		     ((delta > MAX_ALLOWED_DELTA_ADD) || (delta < MIN_ALLOWED_DELTA_ADD)) &&
 		     ((delta > MAX_ALLOWED_DELTA_SUB) || (delta < MIN_ALLOWED_DELTA_SUB)) )

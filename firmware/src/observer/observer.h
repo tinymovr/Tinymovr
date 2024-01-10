@@ -66,7 +66,7 @@ static inline void observer_update(Observer *o)
 	{
 		const float sensor_ticks = sensor_get_ticks(o->sensor_ptr);
 		const float sensor_half_ticks = sensor_ticks * 0.5f;
-		const int16_t angle_meas = sensor_get_angle_rectified(o->sensor_ptr);
+		const int32_t angle_meas = sensor_get_angle_rectified(o->sensor_ptr);
 		const float delta_pos_est = PWM_PERIOD_S * o->vel_estimate;
 		float delta_pos_meas = angle_meas - o->pos_estimate_wrapped;
 		if (delta_pos_meas < -sensor_half_ticks)

@@ -21,12 +21,6 @@
 #include <src/system/system.h>
 #include <src/observer/observer.h>
 
-static ObserverConfig config = {
-	.track_bw = 350.0f,
-	.kp = 0.0f,
-	.ki = 0.0f,
-};
-
 bool observer_init_with_defaults(Observer *o, Sensor *s)
 {
 	ObserverConfig c = {.track_bw=350};
@@ -51,8 +45,8 @@ void observer_set_bandwidth(Observer *o, float bw)
     if (bw > 0.0f)
     {
         o->config.track_bw = bw;
-		o->config.kp = 2.0f * config.track_bw;
-    	o->config.ki = 0.25f * (config.kp * config.kp);
+		o->config.kp = 2.0f * o->config.track_bw;
+    	o->config.ki = 0.25f * (o->config.kp * o->config.kp);
     }
 }
 
