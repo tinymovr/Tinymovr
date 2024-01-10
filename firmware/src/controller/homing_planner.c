@@ -8,12 +8,12 @@
 #include <src/can/can_endpoints.h>
 
 static HomingPlannerConfig config = {
-    .homing_velocity = -8192.0f, // ticks/s
+    .homing_velocity = ENCODER_TICKS_FLOAT, // ticks/s
     .max_homing_t = 20.0f, // s
-    .max_stay_vel = 4000.0f, // ticks/s
-    .max_stay_dpos = 1000.0f, // ticks
+    .max_stay_vel = (ENCODER_TICKS_FLOAT/2.0f), // ticks/s
+    .max_stay_dpos = (ENCODER_TICKS_FLOAT/8.0f), // ticks
     .max_stay_t = 1.0f, // s
-    .retract_distance = 1000.0f // ticks
+    .retract_distance = (ENCODER_TICKS_FLOAT/8.0f) // ticks
 };
 
 static HomingPlannerState state = {0};

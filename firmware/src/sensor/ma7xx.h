@@ -73,7 +73,7 @@ static inline int16_t ma7xx_get_raw_angle(const Sensor *s)
 static inline void ma7xx_update(Sensor *s, bool check_error)
 {
     MA7xxSensor *ms = (MA7xxSensor *)s;
-    const int16_t angle = ssp_read_one(ms->config.ssp_struct) >> 3;
+    const int16_t angle = ssp_read_one(ms->config.ssp_struct);
 
     if (check_error)
     {

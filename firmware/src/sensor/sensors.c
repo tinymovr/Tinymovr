@@ -28,9 +28,7 @@ GenSensor sensors[SENSOR_COUNT] = {
         .reset_func = ma7xx_reset,
         .update_func = ma7xx_update,
         .prepare_func = ma7xx_send_angle_cmd,
-        .get_errors_func = ma7xx_get_errors,
-        .initialized = false,
-        .current = false
+        .get_errors_func = ma7xx_get_errors
     }},
     {.sensor = {
         .config = { .type = SENSOR_TYPE_MA7XX },
@@ -41,9 +39,7 @@ GenSensor sensors[SENSOR_COUNT] = {
         .reset_func = ma7xx_reset,
         .update_func = ma7xx_update,
         .prepare_func = ma7xx_send_angle_cmd,
-        .get_errors_func = ma7xx_get_errors,
-        .initialized = false,
-        .current = false
+        .get_errors_func = ma7xx_get_errors
     }},
     {.sensor = {
         .config = { .type = SENSOR_TYPE_HALL },
@@ -54,9 +50,7 @@ GenSensor sensors[SENSOR_COUNT] = {
         .reset_func = hall_reset,
         .update_func = hall_update,
         .prepare_func = 0x0,
-        .get_errors_func = hall_get_errors,
-        .initialized = false,
-        .current = false
+        .get_errors_func = hall_get_errors
     }}
 };
 

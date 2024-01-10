@@ -79,7 +79,7 @@ bool motor_calibrate_resistance(void);
 bool motor_calibrate_inductance(void);
 
 uint8_t motor_get_pole_pairs(void);
-uint8_t motor_find_pole_pairs(uint16_t ticks, float mpos_start, float mpos_end, float epos_rad);
+uint8_t motor_find_pole_pairs(uint32_t ticks, float mpos_start, float mpos_end, float epos_rad);
 void motor_set_pole_pairs(uint8_t pairs);
 
 float motor_get_phase_resistance(void);

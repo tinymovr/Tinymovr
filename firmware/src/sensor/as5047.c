@@ -32,15 +32,16 @@ bool as5047p_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF 
 
 bool as5047p_init_with_config(Sensor *s, const AS5047PSensorConfig *c) {
     AS5047PSensor *as = (AS5047PSensor *)s;
-    as->base.get_raw_angle_func = ma7xx_get_raw_angle;
-    as->base.update_func = as5047p_update; 
-    as->base.prepare_func = as5047p_send_angle_cmd; 
-    as->base.reset_func = as5047p_reset; 
-    as->base.deinit_func = as5047p_deinit; 
-    as->base.get_errors_func = as5047p_get_errors; 
-    as->base.is_calibrated_func = as5047p_is_calibrated; 
-    as->base.calibrate_func = as5047p_calibrate; 
-    as->base.config.type = SENSOR_TYPE_AS5047;
+    s->get_raw_angle_func = ma7xx_get_raw_angle;
+    s->update_func = as5047p_update; 
+    s->prepare_func = as5047p_send_angle_cmd; 
+    s->reset_func = as5047p_reset; 
+    s->deinit_func = as5047p_deinit; 
+    s->get_errors_func = as5047p_get_errors; 
+    s->is_calibrated_func = as5047p_is_calibrated; 
+    s->calibrate_func = as5047p_calibrate; 
+    s->config.type = SENSOR_TYPE_AS5047;
+    s->ticks = ENCODER_TICKS;
     as->config = *c;
     ssp_init(as->config.ssp_port, SSP_MS_MASTER, 0, 0);
     delay_us(10000); // Example delay, adjust based on AS5047P datasheet

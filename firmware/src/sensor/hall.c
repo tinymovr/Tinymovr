@@ -33,14 +33,15 @@ bool hall_init_with_defaults(Sensor *s)
 bool hall_init_with_config(Sensor *s, const HallSensorConfig *c)
 {
     HallSensor *ms = (HallSensor *)s;
-    ms->base.get_raw_angle_func = hall_get_angle;
-    ms->base.update_func = hall_update;
-    ms->base.reset_func = hall_reset;
-    ms->base.deinit_func = hall_deinit;
-    ms->base.get_errors_func = hall_get_errors;
-    ms->base.is_calibrated_func = hall_sector_map_is_calibrated;
-    ms->base.calibrate_func = hall_calibrate_sequence;
-    ms->base.config.type = SENSOR_TYPE_HALL;
+    s->get_raw_angle_func = hall_get_angle;
+    s->update_func = hall_update;
+    s->reset_func = hall_reset;
+    s->deinit_func = hall_deinit;
+    s->get_errors_func = hall_get_errors;
+    s->is_calibrated_func = hall_sector_map_is_calibrated;
+    s->calibrate_func = hall_calibrate_sequence;
+    s->config.type = SENSOR_TYPE_HALL;
+    s->ticks = HALL_SECTORS;
     ms->config = *c;
     ms->hw_defaults[0] = pac5xxx_tile_register_read(ADDR_CFGAIO7);
     ms->hw_defaults[1] = pac5xxx_tile_register_read(ADDR_CFGAIO8);

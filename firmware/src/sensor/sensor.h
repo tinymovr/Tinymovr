@@ -83,6 +83,7 @@ struct Sensor { // typedefd earlier
     sensor_update_func_t update_func;
     sensor_prepare_func_t prepare_func;
     sensor_get_errors_func_t get_errors_func;
+    uint32_t ticks;
     bool initialized : 1;
     bool current : 1;
 };
@@ -116,31 +117,9 @@ static inline void sensor_invalidate(Sensor *s)
     s->current = false;
 }
 
-static inline uint16_t sensor_get_ticks(Sensor *s) {
-#ifdef BOARD_REV_R5
-    if (SENSOR_TYPE_MA7XX == s->config.type) {
-#endif
-        // We need to derive this during call, because the motor pole pairs
-        // may change after calibration, or after user input
-        return 6 * motor_get_pole_pairs();
-#ifdef BOARD_REV_R5
-    }
-    return twopi_by_hall_sectors;
-#endif
-}
-
-static inline float sensor_ticks_to_eangle(Sensor *s)
+static inline uint16_t sensor_get_ticks(Sensor *s)
 {
-#ifdef BOARD_REV_R5
-    if (SENSOR_TYPE_MA7XX == s->config.type) {
-#endif
-        // We need to derive this during call, because the motor pole pairs
-        // may change after calibration, or after user input
-        return twopi_by_enc_ticks * motor_get_pole_pairs();
-#ifdef BOARD_REV_R5
-    }
-    return twopi_by_hall_sectors;
-#endif
+    return s->ticks;
 }
 
 static inline void sensor_prepare(Sensor *s)

@@ -34,15 +34,16 @@ bool ma7xx_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *s
  bool ma7xx_init_with_config(Sensor *s, const MA7xxSensorConfig *c)
 {
     MA7xxSensor *ms = (MA7xxSensor *)s;
-    ms->base.get_raw_angle_func = ma7xx_get_raw_angle;
-    ms->base.update_func = ma7xx_update;
-    ms->base.prepare_func = ma7xx_send_angle_cmd;
-    ms->base.reset_func = ma7xx_reset;
-    ms->base.deinit_func = ma7xx_deinit;
-    ms->base.get_errors_func = ma7xx_get_errors;
-    ms->base.is_calibrated_func = ma7xx_rec_is_calibrated;
-    ms->base.calibrate_func = ma7xx_calibrate;
-    ms->base.config.type = SENSOR_TYPE_MA7XX;
+    s->get_raw_angle_func = ma7xx_get_raw_angle;
+    s->update_func = ma7xx_update;
+    s->prepare_func = ma7xx_send_angle_cmd;
+    s->reset_func = ma7xx_reset;
+    s->deinit_func = ma7xx_deinit;
+    s->get_errors_func = ma7xx_get_errors;
+    s->is_calibrated_func = ma7xx_rec_is_calibrated;
+    s->calibrate_func = ma7xx_calibrate;
+    s->config.type = SENSOR_TYPE_MA7XX;
+    s->ticks = ENCODER_TICKS;
     ms->config = *c;
     ssp_init(ms->config.ssp_port, SSP_MS_MASTER, 0, 0);
     delay_us(16000); // ensure 16ms sensor startup time as per the datasheet
