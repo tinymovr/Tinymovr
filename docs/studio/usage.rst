@@ -67,6 +67,25 @@ Compatibility
 
 Tinymovr Studio includes by default a checksum comparison to determine protocol compatibility between firmware and studio version. This is performed each time a node is discovered, and prior to initializing the tinymovr object. If you see a compatibility-related message, please upgrade to the latest studio and firmware versions. 
 
+Custom Device Specs
+###################
+
+You can specify a custom device spec (YAML file) as a command line argument:
+
+|gui|
+
+.. code-block:: console
+
+    tinymovr --spec=/path/to/myspec.yaml
+
+|cli|
+
+.. code-block:: console
+
+    tinymovr_cli --spec=/path/to/myspec.yaml
+
+This is useful, for instance, if you have altered the default Tinymovr spec files. Using this parameter with a project developed using `Avlos <https://github.com/tinymovr/avlos>`_, you can even use Tinymovr Studio to control your own custom devices!
+
 
 Issuing Commands in CLI
 #######################
