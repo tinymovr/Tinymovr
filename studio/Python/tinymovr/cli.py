@@ -1,16 +1,18 @@
 """Tinymovr Studio CLI
 
 Usage:
-    tinymovr_cli [--bus=<bus>] [--chan=<chan>] [--bitrate=<bitrate>]
+    tinymovr_cli [--bus=<bus>] [--chan=<chan>] [--spec=<spec>] [--bitrate=<bitrate>]
     tinymovr_cli -h | --help
     tinymovr_cli --version
 
 Options:
     --bus=<bus>  One or more interfaces to use, first available is used [default: canine,slcan_disco].
     --chan=<chan>  The bus device "channel".
+    --spec=<spec> A custom device spec to be added to the list of discoverable spec.
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
 """
 
+import yaml
 import can
 import pkg_resources
 import IPython
@@ -20,7 +22,7 @@ from docopt import docopt
 from tinymovr import init_tee, destroy_tee
 from tinymovr.discovery import Discovery
 from tinymovr.constants import app_name
-from tinymovr.config import get_bus_config, configure_logging
+from tinymovr.config import get_bus_config, configure_logging, add_spec
 
 """
 Tinymovr CLI Module
@@ -48,6 +50,12 @@ def spawn():
     arguments = docopt(__doc__, version=app_name + " " + str(version))
 
     logger = configure_logging()
+
+    spec_file = arguments["--spec"]
+    if spec_file:
+        with open(spec_file, 'r') as file:
+            spec_data = yaml.safe_load(file)
+            add_spec(spec_data, logger)
 
     buses = arguments["--bus"].rsplit(sep=",")
     channel = arguments["--chan"]

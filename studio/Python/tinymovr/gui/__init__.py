@@ -7,14 +7,17 @@ from tinymovr.gui.helpers import (
     display_file_open_dialog,
     display_file_save_dialog,
     magnitude_of,
-    hold_sema,
     TimedGetter,
     check_selected_items,
     get_dynamic_attrs,
     is_dark_mode
 )
 from tinymovr.gui.widgets import (
-    OurQTreeWidget,
+    NodeTreeWidgetItem,
+    AttrTreeWidgetItem,
+    FuncTreeWidgetItem,
+    OptionsTreeWidgetItem,
+    PlaceholderQTreeWidget,
     IconComboBoxWidget,
     ArgumentInputDialog
 )
