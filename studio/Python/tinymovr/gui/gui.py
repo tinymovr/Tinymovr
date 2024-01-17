@@ -1,23 +1,26 @@
 """Tinymovr Studio GUI
 
 Usage:
-    tinymovr [--bus=<bus>] [--chan=<chan>] [--bitrate=<bitrate>] [--max-timeouts=<count>]
+    tinymovr [--bus=<bus>] [--chan=<chan>] [--spec=<spec>] [--bitrate=<bitrate>] [--max-timeouts=<count>]
     tinymovr -h | --help
     tinymovr --version
 
 Options:
     --bus=<bus>  One or more interfaces to use, first available is used [default: canine,slcan_disco].
     --chan=<chan>  The bus device "channel".
+    --spec=<spec> A custom device spec to be added to the list of discoverable specs.
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
     --max-timeouts=<count>  Max timeouts before nodes are rescanned [default: 5].
 """
 
 import sys
+import yaml
 import pkg_resources
 from docopt import docopt
 from PySide6.QtWidgets import QApplication
 from tinymovr.gui import MainWindow, app_stylesheet, app_stylesheet_dark, is_dark_mode
 from tinymovr.constants import app_name
+from tinymovr.config import configure_logging, add_spec
 
 
 """
@@ -41,11 +44,20 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 def spawn():
     version = pkg_resources.require("tinymovr")[0].version
     arguments = docopt(__doc__, version=app_name + " " + str(version))
+
+    logger = configure_logging()
+
+    spec_file = arguments["--spec"]
+    if spec_file:
+        with open(spec_file, 'r') as file:
+            spec_data = yaml.safe_load(file)
+            add_spec(spec_data, logger)
+
     app = QApplication(sys.argv)
     if is_dark_mode():
         app.setStyleSheet(app_stylesheet_dark)
     else:
         app.setStyleSheet(app_stylesheet)
-    w = MainWindow(app, arguments)
+    w = MainWindow(app, arguments, logger)
     w.show()
     sys.exit(app.exec_())

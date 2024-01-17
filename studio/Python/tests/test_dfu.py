@@ -22,8 +22,7 @@ import can
 from tinymovr import init_tee, destroy_tee
 from tinymovr.config import (
     get_bus_config,
-    create_device,
-    definitions
+    create_device
 )
 
 import unittest
