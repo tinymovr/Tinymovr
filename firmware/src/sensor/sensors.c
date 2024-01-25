@@ -61,19 +61,36 @@ bool sensor_init_with_defaults(Sensor *s)
     // to do this here in order to set up the config
     // struct accordingly.
     sensor_connection_t connection = sensor_get_connection(s);
-    if (connection == SENSOR_CONNECTION_ONBOARD_SPI)
+    switch (connection)
     {
-        return ma7xx_init_with_port(s, ONBOARD_SENSOR_SSP_PORT, ONBOARD_SENSOR_SSP_STRUCT);
-    }
-    else if (connection == SENSOR_CONNECTION_EXTERNAL_SPI)
-    {
-        return ma7xx_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT);
-    }
-    else if (connection == SENSOR_CONNECTION_HALL)
-    {
-        return hall_init_with_defaults(s);
+        case SENSOR_CONNECTION_ONBOARD_SPI:
+            return ma7xx_init_with_port(s, ONBOARD_SENSOR_SSP_PORT, ONBOARD_SENSOR_SSP_STRUCT);
+            break;
+        case SENSOR_CONNECTION_EXTERNAL_SPI:
+            return ma7xx_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT);
+            break;
+        case SENSOR_CONNECTION_HALL:
+            return hall_init_with_defaults(s);
+            break;
+        default:
+            break;
     }
     return false;
+}
+
+bool sensor_init_with_configs(Sensor *s, SensorConfig *sc, GenSensorConfig *gsc)
+{
+    switch (sc->type)
+    {
+        case SENSOR_TYPE_MA7XX:
+            ma7xx_init_with_config(s, &(gsc->ma7xx_sensor_config));
+            break;
+        case SENSOR_TYPE_HALL:
+            hall_init_with_config(s, &(gsc->hall_sensor_config));
+            break;
+        default:
+            break;
+    }
 }
 
 void sensors_init_with_defaults(void)
@@ -85,30 +102,36 @@ void sensors_init_with_defaults(void)
 
 void sensors_get_config(SensorsConfig *config_)
 {
-    // for (int i=0; i<SENSOR_COUNT; i++)
-    // {
-    //     config_->config[i] = sensors[i].config;
-    // }
+    // Serialize SensorConfig array
+    for (int i = 0; i < SENSOR_COUNT; ++i) {
+        config_->config[i] = sensors[i].sensor.config;
+    }
+
+    // Serialize GenSensorConfig array
+    for (int i = 0; i < SENSOR_COUNT; ++i) {
+        sensors[i].sensor.get_ss_config_func(sensors[i].sensor, &(config_->ss_config[i]));
+    }
     config_->commutation_connection = sensor_get_connection(commutation_sensor_p);
     config_->position_connection = sensor_get_connection(position_sensor_p);
 }
 
 void sensors_restore_config(SensorsConfig *config_)
 {
-    // for (int i=0; i<SENSOR_COUNT; i++)
-    // {
-    //     sensors[i].config = config_->config[i];
-    // }
-    // commutation_sensor_p = config_->commutation_connection + sensors;
-    // sensor_init_with_config(commutation_sensor_p, &(commutation_sensor_p->config));
-    // position_sensor_p = config_->position_connection + sensors;
-    // if (commutation_sensor_p != position_sensor_p)
-    // {
-    //     sensor_init_with_config(position_sensor_p, &(position_sensor_p->config));
-    // }
-}
+    // Assuming there are functions to set the commutation and position sensor pointers
+    // based on the sensor_connection_t value. If not, this part needs to be adapted.
+    sensor_set_pointer_with_connection(&commutation_sensor_p, config_->commutation_connection);
+    sensor_set_pointer_with_connection(&position_sensor_p, config_->position_connection);
 
-// Interface functions
+    // Restore SensorConfig array
+    for (int i = 0; i < SENSOR_COUNT; ++i) {
+        sensors[i].sensor.config = config_->config[i];
+        if ((sensors[i].sensor.initialized == false) && 
+            (commutation_sensor_p == &(sensors[i].sensor) || position_sensor_p == &(sensors[i].sensor)))
+        {
+            sensor_init_with_configs(commutation_sensor_p, &(config_->config[i]), &(config_->ss_config[i]));
+        }
+    }
+}
 
 void commutation_sensor_set_connection(sensor_connection_t new_connection)
 {

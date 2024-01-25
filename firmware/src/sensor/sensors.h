@@ -37,14 +37,14 @@ typedef union
 
 typedef union 
 {
-    SensorConfig sensor_config;
     MA7xxSensorConfig ma7xx_sensor_config;
     HallSensorConfig hall_sensor_config;
 } GenSensorConfig;
 
 typedef struct
 {
-    GenSensorConfig config[SENSOR_COUNT];
+    SensorConfig config[SENSOR_COUNT];
+    GenSensorConfig ss_config[SENSOR_COUNT];
     sensor_connection_t commutation_connection;
     sensor_connection_t position_connection;
 } SensorsConfig;
@@ -64,14 +64,17 @@ static inline sensor_connection_t sensor_get_connection(const Sensor *sensor)
     return s - sensors;
 }
 
+static inline void sensor_set_pointer_with_connection(Sensor **sensor, sensor_connection_t connection)
+{
+    *sensor = (Sensor *)(&(sensors[connection]));
+}
+
 void sensor_set_connection(Sensor** target_sensor, Sensor** other_sensor, sensor_connection_t new_connection);
 
 bool sensor_init_with_defaults(Sensor *s);
 void sensors_init_with_defaults(void);
 void sensors_get_config(SensorsConfig *config_);
 void sensors_restore_config(SensorsConfig *config_);
-
-// Interface functions
 
 static inline sensor_connection_t commutation_sensor_get_connection(void)
 {
