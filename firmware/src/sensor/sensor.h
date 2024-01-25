@@ -88,7 +88,6 @@ struct Sensor { // typedefd earlier
     bool current : 1;
 };
 
-uint32_t get_next_sensor_id(void);
 void sensor_reset(Sensor *s);
 bool sensor_calibrate_offset_and_rectification(Sensor *s, Observer *o);
 bool sensor_calibrate_direction_and_pole_pair_count(Sensor *s, Observer *o);

@@ -19,13 +19,6 @@
 #include <src/observer/observer.h>
 #include <src/sensor/sensor.h>
 
-static uint32_t sensor_id = 1; // 0 implicitly treated as missing value
-
-uint32_t get_next_sensor_id(void)
-{
-    return sensor_id++;
-}
-
 void sensor_reset(Sensor *s)
 {
     (void)memset(s->config.rec_table, 0, sizeof(s->config.rec_table));
