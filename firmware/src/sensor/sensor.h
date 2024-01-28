@@ -48,14 +48,15 @@ typedef void (*sensor_deinit_func_t)(Sensor *);
 typedef void (*sensor_reset_func_t)(Sensor *);
 typedef void (*sensor_prepare_func_t)(const Sensor *);
 typedef void (*sensor_update_func_t)(Sensor *, bool);
+typedef void (*sensor_get_ss_config_func_t)(Sensor* sensor, void* buffer);
 typedef uint8_t (*sensor_get_errors_func_t)(const Sensor *);
 
 typedef enum {
     SENSOR_TYPE_INVALID = 0,
     SENSOR_TYPE_MA7XX = 1,
-    SENSOR_TYPE_HALL = 2,
-    SENSOR_TYPE_AS5047 = 3,
-    SENSOR_TYPE_AMT22 = 4,
+    SENSOR_TYPE_AS5047 = 2,
+    SENSOR_TYPE_AMT22 = 3,
+    SENSOR_TYPE_HALL = 4,
     SENSOR_TYPE_MAX
 } sensor_type_t;
 
@@ -82,6 +83,7 @@ struct Sensor { // typedefd earlier
     sensor_reset_func_t reset_func;
     sensor_update_func_t update_func;
     sensor_prepare_func_t prepare_func;
+    sensor_get_ss_config_func_t get_ss_config_func;
     sensor_get_errors_func_t get_errors_func;
     uint32_t ticks;
     bool initialized : 1;

@@ -44,11 +44,13 @@ typedef struct
 	int32_t angle;
 } MA7xxSensor;
 
+void ma7xx_make_blank_sensor(Sensor *s);
 bool ma7xx_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct);
 bool ma7xx_init_with_config(Sensor *s, const MA7xxSensorConfig *c);
 void ma7xx_deinit(Sensor *s);
 void ma7xx_reset(Sensor *s);
 bool ma7xx_calibrate(Sensor *s, Observer *o);
+void ma7xx_get_ss_config(Sensor *s, void* buffer);
 
 static inline bool ma7xx_rec_is_calibrated(const Sensor *s)
 {

@@ -352,8 +352,8 @@ remote_attributes:
               - name: type
                 options: [MA7XX, AS5047, AMT22]
                 meta: {export: True}
-                getter_name: sensor_external_spi_get_type
-                setter_name: sensor_external_spi_set_type
+                getter_name: sensor_external_spi_get_type_avlos
+                setter_name: sensor_external_spi_set_type_avlos
                 summary: The type of external sensor type. Either MA7XX, AS5047 or AMT22.
               - name: calibrated
                 dtype: bool

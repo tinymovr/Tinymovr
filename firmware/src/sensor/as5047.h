@@ -43,13 +43,14 @@ typedef struct
     int32_t angle;
 } AS5047PSensor;
 
+void as5047p_make_blank_sensor(Sensor *s);
 bool as5047p_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct);
 bool as5047p_init_with_config(Sensor *s, const AS5047PSensorConfig *c);
 void as5047p_deinit(Sensor *s);
 void as5047p_reset(Sensor *s);
 bool as5047p_calibrate(Sensor *s, Observer *o);
 
-bool as5047p_is_calibrated(const Sensor *s)
+static inline bool as5047p_is_calibrated(const Sensor *s)
 {
     return s->config.rec_calibrated;
 }

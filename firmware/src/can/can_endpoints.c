@@ -790,7 +790,7 @@ uint8_t avlos_sensors_setup_external_spi_type(uint8_t * buffer, uint8_t * buffer
 {
 if (AVLOS_CMD_READ == cmd) {
         uint8_t v;
-        v = sensor_external_spi_get_type();
+        v = sensor_external_spi_get_type_avlos();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
@@ -798,7 +798,7 @@ if (AVLOS_CMD_READ == cmd) {
 else if (AVLOS_CMD_WRITE == cmd) {
         uint8_t v;
         memcpy(&v, buffer, sizeof(v));
-        sensor_external_spi_set_type(v);
+        sensor_external_spi_set_type_avlos(v);
         return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;

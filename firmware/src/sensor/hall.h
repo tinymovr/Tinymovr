@@ -37,11 +37,13 @@ typedef struct
     uint8_t hw_defaults[3];
 } HallSensor;
 
+void hall_make_blank_sensor(Sensor *s);
 bool hall_init_with_defaults(Sensor *s);
 bool hall_init_with_config(Sensor *s, const HallSensorConfig *c);
 void hall_deinit(Sensor *s);
 void hall_reset(Sensor *s);
 bool hall_calibrate_sequence(Sensor *s, Observer *o);
+void hall_get_ss_config(Sensor *s, void* buffer);
 
 static inline uint8_t hall_get_errors(const Sensor *s)
 {

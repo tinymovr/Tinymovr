@@ -24,6 +24,20 @@
 #define AIO6789_IO_MODE                 0x00
 #define AIO_INPUT                       0x00
 
+void hall_make_blank_sensor(Sensor *s)
+{
+    s->config.type = SENSOR_TYPE_HALL;
+    s->ticks = HALL_SECTORS;
+    s->get_raw_angle_func = hall_get_angle;
+    s->update_func = hall_update;
+    s->reset_func = hall_reset;
+    s->deinit_func = hall_deinit;
+    s->get_errors_func = hall_get_errors;
+    s->is_calibrated_func = hall_sector_map_is_calibrated;
+    s->calibrate_func = hall_calibrate_sequence;
+    s->get_ss_config_func = hall_get_ss_config;
+}
+
 bool hall_init_with_defaults(Sensor *s)
 {
     HallSensorConfig c = {0};
@@ -33,15 +47,6 @@ bool hall_init_with_defaults(Sensor *s)
 bool hall_init_with_config(Sensor *s, const HallSensorConfig *c)
 {
     HallSensor *ms = (HallSensor *)s;
-    s->get_raw_angle_func = hall_get_angle;
-    s->update_func = hall_update;
-    s->reset_func = hall_reset;
-    s->deinit_func = hall_deinit;
-    s->get_errors_func = hall_get_errors;
-    s->is_calibrated_func = hall_sector_map_is_calibrated;
-    s->calibrate_func = hall_calibrate_sequence;
-    s->config.type = SENSOR_TYPE_HALL;
-    s->ticks = HALL_SECTORS;
     ms->config = *c;
     ms->hw_defaults[0] = pac5xxx_tile_register_read(ADDR_CFGAIO7);
     ms->hw_defaults[1] = pac5xxx_tile_register_read(ADDR_CFGAIO8);
@@ -137,4 +142,9 @@ bool hall_calibrate_sequence(Sensor *s, Observer *o)
         ms->errors |= SENSORS_SETUP_HALL_ERRORS_CALIBRATION_FAILED;
     }
     return success;
+}
+
+void hall_get_ss_config(Sensor *s, void* buffer)
+{
+
 }

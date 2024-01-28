@@ -19,6 +19,7 @@
 
 #include <src/sensor/ma7xx.h>
 #include <src/sensor/hall.h>
+#include <src/sensor/as5047.h>
 #include <src/sensor/sensor.h>
 
 #define SENSOR_COUNT 3
@@ -33,12 +34,14 @@ typedef union
     Sensor sensor;
     MA7xxSensor ma7xx_sensor;
     HallSensor hall_sensor;
+    AS5047PSensor as5047p_sensor;
 } GenSensor;
 
 typedef union 
 {
     MA7xxSensorConfig ma7xx_sensor_config;
     HallSensorConfig hall_sensor_config;
+    AS5047PSensorConfig as5047p_sensor_config;
 } GenSensorConfig;
 
 typedef struct
@@ -105,12 +108,26 @@ static inline void sensors_calibrate(void)
     position_sensor_p->calibrate_func(position_sensor_p, &position_observer);
 }
 
-static inline sensor_type_t sensor_external_spi_get_type(void)
+static inline sensors_setup_external_spi_type_options sensor_external_spi_get_type_avlos(void)
 {
-    return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type;
+    switch (sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type)
+    {
+        case SENSOR_TYPE_MA7XX:
+            return SENSORS_SETUP_EXTERNAL_SPI_TYPE_MA7XX;
+            break;
+        case SENSOR_TYPE_AS5047:
+            return SENSORS_SETUP_EXTERNAL_SPI_TYPE_AS5047;
+            break;
+        case SENSOR_TYPE_AMT22:
+            return SENSORS_SETUP_EXTERNAL_SPI_TYPE_AMT22;
+            break;
+        default:
+            return SENSORS_SETUP_EXTERNAL_SPI_TYPE_MA7XX;
+            break;
+    }
 }
 
-void sensor_external_spi_set_type(sensor_type_t type);
+void sensor_external_spi_set_type_avlos(sensors_setup_external_spi_type_options type);
 
 static inline bool sensor_onboard_get_is_calibrated(void)
 {
