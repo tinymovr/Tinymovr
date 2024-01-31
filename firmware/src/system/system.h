@@ -41,8 +41,9 @@ void system_reset_calibration(void);
 
 static inline uint8_t system_get_fw_version_string(char *buffer)
 {
-    memcpy(buffer, GIT_VERSION, 4);
-    return 4;
+    const uint8_t size = fminf(sizeof(GIT_VERSION), 8);
+    memcpy(buffer, GIT_VERSION, size);
+    return size;
 }
 
 static inline uint32_t system_get_uid(void)
