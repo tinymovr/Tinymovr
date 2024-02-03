@@ -739,7 +739,7 @@ void ssp_interrupt_disable(SSP_TYPE ssp)
     }
 }
 
-void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t cph, uint8_t cpol)
+void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t clkn_div, uint8_t cph, uint8_t cpol)
 {
     PAC55XX_SSP_TYPEDEF *ssp_ptr;
 
@@ -777,13 +777,13 @@ void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t cph, uint8_t cpol)
     // SSPCLK = PCLK / ((SSPxCLK.M + 1)*SSPxCLK.N) = 150000000 / ((2+1) x 6) = 8.47MHz
     // SSPCLK = PCLK / ((SSPxCLK.M + 1)*SSPxCLK.N) = 150000000 / ((2+1) x 4) = 12.5MHz
 	ssp_ptr->CLK.M = 2;
-	ssp_ptr->CLK.N = 4;                                     // N must be even value from 2 to 254
+	ssp_ptr->CLK.N = clkn_div;                                     // N must be even value from 2 to 254
 	ssp_ptr->CON.FRF = SSP_FRAME_FORMAT_SPI;                 // Frame Format, SPI frame format
 	ssp_ptr->CON.MS = ms_mode;                               // Master/Slave mode, master mode
 	ssp_ptr->CON.LSBFIRST = SSP_ENDIAN_MSB;                  // Endian Order, MSB transmit 1st
 	ssp_ptr->CON.LBM = SSP_LP_NORMAL;                        // Loopback Mode, no loopback mode
-	ssp_ptr->CON.CPH = cph;                      // Clock Out Phase, SPI captures data at 2nd edge transition of the frame
-	ssp_ptr->CON.CPO = cpol;                // Clock Out Polarity, SPI clock active high
+	ssp_ptr->CON.CPH = cph;                                  // Clock Out Phase
+	ssp_ptr->CON.CPO = cpol;                                 // Clock Out Polarity
     ssp_ptr->CON.DSS = SSP_DATA_SIZE_16;                     // Data Size Select, 16 bit data
     ssp_ptr->CON.SOD = SSP_OUTPUT_NOT_DRIVE;                 // Slave Output Disable
 

@@ -50,7 +50,7 @@ bool ma7xx_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *s
 {
     MA7xxSensor *ms = (MA7xxSensor *)s;
     ms->config = *c;
-    ssp_init(ms->config.ssp_port, SSP_MS_MASTER, 0, 0);
+    ssp_init(ms->config.ssp_port, SSP_MS_MASTER, 4, 0, 0);
     delay_us(16000); // ensure 16ms sensor startup time as per the datasheet
     ma7xx_send_angle_cmd(s);
     ma7xx_update(s, false);
