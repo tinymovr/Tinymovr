@@ -394,6 +394,11 @@ remote_attributes:
                 getter_name: position_observer_get_bandwidth
                 setter_name: position_observer_set_bandwidth
                 summary: The position sensor observer bandwidth.
+              - name: raw_angle
+                dtype: int32
+                meta: {dynamic: True}
+                getter_name: sensor_position_get_raw_angle
+                summary: The raw position sensor angle.
               - name: position_estimate
                 dtype: float
                 unit: ticks
@@ -421,6 +426,11 @@ remote_attributes:
                 getter_name: commutation_observer_get_bandwidth
                 setter_name: commutation_observer_set_bandwidth
                 summary: The commutation sensor observer bandwidth.
+              - name: raw_angle
+                dtype: int32
+                meta: {dynamic: True}
+                getter_name: sensor_commutation_get_raw_angle
+                summary: The raw commutation sensor angle.
               - name: position_estimate
                 dtype: float
                 unit: ticks
