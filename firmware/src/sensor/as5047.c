@@ -27,7 +27,7 @@ void as5047p_make_blank_sensor(Sensor *s)
 {
     s->config.type = SENSOR_TYPE_AS5047;
     s->ticks = ENCODER_TICKS;
-    s->get_raw_angle_func = ma7xx_get_raw_angle;
+    s->get_raw_angle_func = as5047p_get_raw_angle;
     s->update_func = as5047p_update; 
     s->prepare_func = as5047p_send_angle_cmd; 
     s->reset_func = as5047p_reset; 
@@ -35,6 +35,7 @@ void as5047p_make_blank_sensor(Sensor *s)
     s->get_errors_func = as5047p_get_errors; 
     s->is_calibrated_func = as5047p_is_calibrated; 
     s->calibrate_func = as5047p_calibrate; 
+    s->get_ss_config_func = as5047p_get_ss_config;
 }
 
 bool as5047p_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct) {
