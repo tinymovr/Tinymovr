@@ -21,13 +21,13 @@
 #include <src/system/system.h>
 #include <src/observer/observer.h>
 
-bool observer_init_with_defaults(Observer *o, Sensor *s)
+bool observer_init_with_defaults(Observer *o, Sensor **s)
 {
 	ObserverConfig c = {.track_bw=350};
     return observer_init_with_config(o, s, &c);
 }
 
-bool observer_init_with_config(Observer *o, Sensor *s, ObserverConfig *c)
+bool observer_init_with_config(Observer *o, Sensor **s, ObserverConfig *c)
 {
 	o->sensor_ptr = s;
 	o->config = *c;
@@ -52,8 +52,8 @@ void observer_set_bandwidth(Observer *o, float bw)
 
 void observers_init_with_defaults(void)
 {
-    observer_init_with_defaults(&commutation_observer, commutation_sensor_p);
-	observer_init_with_defaults(&position_observer, position_sensor_p);
+    observer_init_with_defaults(&commutation_observer, &commutation_sensor_p);
+	observer_init_with_defaults(&position_observer, &position_sensor_p);
 }
 
 void observers_get_config(ObserversConfig *config_)

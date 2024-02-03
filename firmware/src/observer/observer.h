@@ -34,7 +34,7 @@ typedef struct
 
 struct Observer {
 	ObserverConfig config;
-	Sensor *sensor_ptr;
+	Sensor **sensor_ptr;
 	int32_t pos_sector;
 	float pos_estimate_wrapped;
 	float vel_estimate;
@@ -50,8 +50,8 @@ typedef struct {
 Observer commutation_observer;
 Observer position_observer;
 
-bool observer_init_with_defaults(Observer *o, Sensor *s);
-bool observer_init_with_config(Observer *o, Sensor *s, ObserverConfig *c);
+bool observer_init_with_defaults(Observer *o, Sensor **s);
+bool observer_init_with_config(Observer *o, Sensor **s, ObserverConfig *c);
 
 float observer_get_bandwidth(Observer *o);
 void observer_set_bandwidth(Observer *o, float bw);
@@ -64,9 +64,9 @@ static inline void observer_update(Observer *o)
 {
 	if (o->current == false)
 	{
-		const float sensor_ticks = sensor_get_ticks(o->sensor_ptr);
+		const float sensor_ticks = sensor_get_ticks(*(o->sensor_ptr));
 		const float sensor_half_ticks = sensor_ticks * 0.5f;
-		const int32_t angle_meas = sensor_get_angle_rectified(o->sensor_ptr);
+		const int32_t angle_meas = sensor_get_angle_rectified(*(o->sensor_ptr));
 		const float delta_pos_est = PWM_PERIOD_S * o->vel_estimate;
 		float delta_pos_meas = angle_meas - o->pos_estimate_wrapped;
 		if (delta_pos_meas < -sensor_half_ticks)
@@ -102,13 +102,13 @@ static inline void observer_invalidate(Observer *o)
 
 static inline float observer_get_pos_estimate(Observer *o)
 {
-	const float primary = sensor_get_ticks(o->sensor_ptr) * o->pos_sector;
+	const float primary = sensor_get_ticks(*(o->sensor_ptr)) * o->pos_sector;
 	return primary + o->pos_estimate_wrapped;
 }
 
 static inline float observer_get_diff(Observer *o, float target)
 {
-	const float primary = sensor_get_ticks(o->sensor_ptr) * o->pos_sector;
+	const float primary = sensor_get_ticks(*(o->sensor_ptr)) * o->pos_sector;
 	const float diff_sector = target - primary;
 	return diff_sector - o->pos_estimate_wrapped;
 }
@@ -120,7 +120,7 @@ static inline float observer_get_vel_estimate(Observer *o)
 
 static inline float observer_get_epos(Observer *o)
 {
-	if (SENSOR_TYPE_HALL == o->sensor_ptr->config.type)
+	if (SENSOR_TYPE_HALL == (*(o->sensor_ptr))->config.type)
 	{
 		return o->pos_estimate_wrapped * twopi_by_hall_sectors;
 	}
@@ -129,7 +129,7 @@ static inline float observer_get_epos(Observer *o)
 
 static inline float observer_get_evel(Observer *o)
 {
-	if (SENSOR_TYPE_HALL == o->sensor_ptr->config.type)
+	if (SENSOR_TYPE_HALL == (*(o->sensor_ptr))->config.type)
 	{
 		return o->vel_estimate * twopi_by_hall_sectors;
 	}
