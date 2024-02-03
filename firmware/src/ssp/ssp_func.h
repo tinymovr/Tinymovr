@@ -16,6 +16,13 @@
 
 #include "src/common.h"
 
+// SPI mode Clock polarity  Clock phase
+//          (CPOL)          (CPHA)	
+// 0	    0              	0	
+// 1	    0	            1	
+// 2	    1	            0	
+// 3	    1	            1	
+
 #define DF_SSP_BUSY_TICK (25000u)    // use to check the busy tick
 
 // Interrupt Enable Enumeration Type
