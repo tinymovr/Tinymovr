@@ -74,6 +74,10 @@ remote_attributes:
     dtype: void
     arguments: []
     meta: {reload_data: True}
+  - name: config_size
+    summary: Size (in bytes) of the configuration object.
+    getter_name: system_get_config_size
+    dtype: uint32
   - name: scheduler
     remote_attributes:
       - name: errors

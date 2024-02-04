@@ -39,6 +39,8 @@ void system_reset(void);
 void system_enter_dfu(void);
 void system_reset_calibration(void);
 
+extern const uint32_t config_size;
+
 static inline uint8_t system_get_fw_version_string(char *buffer)
 {
     const uint8_t size = fminf(sizeof(GIT_VERSION), 8);
@@ -54,6 +56,11 @@ static inline uint32_t system_get_uid(void)
 static inline uint32_t system_get_hw_revision(void)
 {
     return BOARD_REV_IDX;
+}
+
+static inline uint32_t system_get_config_size(void)
+{
+    return config_size;
 }
 
 void system_reset_calibration(void);

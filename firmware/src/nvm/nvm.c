@@ -23,6 +23,8 @@
 
 static struct NVMStruct s;
 
+const uint32_t config_size = sizeof(struct NVMStruct);
+
 bool nvm_save_config(void)
 {
 	bool commited = false;

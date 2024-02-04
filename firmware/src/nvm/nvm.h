@@ -41,6 +41,8 @@ struct NVMStruct {
     char version[16];
 };
 
+extern const uint32_t config_size;
+
 bool nvm_save_config(void);
 bool nvm_load_config(void);
 void nvm_erase(void);
