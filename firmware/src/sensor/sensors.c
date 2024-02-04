@@ -34,8 +34,19 @@ bool sensor_init_with_defaults(Sensor *s)
             return ma7xx_init_with_port(s, ONBOARD_SENSOR_SSP_PORT, ONBOARD_SENSOR_SSP_STRUCT);
             break;
         case SENSOR_CONNECTION_EXTERNAL_SPI:
-            ma7xx_make_blank_sensor(s);
-            return ma7xx_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT);
+            switch (s->config.type)
+            {
+                case SENSOR_TYPE_MA7XX:
+                    ma7xx_make_blank_sensor(s);
+                    return ma7xx_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT);
+                    break;
+                case SENSOR_TYPE_AS5047:
+                    as5047p_make_blank_sensor(s);
+                    return as5047p_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT);
+                    break;
+                default:
+                    break;
+            }
             break;
         case SENSOR_CONNECTION_HALL:
             hall_make_blank_sensor(s);
@@ -151,9 +162,12 @@ void sensor_external_spi_set_type_avlos(sensors_setup_external_spi_type_options 
         && (internal_type != sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type))
     {
         Sensor *s = &(sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor);
-        s->deinit_func(s);
+        if (s->initialized)
+        {
+            s->deinit_func(s);
+        }
         sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type = internal_type;
-        sensors_init_with_defaults();
+        sensor_init_with_defaults(s);
     }
 }
 

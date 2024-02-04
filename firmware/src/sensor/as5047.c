@@ -72,3 +72,8 @@ bool as5047p_calibrate(Sensor *s, Observer *o)
 {
     return sensor_calibrate_direction_and_pole_pair_count(s, o) && sensor_calibrate_offset_and_rectification(s, o);
 }
+
+void as5047p_get_ss_config(Sensor *s, void* buffer)
+{
+
+}

@@ -598,6 +598,26 @@ void SSPD_IO_Select_PG4567(SSP_MS_TYPE ms_mode)
     PAC55XX_SCC->PGMUXSEL.w |= 0x55550000;                      // Set Port Pin as SSP
 }
 
+// void SSPD_IO_Select_PD45PF45(SSP_MS_TYPE ms_mode)
+// {
+//     if (ms_mode == SSP_MS_MASTER)
+//     {
+//         PAC55XX_GPIOD->MODE.P4 = IO_PUSH_PULL_OUTPUT;           // MOSI
+//         PAC55XX_GPIOD->MODE.P5 = IO_HIGH_IMPEDENCE_INPUT;       // MISO
+//         PAC55XX_GPIOF->MODE.P4 = IO_PUSH_PULL_OUTPUT;           // SCLK
+//         PAC55XX_GPIOF->MODE.P5 = IO_PUSH_PULL_OUTPUT;           // SS
+
+//         PAC55XX_SCC->PDPUEN.P4 = 0;
+//         PAC55XX_SCC->PDPUEN.P5 = 1;
+//         PAC55XX_SCC->PFPUEN.P4 = 0;
+//         PAC55XX_SCC->PFPUEN.P5 = 0;
+//     }
+//     PAC55XX_SCC->PDMUXSEL.w &= 0xFFFF00FF;                      // Clear Port Pin selection
+//     PAC55XX_SCC->PDMUXSEL.w |= 0x00007700;                      // Set Port Pin as SSP
+//     PAC55XX_SCC->PFMUXSEL.w &= 0xFFFF00FF;                      // Clear Port Pin selection
+//     PAC55XX_SCC->PFMUXSEL.w |= 0x00005500;                      // Set Port Pin as SSP
+// }
+
 //==============================================================================
 ///@brief
 ///     Choose the SSP and Enable the IO you want
@@ -641,9 +661,9 @@ void ssp_io_config(SSP_TYPE ssp, SSP_MS_TYPE ms_mode)
 
         case SSPD:
             // Select ssp D peripheral choose one!
-            SSPD_IO_Select_PD4567(ms_mode);
+//            SSPD_IO_Select_PD4567(ms_mode);
 //            SSPD_IO_Select_PE4567(ms_mode);
-//            SSPD_IO_Select_PF4567(ms_mode);
+            SSPD_IO_Select_PF4567(ms_mode);
 //            SSPD_IO_Select_PG0123(ms_mode);
 //            SSPD_IO_Select_PG4567(ms_mode);
             break;

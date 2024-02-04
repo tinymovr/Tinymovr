@@ -158,3 +158,13 @@ static inline uint8_t sensor_hall_get_errors(void)
 {
     return sensors[SENSOR_CONNECTION_HALL].sensor.get_errors_func(&(sensors[SENSOR_CONNECTION_HALL].sensor));
 }
+
+static inline int32_t sensor_commutation_get_raw_angle(void)
+{
+    return commutation_sensor_p->get_raw_angle_func(commutation_sensor_p);
+}
+
+static inline int32_t sensor_position_get_raw_angle(void)
+{
+    return position_sensor_p->get_raw_angle_func(position_sensor_p);
+}

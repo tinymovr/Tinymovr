@@ -49,6 +49,7 @@ bool as5047p_init_with_config(Sensor *s, const AS5047PSensorConfig *c);
 void as5047p_deinit(Sensor *s);
 void as5047p_reset(Sensor *s);
 bool as5047p_calibrate(Sensor *s, Observer *o);
+void as5047p_get_ss_config(Sensor *s, void* buffer);
 
 static inline bool as5047p_is_calibrated(const Sensor *s)
 {
@@ -73,7 +74,8 @@ static inline int32_t as5047p_get_raw_angle(const Sensor *s)
 static inline void as5047p_update(Sensor *s, bool check_error)
 {
     AS5047PSensor *as = (AS5047PSensor *)s;
-    const int32_t angle = ssp_read_one(as->config.ssp_struct) & 0x3FFF; // Mask to get the angle value
+    volatile uint16_t read_value = ssp_read_one(as->config.ssp_struct);
+    const int32_t angle = read_value & 0x3FFF; // Mask to get the angle value
     if (check_error)
     {
     	const int32_t delta = as->angle - angle;
