@@ -238,6 +238,9 @@ class OptionsTreeWidgetItem(EdgeTreeWidgetItem):
         )
         self.treeWidget().setItemWidget(self, 1, self.combo_box_container)
 
+    def set_text(self, value):
+        self.combo_box_container.combo.setCurrentIndex(self._tm_node.options[value])
+
     @QtCore.Slot()
     def _on_combobox_changed(self, index):
         self._tm_node.set_value(index)
