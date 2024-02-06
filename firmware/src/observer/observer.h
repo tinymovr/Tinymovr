@@ -29,7 +29,6 @@ typedef struct
 	float track_bw;
 	float kp;
 	float ki;
-	uint8_t sensor_id;
 } ObserverConfig;
 
 struct Observer {
@@ -102,7 +101,7 @@ static inline void observer_invalidate(Observer *o)
 
 static inline float observer_get_pos_estimate(Observer *o)
 {
-	const float primary = sensor_get_ticks(*(o->sensor_ptr)) * o->pos_sector;
+	const float primary = ((int32_t)sensor_get_ticks(*(o->sensor_ptr))) * o->pos_sector;
 	return primary + o->pos_estimate_wrapped;
 }
 
