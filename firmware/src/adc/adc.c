@@ -17,6 +17,7 @@
 
 #include <math.h>
 #include <string.h>
+#include <src/can/can_endpoints.h>
 #include <src/motor/motor.h>
 #include <src/controller/controller.h>
 #include <src/adc/adc.h>
@@ -265,13 +266,13 @@ TM_RAMFUNC void ADC_update(void)
 {
     switch (controller_get_state())
     {
-        case STATE_CALIBRATE:
+        case CONTROLLER_STATE_CALIBRATE:
         {
             adc_config.I_phase_offset.A += (((float)PAC55XX_ADC->DTSERES6.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.A) * adc_state.I_phase_offset_D;
             adc_config.I_phase_offset.B += (((float)PAC55XX_ADC->DTSERES8.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.B) * adc_state.I_phase_offset_D;
             adc_config.I_phase_offset.C += (((float)PAC55XX_ADC->DTSERES10.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.C) * adc_state.I_phase_offset_D;
         }
-        case STATE_CL_CONTROL:
+        case CONTROLLER_STATE_CL_CONTROL:
         {
             const float i_a = (((float)PAC55XX_ADC->DTSERES14.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.A);
             const float i_b = (((float)PAC55XX_ADC->DTSERES16.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.B);

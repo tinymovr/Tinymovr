@@ -5,10 +5,12 @@ generators:
   generator_c:
     enabled: true
     paths:
+      output_enums: ./firmware/src/tm_enums.h
       output_header: ./firmware/src/can/can_endpoints.h
       output_impl: ./firmware/src/can/can_endpoints.c
     header_includes:
     - src/common.h
+    - src/tm_enums.h
     impl_includes:
     - <string.h>
     - src/adc/adc.h

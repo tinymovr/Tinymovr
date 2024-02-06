@@ -88,13 +88,13 @@ remote_attributes:
   - name: controller
     remote_attributes:
       - name: state
-        dtype: uint8
+        options: [IDLE, CALIBRATE, CL_CONTROL]
         meta: {dynamic: True}
         getter_name: controller_get_state
         setter_name: controller_set_state
         summary: The state of the controller.
       - name: mode
-        dtype: uint8
+        options: [CURRENT, VELOCITY, POSITION, TRAJECTORY, HOMING]
         meta: {dynamic: True}
         getter_name: controller_get_mode
         setter_name: controller_set_mode

@@ -20,11 +20,11 @@ static HomingPlannerState state = {0};
 
 bool homing_planner_home(void)
 {
-    if (!errors_exist() && controller_get_mode() != CTRL_HOMING)
+    if (!errors_exist() && controller_get_mode() != CONTROLLER_MODE_HOMING)
     {
         state.stay_t_current = 0;
         state.home_t_current = 0;
-        controller_set_mode(CTRL_HOMING);
+        controller_set_mode(CONTROLLER_MODE_HOMING);
         state.warnings = HOMING_WARNINGS_NONE;
         return true;
     }

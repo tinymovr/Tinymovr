@@ -36,18 +36,18 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
         controller_set_Iq_setpoint_user_frame(0);
         controller_set_vel_setpoint_user_frame(0);
         controller_set_pos_setpoint_user_frame(data);
-        controller_set_mode(CTRL_POSITION);
+        controller_set_mode(CONTROLLER_MODE_POSITION);
         break;
 
     case 'V': // vel setpoint
         controller_set_Iq_setpoint_user_frame(0);
         controller_set_vel_setpoint_user_frame(data);
-        controller_set_mode(CTRL_VELOCITY);
+        controller_set_mode(CONTROLLER_MODE_VELOCITY);
         controller_set_vel_setpoint_user_frame((float)data);
         break;
 
     case 'I': // current setpoint
-        controller_set_mode(CTRL_CURRENT);
+        controller_set_mode(CONTROLLER_MODE_CURRENT);
         controller_set_Iq_setpoint_user_frame((float)data * ONE_OVER_UART_I_SCALING_FACTOR);
         break;
 
@@ -181,15 +181,15 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
     case 'Q': // calibrate
-        controller_set_state(STATE_CALIBRATE);
+        controller_set_state(CONTROLLER_STATE_CALIBRATE);
         break;
 
     case 'A': // closed loop
-        controller_set_state(STATE_CL_CONTROL);
+        controller_set_state(CONTROLLER_STATE_CL_CONTROL);
         break;
 
     case 'Z': // idle
-        controller_set_state(STATE_IDLE);
+        controller_set_state(CONTROLLER_STATE_IDLE);
         break;
 
     case 'R': // reset mcu

@@ -40,7 +40,7 @@ bool nvm_save_config(void)
 	s.traj_planner_config = *traj_planner_get_config();
 	strlcpy(s.version, GIT_VERSION, sizeof(s.version));
 	memcpy(data, &s, sizeof(struct NVMStruct));
-	if (STATE_IDLE == controller_get_state())
+	if (CONTROLLER_STATE_IDLE == controller_get_state())
 	{
 		uint8_t *dataBuffer = data;
 		__disable_irq();
@@ -75,7 +75,7 @@ bool nvm_load_config(void)
 
 void nvm_erase(void)
 {
-	if (STATE_IDLE == controller_get_state())
+	if (CONTROLLER_STATE_IDLE == controller_get_state())
 	{
 		flash_erase_page(SETTINGS_PAGE);
 		system_reset();

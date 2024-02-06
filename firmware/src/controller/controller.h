@@ -19,30 +19,14 @@
 #define CONTROLLER_CONTROLLER_H_
 
 #include <src/common.h>
+#include <src/tm_enums.h>
 #include <src/controller/trajectory_planner.h>
 #include <src/controller/homing_planner.h>
 
-typedef enum
-{
-    STATE_IDLE = 0,
-    STATE_CALIBRATE = 1,
-    STATE_CL_CONTROL = 2
-} ControlState;
-
-typedef enum
-{
-    CTRL_CURRENT = 0,
-    CTRL_VELOCITY = 1,
-    CTRL_POSITION = 2,
-    CTRL_TRAJECTORY = 3,
-    CTRL_HOMING = 4
-} ControlMode;
-
 typedef struct
 {
-    // TODO: State.state is very confusing, name appropriately
-    ControlState state;
-    ControlMode mode;
+    controller_state_options state;
+    controller_mode_options mode;
     uint8_t warnings;
     uint8_t errors;
     bool is_calibrating;
@@ -85,17 +69,17 @@ typedef struct
 
 void Controller_ControlLoop(void);
 
-ControlState controller_get_state(void);
-void controller_set_state(ControlState new_state);
+controller_state_options controller_get_state(void);
+void controller_set_state(controller_state_options new_state);
 
-ControlMode controller_get_mode(void);
-void controller_set_mode(ControlMode mode);
+controller_mode_options controller_get_mode(void);
+void controller_set_mode(controller_mode_options mode);
 
-inline void controller_calibrate(void) {controller_set_state(STATE_CALIBRATE);}
-inline void controller_idle(void) {controller_set_state(STATE_IDLE);}
-inline void controller_position_mode(void) {controller_set_mode(CTRL_POSITION);controller_set_state(STATE_CL_CONTROL);}
-inline void controller_velocity_mode(void) {controller_set_mode(CTRL_VELOCITY);controller_set_state(STATE_CL_CONTROL);}
-inline void controller_current_mode(void) {controller_set_mode(CTRL_CURRENT);controller_set_state(STATE_CL_CONTROL);}
+inline void controller_calibrate(void) {controller_set_state(CONTROLLER_STATE_CALIBRATE);}
+inline void controller_idle(void) {controller_set_state(CONTROLLER_STATE_IDLE);}
+inline void controller_position_mode(void) {controller_set_mode(CONTROLLER_MODE_POSITION);controller_set_state(CONTROLLER_STATE_CL_CONTROL);}
+inline void controller_velocity_mode(void) {controller_set_mode(CONTROLLER_MODE_VELOCITY);controller_set_state(CONTROLLER_STATE_CL_CONTROL);}
+inline void controller_current_mode(void) {controller_set_mode(CONTROLLER_MODE_CURRENT);controller_set_state(CONTROLLER_STATE_CL_CONTROL);}
 
 float controller_get_pos_setpoint_user_frame(void);
 void controller_set_pos_setpoint_user_frame(float value);

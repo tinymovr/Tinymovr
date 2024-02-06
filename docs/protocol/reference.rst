@@ -233,7 +233,13 @@ Type: uint8
 
 The state of the controller.
 
+Options: 
 
+- IDLE
+
+- CALIBRATE
+
+- CL_CONTROL
 
 controller.mode
 -------------------------------------------------------------------
@@ -246,7 +252,17 @@ Type: uint8
 
 The control mode of the controller.
 
+Options: 
 
+- CURRENT
+
+- VELOCITY
+
+- POSITION
+
+- TRAJECTORY
+
+- HOMING
 
 controller.warnings
 -------------------------------------------------------------------

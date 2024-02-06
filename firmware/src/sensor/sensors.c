@@ -158,7 +158,7 @@ void sensor_external_spi_set_type_avlos(sensors_setup_external_spi_type_options 
             break;
     }
     if (valid 
-        && (controller_get_state() == STATE_IDLE)
+        && (controller_get_state() == CONTROLLER_STATE_IDLE)
         && (internal_type != sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type))
     {
         Sensor *s = &(sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor);
@@ -173,7 +173,7 @@ void sensor_external_spi_set_type_avlos(sensors_setup_external_spi_type_options 
 
 void sensor_set_connection(Sensor** target_sensor, Sensor** other_sensor, sensor_connection_t new_connection)
 {
-    if (controller_get_state() == STATE_IDLE
+    if (controller_get_state() == CONTROLLER_STATE_IDLE
         && new_connection != sensor_get_connection(*target_sensor) 
         && new_connection >= 0 && new_connection < SENSOR_CONNECTION_MAX)
     {

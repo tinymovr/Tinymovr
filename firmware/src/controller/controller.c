@@ -34,8 +34,8 @@ static inline bool Controller_LimitVelocity(float min_limit, float max_limit, fl
 static MotionPlan motion_plan;
 static ControllerState state = {
 
-    .state = STATE_IDLE,
-    .mode = CTRL_CURRENT,
+    .state = CONTROLLER_STATE_IDLE,
+    .mode = CONTROLLER_MODE_CURRENT,
     .errors = CONTROLLER_ERRORS_NONE,
     .is_calibrating = false,
 
@@ -112,26 +112,26 @@ void Controller_ControlLoop(void)
         {
             state.errors |= CONTROLLER_ERRORS_CURRENT_LIMIT_EXCEEDED;
         }
-        if (errors_exist() && (state.state != STATE_IDLE))
+        if (errors_exist() && (state.state != CONTROLLER_STATE_IDLE))
         {
-            controller_set_state(STATE_IDLE);
+            controller_set_state(CONTROLLER_STATE_IDLE);
         }
 
-        if (state.state == STATE_CALIBRATE)
+        if (state.state == CONTROLLER_STATE_CALIBRATE)
         {
             state.is_calibrating = true;
             system_reset_calibration();
             (void)(ADC_calibrate_offset() && motor_calibrate_resistance() && motor_calibrate_inductance());
             (void)(sensors_calibrate());
             state.is_calibrating = false;
-            controller_set_state(STATE_IDLE); 
+            controller_set_state(CONTROLLER_STATE_IDLE); 
         }
-        else if (state.state == STATE_CL_CONTROL)
+        else if (state.state == CONTROLLER_STATE_CL_CONTROL)
         {
             // Check the watchdog and revert to idle if it has timed out
             if (Watchdog_triggered())
             {
-                controller_set_state(STATE_IDLE);
+                controller_set_state(CONTROLLER_STATE_IDLE);
                 Watchdog_reset();
             }
             else
@@ -151,22 +151,22 @@ TM_RAMFUNC void CLControlStep(void)
 {
     switch (state.mode)
     {
-        case CTRL_TRAJECTORY:
+        case CONTROLLER_MODE_TRAJECTORY:
         state.t_plan += PWM_PERIOD_S;
         // This will set state.pos_setpoint state.vel_setpoint (in user frame)
         if (!traj_planner_evaluate(state.t_plan, &motion_plan))
         {
             // Drop to position mode on error or completion
-            controller_set_mode(CTRL_POSITION);
+            controller_set_mode(CONTROLLER_MODE_POSITION);
             state.t_plan = 0;
         }
         break;
-        case CTRL_HOMING:
+        case CONTROLLER_MODE_HOMING:
         // This will set state.pos_setpoint state.vel_setpoint (in user frame)
         if (!homing_planner_evaluate())
         {
             // Drop to position mode on error or completion
-            controller_set_mode(CTRL_POSITION);
+            controller_set_mode(CONTROLLER_MODE_POSITION);
         }
         break;
         default: break;
@@ -190,7 +190,7 @@ TM_RAMFUNC void CLControlStep(void)
     float vel_setpoint = state.vel_ramp_setpoint ;
     float vel_setpoint_integrator = state.vel_ramp_setpoint ;
 
-    if (state.mode >= CTRL_POSITION)
+    if (state.mode >= CONTROLLER_MODE_POSITION)
     {
         const float delta_pos = observer_get_diff(&position_observer, state.pos_setpoint);
         const float delta_pos_integrator = sgnf(delta_pos) * our_fmaxf(0, fabsf(delta_pos) - config.vel_integrator_deadband);
@@ -201,7 +201,7 @@ TM_RAMFUNC void CLControlStep(void)
     const float vel_estimate = observer_get_vel_estimate(&position_observer);
     float Iq_setpoint = state.Iq_setpoint;
 
-    if (state.mode >= CTRL_VELOCITY)
+    if (state.mode >= CONTROLLER_MODE_VELOCITY)
     {
         const float delta_vel = vel_setpoint - vel_estimate;
         const float delta_vel_integrator = vel_setpoint_integrator - vel_estimate;
@@ -305,64 +305,64 @@ TM_RAMFUNC void CLControlStep(void)
 }
 
 
-TM_RAMFUNC ControlState controller_get_state(void)
+TM_RAMFUNC controller_state_options controller_get_state(void)
 {
     return state.state;
 }
 
-TM_RAMFUNC void controller_set_state(ControlState new_state)
+TM_RAMFUNC void controller_set_state(controller_state_options new_state)
 {
     if ((new_state != state.state) && (false == state.is_calibrating))
     {
-        if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE) && (!errors_exist()) && motor_get_calibrated())
+        if ((new_state == CONTROLLER_STATE_CL_CONTROL) && (state.state == CONTROLLER_STATE_IDLE) && (!errors_exist()) && motor_get_calibrated())
         {
             state.pos_setpoint = observer_get_pos_estimate(&position_observer);
             gate_driver_enable();
-            state.state = STATE_CL_CONTROL;
+            state.state = CONTROLLER_STATE_CL_CONTROL;
         }
-        else if ((new_state == STATE_CALIBRATE) && (state.state == STATE_IDLE) && (!errors_exist()))
+        else if ((new_state == CONTROLLER_STATE_CALIBRATE) && (state.state == CONTROLLER_STATE_IDLE) && (!errors_exist()))
         {
             gate_driver_enable();
-            state.state = STATE_CALIBRATE;
+            state.state = CONTROLLER_STATE_CALIBRATE;
         }
-        else // state != STATE_IDLE --> Got to idle state anyway
+        else // state != CONTROLLER_STATE_IDLE --> Got to idle state anyway
         {
             gate_driver_set_duty_cycle(&three_phase_zero);
             gate_driver_disable();
-            state.state = STATE_IDLE;
+            state.state = CONTROLLER_STATE_IDLE;
         }
     }
 }
 
-TM_RAMFUNC ControlMode controller_get_mode(void)
+TM_RAMFUNC controller_mode_options controller_get_mode(void)
 {
     return state.mode;
 }
 
-TM_RAMFUNC void controller_set_mode(ControlMode new_mode)
+TM_RAMFUNC void controller_set_mode(controller_mode_options new_mode)
 {
     if (new_mode != state.mode)
     {
         switch (new_mode)
         {
-            case CTRL_HOMING:
-            state.mode = CTRL_HOMING;
+            case CONTROLLER_MODE_HOMING:
+            state.mode = CONTROLLER_MODE_HOMING;
             break;
 
-            case CTRL_TRAJECTORY:
-            state.mode = CTRL_TRAJECTORY;
+            case CONTROLLER_MODE_TRAJECTORY:
+            state.mode = CONTROLLER_MODE_TRAJECTORY;
             break;
 
-            case CTRL_POSITION:
-            state.mode = CTRL_POSITION;
+            case CONTROLLER_MODE_POSITION:
+            state.mode = CONTROLLER_MODE_POSITION;
             break;
 
-            case CTRL_VELOCITY:
-            state.mode = CTRL_VELOCITY;
+            case CONTROLLER_MODE_VELOCITY:
+            state.mode = CONTROLLER_MODE_VELOCITY;
             break;
 
-            case CTRL_CURRENT:
-            state.mode = CTRL_CURRENT;
+            case CONTROLLER_MODE_CURRENT:
+            state.mode = CONTROLLER_MODE_CURRENT;
             break;
 
             default:
