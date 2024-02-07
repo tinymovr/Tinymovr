@@ -21,12 +21,6 @@
 #include <src/ssp/ssp_func.h>
 #include <src/motor/motor.h>
 
-#define MAX_ALLOWED_DELTA     (ENCODER_TICKS / 6)
-#define MAX_ALLOWED_DELTA_ADD (MAX_ALLOWED_DELTA + ENCODER_TICKS)
-#define MAX_ALLOWED_DELTA_SUB (MAX_ALLOWED_DELTA - ENCODER_TICKS)
-#define MIN_ALLOWED_DELTA_ADD (-MAX_ALLOWED_DELTA + ENCODER_TICKS)
-#define MIN_ALLOWED_DELTA_SUB (-MAX_ALLOWED_DELTA - ENCODER_TICKS)
-
 #if defined BOARD_REV_R3
 #define ONBOARD_SENSOR_SSP_PORT SSPD
 #define ONBOARD_SENSOR_SSP_STRUCT PAC55XX_SSPD
@@ -96,7 +90,7 @@ bool sensor_calibrate_direction_and_pole_pair_count(Sensor *s, Observer *o);
 
 static inline int32_t sensor_get_angle_rectified(const Sensor *s)
 {
-    const uint8_t offset_bits = (ENCODER_BITS - ECN_BITS);
+    const uint8_t offset_bits = (sensor_get_bits(s) - ECN_BITS);
     const int32_t angle = s->get_raw_angle_func(s);
     const int32_t off_1 = s->config.rec_table[angle>>offset_bits];
 	const int32_t off_2 = s->config.rec_table[((angle>>offset_bits) + 1) % ECN_SIZE];

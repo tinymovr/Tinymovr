@@ -21,6 +21,14 @@
 #include <src/can/can_endpoints.h>
 #include <src/sensor/sensor.h>
 
+#define AS5047_BITS (14) // The bits we READ, not the advertised resolution
+#define AS5047_TICKS (1 << AS5047_BITS)
+#define AS5047_MAX_ALLOWED_DELTA     (AS5047_TICKS / 6)
+#define AS5047_MAX_ALLOWED_DELTA_ADD (AS5047_MAX_ALLOWED_DELTA + AS5047_TICKS)
+#define AS5047_MAX_ALLOWED_DELTA_SUB (AS5047_MAX_ALLOWED_DELTA - AS5047_TICKS)
+#define AS5047_MIN_ALLOWED_DELTA_ADD (-AS5047_MAX_ALLOWED_DELTA + AS5047_TICKS)
+#define AS5047_MIN_ALLOWED_DELTA_SUB (-AS5047_MAX_ALLOWED_DELTA - AS5047_TICKS)
+
 typedef struct Observer Observer;
 
 typedef enum {
@@ -79,9 +87,9 @@ static inline void as5047p_update(Sensor *s, bool check_error)
     if (check_error)
     {
     	const int32_t delta = as->angle - angle;
-		if ( ((delta > MAX_ALLOWED_DELTA) || (delta < -MAX_ALLOWED_DELTA)) &&
-		     ((delta > MAX_ALLOWED_DELTA_ADD) || (delta < MIN_ALLOWED_DELTA_ADD)) &&
-		     ((delta > MAX_ALLOWED_DELTA_SUB) || (delta < MIN_ALLOWED_DELTA_SUB)) )
+		if ( ((delta > AS5047_MAX_ALLOWED_DELTA) || (delta < -AS5047_MAX_ALLOWED_DELTA)) &&
+		     ((delta > AS5047_MAX_ALLOWED_DELTA_ADD) || (delta < AS5047_MIN_ALLOWED_DELTA_ADD)) &&
+		     ((delta > AS5047_MAX_ALLOWED_DELTA_SUB) || (delta < AS5047_MIN_ALLOWED_DELTA_SUB)) )
 		{
             as->errors |= SENSORS_SETUP_ONBOARD_ERRORS_READING_UNSTABLE;
 		}

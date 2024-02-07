@@ -125,9 +125,10 @@
 
 #define TIMER_FREQ_HZ (ACLK_FREQ_HZ >> TXCTL_PS_DIV)
 
-#define ENCODER_BITS (16)
-#define ENCODER_TICKS (1 << ENCODER_BITS)
-#define ENCODER_TICKS_FLOAT ((float)(ENCODER_TICKS))
+#define SENSOR_COMMON_RES_BITS (13)
+#define SENSOR_COMMON_RES_TICKS (1 << SENSOR_COMMON_RES_BITS)
+#define SENSOR_COMMON_RES_HALF_TICKS (SENSOR_COMMON_RES_TICKS/2)
+#define SENSOR_COMMON_RES_TICKS_FLOAT ((float)(SENSOR_COMMON_RES_TICKS))
 
 #define HALL_SECTORS (6)
 #define HALL_SECTOR_ANGLE (TWOPI / HALL_SECTORS)
@@ -139,7 +140,7 @@ static const float threehalfpi = 4.7123889f;
 static const float pi = PI;
 static const float halfpi = PI * 0.5f;
 static const float quarterpi = PI * 0.25f;
-static const float twopi_by_enc_ticks = TWOPI / ENCODER_TICKS;
+static const float twopi_by_enc_ticks = TWOPI / SENSOR_COMMON_RES_TICKS;
 static const float twopi_by_hall_sectors = TWOPI / HALL_SECTORS;
 
 _Static_assert(TIMER_FREQ_HZ % (2*PWM_FREQ_HZ) == 0, "Timer frequency not an integer multiple of PWM frequency");

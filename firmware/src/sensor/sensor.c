@@ -33,13 +33,13 @@ bool sensor_calibrate_offset_and_rectification(Sensor *s, Observer *o)
     const int16_t n = ECN_SIZE * npp;
     const int16_t nconv = 100;
     const float delta = 2 * PI * npp / (n * nconv);
-    const float e_pos_to_ticks = ((float)ENCODER_TICKS) / (2 * PI * npp);
+    const float e_pos_to_ticks = ((float)SENSOR_COMMON_RES_TICKS) / (2 * PI * npp);
     float e_pos_ref = 0.f;
     const float I_setpoint = motor_get_I_cal();
     int16_t *lut = s->config.rec_table;
     set_epos_and_wait(e_pos_ref, I_setpoint);
     wait_pwm_cycles(5000);
-    const uint16_t offset_idx = (s->get_raw_angle_func(s)) >> (ENCODER_BITS - ECN_BITS);
+    const uint16_t offset_idx = (s->get_raw_angle_func(s)) >> (SENSOR_COMMON_RES_BITS - ECN_BITS);
 
     for (uint32_t i = 0; i < n; i++)
     {
@@ -113,7 +113,7 @@ bool sensor_calibrate_direction_and_pole_pair_count(Sensor *s, Observer *o)
     set_epos_and_wait(epos_target, I_setpoint);
     wait_pwm_cycles(CAL_STAY_LEN);
     // Find pole pairs
-    if (!motor_find_pole_pairs(ENCODER_TICKS, epos_start, observer_get_pos_estimate(o), epos_target))
+    if (!motor_find_pole_pairs(SENSOR_COMMON_RES_TICKS, epos_start, observer_get_pos_estimate(o), epos_target))
     {
         uint8_t *error_ptr = motor_get_error_ptr();
         *error_ptr |= MOTOR_ERRORS_INVALID_POLE_PAIRS;

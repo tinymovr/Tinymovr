@@ -21,6 +21,14 @@
 #include <src/can/can_endpoints.h>
 #include <src/sensor/sensor.h>
 
+#define MA7XX_BITS (16) // The bits we READ, not the advertised resolution
+#define MA7XX_TICKS (1 << MA7XX_BITS)
+#define MA7XX_MAX_ALLOWED_DELTA     (MA7XX_TICKS / 6)
+#define MA7XX_MAX_ALLOWED_DELTA_ADD (MA7XX_MAX_ALLOWED_DELTA + MA7XX_TICKS)
+#define MA7XX_MAX_ALLOWED_DELTA_SUB (MA7XX_MAX_ALLOWED_DELTA - MA7XX_TICKS)
+#define MA7XX_MIN_ALLOWED_DELTA_ADD (-MA7XX_MAX_ALLOWED_DELTA + MA7XX_TICKS)
+#define MA7XX_MIN_ALLOWED_DELTA_SUB (-MA7XX_MAX_ALLOWED_DELTA - MA7XX_TICKS)
+
 typedef struct Observer Observer;
 
 typedef enum {
@@ -80,9 +88,9 @@ static inline void ma7xx_update(Sensor *s, bool check_error)
     if (check_error)
     {
     	const int32_t delta = ms->angle - angle;
-		if ( ((delta > MAX_ALLOWED_DELTA) || (delta < -MAX_ALLOWED_DELTA)) &&
-		     ((delta > MAX_ALLOWED_DELTA_ADD) || (delta < MIN_ALLOWED_DELTA_ADD)) &&
-		     ((delta > MAX_ALLOWED_DELTA_SUB) || (delta < MIN_ALLOWED_DELTA_SUB)) )
+		if ( ((delta > MA7XX_MAX_ALLOWED_DELTA) || (delta < -MA7XX_MAX_ALLOWED_DELTA)) &&
+		     ((delta > MA7XX_MAX_ALLOWED_DELTA_ADD) || (delta < MA7XX_MIN_ALLOWED_DELTA_ADD)) &&
+		     ((delta > MA7XX_MAX_ALLOWED_DELTA_SUB) || (delta < MA7XX_MIN_ALLOWED_DELTA_SUB)) )
 		{
             ms->errors |= SENSORS_SETUP_ONBOARD_ERRORS_READING_UNSTABLE;
 		}

@@ -23,8 +23,8 @@
 #include <src/controller/trajectory_planner.h>
 
 static TrajPlannerConfig config = {
-	.max_accel = ENCODER_TICKS_FLOAT,
-	.max_decel = ENCODER_TICKS_FLOAT,
+	.max_accel = SENSOR_COMMON_RES_TICKS_FLOAT,
+	.max_decel = SENSOR_COMMON_RES_TICKS_FLOAT,
 	.max_vel = 50000.0f,
 	.deltat_accel = 2.0f,
 	.deltat_decel = 2.0f,

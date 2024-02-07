@@ -63,30 +63,29 @@ static inline void observer_update(Observer *o)
 {
 	if (o->current == false)
 	{
-		const float sensor_ticks = sensor_get_ticks(*(o->sensor_ptr));
-		const float sensor_half_ticks = sensor_ticks * 0.5f;
-		const int32_t angle_meas = sensor_get_angle_rectified(*(o->sensor_ptr));
+		const float sensor_res_norm_factor = SENSOR_COMMON_RES_TICKS_FLOAT / sensor_get_ticks(*(o->sensor_ptr));
+		const float angle_meas = sensor_get_angle_rectified(*(o->sensor_ptr)) * sensor_res_norm_factor;
 		const float delta_pos_est = PWM_PERIOD_S * o->vel_estimate;
 		float delta_pos_meas = angle_meas - o->pos_estimate_wrapped;
-		if (delta_pos_meas < -sensor_half_ticks)
+		if (delta_pos_meas < -SENSOR_COMMON_RES_HALF_TICKS)
 		{
-			delta_pos_meas += sensor_ticks;
+			delta_pos_meas += SENSOR_COMMON_RES_TICKS;
 		}
-		else if (delta_pos_meas >= sensor_half_ticks)
+		else if (delta_pos_meas >= SENSOR_COMMON_RES_HALF_TICKS)
 		{
-			delta_pos_meas -= sensor_ticks;
+			delta_pos_meas -= SENSOR_COMMON_RES_TICKS;
 		}
 		const float delta_pos_error = delta_pos_meas - delta_pos_est;
 		const float incr_pos = delta_pos_est + (PWM_PERIOD_S * o->config.kp * delta_pos_error);
 		o->pos_estimate_wrapped += incr_pos;
 		if (o->pos_estimate_wrapped < 0)
 		{
-			o->pos_estimate_wrapped += sensor_ticks;
+			o->pos_estimate_wrapped += SENSOR_COMMON_RES_TICKS;
 			o->pos_sector -= 1;
 		}
-		else if (o->pos_estimate_wrapped >= sensor_ticks)
+		else if (o->pos_estimate_wrapped >= SENSOR_COMMON_RES_TICKS)
 		{
-			o->pos_estimate_wrapped -= sensor_ticks;
+			o->pos_estimate_wrapped -= SENSOR_COMMON_RES_TICKS;
 			o->pos_sector += 1;
 		}
 		o->vel_estimate += PWM_PERIOD_S * o->config.ki * delta_pos_error;
@@ -101,13 +100,13 @@ static inline void observer_invalidate(Observer *o)
 
 static inline float observer_get_pos_estimate(Observer *o)
 {
-	const float primary = ((int32_t)sensor_get_ticks(*(o->sensor_ptr))) * o->pos_sector;
+	const float primary = SENSOR_COMMON_RES_TICKS * o->pos_sector;
 	return primary + o->pos_estimate_wrapped;
 }
 
 static inline float observer_get_diff(Observer *o, float target)
 {
-	const float primary = sensor_get_ticks(*(o->sensor_ptr)) * o->pos_sector;
+	const float primary = SENSOR_COMMON_RES_TICKS * o->pos_sector;
 	const float diff_sector = target - primary;
 	return diff_sector - o->pos_estimate_wrapped;
 }

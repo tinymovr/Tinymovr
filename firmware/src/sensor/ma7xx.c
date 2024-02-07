@@ -26,7 +26,7 @@
 void ma7xx_make_blank_sensor(Sensor *s)
 {
     s->config.type = SENSOR_TYPE_MA7XX;
-    s->ticks = ENCODER_TICKS;
+    s->ticks = MA7XX_TICKS;
     s->is_calibrated_func = ma7xx_rec_is_calibrated;
     s->calibrate_func = ma7xx_calibrate;
     s->get_raw_angle_func = ma7xx_get_raw_angle;
