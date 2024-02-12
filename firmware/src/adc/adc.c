@@ -250,16 +250,8 @@ TM_RAMFUNC float ADC_get_mcu_temp(void)
 TM_RAMFUNC void ADC_get_phase_currents(FloatTriplet *phc)
 {
     phc->A = adc_state.I_phase_meas.A;
-    if (motor_phases_swapped())
-    {
-        phc->B = adc_state.I_phase_meas.C;
-        phc->C = adc_state.I_phase_meas.B;
-    }
-    else
-    {
-        phc->B = adc_state.I_phase_meas.B;
-        phc->C = adc_state.I_phase_meas.C;
-    }
+    phc->B = adc_state.I_phase_meas.B;
+    phc->C = adc_state.I_phase_meas.C;
 }
 
 TM_RAMFUNC void ADC_update(void)

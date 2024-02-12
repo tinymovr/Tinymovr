@@ -79,6 +79,7 @@ struct Sensor { // typedefd earlier
     sensor_prepare_func_t prepare_func;
     sensor_get_ss_config_func_t get_ss_config_func;
     sensor_get_errors_func_t get_errors_func;
+    uint8_t bits;
     uint32_t ticks;
     bool initialized : 1;
     bool current : 1;
@@ -87,16 +88,6 @@ struct Sensor { // typedefd earlier
 void sensor_reset(Sensor *s);
 bool sensor_calibrate_offset_and_rectification(Sensor *s, Observer *o);
 bool sensor_calibrate_direction_and_pole_pair_count(Sensor *s, Observer *o);
-
-static inline int32_t sensor_get_angle_rectified(const Sensor *s)
-{
-    const uint8_t offset_bits = (sensor_get_bits(s) - ECN_BITS);
-    const int32_t angle = s->get_raw_angle_func(s);
-    const int32_t off_1 = s->config.rec_table[angle>>offset_bits];
-	const int32_t off_2 = s->config.rec_table[((angle>>offset_bits) + 1) % ECN_SIZE];
-	const int32_t off_interp = off_1 + ((off_2 - off_1)* (angle - ((angle>>offset_bits)<<offset_bits))>>offset_bits);
-	return angle + off_interp;
-}
 
 static inline void sensor_update(Sensor *s, bool check_error)
 {
@@ -112,7 +103,12 @@ static inline void sensor_invalidate(Sensor *s)
     s->current = false;
 }
 
-static inline uint32_t sensor_get_ticks(Sensor *s)
+static inline uint8_t sensor_get_bits(const Sensor *s)
+{
+    return s->bits;
+}
+
+static inline uint32_t sensor_get_ticks(const Sensor *s)
 {
     return s->ticks;
 }
@@ -125,3 +121,12 @@ static inline void sensor_prepare(Sensor *s)
     }
 }
 
+static inline int32_t sensor_get_angle_rectified(const Sensor *s)
+{
+    const uint8_t offset_bits = (sensor_get_bits(s) - ECN_BITS);
+    const int32_t angle = s->get_raw_angle_func(s);
+    const int32_t off_1 = s->config.rec_table[angle>>offset_bits];
+	const int32_t off_2 = s->config.rec_table[((angle>>offset_bits) + 1) % ECN_SIZE];
+	const int32_t off_interp = off_1 + ((off_2 - off_1)* (angle - ((angle>>offset_bits)<<offset_bits))>>offset_bits);
+	return angle + off_interp;
+}

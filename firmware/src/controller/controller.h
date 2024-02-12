@@ -15,8 +15,7 @@
 //  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef CONTROLLER_CONTROLLER_H_
-#define CONTROLLER_CONTROLLER_H_
+#pragma once
 
 #include <src/common.h>
 #include <src/tm_enums.h>
@@ -32,19 +31,19 @@ typedef struct
     bool is_calibrating;
     FloatTriplet I_phase_meas;
     FloatTriplet modulation_values;
-    float Iq_est;
-    float Id_est;
+    float Iq_estimate;
+    float Id_estimate;
     float Ibus_est;
     float power_est;
-    float pos_setpoint;
-    float vel_setpoint;
+    float pos_setpoint; // expressed in position frame
+    float vel_setpoint; // expressed in position frame
     float vel_ramp_setpoint;
-    float Iq_setpoint;
-    float Id_setpoint;
-    float Vq_setpoint;
-    float vel_integrator_Iq;
-    float Iq_integrator_Vq;
-    float Id_integrator_Vd;
+    float Iq_setpoint; // expressed in commutation frame
+    float Id_setpoint; // expressed in commutation frame
+    float Vq_setpoint; // expressed in commutation frame
+    float vel_integrator;
+    float Iq_integrator;
+    float Id_integrator;
     float t_plan;
 } ControllerState;
 
@@ -55,12 +54,12 @@ typedef struct
     float I_limit;
     float pos_gain;
     float vel_gain;
-    float vel_integrator_gain;
-    float vel_integrator_deadband;
+    float vel_integral_gain;
+    float vel_integral_deadband;
     float I_bw;
     float I_gain;
-    float Iq_integrator_gain;
-    float Id_integrator_gain;
+    float Iq_integral_gain;
+    float Id_integral_gain;
     float I_k;
     float vel_increment;
     float max_Ibus_regen;
@@ -81,34 +80,31 @@ inline void controller_position_mode(void) {controller_set_mode(CONTROLLER_MODE_
 inline void controller_velocity_mode(void) {controller_set_mode(CONTROLLER_MODE_VELOCITY);controller_set_state(CONTROLLER_STATE_CL_CONTROL);}
 inline void controller_current_mode(void) {controller_set_mode(CONTROLLER_MODE_CURRENT);controller_set_state(CONTROLLER_STATE_CL_CONTROL);}
 
+float controller_get_Iq_estimate_user_frame(void);
+
 float controller_get_pos_setpoint_user_frame(void);
-void controller_set_pos_setpoint_user_frame(float value);
 float controller_get_vel_setpoint_user_frame(void);
+float controller_get_Iq_setpoint_user_frame(void);
+float controller_get_Id_setpoint_user_frame(void);
+
+void controller_set_pos_setpoint_user_frame(float value);
 void controller_set_vel_setpoint_user_frame(float value);
+void controller_set_Iq_setpoint_user_frame(float value);
 
 float controller_get_Iq_estimate(void);
-float controller_get_Iq_setpoint(void);
-void controller_set_Iq_setpoint(float value);
-
-float controller_get_Iq_estimate_user_frame(void);
-float controller_get_Iq_setpoint_user_frame(void);
-void controller_set_Iq_setpoint_user_frame(float value);
-float controller_get_Id_setpoint_user_frame(void);
 
 float controller_get_Vq_setpoint_user_frame(void);
 
 float controller_set_pos_vel_setpoints(float pos_setpoint, float vel_setpoint);
 
-void controller_get_modulation_values(FloatTriplet *dc);
-
 float controller_get_pos_gain(void);
 void controller_set_pos_gain(float gain);
 float controller_get_vel_gain(void);
 void controller_set_vel_gain(float gain);
-float controller_get_vel_integrator_gain(void);
-void controller_set_vel_integrator_gain(float gain);
-float controller_get_vel_integrator_deadband(void);
-void controller_set_vel_integrator_deadband(float gain);
+float controller_get_vel_integral_gain(void);
+void controller_set_vel_integral_gain(float gain);
+float controller_get_vel_integral_deadband(void);
+void controller_set_vel_integral_deadband(float gain);
 float controller_get_Iq_gain(void);
 float controller_get_I_bw(void);
 void controller_set_I_bw(float bw);
@@ -138,4 +134,3 @@ uint8_t controller_get_errors(void);
 ControllerConfig *controller_get_config(void);
 void controller_restore_config(ControllerConfig *config_);
 
-#endif /* CONTROLLER_CONTROLLER_H_ */

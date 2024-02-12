@@ -106,19 +106,6 @@ TM_RAMFUNC void system_update(void)
     {
         state.errors |= ERRORS_UNDERVOLTAGE;
     }
-    // const uint8_t drv_status = pac5xxx_tile_register_read(ADDR_STATDRV);
-    // if (drv_status > 0)
-    // {
-    //     state.errors |= ((drv_status & 0x56) << 1);
-    // }
-    // const uint8_t drv_fault = pac5xxx_tile_register_read(ADDR_DRV_FLT);
-    // if (drv_fault > 0)
-    // {
-    //     // We use 0x5 mask because we ignore CHARGE_PUMP_FAULT_STAT
-    //     // for the time being, as it seems to always be set, and
-    //     // ERRORS_DRVXX_DISABLE, as it seems to give spurious errors.
-    //     state.errors |= ((drv_fault & 0x5) << 1);
-    // }
 }
 
 void system_reset(void)
@@ -157,6 +144,17 @@ TM_RAMFUNC bool system_get_calibrated(void)
 TM_RAMFUNC uint8_t system_get_errors(void)
 {
     return state.errors;
+}
+
+TM_RAMFUNC uint8_t system_get_warnings(void)
+{
+    // As the user request rate is less than the update
+    // rate, and the warnings do not affect system integrity
+    // evaluation, it is better to fetch the registers per
+    // request
+    const uint8_t warnings = ((pac5xxx_tile_register_read(ADDR_STATDRV) & 0x56)) |
+                             ((pac5xxx_tile_register_read(ADDR_DRV_FLT) & 0x5));
+    return warnings;
 }
 
 TM_RAMFUNC bool errors_exist(void)

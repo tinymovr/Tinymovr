@@ -131,7 +131,7 @@ bool sensor_calibrate_direction_and_pole_pair_count(Sensor *s, Observer *o)
     gate_driver_set_duty_cycle(&three_phase_zero);
     if (success && epos_start > epos_end)
     {
-        motor_set_phases_swapped(true);
+        #warning IMPLEMENT THIS
     }
     return success;
 }

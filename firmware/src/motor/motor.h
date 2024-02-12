@@ -56,16 +56,12 @@ typedef struct
 	float phase_resistance;
 	float phase_inductance;
 
-	float user_offset;
-	float user_direction;
-
 	float I_cal;
 
 	bool resistance_calibrated;
 	bool inductance_calibrated;
 	bool poles_calibrated;
 
-	bool phases_swapped;
 	bool is_gimbal;
 } MotorConfig;
 
@@ -93,19 +89,10 @@ void motor_set_phase_R_and_L(float R, float L);
 float motor_get_I_cal(void);
 void motor_set_I_cal(float I);
 
-bool motor_phases_swapped(void);
-void motor_set_phases_swapped(bool swapped);
-
 bool motor_get_calibrated(void);
 
 bool motor_get_is_gimbal(void);
 void motor_set_is_gimbal(bool gimbal);
-
-float motor_get_user_offset(void);
-void motor_set_user_offset(float offset);
-
-int8_t motor_get_user_direction(void);
-void motor_set_user_direction(int8_t dir);
 
 uint8_t motor_get_errors(void);
 uint8_t *motor_get_error_ptr(void);

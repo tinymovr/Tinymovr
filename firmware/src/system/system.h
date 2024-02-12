@@ -67,6 +67,7 @@ void system_reset_calibration(void);
 float system_get_Vbus(void);
 bool system_get_calibrated(void);
 uint8_t system_get_errors(void);
+uint8_t system_get_warnings(void);
 bool errors_exist(void);
 
 #endif /* SYSTEM_SYSTEM_H_ */

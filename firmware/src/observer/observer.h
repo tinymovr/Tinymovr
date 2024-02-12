@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <src/common.h>
 #include <src/sensor/sensors.h>
+#include <src/xf1.h>
 
 typedef struct Observer Observer;
 
@@ -44,10 +45,27 @@ struct Observer {
 typedef struct {
     ObserverConfig config_commutation;
 	ObserverConfig config_position;
+	FrameTransformation position_sensor_to_user;
+	FrameTransformation user_to_position_sensor;
+	FrameTransformation position_sensor_to_commutation_sensor;
+	FrameTransformation commutation_sensor_to_position_sensor;
+	FrameTransformation commutation_sensor_to_user;
+	FrameTransformation user_to_commutation_sensor;
+	FrameTransformation commutation_sensor_to_motor;
+	FrameTransformation motor_to_commutation_sensor;
 } ObserversConfig;
 
 Observer commutation_observer;
 Observer position_observer;
+
+FrameTransformation position_sensor_to_user;
+FrameTransformation user_to_position_sensor;
+FrameTransformation position_sensor_to_commutation_sensor;
+FrameTransformation commutation_sensor_to_position_sensor;
+FrameTransformation commutation_sensor_to_user;
+FrameTransformation user_to_commutation_sensor;
+FrameTransformation commutation_sensor_to_motor;
+FrameTransformation motor_to_commutation_sensor;
 
 bool observer_init_with_defaults(Observer *o, Sensor **s);
 bool observer_init_with_config(Observer *o, Sensor **s, ObserverConfig *c);
@@ -134,17 +152,29 @@ static inline float observer_get_evel(Observer *o)
 	return o->vel_estimate * twopi_by_enc_ticks * motor_get_pole_pairs();
 }
 
-static inline float observer_get_pos_estimate_user_frame(Observer *o)
-{
-	return (observer_get_pos_estimate(o) - motor_get_user_offset()) * motor_get_user_direction();
-}
-
-static inline float observer_get_vel_estimate_user_frame(Observer *o)
-{
-	return o->vel_estimate * motor_get_user_direction();
-}
-
 // Interface functions
+
+static inline float get_position_observer_to_user_offset(void)
+{
+	return position_sensor_to_user.offset;
+}
+
+static inline float get_position_observer_to_user_multiplier(void)
+{
+	return position_sensor_to_user.multiplier;
+}
+
+static inline void set_position_observer_to_user_offset(float value)
+{
+	position_sensor_to_user.offset = value;
+	commutation_sensor_to_user = combine_transformations(&commutation_sensor_to_position_sensor, &position_sensor_to_user);
+}
+
+static inline void set_position_observer_to_user_multiplier(float value)
+{
+	position_sensor_to_user.offset = value;
+	commutation_sensor_to_user = combine_transformations(&commutation_sensor_to_position_sensor, &position_sensor_to_user);
+}
 
 static inline float commutation_observer_get_bandwidth(void)
 {
@@ -160,22 +190,32 @@ static inline float position_observer_get_bandwidth(void)
 
 void position_observer_set_bandwidth(float bw);
 
-static inline float commutation_observer_get_pos_estimate_user_frame(void)
+static inline float commutation_observer_get_pos_estimate(void)
 {
-	return observer_get_pos_estimate_user_frame(&commutation_observer);
+	return observer_get_pos_estimate(&commutation_observer);
 }
 
-static inline float commutation_observer_get_vel_estimate_user_frame(void)
+static inline float commutation_observer_get_vel_estimate(void)
 {
-	return observer_get_vel_estimate_user_frame(&commutation_observer);
+	return observer_get_vel_estimate(&commutation_observer);
 }
 
-static inline float position_observer_get_pos_estimate_user_frame(void)
+static inline float position_observer_get_pos_estimate(void)
 {
-	return observer_get_pos_estimate_user_frame(&position_observer);
+	return observer_get_pos_estimate(&position_observer);
 }
 
-static inline float position_observer_get_vel_estimate_user_frame(void)
+static inline float position_observer_get_vel_estimate(void)
 {
-	return observer_get_vel_estimate_user_frame(&position_observer);
+	return observer_get_vel_estimate(&position_observer);
+}
+
+static inline float user_frame_get_pos_estimate(void)
+{
+	return apply_transformation(observer_get_pos_estimate(&position_observer), &position_sensor_to_user);
+}
+
+static inline float user_frame_get_vel_estimate(void)
+{
+	return apply_velocity_transformation(observer_get_vel_estimate(&position_observer), &position_sensor_to_user);;
 }

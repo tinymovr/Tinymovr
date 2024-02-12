@@ -26,6 +26,7 @@
 void ma7xx_make_blank_sensor(Sensor *s)
 {
     s->config.type = SENSOR_TYPE_MA7XX;
+    s->bits = MA7XX_BITS;
     s->ticks = MA7XX_TICKS;
     s->is_calibrated_func = ma7xx_rec_is_calibrated;
     s->calibrate_func = ma7xx_calibrate;

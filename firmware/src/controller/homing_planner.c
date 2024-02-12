@@ -57,8 +57,10 @@ TM_RAMFUNC bool homing_planner_evaluate()
             if (state.stay_t_current >= config.max_stay_t)
             {
                 // First time the endstop is considered found, reset origins and setpoints
-                motor_set_user_offset(0);
-                motor_set_user_offset(observer_pos);
+                user_to_position_sensor.offset = observer_pos;
+                position_sensor_to_user = derive_inverse_transformation(&user_to_position_sensor);
+                user_to_commutation_sensor = combine_transformations(&user_to_position_sensor, &position_sensor_to_commutation_sensor);
+                commutation_sensor_to_user = derive_inverse_transformation(&user_to_commutation_sensor);
                 controller_set_pos_setpoint_user_frame(0);
                 controller_set_vel_setpoint_user_frame(0);
             }

@@ -19,6 +19,13 @@
 
 #include <src/sensor/sensor.h>
 
+#define HALL_BITS (3)
+#define HALL_SECTORS (HALL_BITS - 2)
+#define HALL_SECTOR_ANGLE (TWOPI / HALL_SECTORS)
+#define CAL_DIR_LEN_PER_SECTOR (CAL_DIR_LEN / HALL_SECTORS)
+
+static const float twopi_by_hall_sectors = TWOPI / HALL_SECTORS;
+
 typedef struct Observer Observer;
 
 typedef struct

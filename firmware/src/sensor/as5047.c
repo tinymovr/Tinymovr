@@ -26,6 +26,7 @@
 void as5047p_make_blank_sensor(Sensor *s)
 {
     s->config.type = SENSOR_TYPE_AS5047;
+    s->bits = AS5047_BITS;
     s->ticks = AS5047_TICKS;
     s->get_raw_angle_func = as5047p_get_raw_angle;
     s->update_func = as5047p_update; 

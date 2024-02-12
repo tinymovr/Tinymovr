@@ -30,16 +30,12 @@ static MotorConfig config = {
 	.phase_resistance = MIN_PHASE_RESISTANCE,
 	.phase_inductance = MIN_PHASE_INDUCTANCE,
 
-	.user_offset = 0.0f,
-	.user_direction = 1,
-
 	.I_cal = 6.0f,
 
 	.resistance_calibrated = false,
 	.inductance_calibrated = false,
 	.poles_calibrated = false,
 
-	.phases_swapped = false,
 	.is_gimbal = false};
 
 #elif defined BOARD_REV_M5
@@ -49,16 +45,12 @@ static MotorConfig config = {
 	.phase_resistance = MIN_PHASE_RESISTANCE,
 	.phase_inductance = MIN_PHASE_INDUCTANCE,
 
-	.user_offset = 0.0f,
-	.user_direction = 1,
-
 	.I_cal = 1.2f,
 
 	.resistance_calibrated = false,
 	.inductance_calibrated = false,
 	.poles_calibrated = false,
 
-	.phases_swapped = false,
 	.is_gimbal = false};
 
 #endif
@@ -80,10 +72,7 @@ void motor_reset_calibration()
 		config.resistance_calibrated = false;
 		config.inductance_calibrated = false;
 	}
-	config.user_offset = 0.0f;
-	config.user_direction = 1;
 	config.poles_calibrated = false;
-	config.phases_swapped = false;
 }
 
 bool motor_calibrate_resistance(void)
@@ -264,16 +253,6 @@ TM_RAMFUNC void motor_set_I_cal(float I)
 	}
 }
 
-TM_RAMFUNC bool motor_phases_swapped(void)
-{
-	return config.phases_swapped;
-}
-
-TM_RAMFUNC void motor_set_phases_swapped(bool swapped)
-{
-	config.phases_swapped = swapped;
-}
-
 TM_RAMFUNC bool motor_get_calibrated(void)
 {
 	return config.resistance_calibrated && config.inductance_calibrated && config.poles_calibrated;
@@ -287,29 +266,6 @@ TM_RAMFUNC bool motor_get_is_gimbal(void)
 TM_RAMFUNC void motor_set_is_gimbal(bool gimbal)
 {
 	config.is_gimbal = gimbal;
-}
-
-TM_RAMFUNC float motor_get_user_offset(void)
-{
-	return config.user_offset;
-}
-
-TM_RAMFUNC void motor_set_user_offset(float offset)
-{
-	config.user_offset = offset;
-}
-
-TM_RAMFUNC int8_t motor_get_user_direction(void)
-{
-	return config.user_direction;
-}
-
-TM_RAMFUNC void motor_set_user_direction(int8_t dir)
-{
-	if ((dir == -1) || (dir == 1))
-	{
-		config.user_direction = dir;
-	}
 }
 
 TM_RAMFUNC uint8_t motor_get_errors(void)

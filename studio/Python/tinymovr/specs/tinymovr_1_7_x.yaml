@@ -47,10 +47,15 @@ remote_attributes:
     getter_name: system_get_calibrated
     summary: Whether the system has been calibrated.
   - name: errors
-    flags: [UNDERVOLTAGE, DRIVER_FAULT, CHARGE_PUMP_FAULT_STAT, CHARGE_PUMP_FAULT, DRV10_DISABLE, DRV32_DISABLE, DRV54_DISABLE]
+    flags: [UNDERVOLTAGE]
     meta: {dynamic: True}
     getter_name: system_get_errors
     summary: Any system errors, as a bitmask
+  - name: warnings
+    flags: [DRIVER_FAULT, CHARGE_PUMP_FAULT_STAT, CHARGE_PUMP_FAULT, DRV10_DISABLE, DRV32_DISABLE, DRV54_DISABLE]
+    meta: {dynamic: True}
+    getter_name: system_get_warnings
+    summary: Any system warnings, as a bitmask
   - name: save_config
     summary: Save configuration to non-volatile memory.
     caller_name: nvm_save_config
@@ -117,7 +122,7 @@ remote_attributes:
             meta: {jog_step: 100}
             getter_name: controller_get_pos_setpoint_user_frame
             setter_name: controller_set_pos_setpoint_user_frame
-            summary: The position setpoint.
+            summary: The position setpoint in the user reference frame.
           - name: p_gain
             dtype: float
             meta: {export: True}
@@ -132,7 +137,7 @@ remote_attributes:
             meta: {jog_step: 200}
             getter_name: controller_get_vel_setpoint_user_frame
             setter_name: controller_set_vel_setpoint_user_frame
-            summary: The velocity setpoint.
+            summary: The velocity setpoint in the user reference frame.
           - name: limit
             dtype: float
             unit: tick/sec
@@ -149,15 +154,15 @@ remote_attributes:
           - name: i_gain
             dtype: float
             meta: {export: True}
-            getter_name: controller_get_vel_integrator_gain
-            setter_name: controller_set_vel_integrator_gain
+            getter_name: controller_get_vel_integral_gain
+            setter_name: controller_set_vel_integral_gain
             summary: The integral gain of the velocity controller.
           - name: deadband
             dtype: float
             unit: tick
             meta: {export: True}
-            getter_name: controller_get_vel_integrator_deadband
-            setter_name: controller_set_vel_integrator_deadband
+            getter_name: controller_get_vel_integral_deadband
+            setter_name: controller_set_vel_integral_deadband
             rst_target: integrator-deadband
             summary: The deadband of the velocity integrator. A region around the position setpoint where the velocity integrator is not updated.
           - name: increment
@@ -174,13 +179,13 @@ remote_attributes:
             meta: {jog_step: 0.005}
             getter_name: controller_get_Iq_setpoint_user_frame
             setter_name: controller_set_Iq_setpoint_user_frame
-            summary: The Iq setpoint.
+            summary: The Iq setpoint in the user reference frame.
           - name: Id_setpoint
             dtype: float
             unit: ampere
             meta: {dynamic: True}
             getter_name: controller_get_Id_setpoint_user_frame
-            summary: The Id setpoint.
+            summary: The Id setpoint in the user reference frame.
           - name: Iq_limit
             dtype: float
             unit: ampere
@@ -192,7 +197,7 @@ remote_attributes:
             unit: ampere
             meta: {dynamic: True}
             getter_name: controller_get_Iq_estimate_user_frame
-            summary: The Iq estimate.
+            summary: The Iq estimate in the user reference frame.
           - name: bandwidth
             dtype: float
             unit: Hz
@@ -251,7 +256,7 @@ remote_attributes:
         dtype: void
         arguments: []
       - name: set_pos_vel_setpoints
-        summary: Set the position and velocity setpoints in one go, and retrieve the position estimate
+        summary: Set the position and velocity setpoints in the user reference frame in one go, and retrieve the position estimate
         caller_name: controller_set_pos_vel_setpoints
         dtype: float
         arguments:
@@ -306,18 +311,6 @@ remote_attributes:
         getter_name: motor_get_is_gimbal
         setter_name: motor_set_is_gimbal
         summary: The type of the motor. Either high current or gimbal.
-      - name: offset
-        dtype: float
-        meta: {export: True}
-        getter_name: motor_get_user_offset
-        setter_name: motor_set_user_offset
-        summary: User-defined offset of the motor.
-      - name: direction
-        dtype: int8
-        meta: {export: True}
-        getter_name: motor_get_user_direction
-        setter_name: motor_set_user_direction
-        summary: User-defined direction of the motor.
       - name: calibrated
         dtype: bool
         meta: {dynamic: True}
@@ -337,6 +330,31 @@ remote_attributes:
         summary: Any motor/calibration errors, as a bitmask
   - name: sensors
     remote_attributes:
+      - name: user_frame
+        remote_attributes:
+          - name: position_estimate
+            dtype: float
+            unit: ticks
+            meta: {dynamic: True}
+            getter_name: user_frame_get_pos_estimate
+            summary: The filtered position estimate in the user reference frame.
+          - name: velocity_estimate
+            dtype: float
+            unit: ticks/second
+            meta: {dynamic: True}
+            getter_name: user_frame_get_vel_estimate
+            summary: The filtered velocity estimate in the user reference frame.
+          - name: offset
+            dtype: float
+            unit: ticks
+            getter_name: get_position_observer_to_user_offset
+            setter_name: set_position_observer_to_user_offset
+            summary: The user defined offset.
+          - name: multiplier
+            dtype: float
+            getter_name: get_position_observer_to_user_multiplier
+            setter_name: set_position_observer_to_user_multiplier
+            summary: The user defined multipler.
       - name: setup
         remote_attributes:
           - name: onboard
@@ -383,7 +401,7 @@ remote_attributes:
                 summary: Any sensor errors, as a bitmask
       - name: select
         remote_attributes:
-          - name: position
+          - name: position_sensor
             remote_attributes:
               - name: connection
                 options: [ONBOARD, EXTERNAL_SPI, HALL]
@@ -407,15 +425,15 @@ remote_attributes:
                 dtype: float
                 unit: ticks
                 meta: {dynamic: True}
-                getter_name: position_observer_get_pos_estimate_user_frame
-                summary: The filtered position sensor position estimate.
+                getter_name: position_observer_get_pos_estimate
+                summary: The filtered position estimate in the position sensor reference frame.
               - name: velocity_estimate
                 dtype: float
                 unit: ticks/second
                 meta: {dynamic: True}
-                getter_name: position_observer_get_vel_estimate_user_frame
-                summary: The filtered position sensor velocity estimate.
-          - name: commutation
+                getter_name: position_observer_get_vel_estimate
+                summary: The filtered velocity estimate in the position sensor reference frame.
+          - name: commutation_sensor
             remote_attributes:
               - name: connection
                 options: [ONBOARD, EXTERNAL_SPI, HALL]
@@ -439,14 +457,14 @@ remote_attributes:
                 dtype: float
                 unit: ticks
                 meta: {dynamic: True}
-                getter_name: commutation_observer_get_pos_estimate_user_frame
-                summary: The filtered commutation sensor position estimate.
+                getter_name: commutation_observer_get_pos_estimate
+                summary: The filtered position estimate in the commutation sensor reference frame.
               - name: velocity_estimate
                 dtype: float
                 unit: ticks/second
                 meta: {dynamic: True}
-                getter_name: commutation_observer_get_vel_estimate_user_frame
-                summary: The filtered commutation sensor velocity estimate.    
+                getter_name: commutation_observer_get_vel_estimate
+                summary: The filtered velocity estimate in the commutation sensor reference frame.
   - name: traj_planner
     remote_attributes:
       - name: max_accel
@@ -492,7 +510,7 @@ remote_attributes:
         setter_name: planner_set_deltat_total
         summary: In time mode, the total time of the generated trajectory.
       - name: move_to
-        summary: Move to target position respecting velocity and acceleration limits.
+        summary: Move to target position in the user reference frame respecting velocity and acceleration limits.
         caller_name: planner_move_to_vlimit
         dtype: void
         arguments:
@@ -500,7 +518,7 @@ remote_attributes:
             dtype: float
             unit: tick
       - name: move_to_tlimit
-        summary: Move to target position respecting time limits for each sector.
+        summary: Move to target position in the user reference frame respecting time limits for each sector.
         caller_name: planner_move_to_tlimit
         dtype: void
         arguments:

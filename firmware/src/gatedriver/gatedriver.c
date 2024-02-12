@@ -15,7 +15,6 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <src/common.h>
 #include <src/motor/motor.h>
 #include <src/gatedriver/gatedriver.h>
 
@@ -60,22 +59,3 @@ TM_RAMFUNC void gate_driver_disable(void)
     PAC55XX_GPIOB->OUTMASK.w = 0x00;
 }
 
-TM_RAMFUNC bool gate_driver_is_enabled(void)
-{
-    return ((pac5xxx_tile_register_read(ADDR_ENDRV) & 0x1) == 1);
-}
-
-TM_RAMFUNC void gate_driver_set_duty_cycle(const FloatTriplet *dutycycles)
-{
-	m1_u_set_duty(dutycycles->A);
-	if (motor_phases_swapped())
-	{
-		m1_v_set_duty(dutycycles->C);
-		m1_w_set_duty(dutycycles->B);
-	}
-	else
-	{
-		m1_v_set_duty(dutycycles->B);
-		m1_w_set_duty(dutycycles->C);
-	}
-}
