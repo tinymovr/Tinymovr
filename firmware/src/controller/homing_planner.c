@@ -50,17 +50,17 @@ TM_RAMFUNC bool homing_planner_evaluate()
         controller_set_pos_setpoint_user_frame(next_pos_setpoint);
         controller_set_vel_setpoint_user_frame(config.homing_velocity);
 
-        const float observer_pos = observer_get_pos_estimate_user_frame(&position_observer);
-        if (fabsf(observer_get_vel_estimate_user_frame(&position_observer)) < config.max_stay_vel && fabsf(current_pos_setpoint - observer_pos) > config.max_stay_dpos)
+        const float observer_pos = user_frame_get_pos_estimate();
+        if (fabsf(user_frame_get_vel_estimate()) < config.max_stay_vel && fabsf(current_pos_setpoint - observer_pos) > config.max_stay_dpos)
         {
             state.stay_t_current += PWM_PERIOD_S;
             if (state.stay_t_current >= config.max_stay_t)
             {
                 // First time the endstop is considered found, reset origins and setpoints
                 user_to_position_sensor.offset = observer_pos;
-                position_sensor_to_user = derive_inverse_transformation(&user_to_position_sensor);
-                user_to_commutation_sensor = combine_transformations(&user_to_position_sensor, &position_sensor_to_commutation_sensor);
-                commutation_sensor_to_user = derive_inverse_transformation(&user_to_commutation_sensor);
+                position_sensor_to_user = derive_inverse_transform(&user_to_position_sensor);
+                user_to_motor = combine_transforms(&user_to_position_sensor, &position_sensor_to_motor);
+                motor_to_user = derive_inverse_transform(&user_to_motor);
                 controller_set_pos_setpoint_user_frame(0);
                 controller_set_vel_setpoint_user_frame(0);
             }

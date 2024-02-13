@@ -257,7 +257,7 @@ remote_attributes:
         arguments: []
       - name: set_pos_vel_setpoints
         summary: Set the position and velocity setpoints in the user reference frame in one go, and retrieve the position estimate
-        caller_name: controller_set_pos_vel_setpoints
+        caller_name: controller_set_pos_vel_setpoints_user_frame
         dtype: float
         arguments:
           - name: pos_setpoint

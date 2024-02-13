@@ -188,7 +188,7 @@ TM_RAMFUNC void CLControlStep(void)
 
     if (state.mode >= CONTROLLER_MODE_POSITION)
     {
-        const float delta_pos = observer_get_diff(&position_observer, state.pos_setpoint);
+        const float delta_pos = get_diff_position_sensor_frame(state.pos_setpoint);
         const float delta_pos_integral = sgnf(delta_pos) * our_fmaxf(0, fabsf(delta_pos) - config.vel_integral_deadband);
         vel_setpoint += delta_pos * config.pos_gain;
         vel_setpoint_integral += delta_pos_integral * config.pos_gain;
@@ -201,7 +201,7 @@ TM_RAMFUNC void CLControlStep(void)
     {
         const float delta_vel = vel_setpoint - vel_estimate;
         // Velocity limiting will be done later on based on the estimate
-        Iq_setpoint += apply_velocity_transformation(delta_vel * config.vel_gain + state.vel_integrator, &position_sensor_to_commutation_sensor);
+        Iq_setpoint += apply_velocity_transform(delta_vel * config.vel_gain + state.vel_integrator, &position_sensor_to_motor);
         state.vel_integrator += (vel_setpoint_integral - vel_estimate) * PWM_PERIOD_S * config.vel_integral_gain;
     }
     else
@@ -234,8 +234,7 @@ TM_RAMFUNC void CLControlStep(void)
         state.Id_setpoint = 0.0f;
     }
 
-    #warning REVISE THIS
-    const float e_phase = observer_get_epos(&commutation_observer);
+    const float e_phase = observer_get_epos_motor_frame();
     const float c_I = fast_cos(e_phase);
     const float s_I = fast_sin(e_phase);
 
@@ -243,8 +242,7 @@ TM_RAMFUNC void CLControlStep(void)
     float Vq;
     if (motor_get_is_gimbal() == true)
     {
-        #warning REVISE THIS
-        const float e_phase_vel = observer_get_evel(&commutation_observer);
+        const float e_phase_vel = observer_get_evel_motor_frame();
         Vd = -e_phase_vel * motor_get_phase_inductance() * Iq_setpoint;
         Vq = motor_get_phase_resistance() * Iq_setpoint;
     }
@@ -291,12 +289,9 @@ TM_RAMFUNC void CLControlStep(void)
         state.warnings |= CONTROLLER_WARNINGS_MODULATION_LIMITED;
     }
 
-    const float mod_q_motor_frame = apply_velocity_transformation(mod_q, &commutation_sensor_to_motor);
-    const float mod_d_motor_frame = apply_velocity_transformation(mod_d, &commutation_sensor_to_motor);
-
     // Inverse Park transform
-    float mod_a = (c_I * mod_d_motor_frame) - (s_I * mod_q_motor_frame);
-    float mod_b = (c_I * mod_q_motor_frame) + (s_I * mod_d_motor_frame);
+    float mod_a = (c_I * mod_d) - (s_I * mod_q);
+    float mod_b = (c_I * mod_q) + (s_I * mod_d);
 
     SVM(mod_a, mod_b, &state.modulation_values.A,
         &state.modulation_values.B, &state.modulation_values.C);
@@ -372,17 +367,17 @@ TM_RAMFUNC void controller_set_mode(controller_mode_options new_mode)
 
 TM_RAMFUNC float controller_get_Iq_estimate_user_frame(void)
 {
-    return apply_velocity_transformation(state.Iq_estimate, &commutation_sensor_to_user);
+    return apply_velocity_transform(state.Iq_estimate, &motor_to_user);
 }
 
 TM_RAMFUNC float controller_get_pos_setpoint_user_frame(void)
 {
-    return apply_transformation(state.pos_setpoint, &position_sensor_to_user);
+    return apply_transform(state.pos_setpoint, &position_sensor_to_user);
 }
 
 TM_RAMFUNC float controller_get_vel_setpoint_user_frame(void)
 {
-    return apply_velocity_transformation(state.vel_setpoint, &position_sensor_to_user);
+    return apply_velocity_transform(state.vel_setpoint, &position_sensor_to_user);
 }
 
 TM_RAMFUNC float controller_get_Iq_estimate(void)
@@ -391,33 +386,39 @@ TM_RAMFUNC float controller_get_Iq_estimate(void)
 }
 TM_RAMFUNC float controller_get_Iq_setpoint_user_frame(void)
 {
-    return apply_velocity_transformation(state.Iq_setpoint, &commutation_sensor_to_user);
+    return apply_velocity_transform(state.Iq_setpoint, &motor_to_user);
 }
 
 TM_RAMFUNC float controller_get_Id_setpoint_user_frame(void)
 {
-    return apply_velocity_transformation(state.Id_setpoint, &commutation_sensor_to_user);
+    return apply_velocity_transform(state.Id_setpoint, &motor_to_user);
 }
 
 TM_RAMFUNC void controller_set_pos_setpoint_user_frame(float value)
 {
-    state.pos_setpoint = apply_transformation(value, &user_to_position_sensor);
+    state.pos_setpoint = apply_transform(value, &user_to_position_sensor);
 }
 
 TM_RAMFUNC void controller_set_vel_setpoint_user_frame(float value)
 {
-    state.vel_setpoint = apply_velocity_transformation(value, &user_to_position_sensor);
+    state.vel_setpoint = apply_velocity_transform(value, &user_to_position_sensor);
 }
 
 TM_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value)
 {
-    state.Iq_setpoint = apply_velocity_transformation(value, &user_to_commutation_sensor);
+    state.Iq_setpoint = apply_velocity_transform(value, &user_to_motor);
+}
 
+float controller_set_pos_vel_setpoints_user_frame(float pos_setpoint, float vel_setpoint)
+{
+    controller_set_pos_setpoint_user_frame(pos_setpoint);
+    controller_set_vel_setpoint_user_frame(vel_setpoint);
+    return user_frame_get_pos_estimate();
 }
 
 TM_RAMFUNC float controller_get_Vq_setpoint_user_frame(void)
 {
-    return apply_velocity_transformation(state.Vq_setpoint, &commutation_sensor_to_user);
+    return apply_velocity_transform(state.Vq_setpoint, &motor_to_user);
 }
 
 float controller_get_pos_gain(void)

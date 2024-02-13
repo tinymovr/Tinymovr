@@ -72,7 +72,7 @@ void ma7xx_reset(Sensor *s)
 
 bool ma7xx_calibrate(Sensor *s, Observer *o)
 {
-    return sensor_calibrate_direction_and_pole_pair_count(s, o) && sensor_calibrate_offset_and_rectification(s, o);
+    return calibrate_pole_pair_count_and_transforms(s, o) && sensor_calibrate_offset_and_rectification(s, o);
 }
 
 void ma7xx_get_ss_config(Sensor *s, void* buffer)

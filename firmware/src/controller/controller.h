@@ -91,6 +91,8 @@ void controller_set_pos_setpoint_user_frame(float value);
 void controller_set_vel_setpoint_user_frame(float value);
 void controller_set_Iq_setpoint_user_frame(float value);
 
+float controller_set_pos_vel_setpoints_user_frame(float pos_setpoint, float vel_setpoint);
+
 float controller_get_Iq_estimate(void);
 
 float controller_get_Vq_setpoint_user_frame(void);
