@@ -90,11 +90,11 @@ def upload_bin(device, bin_path):
     total_size = os.path.getsize(bin_path)  # Get the total size of .bin file
     uploaded_size = 0
     print("\nErasing flash...")
-    if 'hash_validation' in inspect.signature(device.erase_all).parameters:
-        # Call erase_all with hash_validation, using the device's specified hash
+    try:
+        # Assume device.erase_all can take hash_validation and attempt to call it
         result = device.erase_all(device.hash_uint32)
-    else:
-        # If not, call erase_all without hash_validation
+    except TypeError:
+        # Fallback to calling erase_all without hash_validation if TypeError is raised
         result = device.erase_all()
     if result != 0:
         print("\nError while erasing!")
@@ -116,11 +116,11 @@ def upload_bin(device, bin_path):
                     time.sleep(1e-5)
 
                 # Commit the data in scratchpad to flash memory and get checksum
-                if 'hash_validation' in inspect.signature(device.commit).parameters:
-                    # Call commit with hash_validation, using the device's specified hash
+                try:
+                    # Assume device.commit can take hash_validation and attempt to call it
                     device_checksum = device.commit(flash_addr, device.hash_uint32)
-                else:
-                    # If not, call commit without hash_validation
+                except TypeError:
+                    # Fallback to calling commit without hash_validation if TypeError is raised
                     device_checksum = device.commit(flash_addr)
 
                 local_checksum = calculate_local_checksum(chunk)
