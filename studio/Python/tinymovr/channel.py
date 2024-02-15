@@ -24,30 +24,29 @@ from tinymovr.constants import (
     CAN_DEV_MASK,
     CAN_EP_SIZE,
     CAN_EP_MASK,
-    CAN_SEQ_SIZE,
-    CAN_SEQ_MASK,
+    CAN_HASH_SIZE,
+    CAN_HASH_MASK,
 )
 from tinymovr.codec import MultibyteCodec
 
 
 class ResponseError(Exception):
-    def __init__(self, kw, *args, **kwargs):
-        msg = "Node {} did not respond".format(kw)
-        super().__init__(msg, *args, **kwargs)
-        self.kw = kw
+    def __init__(self, node_id):
+        super().__init__(f"Node {node_id} did not respond")
+        self.node_id = node_id
 
 
 class CANChannel(BaseChannel):
-    def __init__(self, node_id):
+    def __init__(self, node_id, compare_hash = 0):
         self.node_id = node_id
-        get_tee().add(
-            lambda frame: frame.is_remote_frame == False
-            and ids_from_arbitration(frame.arbitration_id)[2] == node_id,
-            self._recv_cb,
-        )
+        self.compare_hash = compare_hash
         self.queue = []
         self.lock = Lock()
         self.evt = Event()
+        get_tee().add(self._filter_frame, self._recv_cb)
+
+    def _filter_frame(self, frame):
+        return not frame.is_remote_frame and ids_from_arbitration(frame.arbitration_id)[2] == self.node_id
 
     def _recv_cb(self, frame):
         """
@@ -76,12 +75,11 @@ class CANChannel(BaseChannel):
         with self.lock:
             self.evt.wait(timeout=timeout)
             self.evt.clear()
-            frame_id = arbitration_from_ids(ep_id, 0, self.node_id)
-            index = 0
-            while index < len(self.queue):
-                if self.queue[index].arbitration_id == frame_id:
-                    return self.queue.pop(index).data
-                index += 1
+            for frame in self.queue:
+                inc_ep_id, inc_hash, _ = ids_from_arbitration(frame.arbitration_id)
+                if inc_ep_id == ep_id and (inc_hash == self.compare_hash or inc_hash == 0):
+                    self.queue.remove(frame)
+                    return frame.data
             raise ResponseError(self.node_id)
 
     def create_frame(self, endpoint_id, rtr=False, payload=None):
@@ -89,7 +87,7 @@ class CANChannel(BaseChannel):
         Generate a CAN frame using python-can Message class
         """
         return can.Message(
-            arbitration_id=arbitration_from_ids(endpoint_id, 0, self.node_id),
+            arbitration_id=arbitration_from_ids(endpoint_id, self.compare_hash, self.node_id),
             is_extended_id=True,
             is_remote_frame=rtr,
             data=payload,
@@ -103,22 +101,22 @@ class CANChannel(BaseChannel):
 # TODO: Implement unit test for these functions
 def ids_from_arbitration(arbitration_id):
     """
-    Generate endpoint, message sequence and node ids
+    Generate endpoint, hash value and node ids
     from a CAN arbitration id
     """
-    node_id = (arbitration_id & CAN_DEV_MASK) >> (CAN_EP_SIZE + CAN_SEQ_SIZE)
-    seq_id = (arbitration_id & CAN_SEQ_MASK) >> CAN_EP_SIZE
+    node_id = (arbitration_id & CAN_DEV_MASK) >> (CAN_EP_SIZE + CAN_HASH_SIZE)
+    hash = (arbitration_id & CAN_HASH_MASK) >> CAN_EP_SIZE
     ep_id = arbitration_id & CAN_EP_MASK
-    return ep_id, seq_id, node_id
+    return ep_id, hash, node_id
 
 
-def arbitration_from_ids(ep_id, seq_id, node_id):
+def arbitration_from_ids(ep_id, hash, node_id):
     """
     Generate a CAN arbitration id from endpoint,
-    message sequence and node ids
+    hash value and node ids
     """
     return (
         ep_id & CAN_EP_MASK
-        | ((seq_id << CAN_EP_SIZE) & CAN_SEQ_MASK)
-        | ((node_id << (CAN_EP_SIZE + CAN_SEQ_SIZE)) & CAN_DEV_MASK)
+        | ((hash << CAN_EP_SIZE) & CAN_HASH_MASK)
+        | ((node_id << (CAN_EP_SIZE + CAN_HASH_SIZE)) & CAN_DEV_MASK)
     )

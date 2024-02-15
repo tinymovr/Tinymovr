@@ -69,18 +69,20 @@ def create_device(node_id):
     Create a device with the defined ID.
     The hash value will be retrieved from the remote.
     """
-    chan = CANChannel(node_id)
 
     # Temporarily using a default spec to get the protocol_hash
     # This assumes that `protocol_hash` is standard across different specs
     # Get the first spec as a temp
-    tmp_spec = list(specs["hash_uint32"].values())[0]
+    tmp_hash = list(specs["hash_uint32"].keys())[0]
+    tmp_spec = specs["hash_uint32"][tmp_hash]
     node = deserialize(tmp_spec)
+    chan = CANChannel(node_id, (tmp_hash & 0xFF))
     node._channel = chan
 
     # Check for the correct spec using the remote hash
     protocol_hash = node.protocol_hash
     device_spec = specs["hash_uint32"].get(protocol_hash)
+    chan.compare_hash = protocol_hash & 0xFF
 
     if not device_spec:
         raise ValueError(f"No device spec found for hash {protocol_hash}.")
@@ -101,6 +103,7 @@ def create_device_with_hash_msg(heartbeat_msg):
 
     hash, *_ = chan.serializer.deserialize(heartbeat_msg.data[:4], DataType.UINT32)
     device_spec = specs["hash_uint32"].get(hash)
+    chan.compare_hash = hash & 0xFF
 
     if not device_spec:
         raise ValueError(f"No device spec found for hash {hash}.")
