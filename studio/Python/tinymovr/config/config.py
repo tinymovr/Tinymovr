@@ -76,7 +76,7 @@ def create_device(node_id):
     tmp_hash = list(specs["hash_uint32"].keys())[0]
     tmp_spec = specs["hash_uint32"][tmp_hash]
     node = deserialize(tmp_spec)
-    chan = CANChannel(node_id, (tmp_hash & 0xFF))
+    chan = CANChannel(node_id, 0)
     node._channel = chan
 
     # Check for the correct spec using the remote hash
