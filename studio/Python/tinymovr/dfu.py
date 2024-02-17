@@ -15,6 +15,7 @@ Options:
 import sys
 import os
 import time
+import inspect
 from pathlib import Path
 import can
 import yaml
@@ -89,7 +90,12 @@ def upload_bin(device, bin_path):
     total_size = os.path.getsize(bin_path)  # Get the total size of .bin file
     uploaded_size = 0
     print("\nErasing flash...")
-    result = device.erase_all()
+    try:
+        # Assume device.erase_all can take hash_validation and attempt to call it
+        result = device.erase_all(device.hash_uint32)
+    except TypeError:
+        # Fallback to calling erase_all without hash_validation if TypeError is raised
+        result = device.erase_all()
     if result != 0:
         print("\nError while erasing!")
         return
@@ -110,7 +116,12 @@ def upload_bin(device, bin_path):
                     time.sleep(1e-5)
 
                 # Commit the data in scratchpad to flash memory and get checksum
-                device_checksum = device.commit(flash_addr)
+                try:
+                    # Assume device.commit can take hash_validation and attempt to call it
+                    device_checksum = device.commit(flash_addr, device.hash_uint32)
+                except TypeError:
+                    # Fallback to calling commit without hash_validation if TypeError is raised
+                    device_checksum = device.commit(flash_addr)
 
                 local_checksum = calculate_local_checksum(chunk)
 

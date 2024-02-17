@@ -95,7 +95,7 @@ typedef enum
     ENCODER_TYPE_HALL = 1
 } encoder_type_options;
 
-extern uint32_t avlos_proto_hash;
+static const uint32_t avlos_proto_hash = 3526126264;
 extern uint8_t (*avlos_endpoints[79])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 

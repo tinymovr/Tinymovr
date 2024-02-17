@@ -104,7 +104,7 @@ all: release
 debug: CFLAGS += -DDEBUG -g2 -O1
 debug: CPPFLAGS += -DDEBUG -g2 -O1
 debug: LDFLAGS += -O1
-debug: OBJECTS += $(BUILDDIR)/bootloader_$(REV).o
+debug: OBJECTS += $(BUILDDIR)/bootloader-$(REV).o
 debug: binary
 
 # Upgrade target
@@ -114,11 +114,11 @@ upgrade: LDFLAGS += -O3
 upgrade: binary
 
 # Release target
-release: OBJECTS += $(BUILDDIR)/bootloader_$(REV).o
+release: OBJECTS += $(BUILDDIR)/bootloader-$(REV).o
 release: upgrade
 
 # Binary target
-binary: print_board_rev $(HEX) $(BIN) $(ELF)
+binary: print_board_info $(HEX) $(BIN) $(ELF)
 
 # Objcopy to HEX
 $(HEX): $(ELF)
@@ -131,7 +131,7 @@ $(BIN): $(ELF)
 
 # Link
 $(ELF): $(OBJECTS)
-	- $(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.bl_section,alloc,load,readonly,data,contents $(PROJECTDIR)/bootloader/bootloader_$(REV).bin $(BUILDDIR)/bootloader_$(REV).o
+	- $(OBJCOPY) -I binary -O elf32-littlearm -B arm --rename-section .data=.bl_section,alloc,load,readonly,data,contents $(PROJECTDIR)/bootloader/bootloader-$(REV).bin $(BUILDDIR)/bootloader-$(REV).o
 	$(LD) $(LDFLAGS) $(OBJECTS) -o $(ELF)
 	$(SIZE_EX) --format=berkeley $(ELF)
 
@@ -151,8 +151,9 @@ clean :
 	- $(rmdir_cmd) "$(BUILDDIR)"
 
 # Print board revision
-.PHONY: print_board_rev
-print_board_rev:
-	@echo "===Building Tinymovr==="
+.PHONY: print_board_info
+print_board_info:
+	@echo "===Building Tinymovr Bootloader==="
 	@echo "Board revision is $(REV)"
-	@echo "======================="
+	@echo "Fw version is $(GIT_VERSION)"
+	@echo "=================================="

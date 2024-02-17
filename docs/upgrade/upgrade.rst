@@ -29,8 +29,8 @@ R5.0, R5.1
   :width: 800
   :alt: Tinymovr R5.0 and R5.1 connectors and pinouts
 
-M5.1
-====
+M5.1, M5.2
+==========
 
 .. image:: connectors_m5.png
   :width: 800
