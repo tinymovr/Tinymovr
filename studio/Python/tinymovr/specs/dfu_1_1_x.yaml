@@ -1,0 +1,72 @@
+
+name: tm_dfu
+remote_attributes:
+  - name: protocol_hash
+    dtype: uint32
+    getter_name: _system_get_proto_hash_and_trigger_dfu
+    summary: The Avlos protocol hash.
+  - name: uid
+    dtype: uint32
+    getter_name: system_get_uid
+    summary: The unique device ID, unique to each PAC55xx chip produced.
+  - name: fw_version
+    dtype: string
+    getter_name: system_get_fw_version_string
+    summary: The bootloader firmware version.
+  - name: hw_revision
+    dtype: uint32
+    getter_name: system_get_hw_revision
+    summary: The hardware revision.
+  - name: reset
+    summary: Reset the device.
+    caller_name: system_reset
+    dtype: void
+    arguments: []
+    meta: {reload_data: True}
+  - name: node_id
+    summary: The node id
+    getter_name: CAN_get_ID
+    dtype: uint8
+  - name: error
+    options: [NONE, START_EXECUTION_STACK_POINTER_OUT_OF_RANGE, START_EXECUTION_ADDRESS_OUT_OF_RANGE, START_EXECUTION_ADDRESS_LSB_NOT_SET]
+    getter_name: system_get_error
+    summary: The last error encountered in DFU
+  - name: read_flash_32
+    summary: Read a 32 bit value from the flash
+    caller_name: nvm_read_flash_32
+    dtype: uint32
+    arguments:
+      - name: address
+        dtype: uint32
+  - name: write_scratch_32
+    summary: Write a 32 bit value to the scratchpad
+    caller_name: nvm_write_scratch_32
+    dtype: void
+    arguments:
+      - name: offset_word32
+        dtype: uint8
+      - name: value
+        dtype: uint32
+  - name: read_scratch_32
+    summary: Read a 32 bit value from the scratchpad
+    caller_name: nvm_read_scratch_32
+    dtype: uint32
+    arguments:
+      - name: offset_word32
+        dtype: uint8
+  - name: commit
+    summary: Commit the 128 bit scratchpad to the specified flash address. Pass the current protocol hash for validation.
+    caller_name: nvm_commit
+    dtype: uint32
+    arguments:
+      - name: address
+        dtype: uint32
+      - name: hash_validation
+        dtype: uint32
+  - name: erase_all
+    summary: Erase all flash. Pass the current protocol hash for validation.
+    caller_name: nvm_erase_all
+    dtype: uint32
+    arguments:
+      - name: hash_validation
+        dtype: uint32

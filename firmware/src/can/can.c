@@ -39,6 +39,9 @@ static CANState state ={0};
 
 extern volatile uint32_t msTicks;
 
+const uint8_t avlos_proto_hash_8 = (uint8_t)(avlos_proto_hash & 0xFF);
+const size_t endpoint_count = sizeof(avlos_endpoints) / sizeof(avlos_endpoints[0]);
+
 void CAN_init(void)
 {
 #if defined(BOARD_REV_R52)
@@ -135,7 +138,8 @@ void CAN_process_interrupt(void)
 {
     can_process_extended();
 
-    if (sizeof(avlos_endpoints) / sizeof(avlos_endpoints[0]) > can_ep_id)
+    if ((endpoint_count > can_ep_id) && 
+       ((can_frame_hash == avlos_proto_hash_8) || (can_frame_hash == 0)))
     {
         uint8_t (*callback)(uint8_t buffer[], uint8_t * buffer_length, Avlos_Command cmd) = avlos_endpoints[can_ep_id];
         uint8_t can_msg_buffer[8];
