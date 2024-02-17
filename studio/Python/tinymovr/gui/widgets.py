@@ -131,6 +131,7 @@ class AttrTreeWidgetItem(EdgeTreeWidgetItem):
             self.text_editor.editingFinished.connect(self._on_editor_text_changed)
         else:
             self.text_editor = QLineEdit(format_value(node.get_value()))
+            self.text_editor.editingFinished.connect(self._on_editor_text_changed)
         if not editable:
             self.text_editor.setReadOnly(True)
         self._checked = False
@@ -153,7 +154,7 @@ class AttrTreeWidgetItem(EdgeTreeWidgetItem):
         except UndefinedUnitError:
             attr.set_value(text)
         if "reload_data" in attr.meta and attr.meta["reload_data"]:
-            self.worker.reset()
+            self.treeWidget().window().worker.reset()
             return
         else:
             self.text_editor.setText(format_value(attr.get_value()))

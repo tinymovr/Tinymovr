@@ -67,6 +67,25 @@ Compatibility
 
 Tinymovr Studio includes by default a checksum comparison to determine protocol compatibility between firmware and studio version. This is performed each time a node is discovered, and prior to initializing the tinymovr object. If you see a compatibility-related message, please upgrade to the latest studio and firmware versions. 
 
+Custom Device Specs
+###################
+
+You can specify a custom device spec (YAML file) as a command line argument:
+
+|gui|
+
+.. code-block:: console
+
+    tinymovr --spec=/path/to/myspec.yaml
+
+|cli|
+
+.. code-block:: console
+
+    tinymovr_cli --spec=/path/to/myspec.yaml
+
+This is useful, for instance, if you have altered the default Tinymovr spec files. Using this parameter with a project developed using `Avlos <https://github.com/tinymovr/avlos>`_, you can even use Tinymovr Studio to control your own custom devices!
+
 
 Issuing Commands in CLI
 #######################
@@ -101,6 +120,8 @@ In order for multiple Tinymovr instances to coexist in the same CAN network, the
   :width: 400
   :alt: Change CAN bus node ID using the GUI
 
+The board will be discovered with the new ID. Studio GUI will rescan, discover the new node, and remove the old instance.
+
 2. |cli| Change the ID
 
 .. code-block:: python
@@ -109,21 +130,21 @@ In order for multiple Tinymovr instances to coexist in the same CAN network, the
 
 where x is the desired ID. You can assign IDs in the range 1-1024.
 
-3. Relaunch Studio. The board will be discovered with the new ID.
+The board will be discovered with the new ID. Relaunch Studio CLI to remove the old board instance. 
 
-4. |gui| Save configuration.
+3. |gui| Save configuration.
 
 .. image:: save_config.png
   :width: 400
   :alt: Save configuration using the GUI
 
-4. |cli| Save configuration.
+3. |cli| Save configuration.
 
 .. code-block:: python
 
     tm1.save_config()
 
-5. Power down or reset the board. Tinymovr is now ready to use with the new ID.
+4. Power down or reset the board. Tinymovr is now ready to use with the new ID.
 
 .. _command-line-options:
 

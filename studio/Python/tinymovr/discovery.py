@@ -21,7 +21,7 @@ from threading import Thread, Event
 from tinymovr.channel import ResponseError
 from tinymovr.tee import get_tee
 from tinymovr.constants import HEARTBEAT_BASE
-from tinymovr.config import create_device_with_hash_msg, ProtocolVersionError
+from tinymovr.config import create_device_with_hash_msg
 
 
 class Discovery:
@@ -72,7 +72,7 @@ class Discovery:
                 self._append_to_queue((node, node_id))
             except ResponseError as e:
                 self.logger.error(e)
-            except ProtocolVersionError as e:
+            except ValueError as e:
                 self.logger.error(e)
                 self.incompatible_nodes.add(node_id)
             self.pending_nodes.remove(node_id)

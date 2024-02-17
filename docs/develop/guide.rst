@@ -12,7 +12,7 @@ This document provides a guide for setting up a development environment for deve
 Hardware Connections
 ####################
 
-For proper debugging capabilities you will need a Segger J-Link adapter. Unfortunately original J-Link adapters are quite expensive. A more affordable option is the J-Link EDU adapter at around $60 or the J-Link EDU mini adapter at around $20. In addition, there are J-Link clones that can be purchased for very low prices on ebay or Aliexpress. However, reliability of these clones is not guaranteed.
+For proper debugging capabilities you will need a Segger J-Link adapter. Unfortunately original J-Link adapters are quite expensive. A more affordable option is the J-Link EDU adapter at around $60 or the J-Link EDU mini adapter at around $20. In addition, there are J-Link clones that can be purchased for very low prices on ebay or Aliexpress. However, reliability of these clones is not guaranteed, and we do not provide support when using these clones.
 
 With the board and J-Link adapter powered off, connect the J-Link to Tinymovr as shown below:
 
@@ -42,7 +42,7 @@ Connection with SWD adapter (e.g. isolator) for R5:
 
 (diagrams made with `Wireviz <https://github.com/formatc1702/WireViz>`_)
 
-As of Tinymovr 1.0.1, it is no longer necessary to patch the `JLinkDevices.xml` file with the PAC additions, in order for JLinkGDBServer to work properly. Relevant files are included in the repo.
+As of Tinymovr 1.0.1, it is no longer necessary to patch the ``JLinkDevices.xml`` file with the PAC additions, in order for JLinkGDBServer to work properly. Relevant files are included in the repo.
 
 
 .. _develop-preparation:
@@ -64,7 +64,7 @@ The file comes in a zipped installer exe (!), which all it does is extract the c
 
     cp -r <pac55xx_sdk_location> <tinymovr_location>/firmware/pac55xx_sdk/
 
-In any case, the target directory should be named `pac55xx_sdk`. The above copy command ensures this.
+In any case, the target directory should be named ``pac55xx_sdk``. The above copy command ensures this.
 
 Now you have the required PAC SDK almost ready. There is a small patch that you will need to apply in the pac55xx_sdk directory. It is suggested to use the `Python patch package <https://pypi.org/project/patch/>`_, which is cross-platform. If you do not have the package, install using pip:
 
@@ -100,7 +100,7 @@ We take great pride in creating this in-house, cross-platform development soluti
 Configuring
 ***********
 
-You'll need to configure the path to the JLink debug server in `.vscode/launch.json`. The configuration blocks look like this:
+You'll need to configure the path to the JLink debug server in ``.vscode/launch.json``. The configuration blocks look like this:
 
 .. code-block:: javascript
   
@@ -135,7 +135,7 @@ Select the board revision against which you are compiling from the list. The bui
 More about Hardware Revisions
 -----------------------------
 
-Tinymovr passes the `BOARD_REV_XX` argument regarding the board revision to the compiler. This is used in the firmware to configure the hardware accordingly. Invoking a make command with the REV argument is as follows:
+Tinymovr passes the ``BOARD_REV_XX`` argument regarding the board revision to the compiler. This is used in the firmware to configure the hardware accordingly. Invoking a make command with the REV argument is as follows:
 
 .. code-block:: console
 
@@ -157,7 +157,7 @@ Flashing and Debugging
 
 Before debugging, make sure the J-Link drivers and software is installed. The drivers and software, together with instructions, can be found in the `Qorvo website <https://www.qorvo.com/products/p/PAC5527#evaluation-tools>`_, under the download 'Segger J-Link Support'. This download includes a nacessary patch to enable J-Link to work with Qorvo devices. Instructions on how to apply the patch are included in the download.
 
-The Tinymovr repo includes all VSCode settings configured, except for the JLink `serverpath` variable in `launch.json`, which you'll need to update to reflect your system. Note that there are multiple instances in the file, you'll need to update all of them.
+The Tinymovr repo includes all VSCode settings configured, except for the JLink ``serverpath`` variable in ``launch.json``, which you'll need to update to reflect your system. Note that there are multiple instances in the file, you'll need to update all of them.
 
 We offer various VSCode launch configurations to suit different development and debugging tasks, including remote Tinymovr flashing debugging using a remote JLink server. These are are briefly outlined below.
 
@@ -216,7 +216,7 @@ Eclipse is no longer supported. Consider :ref:`develop-setting-up-vscode` instea
 Setup Studio for Development
 ############################
 
-Tinymovr Studio is a Python application and as such can be easily set up to facilitate development. The approach is to use `pip` to install Tinymovr in develop mode, from a local copy of the (`git repo <https://github.com/tinymovr/Tinymovr>`_). This allows any changes you make to the local code to be immediately available when you run the executable (`tinymovr`, `tinymovr_cli`, or `tinymovr_dfu`).
+Tinymovr Studio is a Python application and as such can be easily set up to facilitate development. The approach is to use ``pip`` to install Tinymovr in develop mode, from a local copy of the (``git repo <https://github.com/tinymovr/Tinymovr>``_). This allows any changes you make to the local code to be immediately available when you run the executable (``tinymovr``, ``tinymovr_cli``, or ``tinymovr_dfu``).
 
 .. note::
    We recommend installing Tinymovr in a virtual environment. `Here is a quick tutorial on how to setup a virtual environment using Conda <https://conda.io/projects/conda/en/latest/user-guide/getting-started.html#managing-environments>`_.
@@ -234,7 +234,28 @@ or to enable GUI support:
 
     pip3 install -e .[GUI]
 
-This will install the Tinymovr Studio in develop mode. Now, `tinymovr`, `tinymovr_cli` and `tinymovr_dfu` will use the local Tinymovr Studio code.
+This will install the Tinymovr Studio in develop mode. Now, ``tinymovr``, ``tinymovr_cl`i`` and ``tinymovr_dfu`` will use the local Tinymovr Studio code.
 
 Happy coding!
 
+
+Custom Device Definitions
+#########################
+
+Tinymovr uses YAML files for device specification (the spec). Device spec files reside in ``{tinymovr_package_dir}/studio/Python/tinymovr/specs/``. This is where files covering Tinymovr firmware 1.3.x to 1.6.x are situated by default. 
+
+You can add custom device spec files in this directory to tell Tinymovr Studio GUI, CLI and library how to communicate with custom devices. For instance, assuming that you have installed Tinymovr Studio using ``pip3``, you will need to find the directory of the tinymovr package first using the command below:
+
+Windows
+
+.. code-block:: console
+
+    python -c "import os, tinymovr; print(os.path.dirname(tinymovr.__file__))"
+
+Macos and Linux
+
+.. code-block:: console
+
+    python3 -c "import os, tinymovr; print(os.path.dirname(tinymovr.__file__))"
+
+Then, paste your custom spec file to ``{tinymovr_package_dir}/studio/Python/tinymovr/specs/``. Tinymovr should correctly discover your custom device.

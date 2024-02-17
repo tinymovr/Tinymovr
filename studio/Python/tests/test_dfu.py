@@ -22,8 +22,7 @@ import can
 from tinymovr import init_tee, destroy_tee
 from tinymovr.config import (
     get_bus_config,
-    create_device,
-    definitions
+    create_device
 )
 
 import unittest
@@ -40,24 +39,26 @@ class TMTestCase(unittest.TestCase):
     def test_dfu(self, node_id=1):
         init_tee(self.can_bus)
         time.sleep(0.5)
-        tm = create_device(node_id=node_id)
-        tm_hash = tm.protocol_hash
-        tm.enter_dfu()
-        time.sleep(0.5)
-        bl = create_device(node_id=node_id)
-        bl_hash = bl.protocol_hash
-        bl.reset()
-        time.sleep(0.2)
-        tm = create_device(node_id=node_id)
-        tm_hash2 = tm.protocol_hash
-        tm.reset()
-        time.sleep(0.2)
-        tm_hash3 = tm.protocol_hash
-        self.assertNotEqual(tm_hash, 0)
-        self.assertEqual(tm_hash, tm_hash2)
-        self.assertEqual(tm_hash, tm_hash3)
-        self.assertNotEqual(tm_hash, bl_hash)
-        time.sleep(0.2)
+        for i in range(10):
+            print("Testing DFU iteration ", i+1)
+            tm = create_device(node_id=node_id)
+            tm_hash = tm.protocol_hash
+            tm.enter_dfu()
+            time.sleep(0.5)
+            bl = create_device(node_id=node_id)
+            bl_hash = bl.protocol_hash
+            bl.reset()
+            time.sleep(0.2)
+            tm = create_device(node_id=node_id)
+            tm_hash2 = tm.protocol_hash
+            tm.reset()
+            time.sleep(0.2)
+            tm_hash3 = tm.protocol_hash
+            self.assertNotEqual(tm_hash, 0)
+            self.assertEqual(tm_hash, tm_hash2)
+            self.assertEqual(tm_hash, tm_hash3)
+            self.assertNotEqual(tm_hash, bl_hash)
+            time.sleep(0.2)
 
     @classmethod
     def tearDownClass(cls):

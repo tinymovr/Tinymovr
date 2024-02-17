@@ -29,8 +29,8 @@ R5.0, R5.1
   :width: 800
   :alt: Tinymovr R5.0 and R5.1 connectors and pinouts
 
-M5.1
-====
+M5.1, M5.2
+==========
 
 .. image:: connectors_m5.png
   :width: 800
@@ -71,6 +71,24 @@ Flashing the Firmware
 1. **Set Up Your CAN Interface**:
 
    Ensure your CAN interface is connected and configured correctly with Tinymovr.
+
+2. **Enter DFU Mode**:
+
+   Launch the Tinymovr CLI:
+
+   .. code-block:: bash
+
+      tinymovr_cli
+
+   Once inside teh CLI, type the following to enter DFU Mode:
+
+   .. code-block:: python
+
+      tmx.enter_dfu()
+
+   Then exit the CLI by typing ``exit``.
+
+   If you are getting an exception after this command, it means that either your Tinymovr does not come with the DFU bootloader, so you will have to :ref:`upgrade-using-activeflashlight`, or your board is already in DFU mode.
 
 2. **Run the Script**:
 

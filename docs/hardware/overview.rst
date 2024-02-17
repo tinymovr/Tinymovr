@@ -47,15 +47,15 @@ M5.x
 
 Tinymovr M5.x is is our specialized driver for gimbal motors and light robotic joints. It features a very compact footprint and 5A max drive.
 
-Board Dimensions (M5.1)
-#######################
+Board Dimensions (M5.1, M5.2)
+#############################
 
 .. image:: dimensions_m5.png
   :width: 800
   :alt: Tinymovr M5 dimensions
 
-Connectivity (M5.1)
-###################
+Connectivity (M5.1, M5.2)
+#########################
 
 .. image:: connectors_m5.png
   :width: 800

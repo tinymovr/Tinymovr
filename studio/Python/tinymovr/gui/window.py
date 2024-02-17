@@ -16,6 +16,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import time
+import logging
 import pkg_resources
 from contextlib import suppress
 import json
@@ -37,7 +38,7 @@ from PySide6.QtGui import QAction
 import pyqtgraph as pg
 from tinymovr.constants import app_name
 from tinymovr.channel import ResponseError as ChannelResponseError
-from tinymovr.config import get_bus_config, configure_logging
+from tinymovr.config import get_bus_config
 from avlos import get_registry
 from avlos.json_codec import AvlosEncoder
 from tinymovr.gui import (
@@ -58,14 +59,17 @@ from tinymovr.gui import (
 class MainWindow(QMainWindow):
     TreeItemCheckedSignal = Signal(dict)
 
-    def __init__(self, app, arguments):
+    def __init__(self, app, arguments, logger):
         super(MainWindow, self).__init__()
 
         # set units default format
         get_registry().default_format = ".6f~"
 
         self.start_time = time.time()
-        self.logger = configure_logging()
+        if logger is None:
+            self.logger = logging.getLogger("tinymovr")
+        else:
+            self.logger = logger
 
         self.attr_widgets_by_id = {}
         self.graphs_by_id = {}
