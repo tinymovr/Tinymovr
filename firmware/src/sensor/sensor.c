@@ -134,12 +134,15 @@ bool calibrate_pole_pair_count_and_transforms(Sensor *s, Observer *o)
     gate_driver_set_duty_cycle(&three_phase_zero);
 
     // Derive transforms
-    position_sensor_to_motor = derive_transform(position_frame_start, 0, position_frame_end, motor_frame_end);
+    position_sensor_to_motor = derive_transform_2p(position_frame_start, 0, position_frame_end, motor_frame_end);
     motor_to_position_sensor = derive_inverse_transform(&position_sensor_to_motor);
-    commutation_sensor_to_motor = derive_transform(commutation_frame_start, 0, commutation_frame_end, motor_frame_end);
+    commutation_sensor_to_motor = derive_dir_transform_2p(commutation_frame_start, 0, commutation_frame_end, motor_frame_end);
     motor_to_commutation_sensor = derive_inverse_transform(&commutation_sensor_to_motor);
     user_to_motor = combine_transforms(&user_to_position_sensor, &position_sensor_to_motor);
     motor_to_user = derive_inverse_transform(&user_to_motor);
+    // Not needed
+    // position_sensor_to_user
+    // user_to_position_sensor
 
     return true;
 }
