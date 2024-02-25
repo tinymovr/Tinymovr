@@ -107,8 +107,8 @@ void Controller_ControlLoop(void)
     {
         state.warnings = 0;
         const float Iq = controller_get_Iq_estimate();
-        if ((Iq > (config.I_limit * I_TRIP_MARGIN)) ||
-            (Iq < -(config.I_limit * I_TRIP_MARGIN)))
+        const float Iq_trip = our_fmaxf(config.I_limit * I_TRIP_MARGIN, MIN_TRIP_CURRENT);
+        if (our_fabsf(Iq) > Iq_trip)
         {
             state.errors |= CONTROLLER_ERRORS_CURRENT_LIMIT_EXCEEDED;
         }

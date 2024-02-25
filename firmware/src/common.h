@@ -123,6 +123,12 @@
 #define BOARD_REV_IDX 21
 #endif
 
+#if defined BOARD_REV_R3 || defined BOARD_REV_R5
+#define MIN_TRIP_CURRENT (5.0f) // A
+#elif defined BOARD_REV_M5
+#define MIN_TRIP_CURRENT (1.0f) // A
+#endif
+
 #define TIMER_FREQ_HZ (ACLK_FREQ_HZ >> TXCTL_PS_DIV)
 
 #define SENSOR_COMMON_RES_BITS (13)
