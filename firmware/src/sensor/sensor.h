@@ -86,8 +86,7 @@ struct Sensor { // typedefd earlier
 };
 
 void sensor_reset(Sensor *s);
-bool sensor_calibrate_offset_and_rectification(Sensor *s, Observer *o);
-bool calibrate_pole_pair_count_and_transforms(Sensor *s, Observer *o);
+bool sensor_calibrate_eccentricity_compensation(Sensor *s, Observer *o);
 
 static inline void sensor_update(Sensor *s, bool check_error)
 {

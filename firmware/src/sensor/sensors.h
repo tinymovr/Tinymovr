@@ -92,6 +92,7 @@ static inline sensor_connection_t position_sensor_get_connection(void)
 }
 
 void position_sensor_set_connection(sensor_connection_t new_connection);
+bool sensors_calibrate_pole_pair_count_and_transforms(void);
 
 static inline void sensors_reset(void)
 {
@@ -104,8 +105,20 @@ static inline void sensors_reset(void)
 
 static inline void sensors_calibrate(void)
 {
-    commutation_sensor_p->calibrate_func(commutation_sensor_p, &commutation_observer);
-    position_sensor_p->calibrate_func(position_sensor_p, &position_observer);
+    if (position_sensor_p->calibrate_func)
+    {
+        position_sensor_p->calibrate_func(position_sensor_p, &position_observer);
+    }
+    if ((commutation_sensor_p != position_sensor_p) && (commutation_sensor_p->calibrate_func))
+    {
+        commutation_sensor_p->calibrate_func(commutation_sensor_p, &commutation_observer);
+    }
+    sensors_calibrate_pole_pair_count_and_transforms();
+    sensor_calibrate_eccentricity_compensation(commutation_sensor_p, &commutation_observer);
+    if (commutation_sensor_p != position_sensor_p)
+    {
+        sensor_calibrate_eccentricity_compensation(position_sensor_p, &position_observer);
+    }
 }
 
 static inline sensors_setup_external_spi_type_options sensor_external_spi_get_type_avlos(void)

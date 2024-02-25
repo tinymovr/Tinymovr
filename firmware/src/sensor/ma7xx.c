@@ -29,7 +29,6 @@ void ma7xx_make_blank_sensor(Sensor *s)
     s->bits = MA7XX_BITS;
     s->ticks = MA7XX_TICKS;
     s->is_calibrated_func = ma7xx_rec_is_calibrated;
-    s->calibrate_func = ma7xx_calibrate;
     s->get_raw_angle_func = ma7xx_get_raw_angle;
     s->deinit_func = ma7xx_deinit;
     s->reset_func = ma7xx_reset;
@@ -68,11 +67,6 @@ void ma7xx_deinit(Sensor *s)
 void ma7xx_reset(Sensor *s)
 {
     sensor_reset(s);
-}
-
-bool ma7xx_calibrate(Sensor *s, Observer *o)
-{
-    return calibrate_pole_pair_count_and_transforms(s, o) && sensor_calibrate_offset_and_rectification(s, o);
 }
 
 void ma7xx_get_ss_config(Sensor *s, void* buffer)

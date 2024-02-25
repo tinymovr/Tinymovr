@@ -35,7 +35,6 @@ void as5047p_make_blank_sensor(Sensor *s)
     s->deinit_func = as5047p_deinit; 
     s->get_errors_func = as5047p_get_errors; 
     s->is_calibrated_func = as5047p_is_calibrated; 
-    s->calibrate_func = as5047p_calibrate; 
     s->get_ss_config_func = as5047p_get_ss_config;
 }
 
@@ -67,11 +66,6 @@ void as5047p_deinit(Sensor *s)
 void as5047p_reset(Sensor *s)
 {
     sensor_reset(s);
-}
-
-bool as5047p_calibrate(Sensor *s, Observer *o)
-{
-    return calibrate_pole_pair_count_and_transforms(s, o) && sensor_calibrate_offset_and_rectification(s, o);
 }
 
 void as5047p_get_ss_config(Sensor *s, void* buffer)
