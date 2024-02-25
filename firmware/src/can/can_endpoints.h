@@ -10,7 +10,7 @@
 #include <src/common.h>
 #include <src/tm_enums.h>
 
-extern uint32_t avlos_proto_hash;
+static const uint32_t avlos_proto_hash = 211282378;
 extern uint8_t (*avlos_endpoints[94])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
