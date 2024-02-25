@@ -28,22 +28,22 @@ void sensor_reset(Sensor *s)
 bool sensor_calibrate_offset_and_rectification(Sensor *s, Observer *o)
 {
     // Size below is an arbitrary large number ie > ECN_SIZE * npp
-    float error_ticks[ECN_SIZE * 20];
+    float error_ticks[ECN_SIZE * 24];
     const int16_t npp = motor_get_pole_pairs();
     const int16_t n = ECN_SIZE * npp;
     const int16_t nconv = 100;
     const float delta = 2 * PI * npp / (n * nconv);
     const float e_pos_to_ticks = ((float)SENSOR_COMMON_RES_TICKS) / (2 * PI * npp);
-    float e_pos_ref = 0.f;
+    float e_pos_ref = 0;
     const float I_setpoint = motor_get_I_cal();
-    int16_t *lut = s->config.rec_table;
+    int32_t *lut = s->config.rec_table;
     set_epos_and_wait(e_pos_ref, I_setpoint);
     wait_pwm_cycles(5000);
-    const uint16_t offset_idx = (s->get_raw_angle_func(s)) >> (SENSOR_COMMON_RES_BITS - ECN_BITS);
+    const int32_t offset_idx = (s->get_raw_angle_func(s)) >> (SENSOR_COMMON_RES_BITS - ECN_BITS);
 
     for (uint32_t i = 0; i < n; i++)
     {
-        for (uint8_t j = 0; j < nconv; j++)
+        for (int16_t j = 0; j < nconv; j++)
         {
             e_pos_ref += delta;
             set_epos_and_wait(e_pos_ref, I_setpoint);
@@ -54,7 +54,7 @@ bool sensor_calibrate_offset_and_rectification(Sensor *s, Observer *o)
     }
     for (uint32_t i = 0; i < n; i++)
     {
-        for (uint8_t j = 0; j < nconv; j++)
+        for (int16_t j = 0; j < nconv; j++)
         {
             e_pos_ref -= delta;
             set_epos_and_wait(e_pos_ref, I_setpoint);
@@ -72,7 +72,7 @@ bool sensor_calibrate_offset_and_rectification(Sensor *s, Observer *o)
         float acc = 0;
         for (int16_t j = 0; j < ECN_SIZE; j++)
         {
-            int16_t read_idx = -ECN_SIZE / 2 + j + i * npp;
+            int32_t read_idx = -ECN_SIZE / 2 + j + i * npp;
             if (read_idx < 0)
             {
                 read_idx += n;
@@ -84,12 +84,12 @@ bool sensor_calibrate_offset_and_rectification(Sensor *s, Observer *o)
             acc += error_ticks[read_idx];
         }
         acc = acc / ((float)(ECN_SIZE * 2));
-        int16_t write_idx = i + offset_idx;
+        int32_t write_idx = i + offset_idx;
         if (write_idx > (ECN_SIZE - 1))
         {
             write_idx -= ECN_SIZE;
         }
-        lut[write_idx] = (int16_t)acc;
+        lut[write_idx] = (int32_t)acc;
     }
     wait_pwm_cycles(5000);
     s->config.rec_calibrated = true;

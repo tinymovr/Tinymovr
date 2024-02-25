@@ -64,7 +64,7 @@ typedef enum {
 struct SensorConfig {
     uint32_t id;
     sensor_type_t type;
-    int16_t rec_table[ECN_SIZE];
+    int32_t rec_table[ECN_SIZE];
     bool rec_calibrated;
 };
 
