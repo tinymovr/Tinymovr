@@ -50,7 +50,7 @@ bool sensor_calibrate_offset_and_rectification(Sensor *s, Observer *o)
         }
         wait_for_control_loop_interrupt();
         const float pos_meas = observer_get_pos_estimate(o);
-        error_ticks[i] = (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
+        error_ticks[i] = e_pos_ref * e_pos_to_ticks - pos_meas;
     }
     for (uint32_t i = 0; i < n; i++)
     {
@@ -61,7 +61,7 @@ bool sensor_calibrate_offset_and_rectification(Sensor *s, Observer *o)
         }
         wait_for_control_loop_interrupt();
         const float pos_meas = observer_get_pos_estimate(o);
-        error_ticks[n - i - 1] += (int16_t)(e_pos_ref * e_pos_to_ticks - pos_meas);
+        error_ticks[n - i - 1] += e_pos_ref * e_pos_to_ticks - pos_meas;
     }
     gate_driver_set_duty_cycle(&three_phase_zero);
     gate_driver_disable();
