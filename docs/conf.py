@@ -20,7 +20,7 @@ master_doc = 'index'
 # -- Project information -----------------------------------------------------
 
 project = 'Tinymovr'
-copyright = '2020, Yannis Chatzikonstantinou'
+copyright = '2020-2024, Yannis Chatzikonstantinou'
 author = 'Yannis Chatzikonstantinou'
 
 
