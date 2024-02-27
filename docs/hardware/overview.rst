@@ -54,12 +54,19 @@ Board Dimensions (M5.1, M5.2)
   :width: 800
   :alt: Tinymovr M5 dimensions
 
-Connectivity (M5.1, M5.2)
+Connectivity (M5.1)
 #########################
 
 .. image:: connectors_m5.png
   :width: 800
-  :alt: Tinymovr M5 connectors and pinouts
+  :alt: Tinymovr M5.1 connectors and pinouts
+
+Connectivity (M5.2)
+#########################
+
+.. image:: connectors_m5_2.png
+  :width: 800
+  :alt: Tinymovr M5.2 connectors and pinouts
 
 
 R3.x
