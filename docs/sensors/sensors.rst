@@ -6,6 +6,13 @@ Overview
 
 This document provides information and guides for using the various angle sensor and encoder types supported by Tinymovr.
 
+Reference Frames
+****************
+
+.. image:: reference_frames.jpg
+  :width: 800
+  :alt: Diagram of the reference frames used in the firmware
+
 Observer bandwidth
 ******************
 
