@@ -31,7 +31,7 @@
 
 volatile uint32_t msTicks = 0;
 
-SchedulerState state = {0};
+static volatile SchedulerState state = {0};
 
 void wait_for_control_loop_interrupt(void)
 {
