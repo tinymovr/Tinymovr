@@ -11,4 +11,5 @@ include tinymovr/specs/tinymovr_1_3_x.yaml
 include tinymovr/specs/tinymovr_1_4_x.yaml
 include tinymovr/specs/tinymovr_1_5_x.yaml
 include tinymovr/specs/tinymovr_1_6_x.yaml
-include tinymovr/specs/dfu.yaml
+include tinymovr/specs/dfu_1_0_x.yaml
+include tinymovr/specs/dfu_1_1_x.yaml

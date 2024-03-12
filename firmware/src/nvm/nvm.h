@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <src/xfs.h>
 #include <src/adc/adc.h>
 #include <src/motor/motor.h>
 #include <src/sensor/sensors.h>
@@ -31,6 +32,7 @@
 struct NVMStruct {
     uint8_t node_id_1;
     uint8_t node_id_2;
+    FramesConfig frames_config;
     ADCConfig adc_config;
     MotorConfig motor_config;
     SensorsConfig sensors_config;

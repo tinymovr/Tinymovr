@@ -4,6 +4,7 @@
 #include <src/observer/observer.h>
 #include <src/controller/controller.h>
 #include <src/utils/utils.h>
+#include <src/xfs.h>
 #include <homing_planner.h>
 #include <src/can/can_endpoints.h>
 
@@ -57,10 +58,10 @@ TM_RAMFUNC bool homing_planner_evaluate()
             if (state.stay_t_current >= config.max_stay_t)
             {
                 // First time the endstop is considered found, reset origins and setpoints
-                user_to_position_sensor.offset = observer_pos;
-                position_sensor_to_user = derive_inverse_transform(&user_to_position_sensor);
-                user_to_motor = combine_transforms(&user_to_position_sensor, &position_sensor_to_motor);
-                motor_to_user = derive_inverse_transform(&user_to_motor);
+                frames.user_to_position_sensor.offset = observer_pos;
+                frames.position_sensor_to_user = derive_inverse_transform(frame_user_to_position_sensor_p());
+                frames.user_to_motor = combine_transforms(frame_user_to_position_sensor_p(), frame_position_sensor_to_motor_p());
+                frames.motor_to_user = derive_inverse_transform(frame_user_to_motor_p());
                 controller_set_pos_setpoint_user_frame(0);
                 controller_set_vel_setpoint_user_frame(0);
             }

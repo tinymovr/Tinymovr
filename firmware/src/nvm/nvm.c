@@ -31,6 +31,7 @@ bool nvm_save_config(void)
 	uint8_t data[sizeof(struct NVMStruct)];
 	s.node_id_1 = CAN_get_ID();
 	s.node_id_2 = CAN_get_ID();
+	frames_get_config(&(s.frames_config));
 	s.adc_config = *ADC_get_config();
 	s.motor_config = *motor_get_config();
 	sensors_get_config(&(s.sensors_config));
@@ -61,6 +62,7 @@ bool nvm_load_config(void)
 	strlcpy(static_version, GIT_VERSION, sizeof(static_version));
 	if (strcmp(s.version, static_version) == 0)
 	{
+		frames_restore_config(&s.frames_config);
 		ADC_restore_config(&s.adc_config);
 		motor_restore_config(&s.motor_config);
 		sensors_restore_config(&s.sensors_config);

@@ -25,11 +25,33 @@ from avlos.deserializer import deserialize
 from tinymovr.codec import DataType
 from tinymovr.channel import CANChannel
 
-specs = {"hash_uint32": {}}
+specs = {}
 
+# We added the following as a temporary solution
+# after a hash was modified without modifying the
+# spec (we are suspecting dependency upgrade
+# breaking hash computation)
+hash_aliases = { 3526126264 : [4118115615]}
+
+def get_device_spec(hash, logger=None):
+    if logger is None:
+        logger = logging.getLogger("tinymovr")
+
+    try:
+        return specs["hash_uint32"][hash]
+    except KeyError:
+        for hash_alias in hash_aliases[hash]:
+            try:
+                spec = specs["hash_uint32"][hash_alias]
+                logger.debug("Found compatible spec via hash alias {} for device hash {}", hash_alias, hash)
+                return spec
+            except KeyError:
+                pass
+    return None
 
 def init_specs_dict():
     global specs
+    specs = {"hash_uint32": {}}
     for yaml_file in Path(files("tinymovr").joinpath("specs/")).glob("*.yaml"):
         with open(str(yaml_file)) as def_raw:
             spec = yaml.safe_load(def_raw)
@@ -64,11 +86,13 @@ def get_bus_config(suggested_types=None):
         raise can.CanInitializationError("No active interface found") from exc
 
 
-def create_device(node_id):
+def create_device(node_id, logger=None):
     """
     Create a device with the defined ID.
     The hash value will be retrieved from the remote.
     """
+    if logger is None:
+        logger = logging.getLogger("tinymovr")
 
     # Temporarily using a default spec to get the protocol_hash
     # This assumes that `protocol_hash` is standard across different specs
@@ -81,11 +105,11 @@ def create_device(node_id):
 
     # Check for the correct spec using the remote hash
     protocol_hash = node.protocol_hash
-    device_spec = specs["hash_uint32"].get(protocol_hash)
+    device_spec = get_device_spec(protocol_hash)
     chan.compare_hash = protocol_hash & 0xFF
 
     if not device_spec:
-        raise ValueError(f"No device spec found for hash {protocol_hash}.")
+        raise ValueError(f"Device found, but incompatible (no device spec found for hash {protocol_hash}).")
 
     node = deserialize(device_spec)
     node._channel = chan
@@ -93,20 +117,27 @@ def create_device(node_id):
     return node
 
 
-def create_device_with_hash_msg(heartbeat_msg):
+def create_device_with_hash_msg(heartbeat_msg, logger=None):
     """
     Create a device, the heartbeat msg will be used
     to decode the actual hash value and id.
     """
+    if logger is None:
+        logger = logging.getLogger("tinymovr")
+
     node_id = heartbeat_msg.arbitration_id & 0x3F
     chan = CANChannel(node_id)
 
     hash, *_ = chan.serializer.deserialize(heartbeat_msg.data[:4], DataType.UINT32)
-    device_spec = specs["hash_uint32"].get(hash)
+    device_spec = get_device_spec(hash)
     chan.compare_hash = hash & 0xFF
 
     if not device_spec:
-        raise ValueError(f"No device spec found for hash {hash}.")
+        # TODO: This message is more descriptive than the
+        # previous ("no device spec found for hash #"), but
+        # may not always be accurate. Still we keep it in
+        # order to better guide the user.4
+        raise ValueError(f"Device found, but incompatible (no device spec found for hash {hash}).")
 
     node = deserialize(device_spec)
 

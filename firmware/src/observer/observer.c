@@ -56,16 +56,16 @@ void observers_init_with_defaults(void)
 	observer_init_with_defaults(&position_observer, &position_sensor_p);
 }
 
-void observers_get_config(ObserversConfig *config_)
+void observers_get_config(ObserversConfig *_config)
 {
-	config_->config_commutation = commutation_observer.config;
-	config_->config_position = position_observer.config;
+	_config->config_commutation = commutation_observer.config;
+	_config->config_position = position_observer.config;
 }
 
-void observers_restore_config(ObserversConfig *config_)
+void observers_restore_config(ObserversConfig *_config)
 {
-	commutation_observer.config = config_->config_commutation;
-	position_observer.config = config_->config_position;
+	commutation_observer.config = _config->config_commutation;
+	position_observer.config = _config->config_position;
 }
 
 void commutation_observer_set_bandwidth(float bw)

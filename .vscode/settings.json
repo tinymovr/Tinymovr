@@ -14,7 +14,19 @@
         "chrono": "c",
         "compare": "c",
         "cstddef": "c",
-        "__locale": "c"
+        "__locale": "c",
+        "__bit_reference": "c",
+        "__node_handle": "c",
+        "atomic": "c",
+        "bitset": "c",
+        "__memory": "c",
+        "locale": "c",
+        "optional": "c",
+        "system_error": "c",
+        "vector": "c",
+        "motor.h": "c",
+        "trajectory_planner.h": "c",
+        "xf1.h": "c"
     },
     "python.testing.unittestArgs": [
         "-v",

@@ -21,7 +21,7 @@
 #include <stdint.h>
 #include <src/common.h>
 #include <src/sensor/sensors.h>
-#include <src/xf1.h>
+#include <src/xfs.h>
 
 typedef struct Observer Observer;
 
@@ -45,27 +45,10 @@ struct Observer {
 typedef struct {
     ObserverConfig config_commutation;
 	ObserverConfig config_position;
-	FrameTransform position_sensor_to_user;
-	FrameTransform user_to_position_sensor;
-	FrameTransform position_sensor_to_motor;
-	FrameTransform motor_to_position_sensor;
-	FrameTransform commutation_sensor_to_motor;
-	FrameTransform motor_to_commutation_sensor;
-	FrameTransform motor_to_user;
-	FrameTransform user_to_motor;
 } ObserversConfig;
 
 Observer commutation_observer;
 Observer position_observer;
-
-FrameTransform position_sensor_to_user;
-FrameTransform user_to_position_sensor;
-FrameTransform position_sensor_to_motor;
-FrameTransform motor_to_position_sensor;
-FrameTransform commutation_sensor_to_motor;
-FrameTransform motor_to_commutation_sensor;
-FrameTransform motor_to_user;
-FrameTransform user_to_motor;
 
 bool observer_init_with_defaults(Observer *o, Sensor **s);
 bool observer_init_with_config(Observer *o, Sensor **s, ObserverConfig *c);
@@ -138,22 +121,22 @@ static inline float observer_get_vel_estimate(Observer *o)
 
 static inline float get_position_observer_to_user_offset(void)
 {
-	return position_sensor_to_user.offset;
+	return frame_position_sensor_to_user_p()->offset;
 }
 
 static inline float get_position_observer_to_user_multiplier(void)
 {
-	return position_sensor_to_user.multiplier;
+	return frame_position_sensor_to_user_p()->multiplier;
 }
 
 static inline void set_position_observer_to_user_offset(float value)
 {
-	position_sensor_to_user.offset = value;
+	frame_position_sensor_to_user_p()->offset = value;
 }
 
 static inline void set_position_observer_to_user_multiplier(float value)
 {
-	position_sensor_to_user.offset = value;
+	frame_position_sensor_to_user_p()->offset = value;
 }
 
 static inline float commutation_observer_get_bandwidth(void)
@@ -192,22 +175,22 @@ static inline float position_observer_get_vel_estimate(void)
 
 static inline float user_frame_get_pos_estimate(void)
 {
-	return apply_transform(position_observer_get_pos_estimate(), &position_sensor_to_user);
+	return apply_transform(position_observer_get_pos_estimate(), frame_position_sensor_to_user_p());
 }
 
 static inline float user_frame_get_vel_estimate(void)
 {
-	return apply_velocity_transform(position_observer_get_vel_estimate(), &position_sensor_to_user);
+	return apply_velocity_transform(position_observer_get_vel_estimate(), frame_position_sensor_to_user_p());
 }
 
 static inline float motor_frame_get_pos_estimate(void)
 {
-	return apply_transform(commutation_observer_get_pos_estimate(), &commutation_sensor_to_motor);
+	return apply_transform(commutation_observer_get_pos_estimate(), frame_commutation_sensor_to_motor_p());
 }
 
 static inline float motor_frame_get_vel_estimate(void)
 {
-	return apply_velocity_transform(commutation_observer_get_vel_estimate(), &commutation_sensor_to_motor);
+	return apply_velocity_transform(commutation_observer_get_vel_estimate(), frame_commutation_sensor_to_motor_p());
 }
 
 static inline float observer_get_epos_motor_frame(void)
