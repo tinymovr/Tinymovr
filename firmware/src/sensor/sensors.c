@@ -222,6 +222,8 @@ bool sensors_calibrate_pole_pair_count_and_transforms(void)
         return false;
     }
 
+    volatile float motor_frame_end_ticks = SENSOR_COMMON_RES_TICKS * (motor_frame_end / (TWOPI * motor_get_pole_pairs()));
+
     // Move back to start epos
     for (uint32_t i = 0; i < CAL_DIR_LEN; i++)
     {
@@ -230,10 +232,19 @@ bool sensors_calibrate_pole_pair_count_and_transforms(void)
     gate_driver_set_duty_cycle(&three_phase_zero);
 
     // Derive transforms
-    frames.position_sensor_to_motor = derive_transform_2p(position_frame_start, 0, position_frame_end, motor_frame_end);
-    frames.motor_to_position_sensor = derive_inverse_transform(frame_position_sensor_to_motor_p());
-    frames.commutation_sensor_to_motor = derive_dir_transform_2p(commutation_frame_start, 0, commutation_frame_end, motor_frame_end);
+    frames.commutation_sensor_to_motor = derive_transform_1p(commutation_frame_end - commutation_frame_start, motor_frame_end_ticks);
     frames.motor_to_commutation_sensor = derive_inverse_transform(frame_commutation_sensor_to_motor_p());
+    if (commutation_sensor_p == position_sensor_p)
+    {
+        frames.position_sensor_to_motor = frames.commutation_sensor_to_motor;
+        frames.motor_to_position_sensor = frames.motor_to_commutation_sensor;
+    }
+    else
+    {
+        frames.position_sensor_to_motor = derive_transform_2p(position_frame_start, position_frame_end, 0, motor_frame_end_ticks);
+        frames.motor_to_position_sensor = derive_inverse_transform(frame_position_sensor_to_motor_p());
+    }
+    
     frames.user_to_motor = combine_transforms(frame_user_to_position_sensor_p(), frame_position_sensor_to_motor_p());
     frames.motor_to_user = derive_inverse_transform(frame_user_to_motor_p());
     // Not needed

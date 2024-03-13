@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <src/xfs.h>
 #include <src/sensor/ma7xx.h>
 #include <src/sensor/hall.h>
 #include <src/sensor/as5047.h>
@@ -114,10 +115,10 @@ static inline void sensors_calibrate(void)
         commutation_sensor_p->calibrate_func(commutation_sensor_p, &commutation_observer);
     }
     sensors_calibrate_pole_pair_count_and_transforms();
-    sensor_calibrate_eccentricity_compensation(commutation_sensor_p, &commutation_observer);
+    sensor_calibrate_eccentricity_compensation(commutation_sensor_p, &commutation_observer, frame_motor_to_commutation_sensor_p());
     if (commutation_sensor_p != position_sensor_p)
     {
-        sensor_calibrate_eccentricity_compensation(position_sensor_p, &position_observer);
+        sensor_calibrate_eccentricity_compensation(position_sensor_p, &position_observer, frame_motor_to_position_sensor_p());
     }
 }
 
