@@ -136,7 +136,7 @@ static inline void set_position_observer_to_user_offset(float value)
 
 static inline void set_position_observer_to_user_multiplier(float value)
 {
-	frame_position_sensor_to_user_p()->offset = value;
+	frame_position_sensor_to_user_p()->multiplier = value;
 }
 
 static inline float commutation_observer_get_bandwidth(void)
