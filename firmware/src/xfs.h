@@ -29,7 +29,10 @@ typedef struct {
 	FrameTransform user_to_motor;
 } FramesConfig;
 
-static FramesConfig frames;
+static FramesConfig frames = {
+    .position_sensor_to_user = DEFAULT_TRANSFORM,
+    .user_to_position_sensor = DEFAULT_TRANSFORM
+};
 
 static inline void frames_get_config(FramesConfig *_config)
 {
