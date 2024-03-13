@@ -18,6 +18,7 @@
 #pragma once
 
 #include <src/common.h>
+#include <src/xfs.h>
 #include <src/ssp/ssp_func.h>
 #include <src/motor/motor.h>
 
@@ -86,7 +87,8 @@ struct Sensor { // typedefd earlier
 };
 
 void sensor_reset(Sensor *s);
-bool sensor_calibrate_eccentricity_compensation(Sensor *s, Observer *o);
+bool sensor_calibrate_eccentricity_compensation(Sensor *s, Observer *o, FrameTransform *xf_motor_to_sensor);
+
 
 static inline void sensor_update(Sensor *s, bool check_error)
 {
