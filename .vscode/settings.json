@@ -26,7 +26,9 @@
         "vector": "c",
         "motor.h": "c",
         "trajectory_planner.h": "c",
-        "xf1.h": "c"
+        "xf1.h": "c",
+        "controller.h": "c",
+        "observer.h": "c"
     },
     "python.testing.unittestArgs": [
         "-v",
