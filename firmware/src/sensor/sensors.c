@@ -232,7 +232,7 @@ bool sensors_calibrate_pole_pair_count_and_transforms(void)
     gate_driver_set_duty_cycle(&three_phase_zero);
 
     // Derive transforms
-    frames.commutation_sensor_to_motor = derive_transform_1p(commutation_frame_end - commutation_frame_start, motor_frame_end_ticks);
+    frames.commutation_sensor_to_motor = derive_dir_transform_2p(commutation_frame_start, commutation_frame_end, 0, motor_frame_end_ticks);
     frames.motor_to_commutation_sensor = derive_inverse_transform(frame_commutation_sensor_to_motor_p());
     if (commutation_sensor_p == position_sensor_p)
     {

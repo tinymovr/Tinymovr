@@ -32,28 +32,28 @@ static inline FrameTransform derive_inverse_transform(const FrameTransform* orig
 }
 
 // Function to derive a FrameTransform based on positions in two frames
-static inline FrameTransform derive_transform_2p(float commandedSource, float measuredSource, float commandedTarget, float measuredTarget) {
+static inline FrameTransform derive_transform_2p(float As, float At, float Bs, float Bt) {
     FrameTransform transformation;
 
-    float sourceDelta = measuredSource - commandedSource;
-    float targetDelta = measuredTarget - commandedTarget;
+    float sourceDelta = Bs - As;
+    float targetDelta = Bt - At;
 
     if (sourceDelta == 0) {
         // If there's no change in source, the multiplier should be set to 1
         // and the offset is simply the difference between target and source positions
         transformation.multiplier = 1.0f;
-        transformation.offset = commandedTarget - commandedSource;
+        transformation.offset = At - As;
     } else {
         // Calculate multiplier, incorporating direction based on the delta values
         transformation.multiplier = targetDelta / sourceDelta;
         // Calculate offset using one pair of points
-        transformation.offset = commandedTarget - (commandedSource * transformation.multiplier);
+        transformation.offset = At - (As * transformation.multiplier);
     }
 
     return transformation;
 }
 
-static inline FrameTransform derive_dir_transform_2p(float As, float Bs, float At, float Bt) {
+static inline FrameTransform derive_dir_transform_2p(float As, float At, float Bs, float Bt) {
     FrameTransform transform;
 
     // Calculate the direction of the movement in both frames
