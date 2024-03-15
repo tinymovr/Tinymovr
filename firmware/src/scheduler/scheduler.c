@@ -31,46 +31,47 @@
 
 volatile uint32_t msTicks = 0;
 
-static volatile SchedulerState state = {0};
+volatile SchedulerState scheduler_state = {0};
 
 void wait_for_control_loop_interrupt(void)
 {
-	
-	while (!state.adc_interrupt)
+	while (!scheduler_state.adc_interrupt)
 	{
 		
-		if (state.can_interrupt)
+		if (scheduler_state.can_interrupt)
 		{
 			// Handle CAN
 			CAN_process_interrupt();
 			// Only clear the flag if all messages in the CAN RX buffer have been processed
 			if (PAC55XX_CAN->SR.RBS == 0)
 			{
-				state.can_interrupt = false;
+				scheduler_state.can_interrupt = false;
 			}
 		}
-		else if (state.uart_message_interrupt)
+		else if (scheduler_state.uart_message_interrupt)
 		{
 			// Handle UART
-			state.uart_message_interrupt = false;
+			scheduler_state.uart_message_interrupt = false;
 			UART_process_message();
 		}
-		else if (state.wwdt_interrupt)
+		else if (scheduler_state.wwdt_interrupt)
 		{
-			state.wwdt_interrupt = false;
+			scheduler_state.wwdt_interrupt = false;
 			WWDT_process_interrupt();
 		}
 		else
 		{
-			state.busy = false;
+			scheduler_state.busy = false;
+			scheduler_state.load = DWT->CYCCNT;
 			// Go back to sleep
 			__DSB();
 			__ISB();
 			__WFI();
 		}
 	}
-	state.busy = true;
-	state.adc_interrupt = false;
+	scheduler_state.busy = true;
+	scheduler_state.adc_interrupt = false;
+	DWT->CYCCNT = 0;
 	// We have to service the control loop by updating
 	// current measurements and encoder estimates.
 	sensor_invalidate(commutation_sensor_p);
@@ -95,22 +96,22 @@ void ADC_IRQHandler(void)
 	// the control deadline is not missed,
 	// i.e. the previous control loop is complete prior
 	// to the ADC triggering the next
-	if ((gate_driver_is_enabled() == true) && (state.busy == true))
+	if (gate_driver_is_enabled() && scheduler_state.busy)
 	{
-		state.errors |= SCHEDULER_ERRORS_CONTROL_BLOCK_REENTERED;
+		scheduler_state.errors |= SCHEDULER_ERRORS_CONTROL_BLOCK_REENTERED;
 		// We do not change the control state here, to
 		// avoid any concurrency issues
 	}
 	else
 	{
-		state.adc_interrupt = true;
+		scheduler_state.adc_interrupt = true;
 	}
 }
 
 void CAN_IRQHandler(void)
 {
 	pac5xxx_can_int_clear_RI();
-	state.can_interrupt = true;
+	scheduler_state.can_interrupt = true;
 }
 
 void SysTick_Handler(void)
@@ -122,18 +123,14 @@ void SysTick_Handler(void)
 
 void UART_ReceiveMessageHandler(void)
 {
-	state.uart_message_interrupt = true;
+	scheduler_state.uart_message_interrupt = true;
 }
 
 void Wdt_IRQHandler(void)
 {
-	state.wwdt_interrupt = true;
+	scheduler_state.wwdt_interrupt = true;
 	PAC55XX_WWDT->WWDTLOCK = WWDTLOCK_REGS_WRITE_AVALABLE;
     // Interrupt flag needs to be cleared here
     PAC55XX_WWDT->WWDTFLAG.IF = 1;
 }
 
-TM_RAMFUNC uint8_t scheduler_get_errors(void)
-{
-	return state.errors;
-}
