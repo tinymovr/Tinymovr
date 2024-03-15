@@ -22,6 +22,12 @@
 void gate_driver_enable(void);
 void gate_driver_disable(void);
 
+typedef struct {
+    bool enabled;
+} GateDriverState;
+
+extern GateDriverState gate_driver_state;
+
 static inline void m1_u_set_duty(const float duty)
 {
     uint16_t val = ((uint16_t)(duty * (TIMER_FREQ_HZ/PWM_FREQ_HZ) )) >>1;
@@ -49,5 +55,5 @@ static inline void gate_driver_set_duty_cycle(const FloatTriplet *dutycycles)
 
 static inline bool gate_driver_is_enabled(void)
 {
-    return ((pac5xxx_tile_register_read(ADDR_ENDRV) & 0x1) == 1);
+    return gate_driver_state.enabled;
 }

@@ -18,6 +18,8 @@
 #include <src/motor/motor.h>
 #include <src/gatedriver/gatedriver.h>
 
+GateDriverState gate_driver_state = {0};
+
 TM_RAMFUNC void gate_driver_enable(void)
 {
     // Select PWMA peripheral for Port B
@@ -39,6 +41,8 @@ TM_RAMFUNC void gate_driver_enable(void)
 
     pac5xxx_tile_register_write(ADDR_CFGDRV4,
             pac5xxx_tile_register_read(ADDR_CFGDRV4) | 0x1); // BBM is bit 0
+
+    gate_driver_state.enabled = ((pac5xxx_tile_register_read(ADDR_ENDRV) & 0x1) == 1);
 }
 
 TM_RAMFUNC void gate_driver_disable(void)
@@ -57,5 +61,7 @@ TM_RAMFUNC void gate_driver_disable(void)
 
     // Turn on output enables
     PAC55XX_GPIOB->OUTMASK.w = 0x00;
+
+    gate_driver_state.enabled = ((pac5xxx_tile_register_read(ADDR_ENDRV) & 0x1) == 1);
 }
 
