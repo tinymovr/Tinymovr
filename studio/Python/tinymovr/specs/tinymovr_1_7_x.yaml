@@ -85,6 +85,11 @@ remote_attributes:
     dtype: uint32
   - name: scheduler
     remote_attributes:
+      - name: load
+        summary: Processor load in ticks per PWM cycle.
+        getter_name: scheduler_get_load
+        meta: {dynamic: True}
+        dtype: uint32
       - name: errors
         flags: [CONTROL_BLOCK_REENTERED]
         meta: {dynamic: True}
