@@ -42,19 +42,4 @@ void timers_init(void)
     PAC55XX_TIMERA->CCTR5.CTR = 0;
     PAC55XX_TIMERA->CCTR6.CTR = 0;
 
-#if defined(DEBUG)
-
-    // Timer B -- Performance Instrumentation (ddebug only)
-
-    // Configure timer clock input for ACLK, divider
-    pac5xxx_timer_clock_config(TimerB, TXCTL_CS_ACLK, TXCTL_PS_DIV);      
-    // Configure timer frequency and count mode             
-    pac5xxx_timer_base_config(TimerB, (TIMER_FREQ_HZ/(PWM_FREQ_HZ*100)), AUTO_RELOAD,
-            TxCTL_MODE_UPDOWN, TIMER_SLAVE_SYNC_DISABLE);    
-
-    PAC55XX_TIMERB->CCTR4.CTR = 0;
-    PAC55XX_TIMERB->CCTR5.CTR = 0;
-    PAC55XX_TIMERB->CCTR6.CTR = 0;                           
-
-#endif
 }
