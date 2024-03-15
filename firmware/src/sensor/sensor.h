@@ -83,7 +83,8 @@ struct Sensor { // typedefd earlier
     uint8_t bits;
     uint32_t ticks;
     bool initialized : 1;
-    bool current : 1;
+    bool prepared : 1;
+    bool updated : 1;
 };
 
 void sensor_reset(Sensor *s);
@@ -92,16 +93,17 @@ bool sensor_calibrate_eccentricity_compensation(Sensor *s, Observer *o, FrameTra
 
 static inline void sensor_update(Sensor *s, bool check_error)
 {
-    if (s->current == false)
+    if (s->updated == false)
     {
         s->update_func(s, check_error);
-        s->current = true;
+        s->updated = true;
     }
 }
 
 static inline void sensor_invalidate(Sensor *s)
 {
-    s->current = false;
+    s->updated = false;
+    s->prepared = false;
 }
 
 static inline uint8_t sensor_get_bits(const Sensor *s)
@@ -116,9 +118,10 @@ static inline uint32_t sensor_get_ticks(const Sensor *s)
 
 static inline void sensor_prepare(Sensor *s)
 {
-    if (s->prepare_func && s->current == false)
+    if (s->prepare_func && s->prepared == false)
     {
         s->prepare_func(s);
+        s->prepared = true;
     }
 }
 
