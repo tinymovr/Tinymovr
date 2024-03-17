@@ -35,7 +35,7 @@ static CANConfig config = {
     .kbaud_rate = CAN_BAUD_1000KHz,
     .heartbeat_period = 1000};
 
-static CANState state ={0};
+static CANState can_state ={0};
 
 extern volatile uint32_t msTicks;
 
@@ -148,7 +148,7 @@ void CAN_process_interrupt(void)
         uint8_t response_type = callback(can_msg_buffer, &data_length, (uint8_t)rtr);
         if ((AVLOS_RET_READ == response_type || AVLOS_RET_CALL == response_type) && (data_length > 0))
         {
-            state.last_msg_ms = msTicks;
+            can_state.last_msg_ms = msTicks;
             can_transmit_extended(data_length, rx_id, can_msg_buffer);
         }
     }
@@ -167,10 +167,10 @@ void CAN_restore_config(CANConfig *config_)
 
 void CAN_update(void) {
     // Transmit heartbeat
-    const uint32_t msg_diff = msTicks - state.last_msg_ms;
+    const uint32_t msg_diff = msTicks - can_state.last_msg_ms;
     if (msg_diff >= config.heartbeat_period && PAC55XX_CAN->SR.TBS != 0)
     {
-        state.last_msg_ms = msTicks;
+        can_state.last_msg_ms = msTicks;
         uint32_t proto_hash = _avlos_get_proto_hash();
         uint8_t buf[8];
         memcpy(buf, &proto_hash, sizeof(proto_hash));
