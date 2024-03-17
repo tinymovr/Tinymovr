@@ -210,7 +210,8 @@ TM_RAMFUNC void CLControlStep(void)
     }
 
     // Velocity-dependent current limiting
-    if (Controller_LimitVelocity(-config.vel_limit, config.vel_limit, vel_estimate, config.vel_gain, &Iq_setpoint) == true)
+    const float vel_estimate_motor_frame = apply_velocity_transform(vel_estimate, frame_position_sensor_to_motor_p());
+    if (Controller_LimitVelocity(-config.vel_limit, config.vel_limit, vel_estimate_motor_frame, config.vel_gain, &Iq_setpoint) == true)
     {
         state.vel_integrator *= 0.995f;
         state.warnings |= CONTROLLER_WARNINGS_VELOCITY_LIMITED;
