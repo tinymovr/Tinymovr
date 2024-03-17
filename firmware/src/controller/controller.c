@@ -290,8 +290,8 @@ TM_RAMFUNC void CLControlStep(void)
     }
 
     // Inverse Park transform
-    float mod_a = (c_I * mod_d) - (s_I * mod_q);
-    float mod_b = (c_I * mod_q) + (s_I * mod_d);
+    const float mod_a = (c_I * mod_d) - (s_I * mod_q);
+    const float mod_b = (c_I * mod_q) + (s_I * mod_d);
 
     SVM(mod_a, mod_b, &state.modulation_values.A,
         &state.modulation_values.B, &state.modulation_values.C);
@@ -583,8 +583,8 @@ void controller_restore_config(ControllerConfig *config_)
     config = *config_;
 }
 
-static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
-                                            float vel_gain, float *I)
+static inline bool Controller_LimitVelocity(const float min_limit, const float max_limit, const float vel_estimate,
+                                            const float vel_gain, float *I)
 {
     float Imax = (max_limit - vel_estimate) * vel_gain;
     float Imin = (min_limit - vel_estimate) * vel_gain;
