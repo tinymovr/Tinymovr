@@ -352,13 +352,13 @@ remote_attributes:
           - name: offset
             dtype: float
             unit: ticks
-            getter_name: get_position_observer_to_user_offset
-            setter_name: set_position_observer_to_user_offset
+            getter_name: frame_user_to_position_sensor_get_offset
+            setter_name: frame_user_to_position_sensor_set_offset
             summary: The user defined offset.
           - name: multiplier
             dtype: float
-            getter_name: get_position_observer_to_user_multiplier
-            setter_name: set_position_observer_to_user_multiplier
+            getter_name: frame_user_to_position_sensor_get_multiplier
+            setter_name: frame_user_to_position_sensor_set_multiplier
             summary: The user defined multipler.
       - name: setup
         remote_attributes:

@@ -789,7 +789,7 @@ uint8_t avlos_sensors_user_frame_offset(uint8_t * buffer, uint8_t * buffer_len, 
 {
 if (AVLOS_CMD_READ == cmd) {
         float v;
-        v = get_position_observer_to_user_offset();
+        v = frame_user_to_position_sensor_get_offset();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
@@ -797,7 +797,7 @@ if (AVLOS_CMD_READ == cmd) {
 else if (AVLOS_CMD_WRITE == cmd) {
         float v;
         memcpy(&v, buffer, sizeof(v));
-        set_position_observer_to_user_offset(v);
+        frame_user_to_position_sensor_set_offset(v);
         return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;
@@ -807,7 +807,7 @@ uint8_t avlos_sensors_user_frame_multiplier(uint8_t * buffer, uint8_t * buffer_l
 {
 if (AVLOS_CMD_READ == cmd) {
         float v;
-        v = get_position_observer_to_user_multiplier();
+        v = frame_user_to_position_sensor_get_multiplier();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
@@ -815,7 +815,7 @@ if (AVLOS_CMD_READ == cmd) {
 else if (AVLOS_CMD_WRITE == cmd) {
         float v;
         memcpy(&v, buffer, sizeof(v));
-        set_position_observer_to_user_multiplier(v);
+        frame_user_to_position_sensor_set_multiplier(v);
         return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;
