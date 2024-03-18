@@ -80,3 +80,46 @@ static inline FrameTransform *frame_user_to_motor_p(void)
 {
     return &(frames.user_to_motor);
 }
+
+static inline float frame_user_to_position_sensor_get_offset(void)
+{
+	return frame_user_to_position_sensor_p()->offset;
+}
+
+static inline float frame_user_to_position_sensor_get_multiplier(void)
+{
+	return frame_user_to_position_sensor_p()->multiplier;
+}
+
+static inline void frame_user_to_position_sensor_set_offset(float value)
+{
+    frames.user_to_position_sensor.offset = value;
+    frames.position_sensor_to_user = derive_inverse_transform(frame_user_to_position_sensor_p());
+    frames.user_to_motor = combine_transforms(frame_user_to_position_sensor_p(), frame_position_sensor_to_motor_p());
+    frames.motor_to_user = derive_inverse_transform(frame_user_to_motor_p());
+}
+
+static inline void frame_user_to_position_sensor_set_multiplier(float value)
+{
+    if (value != 0)
+    {
+        frames.user_to_position_sensor.multiplier = value;
+        frames.position_sensor_to_user = derive_inverse_transform(frame_user_to_position_sensor_p());
+        frames.user_to_motor = combine_transforms(frame_user_to_position_sensor_p(), frame_position_sensor_to_motor_p());
+        frames.motor_to_user = derive_inverse_transform(frame_user_to_motor_p());
+    }
+}
+
+static inline void frame_set_commutation_sensor_to_motor(const FrameTransform value)
+{
+    frames.commutation_sensor_to_motor = value;
+    frames.motor_to_commutation_sensor = derive_inverse_transform(frame_commutation_sensor_to_motor_p());
+}
+
+static inline void frame_set_position_sensor_to_motor(const FrameTransform value)
+{
+    frames.position_sensor_to_motor = value;
+    frames.motor_to_position_sensor = derive_inverse_transform(&value);
+    frames.user_to_motor = combine_transforms(frame_user_to_position_sensor_p(), frame_position_sensor_to_motor_p());
+    frames.motor_to_user = derive_inverse_transform(frame_user_to_motor_p());
+}

@@ -119,26 +119,6 @@ static inline float observer_get_vel_estimate(Observer *o)
 
 // Interface functions
 
-static inline float get_position_observer_to_user_offset(void)
-{
-	return frame_position_sensor_to_user_p()->offset;
-}
-
-static inline float get_position_observer_to_user_multiplier(void)
-{
-	return frame_position_sensor_to_user_p()->multiplier;
-}
-
-static inline void set_position_observer_to_user_offset(float value)
-{
-	frame_position_sensor_to_user_p()->offset = value;
-}
-
-static inline void set_position_observer_to_user_multiplier(float value)
-{
-	frame_position_sensor_to_user_p()->multiplier = value;
-}
-
 static inline float commutation_observer_get_bandwidth(void)
 {
 	return observer_get_bandwidth(&commutation_observer);
