@@ -9,9 +9,53 @@ This document provides information and guides for using the various angle sensor
 Reference Frames
 ****************
 
+In the context of Tinymovr motor control, reference frames are essential for understanding the transformation of sensor data and user setpoints into motor control signals. The following diagram depicts the reference frames and their interconnections:
+
+The diagram below illustrates the flow of data from the physical sensors through various observers and frames, finally reaching the motor.
+
 .. image:: reference_frames.jpg
   :width: 800
   :alt: Diagram of the reference frames used in the firmware
+
+Position Sensor Frame (PSF)
+---------------------------
+
+The Position Sensor Frame (PSF) corresponds to the filtered position sensor data. The main function of this frame is to provide feedback on the estimated position and velocity of the rotor, and therefore provide feedback to the position and velocity control loops. As the homing and trajectory planners also rely on position and velocity estimates, this frame also affects those functions.
+
+Commutation Sensor Frame (CSF)
+------------------------------
+
+The Commutation Sensor Frame (CSF) corresponds to the filtered commutation sensor data. In ths simplest scenario, the position and commutation sensors are the same, as such the PSF and CSF are identical. The main function of this frame is to provide the estimated rotor angle to the current control loop, so that the electrical angle is derived in the Motor Frame, for Field Oriented Control.
+
+Motor Frame (MF)
+----------------
+
+The origin of the Motor Frame (MF) corresponds to the zero electrical angle of the electrical cycle energized during calibration. This is the frame used by current control, and related dq, inverse Park and SVPWM transforms.
+
+User Frame (UF)
+---------------
+
+The User Frame is the interface exposed to the Tinymovr API, allowing the user to command the motor using position, veocity and current setpoints. This frame is related to the PSF, so that the user commands are predominantly based on the position data, with the commutation aspect being internally managed by the firmware's observer algorithms.
+
+Frame Transforms
+----------------
+
+Data from the Position and Commutation Sensors is forwarded to their respective observers. The observers are responsible for filtering the sensor readings and providing position and velocity estimates. This processed data is then translated into two separate frames:
+
+1. The Position Sensor Frame, which carries the filtered position data.
+2. The Commutation Sensor Frame, which ensures the motor's proper electrical commutation.
+
+These frames are then employed to inform the Motor Frame, which is the final reference before actuating the motor. 
+
+As a summary, the following ransforms are derived during calibration and are stored in the Tinymovr firmware:
+
+1. UF <-> PSF
+2. PSF <-> CSF
+3. CSF <-> MF
+4. UF <-> MF
+
+Tinymovr makes use of the XF1 library, which has been developed for this purpose and offers convenience functions to perform transforms, derive transforms from data, as well as inverse and constrained transforms.
+
 
 Observer bandwidth
 ******************
