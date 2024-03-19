@@ -63,6 +63,7 @@ bool sensor_calibrate_eccentricity_compensation(Sensor *s, Observer *o, FrameTra
         error_ticks[n - i - 1] += apply_transform(e_pos_ref * e_pos_to_ticks, xf_motor_to_sensor) - pos_meas_sensor_frame;
     }
     gate_driver_set_duty_cycle(&three_phase_zero);
+    // temporarily disable the inverter, as the following computations will probably exceed a single PWM cycle
     gate_driver_disable();
 
     // FIR filtering and map measurements to lut
@@ -85,6 +86,7 @@ bool sensor_calibrate_eccentricity_compensation(Sensor *s, Observer *o, FrameTra
         acc = acc / ((float)(ECN_SIZE * 2));
         lut[i] = (int32_t)acc;
     }
+    gate_driver_enable();
     wait_pwm_cycles(5000);
     s->config.rec_calibrated = true;
     return true;
