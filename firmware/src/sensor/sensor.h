@@ -82,6 +82,7 @@ struct Sensor { // typedefd earlier
     sensor_get_errors_func_t get_errors_func;
     uint8_t bits;
     uint32_t ticks;
+    float normalization_factor;
     bool initialized : 1;
     bool prepared : 1;
     bool updated : 1;
@@ -133,4 +134,9 @@ static inline int32_t sensor_get_angle_rectified(const Sensor *s)
 	const int32_t off_2 = s->config.rec_table[((angle>>offset_bits) + 1) % ECN_SIZE];
 	const int32_t off_interp = off_1 + ((off_2 - off_1)* (angle - ((angle>>offset_bits)<<offset_bits))>>offset_bits);
 	return angle + off_interp;
+}
+
+static inline float sensor_get_angle_rectified_normalized(const Sensor *s)
+{
+    return sensor_get_angle_rectified(s) * s->normalization_factor;
 }

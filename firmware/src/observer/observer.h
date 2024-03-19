@@ -30,6 +30,8 @@ typedef struct
 	float track_bw;
 	float kp;
 	float ki;
+	float kp_period;
+	float ki_period;
 } ObserverConfig;
 
 struct Observer {
@@ -64,8 +66,7 @@ static inline void observer_update(Observer *o)
 {
 	if (o->current == false)
 	{
-		const float sensor_res_norm_factor = SENSOR_COMMON_RES_TICKS_FLOAT / sensor_get_ticks(*(o->sensor_ptr));
-		const float angle_meas = sensor_get_angle_rectified(*(o->sensor_ptr)) * sensor_res_norm_factor;
+		const float angle_meas = sensor_get_angle_rectified_normalized(*(o->sensor_ptr));
 		const float delta_pos_est = PWM_PERIOD_S * o->vel_estimate;
 		float delta_pos_meas = angle_meas - o->pos_estimate_wrapped;
 		if (delta_pos_meas < -SENSOR_COMMON_RES_HALF_TICKS)
@@ -77,7 +78,7 @@ static inline void observer_update(Observer *o)
 			delta_pos_meas -= SENSOR_COMMON_RES_TICKS;
 		}
 		const float delta_pos_error = delta_pos_meas - delta_pos_est;
-		const float incr_pos = delta_pos_est + (PWM_PERIOD_S * o->config.kp * delta_pos_error);
+		const float incr_pos = delta_pos_est + (o->config.kp_period * delta_pos_error);
 		o->pos_estimate_wrapped += incr_pos;
 		if (o->pos_estimate_wrapped < 0)
 		{
@@ -89,7 +90,7 @@ static inline void observer_update(Observer *o)
 			o->pos_estimate_wrapped -= SENSOR_COMMON_RES_TICKS;
 			o->pos_sector += 1;
 		}
-		o->vel_estimate += PWM_PERIOD_S * o->config.ki * delta_pos_error;
+		o->vel_estimate += o->config.ki_period * delta_pos_error;
 		o->current = true;
 	}
 }

@@ -29,6 +29,7 @@ void hall_make_blank_sensor(Sensor *s)
     s->config.type = SENSOR_TYPE_HALL;
     s->bits = HALL_BITS;
     s->ticks = HALL_SECTORS;
+    s->normalization_factor = SENSOR_COMMON_RES_TICKS_FLOAT / s->ticks;
     s->get_raw_angle_func = hall_get_angle;
     s->update_func = hall_update;
     s->reset_func = hall_reset;

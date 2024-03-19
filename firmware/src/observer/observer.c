@@ -47,6 +47,8 @@ void observer_set_bandwidth(Observer *o, float bw)
         o->config.track_bw = bw;
 		o->config.kp = 2.0f * o->config.track_bw;
     	o->config.ki = 0.25f * (o->config.kp * o->config.kp);
+		o->config.kp_period = o->config.kp * PWM_PERIOD_S;
+		o->config.ki_period = o->config.ki * PWM_PERIOD_S;
     }
 }
 

@@ -28,6 +28,7 @@ void ma7xx_make_blank_sensor(Sensor *s)
     s->config.type = SENSOR_TYPE_MA7XX;
     s->bits = MA7XX_BITS;
     s->ticks = MA7XX_TICKS;
+    s->normalization_factor = SENSOR_COMMON_RES_TICKS_FLOAT / s->ticks;
     s->is_calibrated_func = ma7xx_rec_is_calibrated;
     s->get_raw_angle_func = ma7xx_get_raw_angle;
     s->deinit_func = ma7xx_deinit;

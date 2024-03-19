@@ -226,6 +226,7 @@ TM_RAMFUNC void CLControlStep(void)
 
     // Flux braking
     const float Vbus_voltage = system_get_Vbus();
+    const float one_over_Vbus_voltage = 1.0f / Vbus_voltage;
     if (config.max_Ibrake > 0)
     {
         state.Id_setpoint = our_clamp(-state.Ibus_est*Vbus_voltage, 0, config.max_Ibrake);
@@ -273,8 +274,8 @@ TM_RAMFUNC void CLControlStep(void)
     }
     state.Vq_setpoint = Vq;
     
-    float mod_q = Vq / Vbus_voltage;
-    float mod_d = Vd / Vbus_voltage;
+    float mod_q = Vq * one_over_Vbus_voltage;
+    float mod_d = Vd * one_over_Vbus_voltage;
     state.Ibus_est = state.Iq_estimate * mod_q + state.Id_estimate * mod_d;
     state.power_est = state.Ibus_est * Vbus_voltage;
 
