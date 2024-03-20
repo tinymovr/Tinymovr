@@ -214,7 +214,7 @@ bool sensors_calibrate_pole_pair_count_and_transforms(void)
     const float position_frame_end = position_observer_get_pos_estimate();
 
     // Find pole pairs if not Hall; otherwise have to be defined manually
-    if (commutation_sensor_p->config.type != SENSOR_TYPE_HALL)
+    if (sensor_get_type(commutation_sensor_p) != SENSOR_TYPE_HALL)
     {
         if (!motor_find_pole_pairs(SENSOR_COMMON_RES_TICKS, commutation_frame_start, commutation_frame_end, motor_frame_end))
         {

@@ -117,11 +117,11 @@ static inline void sensors_calibrate(void)
 
     sensors_calibrate_pole_pair_count_and_transforms();
 
-    if (commutation_sensor_p->config.type != SENSOR_TYPE_HALL)
+    if (sensor_get_type(commutation_sensor_p) != SENSOR_TYPE_HALL)
     {
         sensor_calibrate_eccentricity_compensation(commutation_sensor_p, &commutation_observer, frame_motor_to_commutation_sensor_p());
     }
-    if (commutation_sensor_p != position_sensor_p && position_sensor_p->config.type != SENSOR_TYPE_HALL)
+    if (commutation_sensor_p != position_sensor_p && sensor_get_type(position_sensor_p) != SENSOR_TYPE_HALL)
     {
         sensor_calibrate_eccentricity_compensation(position_sensor_p, &position_observer, frame_motor_to_position_sensor_p());
     }

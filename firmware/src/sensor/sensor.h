@@ -117,6 +117,11 @@ static inline uint32_t sensor_get_ticks(const Sensor *s)
     return s->ticks;
 }
 
+static inline sensor_type_t sensor_get_type(const Sensor *s)
+{
+    return s->config.type;
+}
+
 static inline void sensor_prepare(Sensor *s)
 {
     if (s->prepare_func && s->prepared == false)
