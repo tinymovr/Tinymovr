@@ -71,5 +71,6 @@ void as5047p_reset(Sensor *s)
 
 void as5047p_get_ss_config(Sensor *s, void* buffer)
 {
-
+    const AS5047PSensor *ss = ((const AS5047PSensor *)s);
+    memcpy(buffer, &(ss->config), sizeof(ss->config));
 }

@@ -72,5 +72,6 @@ void ma7xx_reset(Sensor *s)
 
 void ma7xx_get_ss_config(Sensor *s, void* buffer)
 {
-
+    const MA7xxSensor *ss = ((const MA7xxSensor *)s);
+    memcpy(buffer, &(ss->config), sizeof(ss->config));
 }

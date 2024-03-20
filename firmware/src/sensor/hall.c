@@ -148,5 +148,6 @@ bool hall_calibrate_sequence(Sensor *s, Observer *o)
 
 void hall_get_ss_config(Sensor *s, void* buffer)
 {
-
+    const HallSensor *ss = ((const HallSensor *)s);
+    memcpy(buffer, &(ss->config), sizeof(ss->config));
 }
