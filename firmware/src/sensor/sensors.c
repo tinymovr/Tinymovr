@@ -210,18 +210,21 @@ bool sensors_calibrate_pole_pair_count_and_transforms(void)
 
     set_epos_and_wait(motor_frame_end, I_setpoint);
     wait_pwm_cycles(CAL_STAY_LEN);
-    float commutation_frame_end = commutation_observer_get_pos_estimate();
-    float position_frame_end = position_observer_get_pos_estimate();
+    const float commutation_frame_end = commutation_observer_get_pos_estimate();
+    const float position_frame_end = position_observer_get_pos_estimate();
 
-    // Find pole pairs
-    if (!motor_find_pole_pairs(SENSOR_COMMON_RES_TICKS, commutation_frame_start, commutation_frame_end, motor_frame_end))
+    // Find pole pairs if not Hall; otherwise have to be defined manually
+    if (commutation_sensor_p->config.type != SENSOR_TYPE_HALL)
     {
-        uint8_t *error_ptr = motor_get_error_ptr();
-        *error_ptr |= MOTOR_ERRORS_INVALID_POLE_PAIRS;
-        return false;
+        if (!motor_find_pole_pairs(SENSOR_COMMON_RES_TICKS, commutation_frame_start, commutation_frame_end, motor_frame_end))
+        {
+            uint8_t *error_ptr = motor_get_error_ptr();
+            *error_ptr |= MOTOR_ERRORS_INVALID_POLE_PAIRS;
+            return false;
+        }
     }
 
-    volatile float motor_frame_end_ticks = SENSOR_COMMON_RES_TICKS * (motor_frame_end / (TWOPI * motor_get_pole_pairs()));
+    const float motor_frame_end_ticks = SENSOR_COMMON_RES_TICKS * (motor_frame_end / (TWOPI * motor_get_pole_pairs()));
 
     // Move back to start epos
     for (uint32_t i = 0; i < CAL_DIR_LEN; i++)
