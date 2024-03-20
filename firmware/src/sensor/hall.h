@@ -67,7 +67,7 @@ static inline void hall_update(Sensor *s, bool check_error)
     HallSensor *ms = (HallSensor *)s;
     const uint8_t sector = (pac5xxx_tile_register_read(ADDR_DINSIG1) >> 1) & 0x07;
     ms->sector = sector;
-    ms->angle = ms->config.sector_map[ms->sector];
+    ms->angle = ms->config.sector_map[ms->sector] * s->normalization_factor;
 }
 
 static inline uint8_t hall_get_sector(const Sensor *s)
