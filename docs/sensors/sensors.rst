@@ -16,14 +16,15 @@ Hall Effect Sensor
 
 To use Hall effect sensors, you need to connect the sensor's power supply, phases and ground to the correct pins on the Tinymovr board. The pinout for the Hall effect sensor connector is shown below.
 
-.. image:: hall_pinout.jpg
+.. image:: hall_pinout_R52.jpg
   :width: 800
-  :alt: Hall effect sensor connection diagram
+  :alt: Hall effect sensor connection diagram for Tinymovr R5.2
 
-.. note::
-  The diagram shows the connector side of the board, i.e. the side where the CAN, UART and SPI connectors, and also the DC-link capacitors are located.
+.. image:: hall_pinout_R51.jpg
+  :width: 800
+  :alt: Hall effect sensor connection diagram for Tinymovr R5.1
 
-Note the U, V and W pins. These need to be connected to the respective pins of the sensor. The pin labeled T is currently not in use. In addition, the 3.3V power supply and the GND need to be connected to the sensor as well.
+Note the U, V and W pins. These need to be connected to the respective pins of the sensor. The pin labeled AUX/T is an input for a thermistor, but is currently not in use. In addition, power supply and GND pins need to be connected to the sensor.
 
 .. note::
   Tinymovr R5.2 and above supply 5V on the FLEX1 power supply pin. You can safely connect this to the Hall effect sensor + terminal.
@@ -33,11 +34,15 @@ Note the U, V and W pins. These need to be connected to the respective pins of t
 Example
 -------
 
-The figure below shows an example of wiring a hub motor to Tinymovr, using the embedded Hall effect sensors of the motor for commutation. Note that the power and ground are connected to an external 5V power supply. Alternatively, if your Hall effect sensors are compatible with 3.3V input, you can connect the leads to the onboard connectors.
+The figures below shows an example of wiring a hubwheel motor to Tinymovr R5.2 and R5.1 respectively, using the embedded Hall effect sensors of the motor for commutation. 
 
-.. image:: hubmotor_diagram.png
+.. image:: hubmotor_diagram_R52.png
   :width: 800
-  :alt: Wiring diagram for connection of hub motor to Tinymovr
+  :alt: Wiring diagram for connection of hub motor to Tinymovr R5.2
+
+.. image:: hubmotor_diagram_R51.png
+  :width: 800
+  :alt: Wiring diagram for connection of hub motor to Tinymovr R5.1
 
 
 Units
@@ -53,7 +58,7 @@ In the context of Tinymovr motor control, reference frames are essential for und
 
 The diagram below illustrates the flow of data from the physical sensors through various observers and frames, finally reaching the motor.
 
-.. image:: reference_frames.jpg
+.. image:: reference_frames.png
   :width: 800
   :alt: Diagram of the reference frames used in the firmware
 
@@ -117,7 +122,7 @@ The value of 300Hz in bandwidth is the default value configured based on the cha
 Sensor Configuration
 ********************
 
-The sensor configuration cinsists of two steps. The first step concerns the setup of the individual sensors being used, and the second step concerns sensor selection. The corresponding sections in the device spec are `tmx.sensors.setup`, and `tmx.sensors.select`.
+The sensor configuration consists of two steps. The first step concerns the setup of the individual sensors being used, and the second step concerns sensor selection. The corresponding sections in the device spec are `tmx.sensors.setup`, and `tmx.sensors.select`.
 
 Sensor Setup
 ============
@@ -160,15 +165,14 @@ Then, configure the external sensor type as follows:
 
 .. code-block:: python
 
-    tmx.encoder.type = 1
-    tmx.encoder.bandwidth = 100
+    tmx.sensors.setup.external_spi.type = AS5047
 
 Then select the `EXTERNAL_SPI` sensor for each of the position and commutation sensors:
 
 .. code-block:: python
 
-    tmx.encoder.type = 1
-    tmx.encoder.bandwidth = 100
+    tmx.sensors.select.commutation_sensor.connection = EXTERNAL_SPI
+    tmx.sensors.select.position_sensor.connection = EXTERNAL_SPI
 
 At this point, you are ready to perform motor/sensor calibration. This will measure the R and L values of the motor, derive frame transforms and eccentricity compensation tables.
 
@@ -193,7 +197,7 @@ Once you have determined that the motor behaves as expected, set to idle and per
     tmx.save_config()
 
 Hall Effect Sensor
-=============
+==================
 
 Ensure the hardware is properly connected. 
 
@@ -201,10 +205,12 @@ Then select the `HALL` sensor for each of the position and commutation sensors, 
 
 .. code-block:: python
 
-    tmx.encoder.type = 1
-    tmx.encoder.bandwidth = 100
+    tmx.sensors.select.commutation_sensor.connection = HALL
+    tmx.sensors.select.position_sensor.connection = HALL
+    tmx.sensors.select.commutation_sensor.bandwidth = 200
+    tmx.sensors.select.position_sensor.bandwidth = 20
 
-This sets the type to Hall effect sensor, and the observer bandwidth to 100Hz.
+This sets the type to Hall effect sensor, and each of the commutation and position observer bandwidths. The commutation observer is set to a higher bandwidth value, in order to ensure that commutation is accurate and a runoff scenario is avoided.
 
 Next, you need to set the motor pole pairs:
 
@@ -212,16 +218,17 @@ Next, you need to set the motor pole pairs:
 
     tmx.motor.pole_pairs = 15
     
-Next comes tuning of gains. Gains are determined on the resolution of a full mechanical turn fo the motor. When using the onboard magnetic sensor, the resolution is fixed to 8192 ticks. However, when using the Hall effect sensor, the mechanical resolution is variable, and amounts to `6 * pole_pair_count`. As such, if you have a 15 pp motor, your mechanical resolution would be 90. 
+Next comes tuning of gains. Gains are determined on the tick count of a full mechanical turn of the motor. When using the an absolute sensor, the tick count is fixed to 8192 ticks (the resolution can be higher as the tick count is a floating point value). 
 
-Because of this vast change in resolution (almost 2 orders of magnitude), the gains need to be updated:
+When using the Hall effect sensor, the tick count is defined as 8192 ticks in an electrical cycle. Thus, your mechanical cycle tick count is variable, depending on the pole pair count of your motor.
+Because of this it is possible that the gains need to be updated. Below we present an example of values that work well with a 15 pp hoverboard motor:
 
 .. code-block:: python
 
     tmx.controller.position.p_gain = 5
-    tmx.controller.velocity.p_gain = 0.07
+    tmx.controller.velocity.p_gain = 0.00001
 
-The values above are just an example using a 15 pp hoverboard motor. For your own motor, you need to determine these experimentally. In position control mode, start by raising the default velocity gain until your motor experiences oscillations. The back up by a factor of two, and repeat the same for position control. This simple tuning heuristic does not result in an optimal configuration but the gains are workable.
+For your own motor, you need to determine these experimentally. Take a look at :ref:`Tuning` for more information.
 
 At this point, you are ready to perform motor/sensor calibration. This will measure the R and L values of the motor, as well as the hall effect sensor sequence.
 
@@ -229,7 +236,7 @@ At this point, you are ready to perform motor/sensor calibration. This will meas
 
     tmx.controller.calibrate()
 
-After calibration finishes, you should be able to control the motor:
+After calibration finishes, you should be able to control the motor. Note that the default reference frame for the hall sensors maps to 8192 ticks per motor electrical cycle. You can change this by modifying the 
 
 .. code-block:: python
 
@@ -246,7 +253,7 @@ Once you have determined that the motor behaves as expected, set to idle and per
     tmx.save_config()
 
 
-Observer bandwidth
+Observer Bandwidth
 ******************
 
 Tinymovr uses a second order observer that filters readings from the sensors, and maintains a position and velocity state. The bandwidth value corresponds to the desired observer bandwidth. It is a configurable value and depends on the dynamics that you wish to achieve with your motor. Keep in mind that high bandwidth values used with motors with fewer pole pairs will make the motors oscillate around the setpoint and have a rough tracking performance (perceivable "knocks" when the rotor moves). On the other hand, too low of a bandwidth value may cause the motor to lose tracking in highly dynamic motions. If you are certain such motions will not be possible (e.g. in heavy moving platforms) you may reduce the bandwidth to ensure smoother motion.
