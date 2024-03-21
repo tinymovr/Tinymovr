@@ -22,6 +22,4 @@ extern void flash_erase_page(uint32_t page_num);
 extern void flash_erase_key(uint32_t key);
 extern void flash_write(uint8_t *p_dest, uint8_t *p_src, uint32_t size_bytes);
 extern void flash_write_word(uint32_t * p_dest, uint32_t value);
-extern uint32_t flash_write_16byte_aligned(uint32_t *p_dest, uint32_t *p_src, uint32_t size_32bit_words);
-extern uint32_t write_flash(uint32_t dest_addr, uint32_t num_words, uint32_t *src);
 #endif
