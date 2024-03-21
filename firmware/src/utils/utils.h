@@ -22,6 +22,8 @@
 
 #include "src/common.h"
 
+#define DIVIDE_AND_ROUND_UP(numerator, divisor) (((numerator) + (divisor) - 1) / (divisor))
+
 extern void wait_for_control_loop_interrupt(void);
 
 #if __ARM_FEATURE_FMA && __ARM_FP&4 && !__SOFTFP__ && !BROKEN_VFP_ASM

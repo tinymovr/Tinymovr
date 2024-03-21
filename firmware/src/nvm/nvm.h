@@ -26,9 +26,6 @@
 #include <src/controller/trajectory_planner.h>
 #include <src/can/can.h>
 
-#define SETTINGS_PAGE (120)
-#define SETTINGS_PAGE_HEX (0x0001E000)
-
 struct NVMStruct {
     uint8_t node_id_1;
     uint8_t node_id_2;
@@ -42,6 +39,11 @@ struct NVMStruct {
     TrajPlannerConfig traj_planner_config;
     char version[16];
 };
+
+#define SETTINGS_PAGE (120)
+#define SETTINGS_PAGE_HEX (0x0001E000)
+#define NVM_PAGE_SIZE (1024)
+#define SETTINGS_PAGE_COUNT (DIVIDE_AND_ROUND_UP(sizeof(struct NVMStruct), NVM_PAGE_SIZE))
 
 extern const uint32_t config_size;
 

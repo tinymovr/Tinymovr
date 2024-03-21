@@ -79,7 +79,10 @@ void nvm_erase(void)
 {
 	if (CONTROLLER_STATE_IDLE == controller_get_state())
 	{
-		flash_erase_page(SETTINGS_PAGE);
+		for (uint8_t i=0; i<SETTINGS_PAGE_COUNT; i++)
+		{
+			flash_erase_page(SETTINGS_PAGE + i);
+		}
 		system_reset();
 	}
 }
