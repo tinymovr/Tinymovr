@@ -21,6 +21,7 @@
 #include <src/sensor/ma7xx.h>
 #include <src/sensor/hall.h>
 #include <src/sensor/as5047.h>
+#include <src/sensor/amt22.h>
 #include <src/sensor/sensor.h>
 
 #define SENSOR_COUNT 3
@@ -36,6 +37,7 @@ typedef union
     MA7xxSensor ma7xx_sensor;
     HallSensor hall_sensor;
     AS5047PSensor as5047p_sensor;
+    AMT22Sensor amt22_sensor;
 } GenSensor;
 
 typedef union 
@@ -43,6 +45,7 @@ typedef union
     MA7xxSensorConfig ma7xx_sensor_config;
     HallSensorConfig hall_sensor_config;
     AS5047PSensorConfig as5047p_sensor_config;
+    AMT22SensorConfig amt22_sensor_config;
 } GenSensorConfig;
 
 typedef struct

@@ -45,6 +45,10 @@ bool sensor_init_with_defaults(Sensor *s)
                     as5047p_make_blank_sensor(s);
                     return as5047p_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT);
                     break;
+                case SENSOR_TYPE_AMT22:
+                    amt22_make_blank_sensor(s);
+                    return amt22_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT);
+                    break;
                 default:
                     break;
             }
@@ -74,6 +78,10 @@ bool sensor_init_with_configs(Sensor *s, SensorConfig *sc, GenSensorConfig *gsc)
         case SENSOR_TYPE_AS5047:
             as5047p_make_blank_sensor(s);
             return as5047p_init_with_config(s, &(gsc->as5047p_sensor_config));
+            break;
+        case SENSOR_TYPE_AMT22:
+            amt22_make_blank_sensor(s);
+            return amt22_init_with_config(s, &(gsc->amt22_sensor_config));
             break;
         default:
             break;
