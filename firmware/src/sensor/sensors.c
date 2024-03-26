@@ -109,8 +109,6 @@ void sensors_get_config(SensorsConfig *config_)
 
 void sensors_restore_config(SensorsConfig *config_)
 {
-    // Assuming there are functions to set the commutation and position sensor pointers
-    // based on the sensor_connection_t value. If not, this part needs to be adapted.
     sensor_set_pointer_with_connection(&commutation_sensor_p, config_->commutation_connection);
     sensor_set_pointer_with_connection(&position_sensor_p, config_->position_connection);
 

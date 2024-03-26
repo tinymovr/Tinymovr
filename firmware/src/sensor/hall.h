@@ -26,8 +26,6 @@
 
 static const float twopi_by_hall_sectors = TWOPI / HALL_SECTORS;
 
-typedef struct Observer Observer;
-
 typedef struct
 {
 	uint8_t sector_map[8];

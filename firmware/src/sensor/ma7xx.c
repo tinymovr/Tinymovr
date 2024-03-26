@@ -20,7 +20,6 @@
 #include <src/utils/utils.h>
 #include <src/can/can_endpoints.h>
 #include <src/sensor/sensor.h>
-#include <src/observer/observer.h>
 #include <src/sensor/ma7xx.h>
 
 void ma7xx_make_blank_sensor(Sensor *s)

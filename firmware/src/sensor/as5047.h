@@ -29,8 +29,6 @@
 #define AS5047_MIN_ALLOWED_DELTA_ADD (-AS5047_MAX_ALLOWED_DELTA + AS5047_TICKS)
 #define AS5047_MIN_ALLOWED_DELTA_SUB (-AS5047_MAX_ALLOWED_DELTA - AS5047_TICKS)
 
-typedef struct Observer Observer;
-
 typedef enum {
     AS5047P_CMD_NOP              = 0x0000,
     AS5047P_CMD_READ_ANGLE       = 0x3FFF // Adjust based on the AS5047P datasheet

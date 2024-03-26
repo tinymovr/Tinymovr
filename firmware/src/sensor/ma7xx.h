@@ -29,8 +29,6 @@
 #define MA7XX_MIN_ALLOWED_DELTA_ADD (-MA7XX_MAX_ALLOWED_DELTA + MA7XX_TICKS)
 #define MA7XX_MIN_ALLOWED_DELTA_SUB (-MA7XX_MAX_ALLOWED_DELTA - MA7XX_TICKS)
 
-typedef struct Observer Observer;
-
 typedef enum {
     MA_CMD_NOP              = 0x0000,
     MA_CMD_ANGLE            = 0x0000,
