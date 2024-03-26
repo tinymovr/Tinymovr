@@ -54,6 +54,7 @@ Observer position_observer;
 
 bool observer_init_with_defaults(Observer *o, Sensor **s);
 bool observer_init_with_config(Observer *o, Sensor **s, ObserverConfig *c);
+void observer_update_params(Observer *o);
 
 float observer_get_bandwidth(Observer *o);
 void observer_set_bandwidth(Observer *o, float bw);

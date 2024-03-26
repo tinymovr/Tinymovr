@@ -35,6 +35,14 @@ bool observer_init_with_config(Observer *o, Sensor **s, ObserverConfig *c)
 	return true;
 }
 
+void observer_update_params(Observer *o)
+{
+    o->config.kp = 2.0f * o->config.track_bw;
+	o->config.ki = 0.25f * (o->config.kp * o->config.kp);
+	o->config.kp_period = o->config.kp * PWM_PERIOD_S;
+	o->config.ki_period = o->config.ki * PWM_PERIOD_S;
+}
+
 float observer_get_bandwidth(Observer *o)
 {
     return o->config.track_bw;
@@ -45,10 +53,7 @@ void observer_set_bandwidth(Observer *o, float bw)
     if (bw > 0.0f)
     {
         o->config.track_bw = bw;
-		o->config.kp = 2.0f * o->config.track_bw;
-    	o->config.ki = 0.25f * (o->config.kp * o->config.kp);
-		o->config.kp_period = o->config.kp * PWM_PERIOD_S;
-		o->config.ki_period = o->config.ki * PWM_PERIOD_S;
+		observer_update_params(o);
     }
 }
 
@@ -68,6 +73,8 @@ void observers_restore_config(ObserversConfig *_config)
 {
 	commutation_observer.config = _config->config_commutation;
 	position_observer.config = _config->config_position;
+	observer_update_params(&commutation_observer);
+	observer_update_params(&position_observer);
 }
 
 void commutation_observer_set_bandwidth(float bw)
