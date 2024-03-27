@@ -29,18 +29,14 @@
 #define AMT22_MIN_ALLOWED_DELTA_ADD (-AMT22_MAX_ALLOWED_DELTA + AMT22_TICKS)
 #define AMT22_MIN_ALLOWED_DELTA_SUB (-AMT22_MAX_ALLOWED_DELTA - AMT22_TICKS)
 
-typedef struct Observer Observer;
-
-// Define commands relevant to the AMT22 here. For simplicity, removed commands specific to the AS5047.
 typedef enum {
-    AMT22_CMD_READ_ANGLE       = 0xFFFF // Placeholder command; update based on the AMT22 datasheet
+    AMT22_CMD_READ_ANGLE       = 0xFFFF
 } AMT22Command;
 
 typedef struct
 {
     SSP_TYPE ssp_port;
     PAC55XX_SSP_TYPEDEF *ssp_struct;
-    // Add any additional configuration parameters needed for AMT22
 } AMT22SensorConfig;
 
 typedef struct
@@ -82,7 +78,8 @@ static inline void amt22_update(Sensor *s, bool check_error)
 {
     AMT22Sensor *as = (AMT22Sensor *)s;
     volatile uint16_t read_value = ssp_read_one(as->config.ssp_struct);
-    const int32_t angle = read_value & 0x3FFF; // Mask to get the angle value, assuming 14-bit resolution
+    // TODO: Add parity check
+    const int32_t angle = read_value & 0x3FFF; 
     if (check_error)
     {
         // Implement error checking specific to the AMT22, if necessary

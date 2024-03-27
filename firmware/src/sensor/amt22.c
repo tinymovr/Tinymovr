@@ -48,11 +48,11 @@ bool amt22_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *s
 bool amt22_init_with_config(Sensor *s, const AMT22SensorConfig *c) {
     AMT22Sensor *as = (AMT22Sensor *)s;
     as->config = *c;
-    ssp_init(as->config.ssp_port, SSP_MS_MASTER, 16, 1, 0);
-    delay_us(10000); // Example delay, you might need to adjust this based on the AMT22's datasheet or your specific hardware setup
+    ssp_init(as->config.ssp_port, SSP_MS_MASTER, 16, 0, 0);
+    delay_us(10000); 
 
-    amt22_send_angle_cmd(s); // This function might need to be adjusted if AMT22 uses different commands or procedures to initiate angle measurement
-    amt22_update(s, false); // Update function will likely need adjustments for reading and interpreting AMT22 data correctly
+    amt22_send_angle_cmd(s); 
+    amt22_update(s, false); 
     s->initialized = true;
     return true;
 }
