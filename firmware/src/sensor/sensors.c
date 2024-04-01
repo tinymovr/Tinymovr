@@ -72,6 +72,7 @@ bool sensor_init_with_defaults(Sensor *s)
         case SENSOR_CONNECTION_ONBOARD_SPI:
             return ma7xx_init_with_port(s, ONBOARD_SENSOR_SSP_PORT, ONBOARD_SENSOR_SSP_STRUCT);
             break;
+#if defined BOARD_REV_R5 || defined BOARD_REV_M5
         case SENSOR_CONNECTION_EXTERNAL_SPI:
             switch (s->config.type)
             {
@@ -88,9 +89,11 @@ bool sensor_init_with_defaults(Sensor *s)
                     break;
             }
             break;
+
         case SENSOR_CONNECTION_HALL:
             return hall_init_with_defaults(s);
             break;
+#endif
         default:
             break;
     }
