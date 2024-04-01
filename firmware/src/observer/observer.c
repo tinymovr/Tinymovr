@@ -71,8 +71,8 @@ void observers_get_config(ObserversConfig *_config)
 
 void observers_restore_config(ObserversConfig *_config)
 {
-	commutation_observer.config = _config->config_commutation;
-	position_observer.config = _config->config_position;
+	observer_init_with_config(&commutation_observer, &commutation_sensor_p, &(_config->config_commutation));
+	observer_init_with_config(&position_observer, &position_sensor_p, &(_config->config_position));
 	observer_update_params(&commutation_observer);
 	observer_update_params(&position_observer);
 }
