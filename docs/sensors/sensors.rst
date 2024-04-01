@@ -172,23 +172,26 @@ Sensor selection can be performed for positioning and for commutation. In both c
 Examples
 ********
 
-External AS5047 Sensor
-======================
+External AS5047 Sensor for Commutation and Positioning
+======================================================
 
+.. note::
+  This is only supported on the Tinymovr M series, and upcoming Tinymovr R versions
+  
 Ensure the hardware is properly connected. 
 
 Then, configure the external sensor type as follows:
 
 .. code-block:: python
 
-    tmx.sensors.setup.external_spi.type = AS5047
+    tmx.sensors.setup.external_spi.type = tmx.sensors.setup.external_spi.type.AS5047
 
 Then select the `EXTERNAL_SPI` sensor for each of the position and commutation sensors:
 
 .. code-block:: python
 
-    tmx.sensors.select.commutation_sensor.connection = EXTERNAL_SPI
-    tmx.sensors.select.position_sensor.connection = EXTERNAL_SPI
+    tmx.sensors.select.commutation_sensor.connection = tmx.sensors.select.commutation_sensor.connection.EXTERNAL_SPI
+    tmx.sensors.select.position_sensor.connection = tmx.sensors.select.position_sensor.connection.EXTERNAL_SPI
 
 At this point, you are ready to perform motor/sensor calibration. This will measure the R and L values of the motor, derive frame transforms and eccentricity compensation tables.
 
@@ -212,8 +215,56 @@ Once you have determined that the motor behaves as expected, set to idle and per
     tmx.controller.idle()
     tmx.save_config()
 
+
+External AMT22 Sensor for Positioning and Onboard MA702/704 for Commutation
+===========================================================================
+
+.. note::
+  This is only supported on the Tinymovr M series, and upcoming Tinymovr R versions
+
+Ensure the hardware is properly connected. 
+
+Then, configure the external sensor type as follows:
+
+.. code-block:: python
+
+    tmx.sensors.setup.external_spi.type = tmx.sensors.setup.external_spi.type.AMT22
+
+Then select the `EXTERNAL_SPI` sensor for each of the position and commutation sensors:
+
+.. code-block:: python
+
+    tmx.sensors.select.commutation_sensor.connection = tmx.sensors.select.commutation_sensor.connection.ONBOARD
+    tmx.sensors.select.position_sensor.connection = tmx.sensors.select.position_sensor.connection.EXTERNAL_SPI
+
+At this point, you are ready to perform motor/sensor calibration. This will measure the R and L values of the motor, derive frame transforms and eccentricity compensation tables.
+
+.. code-block:: python
+
+    tmx.controller.calibrate()
+
+After calibration finishes, you should be able to control the motor:
+
+.. code-block:: python
+
+    tmx.controller.velocity_mode()
+    tmx.controller.velocity.setpoint = 8192 # 60 rpm
+
+The motor should now move at a constant velocity.
+
+Once you have determined that the motor behaves as expected, set to idle and perform another config save to persist the configuration:
+
+.. code-block:: python
+
+    tmx.controller.idle()
+    tmx.save_config()
+
+
 Hall Effect Sensor
 ==================
+
+.. note::
+  This is only supported on the Tinymovr R series.
 
 Ensure the hardware is properly connected. 
 
