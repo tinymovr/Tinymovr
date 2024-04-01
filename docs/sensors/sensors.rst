@@ -11,18 +11,34 @@ This document provides information and guides for using the various angle sensor
 Hardware Setup
 **************
 
+External SPI Sensors
+====================
+
+Tinymovr supports a number of external sensors over the SPI bus. Currently, the MPS MA7xx, the AMS AS5047 and the CUI AMT22 sensors are supported.
+
+.. note::
+  Even though Tinymovr R5.2 has the FLEX2 port which can function as SPI, due to a hardware incompatibility this port does not implement SPI correctly. As such, external sensors are only supported on the M5.x series at the moment.
+
+  Tinymovr R5.3 and above does not have this issue and supports external SPI sensors normally.
+
+.. image:: AS5047_M52.jpg
+  :width: 800
+  :alt: AS5047 Sensor connection diagram for the Tinymovr M5.2
+
+A total of six wires need to be connected: 5V, GND, MISO, MOSI, SCLK and CS
+
 Hall Effect Sensor
 ==================
 
 To use Hall effect sensors, you need to connect the sensor's power supply, phases and ground to the correct pins on the Tinymovr board. The pinout for the Hall effect sensor connector is shown below.
 
-.. image:: hall_pinout_R52.jpg
+.. image:: connectors_R52.jpg
   :width: 800
-  :alt: Hall effect sensor connection diagram for Tinymovr R5.2
+  :alt: Tinymovr R5.2 connector diagram
 
-.. image:: hall_pinout_R51.jpg
+.. image:: connectors_R51.jpg
   :width: 800
-  :alt: Hall effect sensor connection diagram for Tinymovr R5.1
+  :alt: Tinymovr R5.1 connector diagram
 
 Note the U, V and W pins. These need to be connected to the respective pins of the sensor. The pin labeled AUX/T is an input for a thermistor, but is currently not in use. In addition, power supply and GND pins need to be connected to the sensor.
 
@@ -36,7 +52,7 @@ Example
 
 The figures below shows an example of wiring a hubwheel motor to Tinymovr R5.2 and R5.1 respectively, using the embedded Hall effect sensors of the motor for commutation. 
 
-.. image:: hubmotor_diagram_R52.png
+.. image:: hubmotor_diagram_R52.jpg
   :width: 800
   :alt: Wiring diagram for connection of hub motor to Tinymovr R5.2
 
