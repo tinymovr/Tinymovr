@@ -32,7 +32,7 @@ class TestBaseFunction(TMTestCase):
             self.tm.controller.position.setpoint = i * 3000 * ticks
             time.sleep(0.25)
             self.assertAlmostEqual(
-                i * 3000 * ticks, self.tm.encoder.position_estimate, delta=1000 * ticks
+                i * 3000 * ticks, self.tm.sensors.user_frame.position_estimate, delta=1000 * ticks
             )
 
 
