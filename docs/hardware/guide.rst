@@ -73,7 +73,7 @@ Sensor Magnet and Mounting Tips
 
 * Ensure the sensor magnet is firmly attached to the motor shaft, otherwise it may slip out of sync. Use strong adhesive to secure.
 
-* It is possible to have the magnet on the rear side of the PCB, i.e. opposite of the magnet sensor IC, but the gap needs to be reduced to account for the PCB thickness. This has been verified by MPS in a forum post[1]_, quoted below: 
+* It is possible to have the magnet on the rear side of the PCB, i.e. opposite of the magnet sensor IC, but the gap needs to be reduced to account for the PCB thickness. This has been verified by MPS in a forum post [1]_, quoted below: 
   *[...] this type of arrangement is possible, what really matters in the end is that there is enough magnetic field reaching the sensor.
   Of course the minimum distance is imposed by the thickness of the PCB, so it puts some constraints on the design, that you have to take into account when choosing the magnet (you can use our online simulation tool for that). But as long as the PCB is not acting as a magnetic shield (due to copper plane), then it is fine.*
 
