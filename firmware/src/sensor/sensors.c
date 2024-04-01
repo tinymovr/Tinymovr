@@ -21,8 +21,47 @@
 
 GenSensor sensors[SENSOR_COUNT] = {0};
 
+void sensor_make_blank(Sensor *s)
+{
+    // Here we check the sensor connection, either
+    // ONBOARD, EXTERNAL_SPI or EXTERNAL_HALL. We need
+    // to do this here in order to set up the config
+    // struct accordingly.
+    s->initialized = false;
+    sensor_connection_t connection = sensor_get_connection(s);
+    switch (connection)
+    {
+        case SENSOR_CONNECTION_ONBOARD_SPI:
+            ma7xx_make_blank_sensor(s);
+            break;
+        case SENSOR_CONNECTION_EXTERNAL_SPI:
+            switch (s->config.type)
+            {
+                case SENSOR_TYPE_MA7XX:
+                    ma7xx_make_blank_sensor(s);
+                    break;
+                case SENSOR_TYPE_AS5047:
+                    as5047p_make_blank_sensor(s);
+                    break;
+                case SENSOR_TYPE_AMT22:
+                    amt22_make_blank_sensor(s);
+                    break;
+                default:
+                    ma7xx_make_blank_sensor(s);
+                    break;
+            }
+            break;
+        case SENSOR_CONNECTION_HALL:
+            hall_make_blank_sensor(s);
+            break;
+        default:
+            break;
+    }
+}
+
 bool sensor_init_with_defaults(Sensor *s)
 {
+    sensor_make_blank(s);
     // Here we check the sensor connection, either
     // ONBOARD, EXTERNAL_SPI or EXTERNAL_HALL. We need
     // to do this here in order to set up the config
@@ -31,22 +70,18 @@ bool sensor_init_with_defaults(Sensor *s)
     switch (connection)
     {
         case SENSOR_CONNECTION_ONBOARD_SPI:
-            ma7xx_make_blank_sensor(s);
             return ma7xx_init_with_port(s, ONBOARD_SENSOR_SSP_PORT, ONBOARD_SENSOR_SSP_STRUCT);
             break;
         case SENSOR_CONNECTION_EXTERNAL_SPI:
             switch (s->config.type)
             {
                 case SENSOR_TYPE_MA7XX:
-                    ma7xx_make_blank_sensor(s);
                     return ma7xx_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT);
                     break;
                 case SENSOR_TYPE_AS5047:
-                    as5047p_make_blank_sensor(s);
                     return as5047p_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT);
                     break;
                 case SENSOR_TYPE_AMT22:
-                    amt22_make_blank_sensor(s);
                     return amt22_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT);
                     break;
                 default:
@@ -54,7 +89,6 @@ bool sensor_init_with_defaults(Sensor *s)
             }
             break;
         case SENSOR_CONNECTION_HALL:
-            hall_make_blank_sensor(s);
             return hall_init_with_defaults(s);
             break;
         default:
@@ -65,22 +99,19 @@ bool sensor_init_with_defaults(Sensor *s)
 
 bool sensor_init_with_configs(Sensor *s, SensorConfig *sc, GenSensorConfig *gsc)
 {
+    sensor_make_blank(s);
     switch (sc->type)
     {
         case SENSOR_TYPE_MA7XX:
-            ma7xx_make_blank_sensor(s);
             return ma7xx_init_with_config(s, &(gsc->ma7xx_sensor_config));
             break;
         case SENSOR_TYPE_HALL:
-            hall_make_blank_sensor(s);
             return hall_init_with_config(s, &(gsc->hall_sensor_config));
             break;
         case SENSOR_TYPE_AS5047:
-            as5047p_make_blank_sensor(s);
             return as5047p_init_with_config(s, &(gsc->as5047p_sensor_config));
             break;
         case SENSOR_TYPE_AMT22:
-            amt22_make_blank_sensor(s);
             return amt22_init_with_config(s, &(gsc->amt22_sensor_config));
             break;
         default:
@@ -92,8 +123,8 @@ bool sensor_init_with_configs(Sensor *s, SensorConfig *sc, GenSensorConfig *gsc)
 void sensors_init_with_defaults(void)
 {
     sensor_init_with_defaults(&(sensors[0].sensor));
-    ma7xx_make_blank_sensor(&(sensors[1].sensor));
-    hall_make_blank_sensor(&(sensors[2].sensor));
+    sensor_make_blank(&(sensors[1].sensor));
+    sensor_make_blank(&(sensors[2].sensor));
     commutation_sensor_p = &(sensors[0].sensor);
     position_sensor_p = &(sensors[0].sensor);
 }
@@ -128,7 +159,11 @@ void sensors_restore_config(SensorsConfig *config_)
             && (commutation_sensor_p == &(sensors[i].sensor)
             || position_sensor_p == &(sensors[i].sensor)))
         {
-            sensor_init_with_configs(commutation_sensor_p, &(config_->config[i]), &(config_->ss_config[i]));
+            sensor_init_with_configs(&(sensors[i].sensor), &(config_->config[i]), &(config_->ss_config[i]));
+        }
+        else if (sensors[i].sensor.initialized == false)
+        {
+            sensor_make_blank(&(sensors[i].sensor));
         }
     }
 }
