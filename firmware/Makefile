@@ -119,6 +119,11 @@ release: upgrade
 
 # Binary target
 binary: print_board_info $(HEX) $(BIN) $(ELF)
+	@echo "============================================="
+	@echo "Successfully built target $(MAKECMDGOALS)"
+	@echo "Board revision is $(REV)"
+	@echo "Fw version is $(GIT_VERSION)"
+	@echo "============================================="
 
 # Objcopy to HEX
 $(HEX): $(ELF)
@@ -153,7 +158,8 @@ clean :
 # Print board revision
 .PHONY: print_board_info
 print_board_info:
-	@echo "===Building Tinymovr Bootloader==="
+	@echo "============================================="
+	@echo "Building target $(MAKECMDGOALS)"
 	@echo "Board revision is $(REV)"
 	@echo "Fw version is $(GIT_VERSION)"
-	@echo "=================================="
+	@echo "============================================="
