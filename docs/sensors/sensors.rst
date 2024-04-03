@@ -88,6 +88,9 @@ Commutation Sensor Frame (CSF)
 
 The Commutation Sensor Frame (CSF) corresponds to the filtered commutation sensor data. In ths simplest scenario, the position and commutation sensors are the same, as such the PSF and CSF are identical. The main function of this frame is to provide the estimated rotor angle to the current control loop, so that the electrical angle is derived in the Motor Frame, for Field Oriented Control.
 
+.. note::
+  The transform between MF and CSF always has a scale factor of 1. In other words, the commutation sensor is always assumed to be mechanically attached directly to the motor shaft, without reduction.
+
 Motor Frame (MF)
 ================
 
