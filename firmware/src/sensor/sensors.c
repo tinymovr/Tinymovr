@@ -281,14 +281,28 @@ bool sensors_calibrate_pole_pair_count_and_transforms(void)
     gate_driver_set_duty_cycle(&three_phase_zero);
 
     // Derive transforms
-    frame_set_commutation_sensor_to_motor(derive_dir_transform_2p(commutation_frame_start, 0, commutation_frame_end, motor_frame_end_ticks));
+    if (sensor_get_type(commutation_sensor_p) != SENSOR_TYPE_HALL)
+    {
+        frame_set_commutation_sensor_to_motor(derive_dir_transform_2p(commutation_frame_start, 0, commutation_frame_end, motor_frame_end_ticks));
+    }
+    else // commutation sensor is Hall
+    {
+        const FrameTransform t = {.offset = 0.0f, .multiplier = 1.0f};
+        frame_set_commutation_sensor_to_motor(t);
+    }
+
     if (commutation_sensor_p == position_sensor_p)
     {
         frame_set_position_sensor_to_motor(frames.commutation_sensor_to_motor);
     }
-    else
+    else if (sensor_get_type(commutation_sensor_p) != SENSOR_TYPE_HALL)
     {
         frame_set_position_sensor_to_motor(derive_transform_2p(position_frame_start, 0, position_frame_end, motor_frame_end_ticks));
+    }
+    else // position sensor is Hall
+    {
+        const FrameTransform t = {.offset = 0.0f, .multiplier = 1.0f};
+        frame_set_position_sensor_to_motor(t);
     }
 
     return true;
