@@ -196,16 +196,16 @@ static inline float observer_get_epos_motor_frame(void)
 {
 	if (SENSOR_TYPE_HALL == ((*(commutation_observer.sensor_ptr))->config.type))
 	{
-		return motor_frame_get_pos_estimate() * twopi_by_hall_sectors;
+		return motor_frame_get_pos_estimate() * twopi_by_common_ticks;
 	}
-	return motor_frame_get_pos_estimate() * twopi_by_enc_ticks * motor_get_pole_pairs();
+	return motor_frame_get_pos_estimate() * twopi_by_common_ticks * motor_get_pole_pairs();
 }
 
 static inline float observer_get_evel_motor_frame(void)
 {
 	if (SENSOR_TYPE_HALL == ((*(commutation_observer.sensor_ptr))->config.type))
 	{
-		return motor_frame_get_vel_estimate() * twopi_by_hall_sectors;
+		return motor_frame_get_vel_estimate() * twopi_by_common_ticks;
 	}
-	return motor_frame_get_vel_estimate() * twopi_by_enc_ticks * motor_get_pole_pairs();
+	return motor_frame_get_vel_estimate() * twopi_by_common_ticks * motor_get_pole_pairs();
 }
