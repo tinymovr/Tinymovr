@@ -182,7 +182,7 @@ void CAN_restore_config(CANConfig *config_)
 
 void CAN_update(void) {
     // Transmit heartbeat
-    if (can_state.send_heartbeat)
+    if (can_state.send_heartbeat == true)
     {
         const uint32_t msg_diff = msTicks - can_state.last_msg_ms;
         if (msg_diff >= config.heartbeat_period && PAC55XX_CAN->SR.TBS != 0)
