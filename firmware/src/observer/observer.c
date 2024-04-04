@@ -43,6 +43,14 @@ void observer_update_params(Observer *o)
 	o->config.ki_period = o->config.ki * PWM_PERIOD_S;
 }
 
+void observer_reset_state(Observer *o)
+{
+	o->pos_sector = 0;
+	o->pos_estimate_wrapped = 0;
+	o->vel_estimate = 0;
+	o->current = false;
+}
+
 float observer_get_bandwidth(Observer *o)
 {
     return o->config.track_bw;

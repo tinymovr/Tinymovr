@@ -238,6 +238,9 @@ void sensor_set_connection(Sensor** target_sensor, Sensor** other_sensor, sensor
 
 bool sensors_calibrate_pole_pair_count_and_transforms(void)
 {
+    observer_reset_state(&commutation_observer);
+    observer_reset_state(&position_observer);
+
     const float I_setpoint = motor_get_I_cal();
     set_epos_and_wait(0, I_setpoint);
     wait_pwm_cycles(CAL_STAY_LEN);
