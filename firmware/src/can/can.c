@@ -33,9 +33,14 @@
 static CANConfig config = {
     .id = 1,
     .kbaud_rate = CAN_BAUD_1000KHz,
-    .heartbeat_period = 1000};
+    .heartbeat_period = 1000
+};
 
-static CANState can_state ={0};
+static CANState can_state ={
+    .faults = 0,
+    .last_msg_ms = 0,
+    .send_heartbeat = true
+};
 
 extern volatile uint32_t msTicks;
 
@@ -134,6 +139,16 @@ void CAN_set_ID(uint8_t id)
     }
 }
 
+bool CAN_get_send_heartbeat(void)
+{
+    return can_state.send_heartbeat;
+}
+
+void CAN_set_send_heartbeat(bool value)
+{
+    can_state.send_heartbeat = value;
+}
+
 void CAN_process_interrupt(void)
 {
     can_process_extended();
@@ -167,14 +182,17 @@ void CAN_restore_config(CANConfig *config_)
 
 void CAN_update(void) {
     // Transmit heartbeat
-    const uint32_t msg_diff = msTicks - can_state.last_msg_ms;
-    if (msg_diff >= config.heartbeat_period && PAC55XX_CAN->SR.TBS != 0)
+    if (can_state.send_heartbeat)
     {
-        can_state.last_msg_ms = msTicks;
-        uint32_t proto_hash = _avlos_get_proto_hash();
-        uint8_t buf[8];
-        memcpy(buf, &proto_hash, sizeof(proto_hash));
-        memcpy((buf+sizeof(proto_hash)), GIT_VERSION, 4);
-        can_transmit_extended(sizeof(proto_hash)+4, 0x700 | config.id, buf);
+        const uint32_t msg_diff = msTicks - can_state.last_msg_ms;
+        if (msg_diff >= config.heartbeat_period && PAC55XX_CAN->SR.TBS != 0)
+        {
+            can_state.last_msg_ms = msTicks;
+            uint32_t proto_hash = _avlos_get_proto_hash();
+            uint8_t buf[8];
+            memcpy(buf, &proto_hash, sizeof(proto_hash));
+            memcpy((buf+sizeof(proto_hash)), GIT_VERSION, 4);
+            can_transmit_extended(sizeof(proto_hash)+4, 0x700 | config.id, buf);
+        }
     }
 }

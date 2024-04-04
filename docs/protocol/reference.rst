@@ -641,10 +641,23 @@ The ID of the CAN interface.
 
 
 
-motor.R
+comms.can.heartbeat
 -------------------------------------------------------------------
 
 ID: 47
+
+Type: bool
+
+
+
+Toggle sending of heartbeat messages.
+
+
+
+motor.R
+-------------------------------------------------------------------
+
+ID: 48
 
 Type: float
 
@@ -657,7 +670,7 @@ The motor Resistance value.
 motor.L
 -------------------------------------------------------------------
 
-ID: 48
+ID: 49
 
 Type: float
 
@@ -670,7 +683,7 @@ The motor Inductance value.
 motor.pole_pairs
 -------------------------------------------------------------------
 
-ID: 49
+ID: 50
 
 Type: uint8
 
@@ -683,7 +696,7 @@ The motor pole pair count.
 motor.type
 -------------------------------------------------------------------
 
-ID: 50
+ID: 51
 
 Type: uint8
 
@@ -700,7 +713,7 @@ Options:
 motor.calibrated
 -------------------------------------------------------------------
 
-ID: 51
+ID: 52
 
 Type: bool
 
@@ -713,7 +726,7 @@ Whether the motor has been calibrated.
 motor.I_cal
 -------------------------------------------------------------------
 
-ID: 52
+ID: 53
 
 Type: float
 
@@ -726,7 +739,7 @@ The calibration current.
 motor.errors
 -------------------------------------------------------------------
 
-ID: 53
+ID: 54
 
 Type: uint8
 
@@ -745,7 +758,7 @@ Flags:
 sensors.user_frame.position_estimate
 -------------------------------------------------------------------
 
-ID: 54
+ID: 55
 
 Type: float
 
@@ -758,7 +771,7 @@ The filtered position estimate in the user reference frame.
 sensors.user_frame.velocity_estimate
 -------------------------------------------------------------------
 
-ID: 55
+ID: 56
 
 Type: float
 
@@ -771,7 +784,7 @@ The filtered velocity estimate in the user reference frame.
 sensors.user_frame.offset
 -------------------------------------------------------------------
 
-ID: 56
+ID: 57
 
 Type: float
 
@@ -784,7 +797,7 @@ The user defined offset.
 sensors.user_frame.multiplier
 -------------------------------------------------------------------
 
-ID: 57
+ID: 58
 
 Type: float
 
@@ -797,7 +810,7 @@ The user defined multipler.
 sensors.setup.onboard.calibrated
 -------------------------------------------------------------------
 
-ID: 58
+ID: 59
 
 Type: bool
 
@@ -810,7 +823,7 @@ Whether the sensor has been calibrated.
 sensors.setup.onboard.errors
 -------------------------------------------------------------------
 
-ID: 59
+ID: 60
 
 Type: uint8
 
@@ -827,7 +840,7 @@ Flags:
 sensors.setup.external_spi.type
 -------------------------------------------------------------------
 
-ID: 60
+ID: 61
 
 Type: uint8
 
@@ -846,7 +859,7 @@ Options:
 sensors.setup.external_spi.calibrated
 -------------------------------------------------------------------
 
-ID: 61
+ID: 62
 
 Type: bool
 
@@ -859,7 +872,7 @@ Whether the sensor has been calibrated.
 sensors.setup.external_spi.errors
 -------------------------------------------------------------------
 
-ID: 62
+ID: 63
 
 Type: uint8
 
@@ -876,7 +889,7 @@ Flags:
 sensors.setup.hall.calibrated
 -------------------------------------------------------------------
 
-ID: 63
+ID: 64
 
 Type: bool
 
@@ -889,7 +902,7 @@ Whether the sensor has been calibrated.
 sensors.setup.hall.errors
 -------------------------------------------------------------------
 
-ID: 64
+ID: 65
 
 Type: uint8
 
@@ -906,7 +919,7 @@ Flags:
 sensors.select.position_sensor.connection
 -------------------------------------------------------------------
 
-ID: 65
+ID: 66
 
 Type: uint8
 
@@ -925,7 +938,7 @@ Options:
 sensors.select.position_sensor.bandwidth
 -------------------------------------------------------------------
 
-ID: 66
+ID: 67
 
 Type: float
 
@@ -938,7 +951,7 @@ The position sensor observer bandwidth.
 sensors.select.position_sensor.raw_angle
 -------------------------------------------------------------------
 
-ID: 67
+ID: 68
 
 Type: int32
 
@@ -951,7 +964,7 @@ The raw position sensor angle.
 sensors.select.position_sensor.position_estimate
 -------------------------------------------------------------------
 
-ID: 68
+ID: 69
 
 Type: float
 
@@ -964,7 +977,7 @@ The filtered position estimate in the position sensor reference frame.
 sensors.select.position_sensor.velocity_estimate
 -------------------------------------------------------------------
 
-ID: 69
+ID: 70
 
 Type: float
 
@@ -977,7 +990,7 @@ The filtered velocity estimate in the position sensor reference frame.
 sensors.select.commutation_sensor.connection
 -------------------------------------------------------------------
 
-ID: 70
+ID: 71
 
 Type: uint8
 
@@ -996,7 +1009,7 @@ Options:
 sensors.select.commutation_sensor.bandwidth
 -------------------------------------------------------------------
 
-ID: 71
+ID: 72
 
 Type: float
 
@@ -1009,7 +1022,7 @@ The commutation sensor observer bandwidth.
 sensors.select.commutation_sensor.raw_angle
 -------------------------------------------------------------------
 
-ID: 72
+ID: 73
 
 Type: int32
 
@@ -1022,7 +1035,7 @@ The raw commutation sensor angle.
 sensors.select.commutation_sensor.position_estimate
 -------------------------------------------------------------------
 
-ID: 73
+ID: 74
 
 Type: float
 
@@ -1035,7 +1048,7 @@ The filtered position estimate in the commutation sensor reference frame.
 sensors.select.commutation_sensor.velocity_estimate
 -------------------------------------------------------------------
 
-ID: 74
+ID: 75
 
 Type: float
 
@@ -1048,7 +1061,7 @@ The filtered velocity estimate in the commutation sensor reference frame.
 traj_planner.max_accel
 -------------------------------------------------------------------
 
-ID: 75
+ID: 76
 
 Type: float
 
@@ -1061,7 +1074,7 @@ The max allowed acceleration of the generated trajectory.
 traj_planner.max_decel
 -------------------------------------------------------------------
 
-ID: 76
+ID: 77
 
 Type: float
 
@@ -1074,7 +1087,7 @@ The max allowed deceleration of the generated trajectory.
 traj_planner.max_vel
 -------------------------------------------------------------------
 
-ID: 77
+ID: 78
 
 Type: float
 
@@ -1087,7 +1100,7 @@ The max allowed cruise velocity of the generated trajectory.
 traj_planner.t_accel
 -------------------------------------------------------------------
 
-ID: 78
+ID: 79
 
 Type: float
 
@@ -1100,7 +1113,7 @@ In time mode, the acceleration time of the generated trajectory.
 traj_planner.t_decel
 -------------------------------------------------------------------
 
-ID: 79
+ID: 80
 
 Type: float
 
@@ -1113,7 +1126,7 @@ In time mode, the deceleration time of the generated trajectory.
 traj_planner.t_total
 -------------------------------------------------------------------
 
-ID: 80
+ID: 81
 
 Type: float
 
@@ -1126,7 +1139,7 @@ In time mode, the total time of the generated trajectory.
 move_to(float pos_setpoint) -> void
 --------------------------------------------------------------------------------------------
 
-ID: 81
+ID: 82
 
 Return Type: void
 
@@ -1137,7 +1150,7 @@ Move to target position in the user reference frame respecting velocity and acce
 move_to_tlimit(float pos_setpoint) -> void
 --------------------------------------------------------------------------------------------
 
-ID: 82
+ID: 83
 
 Return Type: void
 
@@ -1148,7 +1161,7 @@ Move to target position in the user reference frame respecting time limits for e
 traj_planner.errors
 -------------------------------------------------------------------
 
-ID: 83
+ID: 84
 
 Type: uint8
 
@@ -1165,7 +1178,7 @@ Flags:
 homing.velocity
 -------------------------------------------------------------------
 
-ID: 84
+ID: 85
 
 Type: float
 
@@ -1178,7 +1191,7 @@ The velocity at which the motor performs homing.
 homing.max_homing_t
 -------------------------------------------------------------------
 
-ID: 85
+ID: 86
 
 Type: float
 
@@ -1191,7 +1204,7 @@ The maximum time the motor is allowed to travel before homing times out and abor
 homing.retract_dist
 -------------------------------------------------------------------
 
-ID: 86
+ID: 87
 
 Type: float
 
@@ -1204,7 +1217,7 @@ The retraction distance the motor travels after the endstop has been found.
 homing.warnings
 -------------------------------------------------------------------
 
-ID: 87
+ID: 88
 
 Type: uint8
 
@@ -1219,7 +1232,7 @@ Flags:
 homing.stall_detect.velocity
 -------------------------------------------------------------------
 
-ID: 88
+ID: 89
 
 Type: float
 
@@ -1232,7 +1245,7 @@ The velocity below which (and together with `stall_detect.delta_pos`) stall dete
 homing.stall_detect.delta_pos
 -------------------------------------------------------------------
 
-ID: 89
+ID: 90
 
 Type: float
 
@@ -1245,7 +1258,7 @@ The velocity below which (and together with `stall_detect.delta_pos`) stall dete
 homing.stall_detect.t
 -------------------------------------------------------------------
 
-ID: 90
+ID: 91
 
 Type: float
 
@@ -1258,7 +1271,7 @@ The time to remain in stall detection mode before the motor is considered stalle
 home() -> void
 --------------------------------------------------------------------------------------------
 
-ID: 91
+ID: 92
 
 Return Type: void
 
@@ -1269,7 +1282,7 @@ Perform the homing operation.
 watchdog.enabled
 -------------------------------------------------------------------
 
-ID: 92
+ID: 93
 
 Type: bool
 
@@ -1282,7 +1295,7 @@ Whether the watchdog is enabled or not.
 watchdog.triggered
 -------------------------------------------------------------------
 
-ID: 93
+ID: 94
 
 Type: bool
 
@@ -1295,7 +1308,7 @@ Whether the watchdog has been triggered or not.
 watchdog.timeout
 -------------------------------------------------------------------
 
-ID: 94
+ID: 95
 
 Type: float
 

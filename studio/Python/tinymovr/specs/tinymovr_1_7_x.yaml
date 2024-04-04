@@ -288,6 +288,11 @@ remote_attributes:
         getter_name: CAN_get_ID
         setter_name: CAN_set_ID
         summary: The ID of the CAN interface.
+      - name: heartbeat
+        dtype: bool
+        getter_name: CAN_get_send_heartbeat
+        setter_name: CAN_set_send_heartbeat
+        summary: Toggle sending of heartbeat messages.
   - name: motor
     remote_attributes:
       - name: R
