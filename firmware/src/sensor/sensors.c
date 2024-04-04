@@ -216,24 +216,24 @@ void sensor_external_spi_set_type_avlos(sensors_setup_external_spi_type_options 
     }
 }
 
-void sensor_set_connection(Sensor** target_sensor, Sensor** other_sensor, sensor_connection_t new_connection)
+void sensor_set_connection(Sensor** target_sensor_p, Sensor** other_sensor_p, sensor_connection_t new_connection)
 {
     if (controller_get_state() == CONTROLLER_STATE_IDLE
-        && new_connection != sensor_get_connection(*target_sensor) 
+        && new_connection != sensor_get_connection(*target_sensor_p) 
         && new_connection >= 0 && new_connection < SENSOR_CONNECTION_MAX)
     {
-        if (sensor_get_connection(*target_sensor) != sensor_get_connection(*other_sensor))
+        if (sensor_get_connection(*target_sensor_p) != sensor_get_connection(*other_sensor_p))
         {
-            (*target_sensor)->deinit_func(*target_sensor);
             observer_reset_state(observer_get_for_sensor(*target_sensor_p));
+            (*target_sensor_p)->deinit_func(*target_sensor_p);
         }
 
-        *target_sensor = &(sensors[new_connection].sensor);
+        *target_sensor_p = &(sensors[new_connection].sensor);
 
-        if (new_connection != sensor_get_connection(*other_sensor))
+        if (new_connection != sensor_get_connection(*other_sensor_p))
         {
-            sensor_init_with_defaults(*target_sensor);
             observer_reset_state(observer_get_for_sensor(*target_sensor_p));
+            sensor_init_with_defaults(*target_sensor_p);
         }
     }
 }
