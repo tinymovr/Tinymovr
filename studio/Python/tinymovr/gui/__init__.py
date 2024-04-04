@@ -10,7 +10,8 @@ from tinymovr.gui.helpers import (
     TimedGetter,
     check_selected_items,
     get_dynamic_attrs,
-    is_dark_mode
+    is_dark_mode,
+    strtobool
 )
 from tinymovr.gui.widgets import (
     NodeTreeWidgetItem,
@@ -19,7 +20,8 @@ from tinymovr.gui.widgets import (
     OptionsTreeWidgetItem,
     PlaceholderQTreeWidget,
     IconComboBoxWidget,
-    ArgumentInputDialog
+    ArgumentInputDialog,
+    BoolTreeWidgetItem
 )
 from tinymovr.gui.worker import Worker
 from tinymovr.gui.window import MainWindow

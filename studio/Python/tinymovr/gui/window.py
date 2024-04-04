@@ -40,6 +40,7 @@ from tinymovr.constants import app_name
 from tinymovr.channel import ResponseError as ChannelResponseError
 from tinymovr.config import get_bus_config
 from avlos import get_registry
+from avlos.datatypes import DataType
 from avlos.json_codec import AvlosEncoder
 from tinymovr.gui import (
     NodeTreeWidgetItem,
@@ -48,6 +49,7 @@ from tinymovr.gui import (
     OptionsTreeWidgetItem,
     Worker,
     PlaceholderQTreeWidget,
+    BoolTreeWidgetItem,
     format_value,
     display_file_open_dialog,
     display_file_save_dialog,
@@ -237,7 +239,10 @@ class MainWindow(QMainWindow):
             if hasattr(node, "options"):
                 widget = OptionsTreeWidgetItem(name, node)
             elif hasattr(node, "get_value"):
-                widget = AttrTreeWidgetItem(name, node)
+                if node.dtype == DataType.BOOL:
+                    widget = BoolTreeWidgetItem(name, node)
+                else:
+                    widget = AttrTreeWidgetItem(name, node)
             self.attr_widgets_by_id[node.full_name] = {
                 "node": node,
                 "widget": widget,
