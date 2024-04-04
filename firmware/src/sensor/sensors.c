@@ -225,6 +225,7 @@ void sensor_set_connection(Sensor** target_sensor, Sensor** other_sensor, sensor
         if (sensor_get_connection(*target_sensor) != sensor_get_connection(*other_sensor))
         {
             (*target_sensor)->deinit_func(*target_sensor);
+            observer_reset_state(observer_get_for_sensor(*target_sensor_p));
         }
 
         *target_sensor = &(sensors[new_connection].sensor);
@@ -232,6 +233,7 @@ void sensor_set_connection(Sensor** target_sensor, Sensor** other_sensor, sensor
         if (new_connection != sensor_get_connection(*other_sensor))
         {
             sensor_init_with_defaults(*target_sensor);
+            observer_reset_state(observer_get_for_sensor(*target_sensor_p));
         }
     }
 }

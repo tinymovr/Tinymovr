@@ -97,6 +97,22 @@ static inline void observer_update(Observer *o)
 	}
 }
 
+static inline Observer *observer_get_for_sensor(Sensor *s)
+{
+	if (*(commutation_observer.sensor_ptr) == s)
+	{
+		return &commutation_observer;
+	}
+	else if (*(position_observer.sensor_ptr) == s)
+	{
+		return &position_observer;
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
 static inline void observer_invalidate(Observer *o)
 {
 	o->current = false;
