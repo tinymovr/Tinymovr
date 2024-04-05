@@ -49,10 +49,12 @@ class TMTestCase(unittest.TestCase):
         cls.tm.reset()
         time.sleep(timeout)
 
-    def try_calibrate(self, force=False, *args, **kwargs):
+    def try_calibrate(self, force=False, precheck_callback=None, *args, **kwargs):
         if True == force or not self.tm.calibrated:
             self.tm.controller.calibrate()
             self.wait_for_calibration(*args, **kwargs)
+            if precheck_callback:
+                precheck_callback(self.tm)
             self.assertTrue(self.tm.calibrated)
 
     def wait_for_calibration(self, check_interval=0.05):
