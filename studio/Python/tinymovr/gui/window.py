@@ -33,6 +33,7 @@ from PySide6.QtWidgets import (
     QHeaderView,
     QLabel,
     QMessageBox,
+    QTreeWidgetItem,
 )
 from PySide6.QtGui import QAction
 import pyqtgraph as pg
@@ -58,6 +59,7 @@ from tinymovr.gui import (
 
 class MainWindow(QMainWindow):
     TreeItemCheckedSignal = Signal(dict)
+    updateVisibleAttrsSignal = Signal(set)
 
     def __init__(self, app, arguments, logger):
         super(MainWindow, self).__init__()
@@ -99,6 +101,8 @@ class MainWindow(QMainWindow):
         # Setup the tree widget
         self.tree_widget = PlaceholderQTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
+        self.tree_widget.itemExpanded.connect(self.update_visible_attrs)
+        self.tree_widget.itemCollapsed.connect(self.update_visible_attrs)
         self.tree_widget.setHeaderLabels(["Attribute", "Value"])
 
         self.status_label = QLabel()
@@ -158,15 +162,21 @@ class MainWindow(QMainWindow):
         self.worker.updateTimingsSignal.connect(
             self.timings_updated, QtCore.Qt.QueuedConnection
         )
+        self.updateVisibleAttrsSignal.connect(self.worker.update_visible_attrs)
         app.aboutToQuit.connect(self.about_to_quit)
 
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.worker._update)
-        self.timer.start(40)
+        self.worker_update_timer = QTimer(self)
+        self.worker_update_timer.timeout.connect(self.worker._update)
+        self.worker_update_timer.start(40)
+
+        self.visibility_update_timer = QTimer(self)
+        self.visibility_update_timer.timeout.connect(self.update_visible_attrs)
+        self.visibility_update_timer.start(1000)
 
     @QtCore.Slot()
     def about_to_quit(self):
-        self.timer.stop()
+        self.visibility_update_timer.stop()
+        self.worker_update_timer.stop()
         self.worker.stop()
 
     @QtCore.Slot()
@@ -207,6 +217,19 @@ class MainWindow(QMainWindow):
             "data_line": data_line,
         }
         self.right_layout.addWidget(graph_widget)
+
+    @QtCore.Slot()
+    def update_visible_attrs(self):
+        """
+        Collects names of visible attributes and emits a signal with these names.
+        """
+        visible_attrs = {
+            attr_name
+            for attr_name, widget_info in self.attr_widgets_by_id.items()
+            if self.is_widget_visible(widget_info["widget"])
+            and self.is_item_visible_in_viewport(widget_info["widget"])
+        }
+        self.updateVisibleAttrsSignal.emit(visible_attrs)
 
     @QtCore.Slot()
     def regen_tree(self, devices_by_name):
@@ -326,3 +349,28 @@ class MainWindow(QMainWindow):
                 app_str
             ),
         )
+
+    def is_widget_visible(self, widget):
+        """
+        Check if the given widget is visible, i.e., not hidden and all its
+        ancestor widgets are expanded.
+        """
+        if widget.isHidden():
+            return False
+        parent = widget.parent()
+        while parent is not None:
+            if isinstance(parent, QTreeWidgetItem) and not parent.isExpanded():
+                return False
+            parent = parent.parent()
+        return True
+
+    def is_item_visible_in_viewport(self, item):
+        """
+        Check if the QTreeWidgetItem is visible in the viewport of the QTreeWidget.
+        """
+        # Get the item's rectangle in tree widget coordinates
+        rect = self.tree_widget.visualItemRect(item)
+
+        # Check if the rectangle is within the visible region of the tree widget
+        visible_region = self.tree_widget.visibleRegion()
+        return visible_region.contains(rect)

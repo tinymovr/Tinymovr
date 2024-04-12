@@ -32,7 +32,7 @@ class Worker(QObject):
     regenSignal = QtCore.Signal(dict)
     handleErrorSignal = QtCore.Signal(object)
 
-    def __init__(self, busparams, logger):
+    def __init__(self, busparams, logger, refresh_period=0.3):
         super().__init__()
         self.logger = logger
         self.mutx = QtCore.QMutex()
@@ -43,9 +43,13 @@ class Worker(QObject):
         )
         self.timed_getter = TimedGetter()
 
+        self.refresh_period = refresh_period
+
         self.dt_update = 1
         self.dt_load = 0
         self.t_last_update = time.time()
+
+        self.visible_attrs = set()
 
     @QtCore.Slot()
     def stop(self):
@@ -78,18 +82,19 @@ class Worker(QObject):
             except Exception as e:
                 self.handleErrorSignal.emit(e)
         start_time = time.time()
-        self.dynamic_attrs.sort(
+        attrs_to_update = [attr for attr in self.dynamic_attrs if attr.full_name in self.visible_attrs]
+        attrs_to_update.sort(
             key=lambda attr: self.dynamic_attrs_last_update[attr.full_name]
             if attr.full_name in self.dynamic_attrs_last_update
             else 0
         )
-        for attr in self.dynamic_attrs:
+        for attr in attrs_to_update:
             t = (
                 self.dynamic_attrs_last_update[attr.full_name]
                 if attr.full_name in self.dynamic_attrs_last_update
                 else 0
             )
-            if (attr.full_name not in vals) and (start_time - t > 0.5):
+            if (attr.full_name not in vals) and (start_time - t > self.refresh_period):
                 try:
                     vals[attr.full_name] = self.timed_getter.get_value(attr.get_value)
                     self.dynamic_attrs_last_update[attr.full_name] = start_time
@@ -97,6 +102,13 @@ class Worker(QObject):
                     self.handleErrorSignal.emit(e)
                 break
         return vals
+    
+    @QtCore.Slot(set)
+    def update_visible_attrs(self, attrs):
+        """
+        Update the set of visible attributes based on the signal from the main window.
+        """
+        self.visible_attrs = attrs
 
     def _init_containers(self):
         self.active_attrs = set()
