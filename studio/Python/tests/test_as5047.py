@@ -33,35 +33,29 @@ tsleep = 0.50
 class TestAS5047(TMTestCase):
 
     @classmethod
-    def configure_sensors(cls):
-        cls.tm.sensors.setup.external_spi.type = cls.tm.sensors.setup.external_spi.type.AS5047
-        cls.tm.sensors.select.position_sensor.connection = cls.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI
-        # Commutation sensor remains internal
-        time.sleep(0.2)
-
-    @classmethod
     def setUpClass(cls):
         super(TestAS5047, cls).setUpClass()
         
-        cls.configure_sensors()
+        cls.configure_sensors(cls.tm.sensors.setup.external_spi.type.AS5047)
+        cls.select_sensors(cls.tm.sensors.select.position_sensor.connection.ONBOARD, cls.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
         
-        # We look at the position estimate, which is highly unlikely to be exactly zero.
+        # We look at the position estimate, which is highly unlikely to be exactly 0xFFFF.
         if cls.tm.sensors.select.position_sensor.raw_angle == 16383:
             raise unittest.SkipTest("AS5047 sensor not present. Skipping test.")
 
         cls.reset_and_wait()
 
-    def test_a_position_control_w_loaded_config(self):
+    def test_a_position_control_before_after_save_and_load_config(self):
         """
         Test position control after saving and loading config.
         WARNING: This will perform one NVRAM write and two erase cycles.
         """
-        pass
         self.check_state(0)
         self.tm.erase_config()
         time.sleep(0.2)
 
-        self.configure_sensors()
+        self.configure_sensors(self.tm.sensors.setup.external_spi.type.AS5047)
+        self.select_sensors(self.tm.sensors.select.position_sensor.connection.ONBOARD, self.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
 
         self.tm.motor.I_cal = 0.8
 
@@ -104,6 +98,69 @@ class TestAS5047(TMTestCase):
             self.assertAlmostEqual(
                 self.tm.sensors.user_frame.position_estimate,
                 self.tm.controller.position.setpoint,
+                delta=2000 * tick,
+            )
+
+        self.tm.erase_config()
+        time.sleep(0.2)
+
+    def test_b_position_control_following_sensor_change(self):
+        """
+        Test position control before and after changing sensor connection and type.
+        This test will alter the sensor configuration from an external SPI connection
+        to an onboard connection, and verify if the position control maintains accuracy.
+        """
+        self.check_state(0)
+        self.tm.erase_config()
+        time.sleep(0.2)
+
+        # Initially configure with external SPI sensor
+        self.configure_sensors(self.tm.sensors.setup.external_spi.type.AS5047)
+        self.select_sensors(self.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
+        self.tm.motor.I_cal = 0.8
+        self.try_calibrate()
+
+        # Set initial controller gains
+        self.tm.controller.position.p_gain = 9
+        self.tm.controller.velocity.p_gain = 2e-5
+        self.tm.controller.velocity.i_gain = 0
+
+        # Start with external SPI sensor
+        self.tm.controller.position_mode()
+        self.check_state(2)
+
+        initial_positions = []
+        for _ in range(5):
+            new_pos = random.uniform(-20000, 20000)
+            self.tm.controller.position.setpoint = new_pos * tick
+            time.sleep(tsleep)
+            self.assertAlmostEqual(
+                self.tm.sensors.user_frame.position_estimate,
+                self.tm.controller.position.setpoint,
+                delta=2000 * tick,
+            )
+            initial_positions.append(new_pos * tick)
+
+        self.tm.controller.idle()
+        time.sleep(0.1)
+
+        # Change to onboard sensor
+        self.select_sensors(self.tm.sensors.select.position_sensor.connection.ONBOARD)
+
+        # Re-calibrate with new sensor setup
+        self.try_calibrate()
+        time.sleep(0.1)
+
+        self.tm.controller.position_mode()
+        self.check_state(2)
+
+        # Verify position control with onboard sensor
+        for setpoint in initial_positions:
+            self.tm.controller.position.setsetpoint = setpoint
+            time.sleep(tsleep)
+            self.assertAlmostEqual(
+                self.tm.sensors.user_frame.position_estimate,
+                setpoint,
                 delta=2000 * tick,
             )
 

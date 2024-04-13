@@ -26,6 +26,18 @@ import unittest
 
 
 class TMTestCase(unittest.TestCase):
+
+    @classmethod
+    def configure_sensors(cls, external_spi_type):
+        cls.tm.sensors.setup.external_spi.type = external_spi_type
+        time.sleep(0.2)
+
+    @classmethod
+    def select_sensors(cls, commutation_sensor_connection, position_sensor_connection):
+        cls.tm.sensors.select.commutation_sensor.connection = commutation_sensor_connection
+        cls.tm.sensors.select.position_sensor.connection = position_sensor_connection
+        time.sleep(0.2)
+
     @classmethod
     def setUpClass(cls):
         params = get_bus_config(["canine", "slcan_disco"])
