@@ -297,7 +297,7 @@ bool sensors_calibrate_pole_pair_count_and_transforms(void)
     {
         frame_set_position_sensor_to_motor(frames.commutation_sensor_to_motor);
     }
-    else if (sensor_get_type(commutation_sensor_p) != SENSOR_TYPE_HALL)
+    else if (sensor_get_type(position_sensor_p) != SENSOR_TYPE_HALL)
     {
         frame_set_position_sensor_to_motor(derive_transform_2p(position_frame_start, 0, position_frame_end, motor_frame_end_ticks));
     }

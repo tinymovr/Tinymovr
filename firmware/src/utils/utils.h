@@ -144,7 +144,14 @@ static inline float fast_sin(float angle)
     return fast_cos(halfpi-angle);
 }
 
+static inline int calculate_parity(int x, int mask)
 {
+    x &= mask;
+    x ^= x >> 8;
+    x ^= x >> 4;
+    x ^= x >> 2;
+    x ^= x >> 1;
+    return x & 1;
 }
 
 // https://github.com/madcowswe/ODrive/blob/3113aedf081cf40e942d25d3b0b36c8806f11f23/Firmware/MotorControl/utils.c

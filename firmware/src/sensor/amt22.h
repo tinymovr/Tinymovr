@@ -78,11 +78,31 @@ static inline void amt22_update(Sensor *s, bool check_error)
 {
     AMT22Sensor *as = (AMT22Sensor *)s;
     volatile uint16_t read_value = ssp_read_one(as->config.ssp_struct);
-    // TODO: Add parity check
-    const int32_t angle = read_value & 0x3FFF; 
-    if (check_error)
+
+    int odd_mask = 0x2AAA;  // 0010101010101010, ignoring bits at indexes 14, 15
+    int even_mask = 0x1555;  // 0001010101010101, ignoring bits at indexes 14, 15
+    // 0xAAA8
+    // 0x5554
+
+    const int odd_parity = calculate_parity(read_value, odd_mask);
+    const int even_parity = calculate_parity(read_value, even_mask);
+
+    // Only update angle if parity check passes
+    if (((read_value & 0x01) == odd_parity) && ((read_value & 0x02) == even_parity))
     {
-        // Implement error checking specific to the AMT22, if necessary
+        const int32_t angle = read_value & 0x3FFF; 
+        if (check_error)
+        {
+            const int32_t delta = as->angle - angle;
+            if ( ((delta > AMT22_MAX_ALLOWED_DELTA) || (delta < -AMT22_MAX_ALLOWED_DELTA)) &&
+                ((delta > AMT22_MAX_ALLOWED_DELTA_ADD) || (delta < AMT22_MIN_ALLOWED_DELTA_ADD)) &&
+                ((delta > AMT22_MAX_ALLOWED_DELTA_SUB) || (delta < AMT22_MIN_ALLOWED_DELTA_SUB)) )
+            {
+                as->errors |= SENSORS_SETUP_ONBOARD_ERRORS_READING_UNSTABLE;
+            }
+        }
+        as->angle = angle;
     }
-    as->angle = angle;
 }
+
+
