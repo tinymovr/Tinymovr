@@ -144,21 +144,7 @@ static inline float fast_sin(float angle)
     return fast_cos(halfpi-angle);
 }
 
-static inline uint16_t crc16_ccitt(const uint32_t block[], uint16_t blockLength, uint16_t crc)
 {
-    PAC55XX_CRC->SEED.CRCSEED = crc;
-
-    // Compute CRC using 32-bit input on memory that is 32-bit aligned 
-    while(blockLength)    
-    {
-        PAC55XX_CRC->DATAIN = *block++;             // Input a 32-bit word
-        blockLength = blockLength - 4;              // Decrement Length by 4 bytes
-    }
-    
-    __asm__("NOP");
-    __asm__("NOP");
-
-    return PAC55XX_CRC->OUT.CRCOUT;
 }
 
 // https://github.com/madcowswe/ODrive/blob/3113aedf081cf40e942d25d3b0b36c8806f11f23/Firmware/MotorControl/utils.c
