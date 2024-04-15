@@ -759,7 +759,7 @@ void ssp_interrupt_disable(SSP_TYPE ssp)
     }
 }
 
-void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t clkn_div, uint8_t cph, uint8_t cpol)
+void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t clkn_div, uint32_t data_size, uint8_t cph, uint8_t cpol)
 {
     PAC55XX_SSP_TYPEDEF *ssp_ptr;
 
@@ -804,7 +804,7 @@ void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t clkn_div, uint8_t cph, 
 	ssp_ptr->CON.LBM = SSP_LP_NORMAL;                        // Loopback Mode, no loopback mode
 	ssp_ptr->CON.CPH = cph;                                  // Clock Out Phase
 	ssp_ptr->CON.CPO = cpol;                                 // Clock Out Polarity
-    ssp_ptr->CON.DSS = SSP_DATA_SIZE_16;                     // Data Size Select, 16 bit data
+    ssp_ptr->CON.DSS = data_size;                            // Data Size Select
     ssp_ptr->CON.SOD = SSP_OUTPUT_NOT_DRIVE;                 // Slave Output Disable
 
     ssp_io_config(ssp, ms_mode);

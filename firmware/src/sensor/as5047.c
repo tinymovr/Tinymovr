@@ -48,7 +48,7 @@ bool as5047p_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF 
 bool as5047p_init_with_config(Sensor *s, const AS5047PSensorConfig *c) {
     AS5047PSensor *as = (AS5047PSensor *)s;
     as->config = *c;
-    ssp_init(as->config.ssp_port, SSP_MS_MASTER, 16, 1, 0);
+    ssp_init(as->config.ssp_port, SSP_MS_MASTER, 16, SSP_DATA_SIZE_16, 1, 0);
     delay_us(10000); // Example delay, adjust based on AS5047P datasheet
 
     as5047p_send_angle_cmd(s); 

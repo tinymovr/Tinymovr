@@ -66,6 +66,13 @@ static inline uint8_t amt22_get_errors(const Sensor *s)
 
 static inline void amt22_send_angle_cmd(const Sensor *s)
 {
+    // AMT22 has specific timing requirements with respect to reading
+    // the first and second bytes of the angle. For this reason we
+    // insert the 6us delay that corresponds to the datasheet-specified
+    // 3us + an experimentally defined value to account for transmission
+    // delay.
+    ssp_write_one(((const AMT22Sensor *)s)->config.ssp_struct, AMT22_CMD_READ_ANGLE);
+    delay_us(6);
     ssp_write_one(((const AMT22Sensor *)s)->config.ssp_struct, AMT22_CMD_READ_ANGLE);
 }
 
