@@ -8,6 +8,18 @@ Overview
 This document provides information and guides for using the various angle sensor and encoder types supported by Tinymovr.
 
 
+Connector Overview
+******************
+
+.. image:: connectors_R52.jpg
+  :width: 800
+  :alt: Tinymovr R5.2 connector diagram
+
+.. image:: connectors_R51.jpg
+  :width: 800
+  :alt: Tinymovr R5.1 connector diagram
+
+
 Hardware Setup
 **************
 
@@ -21,26 +33,34 @@ Tinymovr supports a number of external sensors over the SPI bus. Currently, the 
 
   Tinymovr R5.3 and above does not have this issue and supports external SPI sensors normally.
 
+
+AMS AS5047
+------------------
+
+The AMS AS5047 is a compact absolute angle magnetic sensor. It is compatible with Tinymovr M5.x. In the connection diagram below, we consider the AS5047 breakout board issued by AMS.
+
 .. image:: AS5047_M52.jpg
   :width: 800
   :alt: AS5047 Sensor connection diagram for the Tinymovr M5.2
 
-A total of six wires need to be connected: 5V, GND, MISO, MOSI, SCLK and CS
+A total of six wires need to be connected: 5V, GND, MISO, MOSI, SCLK and CS.
+
+
+CUI AMT22
+------------------
+
+The CUI AMT22 is an absolute angle, 12 or 14-bit capacitive sensor. It is compatible with Tinymovr M5.x.
+
+  .. image:: AMT22_M52.jpg
+    :width: 800
+    :alt: AS5047 Sensor connection diagram for the Tinymovr M5.2
+
+A total of six wires need to be connected: 5V, GND, MISO, MOSI, SCLK and CS If using the AMS AMT-06C-1-036 prototype cable, you can additionally connect the cable shield (black wire) to one GND pin on the CAN bus ports or the SWD port.
 
 Hall Effect Sensor
 ==================
 
-To use Hall effect sensors, you need to connect the sensor's power supply, phases and ground to the correct pins on the Tinymovr board. The pinout for the Hall effect sensor connector is shown below.
-
-.. image:: connectors_R52.jpg
-  :width: 800
-  :alt: Tinymovr R5.2 connector diagram
-
-.. image:: connectors_R51.jpg
-  :width: 800
-  :alt: Tinymovr R5.1 connector diagram
-
-Note the U, V and W pins. These need to be connected to the respective pins of the sensor. The pin labeled AUX/T is an input for a thermistor, but is currently not in use. In addition, power supply and GND pins need to be connected to the sensor.
+To use Hall effect sensors, you need to connect the sensor's power supply, phases and ground to the correct pins on the FLEX1 header of the Tinymovr R5.2 or greater, or the AUX header of the Tinymovr R5.1. Note the U, V and W pins. These need to be connected to the respective pins of the sensor. The pin labeled AUX/T is an input for a thermistor, but is currently not in use. In addition, power supply and GND pins need to be connected to the sensor.
 
 .. note::
   Tinymovr R5.2 and above supply 5V on the FLEX1 power supply pin. You can safely connect this to the Hall effect sensor + terminal.
