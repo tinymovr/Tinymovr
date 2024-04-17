@@ -206,6 +206,8 @@ void sensor_external_spi_set_type_avlos(sensors_setup_external_spi_type_options 
         && (controller_get_state() == CONTROLLER_STATE_IDLE)
         && (internal_type != sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type))
     {
+        frames_reset_calibrated();
+        
         Sensor *s = &(sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor);
         if (s->initialized)
         {
@@ -222,6 +224,8 @@ void sensor_set_connection(Sensor** target_sensor_p, Sensor** other_sensor_p, se
         && new_connection != sensor_get_connection(*target_sensor_p) 
         && new_connection >= 0 && new_connection < SENSOR_CONNECTION_MAX)
     {
+        frames_reset_calibrated();
+
         if (sensor_get_connection(*target_sensor_p) != sensor_get_connection(*other_sensor_p))
         {
             observer_reset_state(observer_get_for_sensor(*target_sensor_p));
@@ -295,7 +299,7 @@ bool sensors_calibrate_pole_pair_count_and_transforms(void)
 
     if (commutation_sensor_p == position_sensor_p)
     {
-        frame_set_position_sensor_to_motor(frames.commutation_sensor_to_motor);
+        frame_set_position_sensor_to_motor(*(frame_commutation_sensor_to_motor_p()));
     }
     else if (sensor_get_type(position_sensor_p) != SENSOR_TYPE_HALL)
     {

@@ -141,7 +141,8 @@ TM_RAMFUNC float system_get_Vbus(void)
 
 TM_RAMFUNC bool system_get_calibrated(void)
 {
-    return (motor_get_calibrated() &&
+    return (frames_get_calibrated() &&
+            motor_get_calibrated() &&
             commutation_sensor_p->is_calibrated_func(commutation_sensor_p) &&
             position_sensor_p->is_calibrated_func(position_sensor_p));
 }

@@ -10,5 +10,6 @@ FramesConfig frames = {
     .commutation_sensor_to_motor = DEFAULT_TRANSFORM,
     .motor_to_commutation_sensor = DEFAULT_TRANSFORM,
     .motor_to_user = DEFAULT_TRANSFORM,
-    .user_to_motor = DEFAULT_TRANSFORM
+    .user_to_motor = DEFAULT_TRANSFORM,
+    .calibrated = default_calibrated
 };

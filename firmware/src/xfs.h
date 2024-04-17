@@ -16,7 +16,23 @@
 
 #pragma once
 
+#include <stdbool.h>
 #include <src/xf1.h>
+
+typedef enum {
+    none_calibrated = 0,
+    position_sensor_to_user_calibrated = 1,
+    user_to_position_sensor_calibrated = 1 << 1,
+    position_sensor_to_motor_calibrated = 1 << 2,
+    motor_to_position_sensor_calibrated = 1 << 3,
+    commutation_sensor_to_motor_calibrated = 1 << 4,
+    motor_to_commutation_sensor_calibrated = 1 << 5,
+    motor_to_user_calibrated = 1 << 6,
+    user_to_motor_calibrated = 1 << 7,
+    default_calibrated = (position_sensor_to_user_calibrated | user_to_position_sensor_calibrated),
+    all_calibrated = 0xFF
+} FramesOrder;
+
 
 typedef struct {
 	FrameTransform position_sensor_to_user;
@@ -27,9 +43,20 @@ typedef struct {
 	FrameTransform motor_to_commutation_sensor;
 	FrameTransform motor_to_user;
 	FrameTransform user_to_motor;
+    FramesOrder calibrated;
 } FramesConfig;
 
 extern FramesConfig frames;
+
+static inline bool frames_get_calibrated(void)
+{
+    return (frames.calibrated == all_calibrated);
+}
+
+static inline void frames_reset_calibrated(void)
+{
+    frames.calibrated = default_calibrated;
+}
 
 static inline void frames_get_config(FramesConfig *_config)
 {
@@ -97,6 +124,8 @@ static inline void frame_user_to_position_sensor_set_offset(float value)
     frames.position_sensor_to_user = derive_inverse_transform(frame_user_to_position_sensor_p());
     frames.user_to_motor = combine_transforms(frame_user_to_position_sensor_p(), frame_position_sensor_to_motor_p());
     frames.motor_to_user = derive_inverse_transform(frame_user_to_motor_p());
+    frames.calibrated |= (position_sensor_to_user_calibrated | 
+        user_to_position_sensor_calibrated | motor_to_user_calibrated | user_to_motor_calibrated);
 }
 
 static inline void frame_user_to_position_sensor_set_multiplier(float value)
@@ -107,6 +136,8 @@ static inline void frame_user_to_position_sensor_set_multiplier(float value)
         frames.position_sensor_to_user = derive_inverse_transform(frame_user_to_position_sensor_p());
         frames.user_to_motor = combine_transforms(frame_user_to_position_sensor_p(), frame_position_sensor_to_motor_p());
         frames.motor_to_user = derive_inverse_transform(frame_user_to_motor_p());
+        frames.calibrated |= (position_sensor_to_user_calibrated | 
+            user_to_position_sensor_calibrated | motor_to_user_calibrated | user_to_motor_calibrated);
     }
 }
 
@@ -114,6 +145,7 @@ static inline void frame_set_commutation_sensor_to_motor(const FrameTransform va
 {
     frames.commutation_sensor_to_motor = value;
     frames.motor_to_commutation_sensor = derive_inverse_transform(frame_commutation_sensor_to_motor_p());
+    frames.calibrated |= (commutation_sensor_to_motor_calibrated | motor_to_commutation_sensor_calibrated);
 }
 
 static inline void frame_set_position_sensor_to_motor(const FrameTransform value)
@@ -122,4 +154,6 @@ static inline void frame_set_position_sensor_to_motor(const FrameTransform value
     frames.motor_to_position_sensor = derive_inverse_transform(&value);
     frames.user_to_motor = combine_transforms(frame_user_to_position_sensor_p(), frame_position_sensor_to_motor_p());
     frames.motor_to_user = derive_inverse_transform(frame_user_to_motor_p());
+    frames.calibrated |= (position_sensor_to_motor_calibrated |
+        motor_to_position_sensor_calibrated | motor_to_user_calibrated | user_to_motor_calibrated);
 }
