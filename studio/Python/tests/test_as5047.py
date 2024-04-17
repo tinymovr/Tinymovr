@@ -116,20 +116,20 @@ class TestAS5047(TMTestCase):
 
         # Initially configure with external SPI sensor
         self.configure_sensors(self.tm.sensors.setup.external_spi.type.AS5047)
-        self.select_sensors(self.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
+        self.select_sensors(self.tm.sensors.select.position_sensor.connection.ONBOARD, self.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
         self.tm.motor.I_cal = 0.8
         self.try_calibrate()
 
         # Set initial controller gains
         self.tm.controller.position.p_gain = 9
-        self.tm.controller.velocity.p_gain = 2e-5
+        self.tm.controller.velocity.p_gain = 3e-5
         self.tm.controller.velocity.i_gain = 0
+        self.tm.controller.velocity.limit = 200000
 
         # Start with external SPI sensor
         self.tm.controller.position_mode()
         self.check_state(2)
 
-        initial_positions = []
         for _ in range(5):
             new_pos = random.uniform(-20000, 20000)
             self.tm.controller.position.setpoint = new_pos * tick
@@ -139,13 +139,12 @@ class TestAS5047(TMTestCase):
                 self.tm.controller.position.setpoint,
                 delta=2000 * tick,
             )
-            initial_positions.append(new_pos * tick)
 
         self.tm.controller.idle()
         time.sleep(0.1)
 
         # Change to onboard sensor
-        self.select_sensors(self.tm.sensors.select.position_sensor.connection.ONBOARD)
+        self.select_sensors(self.tm.sensors.select.position_sensor.connection.ONBOARD, self.tm.sensors.select.position_sensor.connection.ONBOARD)
 
         # Re-calibrate with new sensor setup
         self.try_calibrate()
@@ -154,13 +153,13 @@ class TestAS5047(TMTestCase):
         self.tm.controller.position_mode()
         self.check_state(2)
 
-        # Verify position control with onboard sensor
-        for setpoint in initial_positions:
-            self.tm.controller.position.setsetpoint = setpoint
+        for _ in range(5):
+            new_pos = random.uniform(-20000, 20000)
+            self.tm.controller.position.setpoint = new_pos * tick
             time.sleep(tsleep)
             self.assertAlmostEqual(
                 self.tm.sensors.user_frame.position_estimate,
-                setpoint,
+                self.tm.controller.position.setpoint,
                 delta=2000 * tick,
             )
 
