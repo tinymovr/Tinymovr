@@ -90,11 +90,11 @@ remote_attributes:
         getter_name: scheduler_get_load
         meta: {dynamic: True}
         dtype: uint32
-      - name: errors
+      - name: warnings
         flags: [CONTROL_BLOCK_REENTERED]
         meta: {dynamic: True}
-        getter_name: scheduler_get_errors
-        summary: Any scheduler errors, as a bitmask
+        getter_name: scheduler_get_warnings
+        summary: Any scheduler warnings, as a bitmask
   - name: controller
     remote_attributes:
       - name: state
