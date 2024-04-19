@@ -233,7 +233,7 @@ Processor load in ticks per PWM cycle.
 
 
 
-scheduler.errors
+scheduler.warnings
 -------------------------------------------------------------------
 
 ID: 17
@@ -242,7 +242,7 @@ Type: uint8
 
 
 
-Any scheduler errors, as a bitmask
+Any scheduler warnings, as a bitmask
 
 Flags: 
 

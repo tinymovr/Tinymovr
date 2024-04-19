@@ -10,7 +10,7 @@
 #include <src/common.h>
 #include <src/tm_enums.h>
 
-static const uint32_t avlos_proto_hash = 3066507445;
+static const uint32_t avlos_proto_hash = 318558145;
 extern uint8_t (*avlos_endpoints[96])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 extern uint32_t _avlos_get_proto_hash(void);
 
@@ -219,16 +219,16 @@ uint8_t avlos_config_size(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command 
 uint8_t avlos_scheduler_load(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
-* avlos_scheduler_errors
+* avlos_scheduler_warnings
 *
-* Any scheduler errors, as a bitmask
+* Any scheduler warnings, as a bitmask
 *
 * Endpoint ID: 17
 *
 * @param buffer
 * @param buffer_len
 */
-uint8_t avlos_scheduler_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
+uint8_t avlos_scheduler_warnings(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd);
 
 /*
 * avlos_controller_state
