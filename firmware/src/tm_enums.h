@@ -41,9 +41,9 @@ typedef enum
 
 typedef enum
 {
-    SCHEDULER_ERRORS_NONE = 0,
-    SCHEDULER_ERRORS_CONTROL_BLOCK_REENTERED = (1 << 0)
-} scheduler_errors_flags;
+    SCHEDULER_WARNINGS_NONE = 0,
+    SCHEDULER_WARNINGS_CONTROL_BLOCK_REENTERED = (1 << 0)
+} scheduler_warnings_flags;
 
 typedef enum
 {

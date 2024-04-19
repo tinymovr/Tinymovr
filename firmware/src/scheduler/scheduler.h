@@ -26,16 +26,16 @@ typedef struct
 	bool busy;
 	uint32_t load;
 
-    uint8_t errors;
+    uint8_t warnings;
 } SchedulerState;
 
 extern volatile SchedulerState scheduler_state;
 
 void wait_for_control_loop_interrupt(void);
 
-static inline uint8_t scheduler_get_errors(void)
+static inline uint8_t scheduler_get_warnings(void)
 {
-	return scheduler_state.errors;
+	return scheduler_state.warnings;
 }
 
 static inline uint32_t scheduler_get_load(void)

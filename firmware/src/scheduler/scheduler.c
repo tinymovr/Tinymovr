@@ -92,19 +92,13 @@ void wait_for_control_loop_interrupt(void)
 void ADC_IRQHandler(void)
 {
 	PAC55XX_ADC->ADCINT.ADCIRQ0IF = 1;
-	// Only in case the gate driver is enabled, ensure
-	// the control deadline is not missed,
-	// i.e. the previous control loop is complete prior
-	// to the ADC triggering the next
+	scheduler_state.adc_interrupt = true;
+	// Only in case the gate driver is enabled, raise a
+	// warning if the control loop is about to be
+	// reentered
 	if (gate_driver_is_enabled() && scheduler_state.busy)
 	{
-		scheduler_state.errors |= SCHEDULER_ERRORS_CONTROL_BLOCK_REENTERED;
-		// We do not change the control state here, to
-		// avoid any concurrency issues
-	}
-	else
-	{
-		scheduler_state.adc_interrupt = true;
+		scheduler_state.warnings |= SCHEDULER_WARNINGS_CONTROL_BLOCK_REENTERED;
 	}
 }
 
