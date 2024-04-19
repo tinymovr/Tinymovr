@@ -17,6 +17,7 @@
 
 #include <math.h>
 #include <string.h>
+#include <src/can/can_endpoints.h>
 #include <src/motor/motor.h>
 #include <src/controller/controller.h>
 #include <src/adc/adc.h>
@@ -233,37 +234,37 @@ void ADC_DTSE_Init(void)
     pac5xxx_dtse_seq_config(18, ADC0, 0, ADC_IRQ0_EN, SEQ_END); // Get result at DTSERES18, Interrupt
 }
 
-TM_RAMFUNC float adc_get_mcu_temp(void)
+bool ADC_calibrate_offset(void)
+{
+    // We only need to wait here, the ADC loop will
+    // perform the offset calibration automatically
+    wait_pwm_cycles(10000);
+    return true;
+}
+
+TM_RAMFUNC float ADC_get_mcu_temp(void)
 {
     return adc_state.temp;
 }
 
-TM_RAMFUNC void ADC_GetPhaseCurrents(FloatTriplet *phc)
+TM_RAMFUNC void ADC_get_phase_currents(FloatTriplet *phc)
 {
     phc->A = adc_state.I_phase_meas.A;
-    if (motor_phases_swapped())
-    {
-        phc->B = adc_state.I_phase_meas.C;
-        phc->C = adc_state.I_phase_meas.B;
-    }
-    else
-    {
-        phc->B = adc_state.I_phase_meas.B;
-        phc->C = adc_state.I_phase_meas.C;
-    }
+    phc->B = adc_state.I_phase_meas.B;
+    phc->C = adc_state.I_phase_meas.C;
 }
 
 TM_RAMFUNC void ADC_update(void)
 {
     switch (controller_get_state())
     {
-        case STATE_CALIBRATE:
+        case CONTROLLER_STATE_CALIBRATE:
         {
             adc_config.I_phase_offset.A += (((float)PAC55XX_ADC->DTSERES6.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.A) * adc_state.I_phase_offset_D;
             adc_config.I_phase_offset.B += (((float)PAC55XX_ADC->DTSERES8.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.B) * adc_state.I_phase_offset_D;
             adc_config.I_phase_offset.C += (((float)PAC55XX_ADC->DTSERES10.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.C) * adc_state.I_phase_offset_D;
         }
-        case STATE_CL_CONTROL:
+        case CONTROLLER_STATE_CL_CONTROL:
         {
             const float i_a = (((float)PAC55XX_ADC->DTSERES14.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.A);
             const float i_b = (((float)PAC55XX_ADC->DTSERES16.VAL * SHUNT_SCALING_FACTOR) - adc_config.I_phase_offset.B);

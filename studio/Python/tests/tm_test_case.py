@@ -26,6 +26,18 @@ import unittest
 
 
 class TMTestCase(unittest.TestCase):
+
+    @classmethod
+    def configure_sensors(cls, external_spi_type):
+        cls.tm.sensors.setup.external_spi.type = external_spi_type
+        time.sleep(0.2)
+
+    @classmethod
+    def select_sensors(cls, commutation_sensor_connection, position_sensor_connection):
+        cls.tm.sensors.select.commutation_sensor.connection = commutation_sensor_connection
+        cls.tm.sensors.select.position_sensor.connection = position_sensor_connection
+        time.sleep(0.2)
+
     @classmethod
     def setUpClass(cls):
         params = get_bus_config(["canine", "slcan_disco"])
@@ -49,10 +61,12 @@ class TMTestCase(unittest.TestCase):
         cls.tm.reset()
         time.sleep(timeout)
 
-    def try_calibrate(self, force=False, *args, **kwargs):
+    def try_calibrate(self, force=False, precheck_callback=None, *args, **kwargs):
         if True == force or not self.tm.calibrated:
             self.tm.controller.calibrate()
             self.wait_for_calibration(*args, **kwargs)
+            if precheck_callback:
+                precheck_callback(self.tm)
             self.assertTrue(self.tm.calibrated)
 
     def wait_for_calibration(self, check_interval=0.05):

@@ -54,6 +54,8 @@
 #include "pac5xxx_tile_signal_manager.h"
 #include "config.h"
 
+#define ALWAYS_INLINE __attribute__((always_inline)) 
+
 #ifndef PAC5XXX_OK
 #define PAC5XXX_OK 0
 #endif
@@ -86,14 +88,6 @@
 #define READ_UINT32(address) (*((uint32_t *)address))
 
 #define ERROR_FLAG_MAX_SIZE (5u)
-
-#define ENCODER_BITS (13)
-#define ENCODER_TICKS (1 << ENCODER_BITS)
-#define ENCODER_TICKS_FLOAT ((float)(ENCODER_TICKS))
-
-#define HALL_SECTORS (6)
-#define HALL_SECTOR_ANGLE (TWOPI / HALL_SECTORS)
-#define CAL_DIR_LEN_PER_SECTOR (CAL_DIR_LEN / HALL_SECTORS)
 
 #if defined BOARD_REV_R32 || defined BOARD_REV_R33
 #define BOARD_REV_R3
@@ -129,7 +123,18 @@
 #define BOARD_REV_IDX 21
 #endif
 
+#if defined BOARD_REV_R3 || defined BOARD_REV_R5
+#define MIN_TRIP_CURRENT (5.0f) // A
+#elif defined BOARD_REV_M5
+#define MIN_TRIP_CURRENT (1.0f) // A
+#endif
+
 #define TIMER_FREQ_HZ (ACLK_FREQ_HZ >> TXCTL_PS_DIV)
+
+#define SENSOR_COMMON_RES_BITS (13)
+#define SENSOR_COMMON_RES_TICKS (1 << SENSOR_COMMON_RES_BITS)
+#define SENSOR_COMMON_RES_HALF_TICKS (SENSOR_COMMON_RES_TICKS/2)
+#define SENSOR_COMMON_RES_TICKS_FLOAT ((float)(SENSOR_COMMON_RES_TICKS))
 
 static const float one_by_sqrt3 = 0.57735026919f;
 static const float two_by_sqrt3 = 1.15470053838f;
@@ -137,10 +142,9 @@ static const float threehalfpi = 4.7123889f;
 static const float pi = PI;
 static const float halfpi = PI * 0.5f;
 static const float quarterpi = PI * 0.25f;
-static const float twopi_by_enc_ticks = TWOPI / ENCODER_TICKS;
-static const float twopi_by_hall_sectors = TWOPI / HALL_SECTORS;
+static const float twopi_by_common_ticks = TWOPI / SENSOR_COMMON_RES_TICKS;
 
-_Static_assert (TIMER_FREQ_HZ % (2*PWM_FREQ_HZ) == 0, "Timer frequency not an integer multiple of PWM frequency");
+_Static_assert(TIMER_FREQ_HZ % (2*PWM_FREQ_HZ) == 0, "Timer frequency not an integer multiple of PWM frequency");
 
 typedef struct 
 {

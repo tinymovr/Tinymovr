@@ -598,6 +598,26 @@ void SSPD_IO_Select_PG4567(SSP_MS_TYPE ms_mode)
     PAC55XX_SCC->PGMUXSEL.w |= 0x55550000;                      // Set Port Pin as SSP
 }
 
+// void SSPD_IO_Select_PD45PF45(SSP_MS_TYPE ms_mode)
+// {
+//     if (ms_mode == SSP_MS_MASTER)
+//     {
+//         PAC55XX_GPIOD->MODE.P4 = IO_PUSH_PULL_OUTPUT;           // MOSI
+//         PAC55XX_GPIOD->MODE.P5 = IO_HIGH_IMPEDENCE_INPUT;       // MISO
+//         PAC55XX_GPIOF->MODE.P4 = IO_PUSH_PULL_OUTPUT;           // SCLK
+//         PAC55XX_GPIOF->MODE.P5 = IO_PUSH_PULL_OUTPUT;           // SS
+
+//         PAC55XX_SCC->PDPUEN.P4 = 0;
+//         PAC55XX_SCC->PDPUEN.P5 = 1;
+//         PAC55XX_SCC->PFPUEN.P4 = 0;
+//         PAC55XX_SCC->PFPUEN.P5 = 0;
+//     }
+//     PAC55XX_SCC->PDMUXSEL.w &= 0xFFFF00FF;                      // Clear Port Pin selection
+//     PAC55XX_SCC->PDMUXSEL.w |= 0x00007700;                      // Set Port Pin as SSP
+//     PAC55XX_SCC->PFMUXSEL.w &= 0xFFFF00FF;                      // Clear Port Pin selection
+//     PAC55XX_SCC->PFMUXSEL.w |= 0x00005500;                      // Set Port Pin as SSP
+// }
+
 //==============================================================================
 ///@brief
 ///     Choose the SSP and Enable the IO you want
@@ -641,9 +661,9 @@ void ssp_io_config(SSP_TYPE ssp, SSP_MS_TYPE ms_mode)
 
         case SSPD:
             // Select ssp D peripheral choose one!
-            SSPD_IO_Select_PD4567(ms_mode);
+//            SSPD_IO_Select_PD4567(ms_mode);
 //            SSPD_IO_Select_PE4567(ms_mode);
-//            SSPD_IO_Select_PF4567(ms_mode);
+            SSPD_IO_Select_PF4567(ms_mode);
 //            SSPD_IO_Select_PG0123(ms_mode);
 //            SSPD_IO_Select_PG4567(ms_mode);
             break;
@@ -698,7 +718,48 @@ void ssp_interrupt_enable(SSP_TYPE ssp)
     }
 }
 
-void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t cph, uint8_t cpol)
+//==============================================================================
+///@brief
+///     disable the interrupt
+///
+///@param[in]
+///     SSP Type:
+///         SSPA
+///         SSPB
+///         SSPC
+///         SSPD
+///
+//==============================================================================
+void ssp_interrupt_disable(SSP_TYPE ssp)
+{
+    switch (ssp)
+    {
+        case SSPA:
+            NVIC_ClearPendingIRQ(USARTA_IRQn);
+            NVIC_DisableIRQ(USARTA_IRQn);
+            break;
+
+        case SSPB:
+            NVIC_ClearPendingIRQ(USARTB_IRQn);
+            NVIC_DisableIRQ(USARTB_IRQn);
+            break;
+
+        case SSPC:
+            NVIC_ClearPendingIRQ(USARTC_IRQn);
+            NVIC_DisableIRQ(USARTC_IRQn);
+            break;
+
+        case SSPD:
+            NVIC_ClearPendingIRQ(USARTD_IRQn);
+            NVIC_DisableIRQ(USARTD_IRQn);
+            break;
+
+        default:
+            break;
+    }
+}
+
+void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t clkn_div, uint32_t data_size, uint8_t cph, uint8_t cpol)
 {
     PAC55XX_SSP_TYPEDEF *ssp_ptr;
 
@@ -736,14 +797,14 @@ void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t cph, uint8_t cpol)
     // SSPCLK = PCLK / ((SSPxCLK.M + 1)*SSPxCLK.N) = 150000000 / ((2+1) x 6) = 8.47MHz
     // SSPCLK = PCLK / ((SSPxCLK.M + 1)*SSPxCLK.N) = 150000000 / ((2+1) x 4) = 12.5MHz
 	ssp_ptr->CLK.M = 2;
-	ssp_ptr->CLK.N = 4;                                     // N must be even value from 2 to 254
+	ssp_ptr->CLK.N = clkn_div;                                     // N must be even value from 2 to 254
 	ssp_ptr->CON.FRF = SSP_FRAME_FORMAT_SPI;                 // Frame Format, SPI frame format
 	ssp_ptr->CON.MS = ms_mode;                               // Master/Slave mode, master mode
 	ssp_ptr->CON.LSBFIRST = SSP_ENDIAN_MSB;                  // Endian Order, MSB transmit 1st
 	ssp_ptr->CON.LBM = SSP_LP_NORMAL;                        // Loopback Mode, no loopback mode
-	ssp_ptr->CON.CPH = cph;                      // Clock Out Phase, SPI captures data at 2nd edge transition of the frame
-	ssp_ptr->CON.CPO = cpol;                // Clock Out Polarity, SPI clock active high
-    ssp_ptr->CON.DSS = SSP_DATA_SIZE_16;                     // Data Size Select, 16 bit data
+	ssp_ptr->CON.CPH = cph;                                  // Clock Out Phase
+	ssp_ptr->CON.CPO = cpol;                                 // Clock Out Polarity
+    ssp_ptr->CON.DSS = data_size;                            // Data Size Select
     ssp_ptr->CON.SOD = SSP_OUTPUT_NOT_DRIVE;                 // Slave Output Disable
 
     ssp_io_config(ssp, ms_mode);
@@ -758,6 +819,36 @@ void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t cph, uint8_t cpol)
 //    ssp_ptr->IMSC.RTIM = 1;                                  // Enable RX Timeout interrupt
 
     ssp_ptr->CON.SSPEN = SSP_CONTROL_ENABLE;                 // SSP Enable
+}
+
+void ssp_deinit(SSP_TYPE ssp)
+{
+    PAC55XX_SSP_TYPEDEF *ssp_ptr;
+
+    switch (ssp)
+    {
+        case SSPA:
+            ssp_ptr = PAC55XX_SSPA;
+            break;
+
+        case SSPB:
+            ssp_ptr = PAC55XX_SSPB;
+            break;
+
+        case SSPC:
+            ssp_ptr = PAC55XX_SSPC;
+            break;
+
+        case SSPD:
+            ssp_ptr = PAC55XX_SSPD;
+            break;
+
+        default:
+            ssp_ptr = PAC55XX_SSPD;
+            break;
+    }
+    ssp_interrupt_disable(ssp);
+    ssp_ptr->CON.SSPEN = SSP_CONTROL_DISABLE;
 }
 
 //==============================================================================

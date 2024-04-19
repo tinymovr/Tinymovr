@@ -19,9 +19,10 @@
 #include <src/utils/utils.h>
 #include <src/rtt/SEGGER_RTT.h>
 #include <src/controller/controller.h>
-#include <src/encoder/encoder.h>
 #include <src/motor/motor.h>
 #include <src/can/can_endpoints.h>
+#include <src/sensor/sensor.h>
+#include <src/observer/observer.h>
 #include <src/system/system.h>
 
 extern char _eram;
@@ -85,6 +86,11 @@ void system_init(void)
     // Ensure ADC GP0 register is zero, to bypass DFU mode on next boot
     pac5xxx_tile_register_write(ADDR_GP0, 0);
 
+    // Configure reporting of mcu cycles
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    DWT->CYCCNT = 0;
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+
     // Configure error handling
     SCB->CCR |= 0x10;
 
@@ -105,19 +111,6 @@ TM_RAMFUNC void system_update(void)
     {
         state.errors |= ERRORS_UNDERVOLTAGE;
     }
-    // const uint8_t drv_status = pac5xxx_tile_register_read(ADDR_STATDRV);
-    // if (drv_status > 0)
-    // {
-    //     state.errors |= ((drv_status & 0x56) << 1);
-    // }
-    // const uint8_t drv_fault = pac5xxx_tile_register_read(ADDR_DRV_FLT);
-    // if (drv_fault > 0)
-    // {
-    //     // We use 0x5 mask because we ignore CHARGE_PUMP_FAULT_STAT
-    //     // for the time being, as it seems to always be set, and
-    //     // ERRORS_DRVXX_DISABLE, as it seems to give spurious errors.
-    //     state.errors |= ((drv_fault & 0x5) << 1);
-    // }
 }
 
 void system_reset(void)
@@ -132,6 +125,15 @@ void system_enter_dfu(void)
     NVIC_SystemReset();
 }
 
+void system_reset_calibration(void)
+{
+    ADC_reset();
+    sensors_reset();
+    observers_init_with_defaults();
+    motor_reset_calibration();
+    wait_pwm_cycles(5000);
+}
+
 TM_RAMFUNC float system_get_Vbus(void)
 {
     return state.Vbus;
@@ -139,7 +141,10 @@ TM_RAMFUNC float system_get_Vbus(void)
 
 TM_RAMFUNC bool system_get_calibrated(void)
 {
-    return motor_get_calibrated() & encoder_get_calibrated();
+    return (frames_get_calibrated() &&
+            motor_get_calibrated() &&
+            commutation_sensor_p->is_calibrated_func(commutation_sensor_p) &&
+            position_sensor_p->is_calibrated_func(position_sensor_p));
 }
 
 TM_RAMFUNC uint8_t system_get_errors(void)
@@ -147,12 +152,24 @@ TM_RAMFUNC uint8_t system_get_errors(void)
     return state.errors;
 }
 
+TM_RAMFUNC uint8_t system_get_warnings(void)
+{
+    // As the user request rate is less than the update
+    // rate, and the warnings do not affect system integrity
+    // evaluation, it is better to fetch the registers per
+    // request
+    const uint8_t warnings = ((pac5xxx_tile_register_read(ADDR_STATDRV) & 0x56)) |
+                             ((pac5xxx_tile_register_read(ADDR_DRV_FLT) & 0x5));
+    return warnings;
+}
+
 TM_RAMFUNC bool errors_exist(void)
 {
-    return (controller_get_errors() | 
-            encoder_get_errors() | 
-            motor_get_errors() | 
-            planner_get_errors() | 
+    return (controller_get_errors() ||
+            commutation_sensor_p->get_errors_func(commutation_sensor_p) ||
+            position_sensor_p->get_errors_func(position_sensor_p) ||
+            motor_get_errors() ||
+            planner_get_errors() ||
             system_get_errors());
 }
 

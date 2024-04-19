@@ -24,10 +24,21 @@ typedef struct
 	bool uart_message_interrupt;
     bool wwdt_interrupt;
 	bool busy;
+	uint32_t load;
 
     uint8_t errors;
 } SchedulerState;
 
-void WaitForControlLoopInterrupt(void);
+extern volatile SchedulerState scheduler_state;
 
-uint8_t scheduler_get_errors(void);
+void wait_for_control_loop_interrupt(void);
+
+static inline uint8_t scheduler_get_errors(void)
+{
+	return scheduler_state.errors;
+}
+
+static inline uint32_t scheduler_get_load(void)
+{
+	return scheduler_state.load;
+}

@@ -21,129 +21,76 @@
 #include <src/system/system.h>
 #include <src/observer/observer.h>
 
-static ObserverState state = {0};
-
-static ObserverConfig config = {
-		.track_bw = 350.0f,
-		.kp = 0.0f,
-		.ki = 0.0f,
-};
-
-void observer_init(void)
+bool observer_init_with_defaults(Observer *o, Sensor **s)
 {
-	observer_reset();
-    observer_set_bw(config.track_bw);
-	// We keep local copies of a few key variables from
-	// the encoder, because it is faster than calling
-	// the encoder function pointer
-	state.encoder_type = encoder_get_type();
-	state.encoder_ticks = encoder_get_ticks();
-	state.encoder_half_ticks = state.encoder_ticks/2;
+	ObserverConfig c = {.track_bw=350};
+    return observer_init_with_config(o, s, &c);
 }
 
-void observer_reset(void)
+bool observer_init_with_config(Observer *o, Sensor **s, ObserverConfig *c)
 {
-	state.pos_sector = 0;
-	state.pos_estimate_wrapped = 0;
-	state.vel_estimate = 0;
+	o->sensor_ptr = s;
+	o->config = *c;
+    observer_set_bandwidth(o, c->track_bw);
+	return true;
 }
 
-TM_RAMFUNC void observer_update(void)
+void observer_update_params(Observer *o)
 {
-	const int16_t angle_meas = encoder_get_angle();
-	const float delta_pos_est = PWM_PERIOD_S * state.vel_estimate;
-	float delta_pos_meas = angle_meas - state.pos_estimate_wrapped;
-	if (delta_pos_meas < -state.encoder_half_ticks)
-	{
-		delta_pos_meas += state.encoder_ticks;
-	}
-	else if (delta_pos_meas >= state.encoder_half_ticks)
-	{
-		delta_pos_meas -= state.encoder_ticks;
-	}
-	const float delta_pos_error = delta_pos_meas - delta_pos_est;
-	const float incr_pos = delta_pos_est + (PWM_PERIOD_S * config.kp * delta_pos_error);
-	state.pos_estimate_wrapped += incr_pos;
-	if (state.pos_estimate_wrapped < 0)
-	{
-		state.pos_estimate_wrapped += state.encoder_ticks;
-		state.pos_sector -= 1;
-	}
-	else if (state.pos_estimate_wrapped >= state.encoder_ticks)
-	{
-		state.pos_estimate_wrapped -= state.encoder_ticks;
-		state.pos_sector += 1;
-	}
-	state.vel_estimate += PWM_PERIOD_S * config.ki * delta_pos_error;
+    o->config.kp = 2.0f * o->config.track_bw;
+	o->config.ki = 0.25f * (o->config.kp * o->config.kp);
+	o->config.kp_period = o->config.kp * PWM_PERIOD_S;
+	o->config.ki_period = o->config.ki * PWM_PERIOD_S;
 }
 
-float observer_get_bw(void)
+void observer_reset_state(Observer *o)
 {
-    return config.track_bw;
+	o->pos_sector = 0;
+	o->pos_estimate_wrapped = 0;
+	o->vel_estimate = 0;
+	o->current = false;
 }
 
-void observer_set_bw(float bw)
+float observer_get_bandwidth(Observer *o)
+{
+    return o->config.track_bw;
+}
+
+void observer_set_bandwidth(Observer *o, float bw)
 {
     if (bw > 0.0f)
     {
-        config.track_bw = bw;
-		config.kp = 2.0f * config.track_bw;
-    	config.ki = 0.25f * (config.kp * config.kp);
+        o->config.track_bw = bw;
+		observer_update_params(o);
     }
 }
 
-TM_RAMFUNC float observer_get_pos_estimate(void)
+void observers_init_with_defaults(void)
 {
-	const float primary = state.encoder_ticks * state.pos_sector;
-	return primary + state.pos_estimate_wrapped;
+    observer_init_with_defaults(&commutation_observer, &commutation_sensor_p);
+	observer_init_with_defaults(&position_observer, &position_sensor_p);
 }
 
-TM_RAMFUNC float observer_get_diff(float target)
+void observers_get_config(ObserversConfig *_config)
 {
-	const float primary = state.encoder_ticks * state.pos_sector;
-	const float diff_sector = target - primary;
-	return diff_sector - state.pos_estimate_wrapped;
+	_config->config_commutation = commutation_observer.config;
+	_config->config_position = position_observer.config;
 }
 
-TM_RAMFUNC float observer_get_vel_estimate(void)
+void observers_restore_config(ObserversConfig *_config)
 {
-	return state.vel_estimate;
+	observer_init_with_config(&commutation_observer, &commutation_sensor_p, &(_config->config_commutation));
+	observer_init_with_config(&position_observer, &position_sensor_p, &(_config->config_position));
+	observer_update_params(&commutation_observer);
+	observer_update_params(&position_observer);
 }
 
-TM_RAMFUNC float observer_get_epos(void)
+void commutation_observer_set_bandwidth(float bw)
 {
-	if (ENCODER_MA7XX == state.encoder_type)
-	{
-		return state.pos_estimate_wrapped * twopi_by_enc_ticks * motor_get_pole_pairs();
-	}
-	return state.pos_estimate_wrapped * twopi_by_hall_sectors;
+	observer_set_bandwidth(&commutation_observer, bw);
 }
 
-TM_RAMFUNC float observer_get_evel(void)
+void position_observer_set_bandwidth(float bw)
 {
-	if (ENCODER_MA7XX == state.encoder_type)
-	{
-		return state.vel_estimate * twopi_by_enc_ticks * motor_get_pole_pairs();
-	}
-	return state.vel_estimate * twopi_by_hall_sectors;
-}
-
-TM_RAMFUNC float observer_get_pos_estimate_user_frame(void)
-{
-	return (observer_get_pos_estimate() - motor_get_user_offset()) * motor_get_user_direction();
-}
-
-TM_RAMFUNC float observer_get_vel_estimate_user_frame(void)
-{
-	return state.vel_estimate * motor_get_user_direction();
-}
-
-ObserverConfig* observer_get_config(void)
-{
-	return &config;
-}
-
-void observer_restore_config(ObserverConfig* config_)
-{
-	config = *config_;
+	observer_set_bandwidth(&position_observer, bw);
 }

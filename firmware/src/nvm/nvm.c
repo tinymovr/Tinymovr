@@ -23,24 +23,25 @@
 
 static struct NVMStruct s;
 
+const uint32_t config_size = sizeof(struct NVMStruct);
+
 bool nvm_save_config(void)
 {
 	bool commited = false;
 	uint8_t data[sizeof(struct NVMStruct)];
 	s.node_id_1 = CAN_get_ID();
 	s.node_id_2 = CAN_get_ID();
+	frames_get_config(&(s.frames_config));
 	s.adc_config = *ADC_get_config();
 	s.motor_config = *motor_get_config();
-	s.hall_config = *hall_get_config();
-	s.ma7xx_config = *ma7xx_get_config();
-	s.encoder_config = *encoder_get_config();
-	s.observer_config = *observer_get_config();
+	sensors_get_config(&(s.sensors_config));
+	observers_get_config(&(s.observers_config));
 	s.controller_config = *controller_get_config();
 	s.can_config = *CAN_get_config();
 	s.traj_planner_config = *traj_planner_get_config();
 	strlcpy(s.version, GIT_VERSION, sizeof(s.version));
 	memcpy(data, &s, sizeof(struct NVMStruct));
-	if (STATE_IDLE == controller_get_state())
+	if (CONTROLLER_STATE_IDLE == controller_get_state())
 	{
 		uint8_t *dataBuffer = data;
 		__disable_irq();
@@ -61,12 +62,11 @@ bool nvm_load_config(void)
 	strlcpy(static_version, GIT_VERSION, sizeof(static_version));
 	if (strcmp(s.version, static_version) == 0)
 	{
+		frames_restore_config(&s.frames_config);
 		ADC_restore_config(&s.adc_config);
 		motor_restore_config(&s.motor_config);
-		hall_restore_config(&s.hall_config);
-		ma7xx_restore_config(&s.ma7xx_config);
-		encoder_restore_config(&s.encoder_config);
-		observer_restore_config(&s.observer_config);
+		sensors_restore_config(&s.sensors_config);
+		observers_restore_config(&s.observers_config);
 		controller_restore_config(&s.controller_config);
 		CAN_restore_config(&s.can_config);
 		traj_planner_restore_config(&s.traj_planner_config);
@@ -77,9 +77,12 @@ bool nvm_load_config(void)
 
 void nvm_erase(void)
 {
-	if (STATE_IDLE == controller_get_state())
+	if (CONTROLLER_STATE_IDLE == controller_get_state())
 	{
-		flash_erase_page(SETTINGS_PAGE);
+		for (uint8_t i=0; i<SETTINGS_PAGE_COUNT; i++)
+		{
+			flash_erase_page(SETTINGS_PAGE + i);
+		}
 		system_reset();
 	}
 }

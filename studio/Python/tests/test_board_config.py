@@ -27,6 +27,7 @@ ureg = get_registry()
 A = ureg.ampere
 tick = ureg.ticks
 s = ureg.second
+tsleep = 0.20
 
 
 class TestBoardConfig(TMTestCase):
@@ -108,6 +109,56 @@ class TestBoardConfig(TMTestCase):
         self.assertAlmostEqual(self.tm.controller.velocity.deadband, 100 * tick) 
         self.assertAlmostEqual(self.tm.controller.velocity.limit, 120000 * tick / s)
         self.assertAlmostEqual(self.tm.controller.current.Iq_limit, 18 * A)
+        self.tm.erase_config()
+        time.sleep(0.2)
+
+    def test_d_position_control_w_loaded_config(self):
+        """
+        Test position control after saving and loading config.
+        WARNING: This will perform one NVRAM write and two erase cycles.
+        """
+        self.check_state(0)
+        self.tm.erase_config()
+        time.sleep(0.2)
+
+        self.try_calibrate()
+
+        self.tm.controller.position_mode()
+        self.check_state(2)
+
+        for _ in range(15):
+            new_pos = random.uniform(-24000, 24000)
+            self.tm.controller.position.setpoint = new_pos * tick
+            time.sleep(tsleep)
+            self.assertAlmostEqual(
+                self.tm.sensors.user_frame.position_estimate,
+                self.tm.controller.position.setpoint,
+                delta=2000 * tick,
+            )
+
+        self.tm.controller.idle()
+
+        time.sleep(0.1)
+
+        self.tm.save_config()
+        
+        time.sleep(0.2)
+
+        self.reset_and_wait()
+        
+        self.tm.controller.position_mode()
+        self.check_state(2)
+
+        for _ in range(15):
+            new_pos = random.uniform(-24000, 24000)
+            self.tm.controller.position.setpoint = new_pos * tick
+            time.sleep(tsleep)
+            self.assertAlmostEqual(
+                self.tm.sensors.user_frame.position_estimate,
+                self.tm.controller.position.setpoint,
+                delta=2000 * tick,
+            )
+
         self.tm.erase_config()
         time.sleep(0.2)
 

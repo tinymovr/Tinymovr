@@ -37,6 +37,9 @@ void system_init(void);
 void system_update(void);
 void system_reset(void);
 void system_enter_dfu(void);
+void system_reset_calibration(void);
+
+extern const uint32_t config_size;
 
 static inline uint8_t system_get_fw_version_string(char *buffer)
 {
@@ -45,19 +48,26 @@ static inline uint8_t system_get_fw_version_string(char *buffer)
     return size;
 }
 
-inline uint32_t system_get_uid(void)
+static inline uint32_t system_get_uid(void)
 {
     return PAC55XX_INFO1->UNIQUEID[0] ^ PAC55XX_INFO1->UNIQUEID[1] ^ PAC55XX_INFO1->UNIQUEID[2];
 }
 
-inline uint32_t system_get_hw_revision(void)
+static inline uint32_t system_get_hw_revision(void)
 {
     return BOARD_REV_IDX;
 }
 
+static inline uint32_t system_get_config_size(void)
+{
+    return config_size;
+}
+
+void system_reset_calibration(void);
 float system_get_Vbus(void);
 bool system_get_calibrated(void);
 uint8_t system_get_errors(void);
+uint8_t system_get_warnings(void);
 bool errors_exist(void);
 
 #endif /* SYSTEM_SYSTEM_H_ */

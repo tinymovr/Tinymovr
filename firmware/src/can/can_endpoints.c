@@ -8,7 +8,7 @@
 #include <string.h>
 #include <src/adc/adc.h>
 #include <src/system/system.h>
-#include <src/encoder/encoder.h>
+#include <src/sensor/sensors.h>
 #include <src/observer/observer.h>
 #include <src/motor/motor.h>
 #include <src/scheduler/scheduler.h>
@@ -18,7 +18,7 @@
 #include <src/can/can_endpoints.h>
 
 
-uint8_t (*avlos_endpoints[79])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_protocol_hash, &avlos_uid, &avlos_fw_version, &avlos_hw_revision, &avlos_Vbus, &avlos_Ibus, &avlos_power, &avlos_temp, &avlos_calibrated, &avlos_errors, &avlos_save_config, &avlos_erase_config, &avlos_reset, &avlos_enter_dfu, &avlos_scheduler_errors, &avlos_controller_state, &avlos_controller_mode, &avlos_controller_warnings, &avlos_controller_errors, &avlos_controller_position_setpoint, &avlos_controller_position_p_gain, &avlos_controller_velocity_setpoint, &avlos_controller_velocity_limit, &avlos_controller_velocity_p_gain, &avlos_controller_velocity_i_gain, &avlos_controller_velocity_deadband, &avlos_controller_velocity_increment, &avlos_controller_current_Iq_setpoint, &avlos_controller_current_Id_setpoint, &avlos_controller_current_Iq_limit, &avlos_controller_current_Iq_estimate, &avlos_controller_current_bandwidth, &avlos_controller_current_Iq_p_gain, &avlos_controller_current_max_Ibus_regen, &avlos_controller_current_max_Ibrake, &avlos_controller_voltage_Vq_setpoint, &avlos_controller_calibrate, &avlos_controller_idle, &avlos_controller_position_mode, &avlos_controller_velocity_mode, &avlos_controller_current_mode, &avlos_controller_set_pos_vel_setpoints, &avlos_comms_can_rate, &avlos_comms_can_id, &avlos_motor_R, &avlos_motor_L, &avlos_motor_pole_pairs, &avlos_motor_type, &avlos_motor_offset, &avlos_motor_direction, &avlos_motor_calibrated, &avlos_motor_I_cal, &avlos_motor_errors, &avlos_encoder_position_estimate, &avlos_encoder_velocity_estimate, &avlos_encoder_type, &avlos_encoder_bandwidth, &avlos_encoder_calibrated, &avlos_encoder_errors, &avlos_traj_planner_max_accel, &avlos_traj_planner_max_decel, &avlos_traj_planner_max_vel, &avlos_traj_planner_t_accel, &avlos_traj_planner_t_decel, &avlos_traj_planner_t_total, &avlos_traj_planner_move_to, &avlos_traj_planner_move_to_tlimit, &avlos_traj_planner_errors, &avlos_homing_velocity, &avlos_homing_max_homing_t, &avlos_homing_retract_dist, &avlos_homing_warnings, &avlos_homing_stall_detect_velocity, &avlos_homing_stall_detect_delta_pos, &avlos_homing_stall_detect_t, &avlos_homing_home, &avlos_watchdog_enabled, &avlos_watchdog_triggered, &avlos_watchdog_timeout };
+uint8_t (*avlos_endpoints[96])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_protocol_hash, &avlos_uid, &avlos_fw_version, &avlos_hw_revision, &avlos_Vbus, &avlos_Ibus, &avlos_power, &avlos_temp, &avlos_calibrated, &avlos_errors, &avlos_warnings, &avlos_save_config, &avlos_erase_config, &avlos_reset, &avlos_enter_dfu, &avlos_config_size, &avlos_scheduler_load, &avlos_scheduler_errors, &avlos_controller_state, &avlos_controller_mode, &avlos_controller_warnings, &avlos_controller_errors, &avlos_controller_position_setpoint, &avlos_controller_position_p_gain, &avlos_controller_velocity_setpoint, &avlos_controller_velocity_limit, &avlos_controller_velocity_p_gain, &avlos_controller_velocity_i_gain, &avlos_controller_velocity_deadband, &avlos_controller_velocity_increment, &avlos_controller_current_Iq_setpoint, &avlos_controller_current_Id_setpoint, &avlos_controller_current_Iq_limit, &avlos_controller_current_Iq_estimate, &avlos_controller_current_bandwidth, &avlos_controller_current_Iq_p_gain, &avlos_controller_current_max_Ibus_regen, &avlos_controller_current_max_Ibrake, &avlos_controller_voltage_Vq_setpoint, &avlos_controller_calibrate, &avlos_controller_idle, &avlos_controller_position_mode, &avlos_controller_velocity_mode, &avlos_controller_current_mode, &avlos_controller_set_pos_vel_setpoints, &avlos_comms_can_rate, &avlos_comms_can_id, &avlos_comms_can_heartbeat, &avlos_motor_R, &avlos_motor_L, &avlos_motor_pole_pairs, &avlos_motor_type, &avlos_motor_calibrated, &avlos_motor_I_cal, &avlos_motor_errors, &avlos_sensors_user_frame_position_estimate, &avlos_sensors_user_frame_velocity_estimate, &avlos_sensors_user_frame_offset, &avlos_sensors_user_frame_multiplier, &avlos_sensors_setup_onboard_calibrated, &avlos_sensors_setup_onboard_errors, &avlos_sensors_setup_external_spi_type, &avlos_sensors_setup_external_spi_calibrated, &avlos_sensors_setup_external_spi_errors, &avlos_sensors_setup_hall_calibrated, &avlos_sensors_setup_hall_errors, &avlos_sensors_select_position_sensor_connection, &avlos_sensors_select_position_sensor_bandwidth, &avlos_sensors_select_position_sensor_raw_angle, &avlos_sensors_select_position_sensor_position_estimate, &avlos_sensors_select_position_sensor_velocity_estimate, &avlos_sensors_select_commutation_sensor_connection, &avlos_sensors_select_commutation_sensor_bandwidth, &avlos_sensors_select_commutation_sensor_raw_angle, &avlos_sensors_select_commutation_sensor_position_estimate, &avlos_sensors_select_commutation_sensor_velocity_estimate, &avlos_traj_planner_max_accel, &avlos_traj_planner_max_decel, &avlos_traj_planner_max_vel, &avlos_traj_planner_t_accel, &avlos_traj_planner_t_decel, &avlos_traj_planner_t_total, &avlos_traj_planner_move_to, &avlos_traj_planner_move_to_tlimit, &avlos_traj_planner_errors, &avlos_homing_velocity, &avlos_homing_max_homing_t, &avlos_homing_retract_dist, &avlos_homing_warnings, &avlos_homing_stall_detect_velocity, &avlos_homing_stall_detect_delta_pos, &avlos_homing_stall_detect_t, &avlos_homing_home, &avlos_watchdog_enabled, &avlos_watchdog_triggered, &avlos_watchdog_timeout };
 
 uint32_t _avlos_get_proto_hash(void)
 {
@@ -110,7 +110,7 @@ uint8_t avlos_temp(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
 if (AVLOS_CMD_READ == cmd) {
         float v;
-        v = adc_get_mcu_temp();
+        v = ADC_get_mcu_temp();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
@@ -135,6 +135,18 @@ uint8_t avlos_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 if (AVLOS_CMD_READ == cmd) {
         uint8_t v;
         v = system_get_errors();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_warnings(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        uint8_t v;
+        v = system_get_warnings();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
@@ -168,6 +180,30 @@ uint8_t avlos_enter_dfu(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cm
     system_enter_dfu();
 
     return AVLOS_RET_CALL;
+}
+
+uint8_t avlos_config_size(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        uint32_t v;
+        v = system_get_config_size();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_scheduler_load(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        uint32_t v;
+        v = scheduler_get_load();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
 }
 
 uint8_t avlos_scheduler_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
@@ -336,7 +372,7 @@ uint8_t avlos_controller_velocity_i_gain(uint8_t * buffer, uint8_t * buffer_len,
 {
 if (AVLOS_CMD_READ == cmd) {
         float v;
-        v = controller_get_vel_integrator_gain();
+        v = controller_get_vel_integral_gain();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
@@ -344,7 +380,7 @@ if (AVLOS_CMD_READ == cmd) {
 else if (AVLOS_CMD_WRITE == cmd) {
         float v;
         memcpy(&v, buffer, sizeof(v));
-        controller_set_vel_integrator_gain(v);
+        controller_set_vel_integral_gain(v);
         return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;
@@ -354,7 +390,7 @@ uint8_t avlos_controller_velocity_deadband(uint8_t * buffer, uint8_t * buffer_le
 {
 if (AVLOS_CMD_READ == cmd) {
         float v;
-        v = controller_get_vel_integrator_deadband();
+        v = controller_get_vel_integral_deadband();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
@@ -362,7 +398,7 @@ if (AVLOS_CMD_READ == cmd) {
 else if (AVLOS_CMD_WRITE == cmd) {
         float v;
         memcpy(&v, buffer, sizeof(v));
-        controller_set_vel_integrator_deadband(v);
+        controller_set_vel_integral_deadband(v);
         return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;
@@ -568,7 +604,7 @@ uint8_t avlos_controller_set_pos_vel_setpoints(uint8_t * buffer, uint8_t * buffe
     float vel_setpoint;
     memcpy(&vel_setpoint, buffer+_offset, sizeof(vel_setpoint));
     _offset += sizeof(vel_setpoint);
-    float ret_val = controller_set_pos_vel_setpoints(pos_setpoint, vel_setpoint);
+    float ret_val = controller_set_pos_vel_setpoints_user_frame(pos_setpoint, vel_setpoint);
     memcpy(buffer, &ret_val, sizeof(ret_val));
     *buffer_len = sizeof(ret_val);
 
@@ -606,6 +642,24 @@ else if (AVLOS_CMD_WRITE == cmd) {
         uint32_t v;
         memcpy(&v, buffer, sizeof(v));
         CAN_set_ID(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_comms_can_heartbeat(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        bool v;
+        v = CAN_get_send_heartbeat();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+else if (AVLOS_CMD_WRITE == cmd) {
+        bool v;
+        memcpy(&v, buffer, sizeof(v));
+        CAN_set_send_heartbeat(v);
         return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;
@@ -683,42 +737,6 @@ else if (AVLOS_CMD_WRITE == cmd) {
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t avlos_motor_offset(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
-{
-if (AVLOS_CMD_READ == cmd) {
-        float v;
-        v = motor_get_user_offset();
-        *buffer_len = sizeof(v);
-        memcpy(buffer, &v, sizeof(v));
-        return AVLOS_RET_READ;
-    }
-else if (AVLOS_CMD_WRITE == cmd) {
-        float v;
-        memcpy(&v, buffer, sizeof(v));
-        motor_set_user_offset(v);
-        return AVLOS_RET_WRITE;
-    }
-    return AVLOS_RET_NOACTION;
-}
-
-uint8_t avlos_motor_direction(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
-{
-if (AVLOS_CMD_READ == cmd) {
-        int8_t v;
-        v = motor_get_user_direction();
-        *buffer_len = sizeof(v);
-        memcpy(buffer, &v, sizeof(v));
-        return AVLOS_RET_READ;
-    }
-else if (AVLOS_CMD_WRITE == cmd) {
-        int8_t v;
-        memcpy(&v, buffer, sizeof(v));
-        motor_set_user_direction(v);
-        return AVLOS_RET_WRITE;
-    }
-    return AVLOS_RET_NOACTION;
-}
-
 uint8_t avlos_motor_calibrated(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
 if (AVLOS_CMD_READ == cmd) {
@@ -761,11 +779,11 @@ if (AVLOS_CMD_READ == cmd) {
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t avlos_encoder_position_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t avlos_sensors_user_frame_position_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
 if (AVLOS_CMD_READ == cmd) {
         float v;
-        v = observer_get_pos_estimate_user_frame();
+        v = user_frame_get_pos_estimate();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
@@ -773,11 +791,11 @@ if (AVLOS_CMD_READ == cmd) {
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t avlos_encoder_velocity_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t avlos_sensors_user_frame_velocity_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
 if (AVLOS_CMD_READ == cmd) {
         float v;
-        v = observer_get_vel_estimate_user_frame();
+        v = user_frame_get_vel_estimate();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
@@ -785,29 +803,11 @@ if (AVLOS_CMD_READ == cmd) {
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t avlos_encoder_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
-{
-if (AVLOS_CMD_READ == cmd) {
-        uint8_t v;
-        v = encoder_get_type();
-        *buffer_len = sizeof(v);
-        memcpy(buffer, &v, sizeof(v));
-        return AVLOS_RET_READ;
-    }
-else if (AVLOS_CMD_WRITE == cmd) {
-        uint8_t v;
-        memcpy(&v, buffer, sizeof(v));
-        encoder_set_type(v);
-        return AVLOS_RET_WRITE;
-    }
-    return AVLOS_RET_NOACTION;
-}
-
-uint8_t avlos_encoder_bandwidth(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t avlos_sensors_user_frame_offset(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
 if (AVLOS_CMD_READ == cmd) {
         float v;
-        v = observer_get_bw();
+        v = frame_user_to_position_sensor_get_offset();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
@@ -815,17 +815,35 @@ if (AVLOS_CMD_READ == cmd) {
 else if (AVLOS_CMD_WRITE == cmd) {
         float v;
         memcpy(&v, buffer, sizeof(v));
-        observer_set_bw(v);
+        frame_user_to_position_sensor_set_offset(v);
         return AVLOS_RET_WRITE;
     }
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t avlos_encoder_calibrated(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t avlos_sensors_user_frame_multiplier(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        float v;
+        v = frame_user_to_position_sensor_get_multiplier();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+else if (AVLOS_CMD_WRITE == cmd) {
+        float v;
+        memcpy(&v, buffer, sizeof(v));
+        frame_user_to_position_sensor_set_multiplier(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_setup_onboard_calibrated(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
 if (AVLOS_CMD_READ == cmd) {
         bool v;
-        v = encoder_get_calibrated();
+        v = sensor_onboard_get_is_calibrated();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;
@@ -833,11 +851,221 @@ if (AVLOS_CMD_READ == cmd) {
     return AVLOS_RET_NOACTION;
 }
 
-uint8_t avlos_encoder_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+uint8_t avlos_sensors_setup_onboard_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
 if (AVLOS_CMD_READ == cmd) {
         uint8_t v;
-        v = encoder_get_errors();
+        v = sensor_onboard_get_errors();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_setup_external_spi_type(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        uint8_t v;
+        v = sensor_external_spi_get_type_avlos();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+else if (AVLOS_CMD_WRITE == cmd) {
+        uint8_t v;
+        memcpy(&v, buffer, sizeof(v));
+        sensor_external_spi_set_type_avlos(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_setup_external_spi_calibrated(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        bool v;
+        v = sensor_external_spi_get_is_calibrated();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_setup_external_spi_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        uint8_t v;
+        v = sensor_external_spi_get_errors();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_setup_hall_calibrated(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        bool v;
+        v = sensor_hall_get_is_calibrated();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_setup_hall_errors(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        uint8_t v;
+        v = sensor_hall_get_errors();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_select_position_sensor_connection(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        uint8_t v;
+        v = position_sensor_get_connection();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+else if (AVLOS_CMD_WRITE == cmd) {
+        uint8_t v;
+        memcpy(&v, buffer, sizeof(v));
+        position_sensor_set_connection(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_select_position_sensor_bandwidth(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        float v;
+        v = position_observer_get_bandwidth();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+else if (AVLOS_CMD_WRITE == cmd) {
+        float v;
+        memcpy(&v, buffer, sizeof(v));
+        position_observer_set_bandwidth(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_select_position_sensor_raw_angle(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        int32_t v;
+        v = sensor_position_get_raw_angle();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_select_position_sensor_position_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        float v;
+        v = position_observer_get_pos_estimate();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_select_position_sensor_velocity_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        float v;
+        v = position_observer_get_vel_estimate();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_select_commutation_sensor_connection(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        uint8_t v;
+        v = commutation_sensor_get_connection();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+else if (AVLOS_CMD_WRITE == cmd) {
+        uint8_t v;
+        memcpy(&v, buffer, sizeof(v));
+        commutation_sensor_set_connection(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_select_commutation_sensor_bandwidth(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        float v;
+        v = commutation_observer_get_bandwidth();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+else if (AVLOS_CMD_WRITE == cmd) {
+        float v;
+        memcpy(&v, buffer, sizeof(v));
+        commutation_observer_set_bandwidth(v);
+        return AVLOS_RET_WRITE;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_select_commutation_sensor_raw_angle(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        int32_t v;
+        v = sensor_commutation_get_raw_angle();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_select_commutation_sensor_position_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        float v;
+        v = commutation_observer_get_pos_estimate();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_sensors_select_commutation_sensor_velocity_estimate(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        float v;
+        v = commutation_observer_get_vel_estimate();
         *buffer_len = sizeof(v);
         memcpy(buffer, &v, sizeof(v));
         return AVLOS_RET_READ;

@@ -33,7 +33,7 @@ class TestRates(TMTestCase):
         elapsed_time()
         sum = 0
         for _ in range(iterations):
-            sum += self.tm.encoder.position_estimate
+            sum += self.tm.sensors.user_frame.position_estimate
         res = elapsed_time()
         print("Round-trip time (2 packets): " + str(res / iterations) + " seconds")
 

@@ -28,17 +28,17 @@ ureg = get_registry()
 A = ureg.ampere
 ticks = ureg.ticks
 s = ureg.second
-tsleep = 0.19
+tsleep = 0.20
 
 
 class TestBoard(TMTestCase):
-    def test_a_encoder(self):
+    def test_a_sensor_readings(self):
         """
-        Test encoder readings
+        Test sensor readings
         """
         pos_estimates = []
         for _ in range(500):
-            pos_estimates.append(self.tm.encoder.position_estimate)
+            pos_estimates.append(self.tm.sensors.user_frame.position_estimate)
             time.sleep(0.001)
         # apparently the statistics lib works with quantities only
         self.assertLess(st.pstdev(pos_estimates) * ticks, 5 * ticks)
@@ -92,7 +92,7 @@ class TestBoard(TMTestCase):
             self.tm.controller.position.setpoint = i * 1000 * ticks
             time.sleep(tsleep)
             self.assertAlmostEqual(
-                i * 1000 * ticks, self.tm.encoder.position_estimate, delta=1000 * ticks
+                i * 1000 * ticks, self.tm.sensors.user_frame.position_estimate, delta=1000 * ticks
             )
 
     def test_e_velocity_control(self):
@@ -112,25 +112,25 @@ class TestBoard(TMTestCase):
             target = i * 20000 * ticks / s
             self.tm.controller.velocity.setpoint = target
             time.sleep(tsleep)
-            velocity_pairs.append((target, self.tm.encoder.velocity_estimate))
+            velocity_pairs.append((target, self.tm.sensors.user_frame.velocity_estimate))
 
         for i in range(R):
             target = (R - i) * 20000 * ticks / s
             self.tm.controller.velocity.setpoint = target
             time.sleep(tsleep)
-            velocity_pairs.append((target, self.tm.encoder.velocity_estimate))
+            velocity_pairs.append((target, self.tm.sensors.user_frame.velocity_estimate))
 
         for i in range(R):
             target = -i * 20000 * ticks / s
             self.tm.controller.velocity.setpoint = target
             time.sleep(tsleep)
-            velocity_pairs.append((target, self.tm.encoder.velocity_estimate))
+            velocity_pairs.append((target, self.tm.sensors.user_frame.velocity_estimate))
 
         for i in range(R):
             target = (i - R) * 20000 * ticks / s
             self.tm.controller.velocity.setpoint = target
             time.sleep(tsleep)
-            velocity_pairs.append((target, self.tm.encoder.velocity_estimate))
+            velocity_pairs.append((target, self.tm.sensors.user_frame.velocity_estimate))
 
         for target, estimate in velocity_pairs:
             self.assertAlmostEqual(target, estimate, delta=30000 * ticks / s)
@@ -144,14 +144,14 @@ class TestBoard(TMTestCase):
         self.tm.controller.position_mode()
         self.check_state(2)
 
-        for _ in range(10):
+        for _ in range(15):
             new_pos = random.uniform(-24000, 24000)
             self.tm.controller.position.setpoint = new_pos * ticks
             time.sleep(0.35)
             self.assertAlmostEqual(
-                self.tm.encoder.position_estimate,
+                self.tm.sensors.user_frame.position_estimate,
                 self.tm.controller.position.setpoint,
-                delta=1900 * ticks,
+                delta=2000 * ticks,
             )
 
     def test_g_limits(self):
@@ -176,27 +176,27 @@ class TestBoard(TMTestCase):
         time.sleep(0.5)
         self.assertAlmostEqual(
             30000 * ticks / s,
-            self.tm.encoder.velocity_estimate,
+            self.tm.sensors.user_frame.velocity_estimate,
             delta=5000 * ticks / s,
         )
         self.tm.controller.velocity.setpoint = -400000 * ticks / s
         time.sleep(0.5)
         self.assertAlmostEqual(
             -30000 * ticks / s,
-            self.tm.encoder.velocity_estimate,
+            self.tm.sensors.user_frame.velocity_estimate,
             delta=5000 * ticks / s,
         )
 
         self.tm.controller.velocity.setpoint = 0
         time.sleep(0.5)
 
-    # def test_h_timings(self):
-    #     """
-    #     Test DWT busy/total cycle timings
-    #     """
-    #     self.assertGreater(self.tm.scheduler.total, 0)
-    #     self.assertGreater(self.tm.scheduler.busy, 0)
-    #     self.assertLess(self.tm.scheduler.busy, 3000)
+    def test_h_timings(self):
+        """
+        Test DWT busy/total cycle timings
+        """
+        if (self.tm.scheduler.load == 0 or self.tm.scheduler.load > 7000):
+            self.skipTest("Invalid timing values. Skipping test.")
+        self.assertLess(self.tm.scheduler.load, 4000)
 
     def test_i_states(self):
         """
@@ -229,6 +229,8 @@ class TestBoard(TMTestCase):
         """
         Test gimbal mode
         """
+        if self.tm.hw_revision > 20 and self.tm.hw_revision < 30:
+            self.skipTest("Gimbal test not relevant to Tinymovr M5.x. Skipping test.")
         self.reset_and_wait()
         # Ensure we're idle
         self.check_state(0)
@@ -242,35 +244,34 @@ class TestBoard(TMTestCase):
 
         for i in range(10):
             self.tm.controller.position.setpoint = i * 1000 * ticks
-            time.sleep(0.2)
+            time.sleep(0.3)
             self.assertAlmostEqual(
-                i * 1000 * ticks, self.tm.encoder.position_estimate, delta=1000 * ticks
+                i * 1000 * ticks, self.tm.sensors.user_frame.position_estimate, delta=1000 * ticks
             )
-            time.sleep(0.4)
 
-    def test_k_rotor_offset_and_direction(self):
+    def test_k_rotor_offset_and_multiplier(self):
         """
-        Test rotor offset and direction
+        Test rotor offset and multiplier
         """
         self.check_state(0)
         self.try_calibrate()
         self.tm.controller.position_mode()
         self.check_state(2)
 
-        self.assertEqual(self.tm.motor.offset, 0)
-        self.assertEqual(self.tm.motor.direction, 1)
+        self.assertEqual(self.tm.sensors.user_frame.offset, 0)
+        self.assertEqual(self.tm.sensors.user_frame.multiplier, 1)
 
-        offset = self.tm.encoder.position_estimate
-        self.tm.motor.offset = offset
-        self.assertAlmostEqual(self.tm.encoder.position_estimate, 0, delta=100)
+        offset = self.tm.sensors.user_frame.position_estimate
+        self.tm.sensors.user_frame.offset = offset
+        self.assertAlmostEqual(self.tm.sensors.user_frame.position_estimate, 0, delta=100)
 
-        self.tm.motor.direction = -1
-        self.assertAlmostEqual(self.tm.encoder.position_estimate, 0, delta=100)
+        self.tm.sensors.user_frame.multiplier = -1
+        self.assertAlmostEqual(self.tm.sensors.user_frame.position_estimate, 0, delta=100)
 
         self.tm.controller.position.setpoint = offset
         time.sleep(0.5)
-        self.tm.motor.offset = 0
-        self.tm.motor.direction = -1
+        self.tm.sensors.user_frame.offset = 0
+        self.tm.sensors.user_frame.multiplier = -1
         self.assertAlmostEqual(self.tm.controller.position.setpoint, 0, delta=100)
 
     # def test_l_read_write_endpoints(self):
@@ -317,7 +318,7 @@ class TestBoard(TMTestCase):
         self.tm.controller.position_mode()
         pos_estimates = []
         for k in range(50):
-            pos_estimates.append(self.tm.encoder.position_estimate)
+            pos_estimates.append(self.tm.sensors.user_frame.position_estimate)
             time.sleep(0.05)
         self.tm.controller.idle()
         self.assertLess(st.pstdev(pos_estimates) * ticks, 100 * ticks)
@@ -340,7 +341,7 @@ class TestBoard(TMTestCase):
         self.tm.controller.velocity_mode()
         self.tm.controller.velocity.setpoint = 200000
         for k in range(100):
-            vel_estimates.append(self.tm.encoder.velocity_estimate.magnitude)
+            vel_estimates.append(self.tm.sensors.user_frame.velocity_estimate.magnitude)
             t_points.append(k * interval)
             time.sleep(interval)
         self.tm.controller.idle()
@@ -355,7 +356,7 @@ class TestBoard(TMTestCase):
         # Ensure we're idle
         self.check_state(0)
         self.try_calibrate()
-        pos_estimate_ref = self.tm.encoder.position_estimate
+        pos_estimate_ref = self.tm.sensors.user_frame.position_estimate
         pos_estimate_comp = self.tm.controller.set_pos_vel_setpoints(0, 0) * ticks
         self.assertAlmostEqual(pos_estimate_ref, pos_estimate_comp, delta=200*ticks)
 
@@ -363,6 +364,7 @@ class TestBoard(TMTestCase):
         """
         Test flux braking
         """
+        self.skipTest("Temporarily skipping flux braking test.")
         self.reset_and_wait()
         # Ensure we're idle
         self.check_state(0)

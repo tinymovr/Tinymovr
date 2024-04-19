@@ -89,6 +89,7 @@ def upload_bin(device, bin_path):
     """
     total_size = os.path.getsize(bin_path)  # Get the total size of .bin file
     uploaded_size = 0
+
     print("\nErasing flash...")
     try:
         # Assume device.erase_all can take hash_validation and attempt to call it
@@ -100,6 +101,7 @@ def upload_bin(device, bin_path):
         print("\nError while erasing!")
         return
     print("Done.")
+    
     with Progress() as progress:
         task2 = progress.add_task("[orange]Flashing...", total=total_size)
         with open(bin_path, "rb") as bin_file:
