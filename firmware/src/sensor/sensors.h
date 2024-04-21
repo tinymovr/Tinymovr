@@ -149,7 +149,27 @@ static inline sensors_setup_external_spi_type_options sensor_external_spi_get_ty
     }
 }
 
+static inline sensors_setup_external_spi_rate_options sensor_external_spi_get_rate_avlos(void)
+{
+    switch (sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type)
+    {
+        case SENSOR_TYPE_MA7XX:
+            return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].ma7xx_sensor.config.rate;
+            break;
+        case SENSOR_TYPE_AS5047:
+            return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].as5047p_sensor.config.rate;
+            break;
+        case SENSOR_TYPE_AMT22:
+            return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].amt22_sensor.config.rate;
+            break;
+        default:
+            return sensors[SENSOR_CONNECTION_EXTERNAL_SPI].ma7xx_sensor.config.rate;
+            break;
+    }
+}
+
 void sensor_external_spi_set_type_avlos(sensors_setup_external_spi_type_options type);
+void sensor_external_spi_set_rate_avlos(sensors_setup_external_spi_rate_options rate);
 
 static inline bool sensor_onboard_get_is_calibrated(void)
 {

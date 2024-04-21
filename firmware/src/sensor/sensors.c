@@ -183,29 +183,24 @@ void position_sensor_set_connection(sensor_connection_t new_connection)
 
 void sensor_external_spi_set_type_avlos(sensors_setup_external_spi_type_options type)
 {
-    sensor_type_t internal_type;
-    bool valid = false;
-    switch (type)
+    if (type < SENSORS_SETUP_EXTERNAL_SPI_TYPE__MAX
+        && (controller_get_state() == CONTROLLER_STATE_IDLE))
     {
-        case SENSORS_SETUP_EXTERNAL_SPI_TYPE_MA7XX:
-            internal_type = SENSOR_TYPE_MA7XX;
-            valid = true;
-            break;
-        case SENSORS_SETUP_EXTERNAL_SPI_TYPE_AS5047:
-            internal_type = SENSOR_TYPE_AS5047;
-            valid = true;
-            break;
-        case SENSORS_SETUP_EXTERNAL_SPI_TYPE_AMT22:
-            internal_type = SENSOR_TYPE_AMT22;
-            valid = true;
-            break;
-        default:
-            break;
-    }
-    if (valid 
-        && (controller_get_state() == CONTROLLER_STATE_IDLE)
-        && (internal_type != sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type))
-    {
+        sensor_type_t internal_type;
+        switch (type)
+        {
+            case SENSORS_SETUP_EXTERNAL_SPI_TYPE_MA7XX:
+                internal_type = SENSOR_TYPE_MA7XX;
+                break;
+            case SENSORS_SETUP_EXTERNAL_SPI_TYPE_AS5047:
+                internal_type = SENSOR_TYPE_AS5047;
+                break;
+            case SENSORS_SETUP_EXTERNAL_SPI_TYPE_AMT22:
+                internal_type = SENSOR_TYPE_AMT22;
+                break;
+            default:
+                break;
+        }
         frames_reset_calibrated();
         
         Sensor *s = &(sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor);
@@ -215,6 +210,49 @@ void sensor_external_spi_set_type_avlos(sensors_setup_external_spi_type_options 
         }
         sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type = internal_type;
         sensor_init_with_defaults(s);
+    }
+}
+
+void sensor_external_spi_set_rate_avlos(sensors_setup_external_spi_rate_options rate)
+{
+    if (rate < SENSORS_SETUP_EXTERNAL_SPI_RATE__MAX
+        && (controller_get_state() == CONTROLLER_STATE_IDLE))
+    {
+        sensors_setup_external_spi_rate_options current_rate;
+        switch (sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type)
+        {
+            case SENSORS_SETUP_EXTERNAL_SPI_TYPE_MA7XX:
+                current_rate = sensors[SENSOR_CONNECTION_EXTERNAL_SPI].ma7xx_sensor.config.rate;
+                break;
+            case SENSORS_SETUP_EXTERNAL_SPI_TYPE_AS5047:
+                current_rate = sensors[SENSOR_CONNECTION_EXTERNAL_SPI].as5047p_sensor.config.rate;
+                break;
+            case SENSORS_SETUP_EXTERNAL_SPI_TYPE_AMT22:
+                current_rate = sensors[SENSOR_CONNECTION_EXTERNAL_SPI].amt22_sensor.config.rate;
+                break;
+            default:
+                current_rate = sensors[SENSOR_CONNECTION_EXTERNAL_SPI].ma7xx_sensor.config.rate;
+                break;
+        }
+        if (rate != current_rate)
+        {
+            sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.deinit_func(&(sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor));
+            switch (sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type)
+            {
+                case SENSORS_SETUP_EXTERNAL_SPI_TYPE_MA7XX:
+                    sensors[SENSOR_CONNECTION_EXTERNAL_SPI].ma7xx_sensor.config.rate = rate;
+                    break;
+                case SENSORS_SETUP_EXTERNAL_SPI_TYPE_AS5047:
+                    sensors[SENSOR_CONNECTION_EXTERNAL_SPI].as5047p_sensor.config.rate = rate;
+                    break;
+                case SENSORS_SETUP_EXTERNAL_SPI_TYPE_AMT22:
+                    current_rate = sensors[SENSOR_CONNECTION_EXTERNAL_SPI].amt22_sensor.config.rate = rate;
+                    break;
+                default:
+                    break;
+            }
+            sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.init_func(&(sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor));
+        }
     }
 }
 
