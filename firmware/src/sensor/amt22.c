@@ -24,6 +24,8 @@
 
 void amt22_make_blank_sensor(Sensor *s)
 {
+    AMT22Sensor *as = (AMT22Sensor *)s;
+    as->config.rate = SENSORS_SETUP_EXTERNAL_SPI_RATE_3Mbps;
     s->config.type = SENSOR_TYPE_AMT22;
     s->bits = AMT22_BITS;
     s->ticks = AMT22_TICKS;

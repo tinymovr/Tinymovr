@@ -24,6 +24,8 @@
 
 void ma7xx_make_blank_sensor(Sensor *s)
 {
+    MA7xxSensor *as = (MA7xxSensor *)s;
+    as->config.rate = SENSORS_SETUP_EXTERNAL_SPI_RATE_3Mbps;
     s->config.type = SENSOR_TYPE_MA7XX;
     s->bits = MA7XX_BITS;
     s->ticks = MA7XX_TICKS;

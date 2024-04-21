@@ -24,6 +24,8 @@
 
 void as5047p_make_blank_sensor(Sensor *s)
 {
+    AS5047PSensor *as = (AS5047PSensor *)s;
+    as->config.rate = SENSORS_SETUP_EXTERNAL_SPI_RATE_3Mbps;
     s->config.type = SENSOR_TYPE_AS5047;
     s->bits = AS5047_BITS;
     s->ticks = AS5047_TICKS;
