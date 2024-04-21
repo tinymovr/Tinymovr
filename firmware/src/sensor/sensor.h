@@ -39,6 +39,7 @@ typedef struct Observer Observer;
 typedef bool (*sensor_is_calibrated_func_t)(const Sensor *);
 typedef bool (*sensor_calibrate_func_t)(Sensor *, Observer *);
 typedef int32_t (*sensor_get_raw_angle_func_t)(const Sensor *);
+typedef bool (*sensor_init_func_t)(Sensor *);
 typedef void (*sensor_deinit_func_t)(Sensor *);
 typedef void (*sensor_reset_func_t)(Sensor *);
 typedef void (*sensor_prepare_func_t)(const Sensor *);
@@ -74,6 +75,7 @@ struct Sensor { // typedefd earlier
     sensor_is_calibrated_func_t is_calibrated_func;
     sensor_calibrate_func_t calibrate_func;
     sensor_get_raw_angle_func_t get_raw_angle_func;
+    sensor_init_func_t init_func;
     sensor_deinit_func_t deinit_func;
     sensor_reset_func_t reset_func;
     sensor_update_func_t update_func;

@@ -386,7 +386,13 @@ remote_attributes:
                 meta: {export: True}
                 getter_name: sensor_external_spi_get_type_avlos
                 setter_name: sensor_external_spi_set_type_avlos
-                summary: The type of external sensor type. Either MA7XX, AS5047 or AMT22.
+                summary: The type of the external sensor.
+              - name: rate
+                options: [1_5Mbps, 3Mbps, 6Mbps, 8Mbps, 12Mbps]
+                meta: {export: True, dynamic: True}
+                getter_name: sensor_external_spi_get_rate_avlos
+                setter_name: sensor_external_spi_set_rate_avlos
+                summary: The rate of the external sensor.
               - name: calibrated
                 dtype: bool
                 meta: {dynamic: True}

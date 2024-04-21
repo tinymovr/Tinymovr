@@ -37,6 +37,7 @@ typedef struct
 {
     SSP_TYPE ssp_port;
     PAC55XX_SSP_TYPEDEF *ssp_struct;
+    sensors_setup_external_spi_rate_options rate;
 } AMT22SensorConfig;
 
 typedef struct
@@ -48,8 +49,9 @@ typedef struct
 } AMT22Sensor;
 
 void amt22_make_blank_sensor(Sensor *s);
-bool amt22_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct);
+bool amt22_init_with_port_and_rate(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct, sensors_setup_external_spi_rate_options rate);
 bool amt22_init_with_config(Sensor *s, const AMT22SensorConfig *c);
+bool amt22_init(Sensor *s);
 void amt22_deinit(Sensor *s);
 void amt22_reset(Sensor *s);
 void amt22_get_ss_config(Sensor *s, void* buffer);
@@ -72,7 +74,7 @@ static inline void amt22_send_angle_cmd(const Sensor *s)
     // 3us + an experimentally defined value to account for transmission
     // delay.
     ssp_write_one(((const AMT22Sensor *)s)->config.ssp_struct, AMT22_CMD_READ_ANGLE);
-    delay_us(6);
+    delay_us(5);
     ssp_write_one(((const AMT22Sensor *)s)->config.ssp_struct, AMT22_CMD_READ_ANGLE);
 }
 
