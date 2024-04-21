@@ -199,6 +199,7 @@ void sensor_external_spi_set_type_avlos(sensors_setup_external_spi_type_options 
                 internal_type = SENSOR_TYPE_AMT22;
                 break;
             default:
+                internal_type = SENSOR_TYPE_MA7XX;
                 break;
         }
         frames_reset_calibrated();
@@ -221,13 +222,13 @@ void sensor_external_spi_set_rate_avlos(sensors_setup_external_spi_rate_options 
         sensors_setup_external_spi_rate_options current_rate;
         switch (sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type)
         {
-            case SENSORS_SETUP_EXTERNAL_SPI_TYPE_MA7XX:
+            case SENSOR_TYPE_MA7XX:
                 current_rate = sensors[SENSOR_CONNECTION_EXTERNAL_SPI].ma7xx_sensor.config.rate;
                 break;
-            case SENSORS_SETUP_EXTERNAL_SPI_TYPE_AS5047:
+            case SENSOR_TYPE_AS5047:
                 current_rate = sensors[SENSOR_CONNECTION_EXTERNAL_SPI].as5047p_sensor.config.rate;
                 break;
-            case SENSORS_SETUP_EXTERNAL_SPI_TYPE_AMT22:
+            case SENSOR_TYPE_AMT22:
                 current_rate = sensors[SENSOR_CONNECTION_EXTERNAL_SPI].amt22_sensor.config.rate;
                 break;
             default:
@@ -239,13 +240,13 @@ void sensor_external_spi_set_rate_avlos(sensors_setup_external_spi_rate_options 
             sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.deinit_func(&(sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor));
             switch (sensors[SENSOR_CONNECTION_EXTERNAL_SPI].sensor.config.type)
             {
-                case SENSORS_SETUP_EXTERNAL_SPI_TYPE_MA7XX:
+                case SENSOR_TYPE_MA7XX:
                     sensors[SENSOR_CONNECTION_EXTERNAL_SPI].ma7xx_sensor.config.rate = rate;
                     break;
-                case SENSORS_SETUP_EXTERNAL_SPI_TYPE_AS5047:
+                case SENSOR_TYPE_AS5047:
                     sensors[SENSOR_CONNECTION_EXTERNAL_SPI].as5047p_sensor.config.rate = rate;
                     break;
-                case SENSORS_SETUP_EXTERNAL_SPI_TYPE_AMT22:
+                case SENSOR_TYPE_AMT22:
                     current_rate = sensors[SENSOR_CONNECTION_EXTERNAL_SPI].amt22_sensor.config.rate = rate;
                     break;
                 default:
