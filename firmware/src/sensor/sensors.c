@@ -70,20 +70,20 @@ bool sensor_init_with_defaults(Sensor *s)
     switch (connection)
     {
         case SENSOR_CONNECTION_ONBOARD_SPI:
-            return ma7xx_init_with_port(s, ONBOARD_SENSOR_SSP_PORT, ONBOARD_SENSOR_SSP_STRUCT);
+            return ma7xx_init_with_port_and_rate(s, ONBOARD_SENSOR_SSP_PORT, ONBOARD_SENSOR_SSP_STRUCT, SENSORS_SETUP_EXTERNAL_SPI_RATE_12Mbps);
             break;
 #if defined BOARD_REV_R5 || defined BOARD_REV_M5
         case SENSOR_CONNECTION_EXTERNAL_SPI:
             switch (s->config.type)
             {
                 case SENSOR_TYPE_MA7XX:
-                    return ma7xx_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT);
+                    return ma7xx_init_with_port_and_rate(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT, SENSORS_SETUP_EXTERNAL_SPI_RATE_3Mbps);
                     break;
                 case SENSOR_TYPE_AS5047:
-                    return as5047p_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT);
+                    return as5047p_init_with_port_and_rate(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT, SENSORS_SETUP_EXTERNAL_SPI_RATE_3Mbps);
                     break;
                 case SENSOR_TYPE_AMT22:
-                    return amt22_init_with_port(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT);
+                    return amt22_init_with_port_and_rate(s, EXTERNAL_SENSOR_SSP_PORT, EXTERNAL_SENSOR_SSP_STRUCT, SENSORS_SETUP_EXTERNAL_SPI_RATE_3Mbps);
                     break;
                 default:
                     break;

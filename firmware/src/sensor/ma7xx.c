@@ -39,11 +39,12 @@ void ma7xx_make_blank_sensor(Sensor *s)
     s->get_ss_config_func = ma7xx_get_ss_config;
 }
 
-bool ma7xx_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct)
+bool ma7xx_init_with_port_and_rate(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct, sensors_setup_external_spi_rate_options rate)
 {
     MA7xxSensorConfig c = {0};
     c.ssp_port = port;
     c.ssp_struct = ssp_struct;
+    c.rate = rate;
     return ma7xx_init_with_config(s, &c);
 }
 

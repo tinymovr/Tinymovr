@@ -39,20 +39,24 @@ void as5047p_make_blank_sensor(Sensor *s)
     s->get_ss_config_func = as5047p_get_ss_config;
 }
 
-bool as5047p_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct) {
+bool as5047p_init_with_port_and_rate(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct, sensors_setup_external_spi_rate_options rate)
+{
     AS5047PSensorConfig c = {0};
     c.ssp_port = port;
     c.ssp_struct = ssp_struct;
+    c.rate = rate;
     return as5047p_init_with_config(s, &c);
 }
 
-bool as5047p_init_with_config(Sensor *s, const AS5047PSensorConfig *c) {
+bool as5047p_init_with_config(Sensor *s, const AS5047PSensorConfig *c)
+{
     AS5047PSensor *as = (AS5047PSensor *)s;
     as->config = *c;
     return as5047p_init(s);
 }
 
-bool as5047p_init(Sensor *s) {
+bool as5047p_init(Sensor *s)
+{
     AS5047PSensor *as = (AS5047PSensor *)s;
     ssp_init(as->config.ssp_port, SSP_MS_MASTER, 16, SSP_DATA_SIZE_16, 1, 0);
     delay_us(10000); // Example delay, adjust based on AS5047P datasheet

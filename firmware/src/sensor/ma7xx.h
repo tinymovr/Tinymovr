@@ -52,7 +52,7 @@ typedef struct
 } MA7xxSensor;
 
 void ma7xx_make_blank_sensor(Sensor *s);
-bool ma7xx_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct);
+bool ma7xx_init_with_port_and_rate(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct, sensors_setup_external_spi_rate_options rate);
 bool ma7xx_init_with_config(Sensor *s, const MA7xxSensorConfig *c);
 bool ma7xx_init(Sensor *s);
 void ma7xx_deinit(Sensor *s);

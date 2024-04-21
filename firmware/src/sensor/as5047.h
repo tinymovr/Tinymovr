@@ -50,7 +50,7 @@ typedef struct
 } AS5047PSensor;
 
 void as5047p_make_blank_sensor(Sensor *s);
-bool as5047p_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct);
+bool as5047p_init_with_port_and_rate(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct, sensors_setup_external_spi_rate_options rate);
 bool as5047p_init_with_config(Sensor *s, const AS5047PSensorConfig *c);
 bool as5047p_init(Sensor *s);
 void as5047p_deinit(Sensor *s);
