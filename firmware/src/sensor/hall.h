@@ -45,6 +45,7 @@ typedef struct
 void hall_make_blank_sensor(Sensor *s);
 bool hall_init_with_defaults(Sensor *s);
 bool hall_init_with_config(Sensor *s, const HallSensorConfig *c);
+bool hall_init(Sensor *s);
 void hall_deinit(Sensor *s);
 void hall_reset(Sensor *s);
 bool hall_calibrate_sequence(Sensor *s, Observer *o);

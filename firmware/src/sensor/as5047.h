@@ -31,14 +31,14 @@
 
 typedef enum {
     AS5047P_CMD_NOP              = 0x0000,
-    AS5047P_CMD_READ_ANGLE       = 0x3FFF // Adjust based on the AS5047P datasheet
+    AS5047P_CMD_READ_ANGLE       = 0x3FFF 
 } AS5047PCommand;
 
 typedef struct
 {
     SSP_TYPE ssp_port;
     PAC55XX_SSP_TYPEDEF *ssp_struct;
-    // Add any additional configuration parameters needed for AS5047P
+    sensors_setup_external_spi_rate_options rate;
 } AS5047PSensorConfig;
 
 typedef struct
@@ -52,6 +52,7 @@ typedef struct
 void as5047p_make_blank_sensor(Sensor *s);
 bool as5047p_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *ssp_struct);
 bool as5047p_init_with_config(Sensor *s, const AS5047PSensorConfig *c);
+bool as5047p_init(Sensor *s);
 void as5047p_deinit(Sensor *s);
 void as5047p_reset(Sensor *s);
 void as5047p_get_ss_config(Sensor *s, void* buffer);

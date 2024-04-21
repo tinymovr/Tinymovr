@@ -30,6 +30,7 @@ void ma7xx_make_blank_sensor(Sensor *s)
     s->normalization_factor = SENSOR_COMMON_RES_TICKS_FLOAT / s->ticks;
     s->is_calibrated_func = ma7xx_rec_is_calibrated;
     s->get_raw_angle_func = ma7xx_get_raw_angle;
+    s->init_func = ma7xx_init;
     s->deinit_func = ma7xx_deinit;
     s->reset_func = ma7xx_reset;
     s->update_func = ma7xx_update;
@@ -50,6 +51,12 @@ bool ma7xx_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF *s
 {
     MA7xxSensor *ms = (MA7xxSensor *)s;
     ms->config = *c;
+    return ma7xx_init(s);
+}
+
+ bool ma7xx_init(Sensor *s)
+{
+    MA7xxSensor *ms = (MA7xxSensor *)s;
     ssp_init(ms->config.ssp_port, SSP_MS_MASTER, 4, SSP_DATA_SIZE_16, 0, 0);
     delay_us(16000); // ensure 16ms sensor startup time as per the datasheet
     ma7xx_send_angle_cmd(s);

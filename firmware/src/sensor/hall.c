@@ -33,6 +33,7 @@ void hall_make_blank_sensor(Sensor *s)
     s->get_raw_angle_func = hall_get_angle;
     s->update_func = hall_update;
     s->reset_func = hall_reset;
+    s->init_func = hall_init;
     s->deinit_func = hall_deinit;
     s->get_errors_func = hall_get_errors;
     s->is_calibrated_func = hall_sector_map_is_calibrated;
@@ -50,6 +51,12 @@ bool hall_init_with_config(Sensor *s, const HallSensorConfig *c)
 {
     HallSensor *ms = (HallSensor *)s;
     ms->config = *c;
+    return hall_init(s);
+}
+
+bool hall_init(Sensor *s)
+{
+    HallSensor *ms = (HallSensor *)s;
     ms->hw_defaults[0] = pac5xxx_tile_register_read(ADDR_CFGAIO7);
     ms->hw_defaults[1] = pac5xxx_tile_register_read(ADDR_CFGAIO8);
     ms->hw_defaults[2] = pac5xxx_tile_register_read(ADDR_CFGAIO9);

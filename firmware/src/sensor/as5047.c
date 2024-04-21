@@ -31,7 +31,8 @@ void as5047p_make_blank_sensor(Sensor *s)
     s->get_raw_angle_func = as5047p_get_raw_angle;
     s->update_func = as5047p_update; 
     s->prepare_func = as5047p_send_angle_cmd; 
-    s->reset_func = as5047p_reset; 
+    s->reset_func = as5047p_reset;
+    s->init_func = as5047p_init; 
     s->deinit_func = as5047p_deinit; 
     s->get_errors_func = as5047p_get_errors; 
     s->is_calibrated_func = as5047p_is_calibrated; 
@@ -48,6 +49,11 @@ bool as5047p_init_with_port(Sensor *s, const SSP_TYPE port, PAC55XX_SSP_TYPEDEF 
 bool as5047p_init_with_config(Sensor *s, const AS5047PSensorConfig *c) {
     AS5047PSensor *as = (AS5047PSensor *)s;
     as->config = *c;
+    return as5047p_init(s);
+}
+
+bool as5047p_init(Sensor *s) {
+    AS5047PSensor *as = (AS5047PSensor *)s;
     ssp_init(as->config.ssp_port, SSP_MS_MASTER, 16, SSP_DATA_SIZE_16, 1, 0);
     delay_us(10000); // Example delay, adjust based on AS5047P datasheet
 
