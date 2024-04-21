@@ -167,5 +167,59 @@ class TestAS5047(TMTestCase):
         time.sleep(0.2)
 
 
+    def test_c_position_control_change_baud_rates(self):
+        """
+        Test position control with external sensor and
+        different baud rates.
+        """
+        self.check_state(0)
+        self.tm.erase_config()
+        time.sleep(0.2)
+
+        self.configure_sensors(self.tm.sensors.setup.external_spi.type.AS5047)
+        self.select_sensors(self.tm.sensors.select.position_sensor.connection.ONBOARD, self.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
+
+        self.tm.motor.I_cal = 0.8
+
+        self.try_calibrate()
+
+        self.tm.controller.position.p_gain = 9
+        self.tm.controller.velocity.p_gain = 2e-5
+        self.tm.controller.velocity.i_gain = 0
+
+        self.tm.controller.position_mode()
+        self.check_state(2)
+
+        for _ in range(10):
+            new_pos = random.uniform(-20000, 20000)
+            self.tm.controller.position.setpoint = new_pos * tick
+            time.sleep(tsleep)
+            self.assertAlmostEqual(
+                self.tm.sensors.user_frame.position_estimate,
+                self.tm.controller.position.setpoint,
+                delta=2000 * tick,
+            )
+
+        self.tm.controller.idle()
+
+        self.tm.sensors.setup.external_spi.rate = "1_5Mbps"
+        time.sleep(0.1)
+
+        self.tm.controller.position_mode()
+        self.check_state(2)
+
+        for _ in range(10):
+            new_pos = random.uniform(-20000, 20000)
+            self.tm.controller.position.setpoint = new_pos * tick
+            time.sleep(tsleep)
+            self.assertAlmostEqual(
+                self.tm.sensors.user_frame.position_estimate,
+                self.tm.controller.position.setpoint,
+                delta=2000 * tick,
+            )
+
+        self.tm.controller.idle()
+
+
 if __name__ == "__main__":
     unittest.main()
