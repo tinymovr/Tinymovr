@@ -16,8 +16,10 @@ Options:
 import sys
 import yaml
 import pkg_resources
+from importlib_resources import files
 from docopt import docopt
 from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QIcon, QPixmap
 from tinymovr.gui import MainWindow, app_stylesheet, app_stylesheet_dark, is_dark_mode
 from tinymovr.constants import app_name
 from tinymovr.config import configure_logging, add_spec
@@ -54,10 +56,15 @@ def spawn():
             add_spec(spec_data, logger)
 
     app = QApplication(sys.argv)
+
+    icon_path = files("tinymovr").joinpath("resources/icons/app_icon.png")
+    app.setWindowIcon(QIcon(str(icon_path)))
+
     if is_dark_mode():
         app.setStyleSheet(app_stylesheet_dark)
     else:
         app.setStyleSheet(app_stylesheet)
     w = MainWindow(app, arguments, logger)
+
     w.show()
     sys.exit(app.exec_())

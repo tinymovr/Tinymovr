@@ -34,6 +34,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QMessageBox,
     QTreeWidgetItem,
+    QSplitter
 )
 from PySide6.QtGui import QAction
 import pyqtgraph as pg
@@ -110,6 +111,10 @@ class MainWindow(QMainWindow):
         self.status_label = QLabel()
         self.status_label.setStyleSheet("margin: 5px;")
 
+        # Create splitter and add frames
+        self.splitter = QSplitter(QtCore.Qt.Horizontal)
+        self.splitter.setHandleWidth(0)
+
         self.left_frame = QFrame(self)
         self.left_layout = QVBoxLayout()
         self.left_layout.addWidget(self.tree_widget)
@@ -127,9 +132,11 @@ class MainWindow(QMainWindow):
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_frame.setLayout(self.right_layout)
 
-        main_layout = QHBoxLayout()
-        main_layout.addWidget(self.left_frame)
-        main_layout.addWidget(self.right_frame)
+        self.splitter.addWidget(self.left_frame)
+        self.splitter.addWidget(self.right_frame)
+
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(self.splitter)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
 

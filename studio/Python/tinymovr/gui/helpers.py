@@ -201,6 +201,8 @@ app_stylesheet = """
 
 app_stylesheet_dark = """
 
+QSplitter::handle { background-color: black; }
+
 /* --------------------------------------- QPushButton -----------------------------------*/
 
     QPushButton {
