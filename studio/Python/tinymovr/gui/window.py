@@ -35,7 +35,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QTreeWidgetItem,
     QSplitter,
-    QPlainTextEdit
+    QTextBrowser
 )
 from PySide6.QtGui import QAction
 import pyqtgraph as pg
@@ -54,11 +54,13 @@ from tinymovr.gui import (
     PlaceholderQTreeWidget,
     BoolTreeWidgetItem,
     StreamRedirector,
+    QTextBrowserLogger,
     format_value,
     display_file_open_dialog,
     display_file_save_dialog,
     magnitude_of,
     check_selected_items,
+    configure_pretty_errors
 )
 
 
@@ -74,6 +76,7 @@ class MainWindow(QMainWindow):
 
         self.start_time = time.time()
         self.logger = logger if logger is not None else logging.getLogger("tinymovr")
+        configure_pretty_errors()
 
         self.attr_widgets_by_id = {}
         self.graphs_by_id = {}
@@ -142,10 +145,10 @@ class MainWindow(QMainWindow):
         self.splitter.addWidget(self.left_frame)
         self.splitter.addWidget(self.right_frame)
 
-        self.console = QPlainTextEdit()
+        self.console = QTextBrowser()
         self.console.setReadOnly(True)
-        sys.stdout = StreamRedirector(self.console)
-        sys.stderr = StreamRedirector(self.console)
+        self.log_handler = QTextBrowserLogger(self.console)
+        self.logger.addHandler(self.log_handler)
 
         self.main_splitter = QSplitter(QtCore.Qt.Vertical)
         self.main_splitter.setHandleWidth(0)
@@ -219,8 +222,6 @@ class MainWindow(QMainWindow):
         self.visibility_update_timer.stop()
         self.worker_update_timer.stop()
         self.worker.stop()
-        sys.stdout = sys.__stdout__
-        sys.stderr = sys.__stderr__
 
     @QtCore.Slot()
     def handle_worker_error(self, e):
