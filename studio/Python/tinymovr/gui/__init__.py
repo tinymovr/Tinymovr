@@ -7,6 +7,7 @@ from tinymovr.gui.helpers import (
     display_file_open_dialog,
     display_file_save_dialog,
     magnitude_of,
+    StreamRedirector,
     TimedGetter,
     check_selected_items,
     get_dynamic_attrs,

@@ -466,6 +466,22 @@ def magnitude_of(val):
     return val
 
 
+class StreamRedirector(object):
+    """A class to redirect writes from a stream to a QPlainTextEdit."""
+    def __init__(self, widget):
+        self.widget = widget
+        self.buffer = ''
+
+    def write(self, message):
+        self.widget.moveCursor(QtGui.QTextCursor.End)
+        self.widget.insertPlainText(message)
+        self.widget.moveCursor(QtGui.QTextCursor.End)
+        self.widget.ensureCursorVisible()
+
+    def flush(self):
+        pass
+
+
 class TimedGetter:
     """
     An interface class that maintains timing

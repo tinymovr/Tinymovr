@@ -139,6 +139,7 @@ class Worker(QObject):
     def _device_appeared(self, device, node_id):
         self.mutx.lock()
         display_name = "{}{}".format(device.name, node_id)
+        self.logger.warn("Found {} with device uid {}".format(display_name, node_id))
         self.devices_by_name[display_name] = device
         self.names_by_id[node_id] = display_name
         device.name = display_name
