@@ -57,8 +57,6 @@ class TestAMT22(TMTestCase):
         self.configure_sensors(self.tm.sensors.setup.external_spi.type.AMT22)
         self.select_sensors(self.tm.sensors.select.position_sensor.connection.ONBOARD, self.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
 
-        self.tm.motor.I_cal = 1.0
-
         self.try_calibrate()
 
         self.tm.controller.position.p_gain = 9
@@ -118,7 +116,6 @@ class TestAMT22(TMTestCase):
         # Initially configure with external SPI sensor
         self.configure_sensors(self.tm.sensors.setup.external_spi.type.AMT22)
         self.select_sensors(self.tm.sensors.select.position_sensor.connection.ONBOARD, self.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
-        self.tm.motor.I_cal = 1.0
         self.try_calibrate()
 
         # Set initial controller gains

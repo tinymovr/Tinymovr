@@ -235,7 +235,6 @@ class TestBoard(TMTestCase):
         # Ensure we're idle
         self.check_state(0)
         self.tm.motor.type = 1  # gimbal
-        self.tm.motor.I_cal = 5.0
         self.tm.motor.R = 0.2
         self.tm.motor.L = 20 * 1e-5
         self.try_calibrate()
