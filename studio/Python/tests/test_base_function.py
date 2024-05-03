@@ -23,10 +23,6 @@ class TestBaseFunction(TMTestCase):
         """
         hw_rev = self.tm.hw_revision
         self.check_state(0)
-        if hw_rev > 20:
-            self.tm.motor.I_cal = 0.8
-        else:
-            self.tm.motor.I_cal = 5
         self.tm.controller.current.Iq_limit = 5
         self.try_calibrate()
         self.tm.controller.position_mode()

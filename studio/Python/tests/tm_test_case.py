@@ -61,8 +61,20 @@ class TMTestCase(unittest.TestCase):
         cls.tm.reset()
         time.sleep(timeout)
 
-    def try_calibrate(self, force=False, precheck_callback=None, *args, **kwargs):
+    def try_calibrate(self, I_cal=None, force=False, precheck_callback=None,*args, **kwargs):
         if True == force or not self.tm.calibrated:
+            hw_rev = self.tm.hw_revision
+            self.check_state(0)
+            if I_cal and I_cal > 0:
+                self.tm.motor.I_cal = I_cal
+            elif hw_rev > 20:
+                self.tm.motor.I_cal = 0.8
+            else:
+                self.tm.motor.I_cal = 5
+
+            if hw_rev > 20:
+                self.tm.controller.velocity.P_gain = 2e-05
+
             self.tm.controller.calibrate()
             self.wait_for_calibration(*args, **kwargs)
             if precheck_callback:

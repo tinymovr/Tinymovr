@@ -25,6 +25,13 @@
 
 #define DF_SSP_BUSY_TICK (25000u)    // use to check the busy tick
 
+// Device Select Enumeration Type
+typedef enum
+{
+    SWSEL_SPI = 0,
+    SWSEL_SW = 1
+} SSP_SWSEL_TYPE;
+
 // Interrupt Enable Enumeration Type
 typedef enum
 {
@@ -38,7 +45,7 @@ typedef enum
 volatile uint16_t ssp_data[10];
 volatile uint16_t data_num;
 
-extern void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t clkn_div, uint32_t data_size, uint8_t cph, uint8_t cpol);
+extern void ssp_init(SSP_TYPE ssp, SSP_MS_TYPE ms_mode, uint8_t clkn_div, uint32_t data_size, uint8_t swsel, uint8_t cph, uint8_t cpol);
 extern void ssp_deinit(SSP_TYPE ssp);
 extern uint32_t ssp_write_one(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t data);
 extern uint32_t ssp_write_multi(PAC55XX_SSP_TYPEDEF *ssp_ptr, uint16_t *data, uint32_t byte_num);

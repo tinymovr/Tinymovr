@@ -57,8 +57,6 @@ class TestAS5047(TMTestCase):
         self.configure_sensors(self.tm.sensors.setup.external_spi.type.AS5047)
         self.select_sensors(self.tm.sensors.select.position_sensor.connection.ONBOARD, self.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
 
-        self.tm.motor.I_cal = 0.8
-
         self.try_calibrate()
 
         self.tm.controller.position.p_gain = 9
@@ -117,7 +115,6 @@ class TestAS5047(TMTestCase):
         # Initially configure with external SPI sensor
         self.configure_sensors(self.tm.sensors.setup.external_spi.type.AS5047)
         self.select_sensors(self.tm.sensors.select.position_sensor.connection.ONBOARD, self.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
-        self.tm.motor.I_cal = 0.8
         self.try_calibrate()
 
         # Set initial controller gains
@@ -178,8 +175,6 @@ class TestAS5047(TMTestCase):
 
         self.configure_sensors(self.tm.sensors.setup.external_spi.type.AS5047)
         self.select_sensors(self.tm.sensors.select.position_sensor.connection.ONBOARD, self.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
-
-        self.tm.motor.I_cal = 0.8
 
         self.try_calibrate()
 

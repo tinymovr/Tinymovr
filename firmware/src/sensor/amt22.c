@@ -60,11 +60,12 @@ bool amt22_init_with_config(Sensor *s, const AMT22SensorConfig *c)
 bool amt22_init(Sensor *s)
 {
     AMT22Sensor *as = (AMT22Sensor *)s;
-    ssp_init(as->config.ssp_port, SSP_MS_MASTER, 16, SSP_DATA_SIZE_8, 0, 0);
-    delay_us(10000); 
-
+    ssp_init(as->config.ssp_port, SSP_MS_MASTER, 16, SSP_DATA_SIZE_8, SWSEL_SW, 0, 0);
+    delay_us(50000); 
+    
     amt22_send_angle_cmd(s); 
     amt22_update(s, false); 
+
     s->initialized = true;
     return true;
 }
