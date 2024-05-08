@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from tinymovr import init_tee, destroy_tee
+from tinymovr import init_router, destroy_router
 from tinymovr.channel import ResponseError
 from tinymovr.config import create_device
 from unittest.mock import patch, MagicMock
@@ -31,12 +31,12 @@ class TestSimulation(unittest.TestCase):
         """
         can_bus.send = MagicMock()
         can_bus.recv = MagicMock()
-        init_tee(can_bus)
+        init_router(can_bus)
         with self.assertRaises(ResponseError):
             tm = create_device(node_id=1)
         assert can_bus.send.called
         assert can_bus.recv.called
-        destroy_tee()
+        destroy_router()
 
 
 

@@ -7,6 +7,7 @@ import math
 from avlos.unit_field import get_registry
 
 import unittest
+import pytest
 from tests import TMTestCase
 
 ureg = get_registry()
@@ -16,6 +17,8 @@ s = ureg.second
 tsleep = 0.18
 
 class TestWatchdog(TMTestCase):
+
+    @pytest.mark.hitl_default
     def test_watchdog(self):
         """
         Test Watchdog function
