@@ -1,11 +1,66 @@
-
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "wheel", "setuptools-git-versioning>=2.0,<3"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "tinymovr"
+dynamic = ["version"]
+authors = [{ name = "Yannis Chatzikonstantinou", email = "yannis@tinymovr.com" }]
+description = "Tinymovr Studio"
+readme = "README.md"
+license = { file = "LICENSE" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.9"
+dependencies = [
+"ipython",
+"importlib_resources",
+"python-can",
+"python-can-canine",
+"python-can-slcan_disco",
+"avlos>=0.6.6",
+"pyserial",
+"pyusb",
+"pyyaml",
+"docopt",
+"flatten-dict",
+"pint",
+"pretty_errors"
+]
+
+[project.optional-dependencies]
+gui = ["pyside6", "pyqtgraph>=0.13.3"]
+
+[project.urls]
+Homepage = "https://tinymovr.com" 
+Repository = "https://github.com/yconst/Tinymovr"
+
+[project.scripts]
+tinymovr_cli = "tinymovr.cli:spawn"
+tinymovr_dfu = "tinymovr.dfu:spawn"
+
+[tool.setuptools.dynamic]
+version = { attr = "setuptools_git_versioning.get_version" }
+
+[tool.setuptools-git-versioning]
+enabled = true
+dev_template = "{tag}+post{ccount}"
+dirty_template = "{tag}+post{ccount}_dirty"
+
+[project.gui-scripts]
+tinymovr = "tinymovr.gui:spawn"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tinymovr", "tinymovr.*"]
 
 [tool.pytest.ini_options]
 markers = [
     "hitl_default: marks default hardware in the loop tests",
+    "sensor: marks tests that need external sensors attached",
     "sensor_amt22: marks tests that need the amt22 sensor",
     "sensor_as5047: marks tests that need the as5047 sensor",
     "sensor_hall: marks tests that need a hall effect sensored motor",
