@@ -60,6 +60,7 @@ setup(
         "docopt",
         "flatten-dict",
         "pint",
+        "pretty_errors"
     ],
     extras_require={"gui": ["pyside6", "pyqtgraph>=0.13.3"]},
     entry_points={

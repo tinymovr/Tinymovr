@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import sys
 import time
 import logging
 import pkg_resources
@@ -28,13 +29,13 @@ from PySide6.QtWidgets import (
     QMenuBar,
     QWidget,
     QFrame,
-    QHBoxLayout,
     QVBoxLayout,
     QHeaderView,
     QLabel,
     QMessageBox,
     QTreeWidgetItem,
-    QSplitter
+    QSplitter,
+    QTextBrowser
 )
 from PySide6.QtGui import QAction
 import pyqtgraph as pg
@@ -52,11 +53,14 @@ from tinymovr.gui import (
     Worker,
     PlaceholderQTreeWidget,
     BoolTreeWidgetItem,
+    StreamRedirector,
+    QTextBrowserLogger,
     format_value,
     display_file_open_dialog,
     display_file_save_dialog,
     magnitude_of,
     check_selected_items,
+    configure_pretty_errors
 )
 
 
@@ -71,10 +75,8 @@ class MainWindow(QMainWindow):
         get_registry().default_format = ".6f~"
 
         self.start_time = time.time()
-        if logger is None:
-            self.logger = logging.getLogger("tinymovr")
-        else:
-            self.logger = logger
+        self.logger = logger if logger is not None else logging.getLogger("tinymovr")
+        configure_pretty_errors()
 
         self.attr_widgets_by_id = {}
         self.graphs_by_id = {}
@@ -86,6 +88,7 @@ class MainWindow(QMainWindow):
 
         self.file_menu = QMenu("File")
         self.help_menu = QMenu("Help")
+        self.view_menu = QMenu("View")
 
         self.export_action = QAction("Export Config...", self)
         self.import_action = QAction("Import Config", self)
@@ -97,11 +100,19 @@ class MainWindow(QMainWindow):
         self.file_menu.addAction(self.import_action)
         self.help_menu.addAction(self.about_action)
 
+        self.toggle_tree_action = QAction("Hide Tree", self)  # Assume tree is visible initially
+        self.toggle_tree_action.triggered.connect(self.toggle_tree)
+        self.toggle_console_action = QAction("Hide Console", self)  # Assume console is visible initially
+        self.toggle_console_action.triggered.connect(self.toggle_console)
+
+        self.view_menu.addAction(self.toggle_tree_action)
+        self.view_menu.addAction(self.toggle_console_action)
+
         self.menu_bar.addMenu(self.file_menu)
+        self.menu_bar.addMenu(self.view_menu)
         self.menu_bar.addMenu(self.help_menu)
         self.setMenuBar(self.menu_bar)
 
-        # Setup the tree widget
         self.tree_widget = PlaceholderQTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
         self.tree_widget.itemExpanded.connect(self.update_visible_attrs)
@@ -111,14 +122,13 @@ class MainWindow(QMainWindow):
         self.status_label = QLabel()
         self.status_label.setStyleSheet("margin: 5px;")
 
-        # Create splitter and add frames
         self.splitter = QSplitter(QtCore.Qt.Horizontal)
         self.splitter.setHandleWidth(0)
+        self.splitter.splitterMoved.connect(self.check_tree_visibility)
 
         self.left_frame = QFrame(self)
         self.left_layout = QVBoxLayout()
         self.left_layout.addWidget(self.tree_widget)
-        self.left_layout.addWidget(self.status_label)
         self.left_layout.setSpacing(0)
         self.left_layout.setContentsMargins(0, 0, 0, 0)
         self.left_frame.setLayout(self.left_layout)
@@ -135,11 +145,24 @@ class MainWindow(QMainWindow):
         self.splitter.addWidget(self.left_frame)
         self.splitter.addWidget(self.right_frame)
 
+        self.console = QTextBrowser()
+        self.console.setReadOnly(True)
+        self.log_handler = QTextBrowserLogger(self.console)
+        self.logger.addHandler(self.log_handler)
+
+        self.main_splitter = QSplitter(QtCore.Qt.Vertical)
+        self.main_splitter.setHandleWidth(0)
+        self.main_splitter.showEvent = self.on_show_event
+        self.main_splitter.splitterMoved.connect(self.check_console_visibility)
+        self.main_splitter.addWidget(self.splitter)
+        self.main_splitter.addWidget(self.console)
+
         main_layout = QVBoxLayout()
-        main_layout.addWidget(self.splitter)
+        main_layout.addWidget(self.main_splitter)
+        main_layout.addWidget(self.status_label)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
-
+        
         main_widget = QWidget()
         main_widget.setLayout(main_layout)
         main_widget.setMinimumHeight(600)
@@ -180,6 +203,18 @@ class MainWindow(QMainWindow):
         self.visibility_update_timer = QTimer(self)
         self.visibility_update_timer.timeout.connect(self.update_visible_attrs)
         self.visibility_update_timer.start(1000)
+
+    def on_show_event(self, event):
+        total_height = self.splitter.size().height()
+        top_percentage = 0.75  # 75% for the top widget
+        bottom_percentage = 0.25  # 25% for the bottom widget
+
+        top_size = int(total_height * top_percentage)
+        bottom_size = int(total_height * bottom_percentage)
+        
+        self.main_splitter.setSizes([top_size, bottom_size])
+
+        super(MainWindow, self).showEvent(event)
 
     @QtCore.Slot()
     def about_to_quit(self):
@@ -360,6 +395,60 @@ class MainWindow(QMainWindow):
                 app_str
             ),
         )
+
+    def toggle_tree(self):
+        """
+        Toggle the visibility of the tree based on actual size.
+        """
+        tree_size = self.splitter.sizes()[0]
+        if tree_size > 0:
+            self.tree_widget.setVisible(False)
+            self.splitter.setSizes([0, self.splitter.size().width()])
+            self.toggle_tree_action.setText("Show Tree")
+        else:
+            self.tree_widget.setVisible(True)
+            total_size = self.splitter.size().width()
+            left_size = int(total_size * 0.25)
+            right_size = int(total_size * 0.75)
+            self.splitter.setSizes([left_size, right_size])
+            self.toggle_tree_action.setText("Hide Tree")
+
+    def toggle_console(self):
+        """
+        Toggle the visibility of the console based on actual size.
+        """
+        console_height = self.main_splitter.sizes()[-1]
+        if console_height > 0:
+            self.console.setVisible(False)
+            self.main_splitter.setSizes([self.main_splitter.size().height(), 0])
+            self.toggle_console_action.setText("Show Console")
+        else:
+            self.console.setVisible(True)
+            total_height = self.main_splitter.size().height()
+            top_height = int(total_height * 0.75)
+            bottom_height = int(total_height * 0.25)
+            self.main_splitter.setSizes([top_height, bottom_height])
+            self.toggle_console_action.setText("Hide Console")
+
+    def check_tree_visibility(self, pos, index):
+        """
+        Check tree visibility after splitter is moved and update the action text.
+        """
+        tree_size = self.splitter.sizes()[0]  # Assuming tree is always the first widget in the splitter
+        if tree_size == 0:
+            self.toggle_tree_action.setText("Show Tree")
+        else:
+            self.toggle_tree_action.setText("Hide Tree")
+
+    def check_console_visibility(self, pos, index):
+        """
+        Check console visibility after splitter is moved and update the action text.
+        """
+        console_size = self.main_splitter.sizes()[-1]  # Assuming console is always the last widget in the splitter
+        if console_size == 0:
+            self.toggle_console_action.setText("Show Console")
+        else:
+            self.toggle_console_action.setText("Hide Console")
 
     def is_widget_visible(self, widget):
         """
