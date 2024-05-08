@@ -15,30 +15,38 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import unittest
+from unittest.mock import patch, MagicMock
 from tinymovr import init_router, destroy_router
 from tinymovr.channel import ResponseError
 from tinymovr.config import create_device
-from unittest.mock import patch, MagicMock
-import unittest
-
 
 class TestSimulation(unittest.TestCase):
     
     @patch("can.Bus")
-    def test_response_error(self, can_bus):
+    def test_response_error(self, mock_can_bus_class):
         """
-        Test response error
+        Test that an appropriate error is raised when the device receives an erroneous response.
         """
-        can_bus.send = MagicMock()
-        can_bus.recv = MagicMock()
-        init_router(can_bus)
+        # Setup mock
+        mock_can_bus_instance = MagicMock()
+        mock_can_bus_class.return_value = mock_can_bus_instance
+        mock_params = MagicMock()
+        mock_logger = MagicMock()
+        
+        # Initialize the router with the mocked class and parameters
+        init_router(mock_can_bus_class, mock_params, logger=mock_logger)
+        
+        # Test that an error is raised during device creation
         with self.assertRaises(ResponseError):
-            tm = create_device(node_id=1)
-        assert can_bus.send.called
-        assert can_bus.recv.called
+            create_device(node_id=1)
+        
+        # Check if send and recv were called on the can bus instance
+        assert mock_can_bus_instance.send.called
+        assert mock_can_bus_instance.recv.called
+        
+        # Clean up router
         destroy_router()
-
-
 
 if __name__ == "__main__":
     unittest.main()
