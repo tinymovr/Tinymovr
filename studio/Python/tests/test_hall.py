@@ -36,6 +36,7 @@ def set_pole_pairs(tm):
 
 class TestHall(TMTestCase):
 
+    @pytest.mark.sensor
     @pytest.mark.sensor_hall
     def test_a_position_control_w_loaded_config(self):
         """

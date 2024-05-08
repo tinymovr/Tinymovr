@@ -33,6 +33,7 @@ tsleep = 0.80
 
 class TestAMT22(TMTestCase):
 
+    @pytest.mark.sensor
     @pytest.mark.sensor_amt22
     def test_a_position_control_before_after_save_and_load_config(self):
         """
@@ -92,6 +93,7 @@ class TestAMT22(TMTestCase):
         self.tm.erase_config()
         time.sleep(0.2)
 
+    @pytest.mark.sensor
     @pytest.mark.sensor_amt22
     def test_b_position_control_following_sensor_change(self):
         """
