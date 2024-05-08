@@ -19,8 +19,8 @@ import os
 import time
 import can
 
-from tinymovr import init_tee, destroy_tee
-from tinymovr.config import get_bus_config, create_device
+from tinymovr import init_router, destroy_router
+from tinymovr.config import get_bus_config, create_device, configure_logging
 
 import unittest
 
@@ -40,11 +40,11 @@ class TMTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        params = get_bus_config(["canine", "slcan_disco"])
-        params["bitrate"] = 1000000
-        cls.can_bus = can.Bus(**params)
-        init_tee(cls.can_bus)
+        params = get_bus_config(["canine", "slcan_disco"], bitrate=1000000)
+        cls.logger = configure_logging()
+        init_router(can.Bus, params, logger=cls.logger)
         cls.tm = create_device(node_id=1)
+        
         cls.reset_and_wait()
 
     def tearDown(self):
@@ -53,8 +53,7 @@ class TMTestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.tm.reset()
-        destroy_tee()
-        cls.can_bus.shutdown()
+        destroy_router()
 
     @classmethod
     def reset_and_wait(cls, timeout=0.5):

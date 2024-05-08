@@ -1,5 +1,5 @@
 """
-Tinymovr Discovery Module
+Tinymovr DeviceDiscovery Module
 Copyright Ioannis Chatzikonstantinou 2020-2023
 
 Implements a class to discover nodes on the CAN bus based on
@@ -19,12 +19,12 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 import time
 from threading import Thread, Event
 from tinymovr.channel import ResponseError
-from tinymovr.tee import get_tee
+from tinymovr.bus_router import get_router
 from tinymovr.constants import HEARTBEAT_BASE
 from tinymovr.config import create_device_with_hash_msg
 
 
-class Discovery:
+class DeviceDiscovery:
     """
     Discover Tinymovr instances on the CAN bus using the periodically
     transmitted heartbeat frame.
@@ -41,7 +41,7 @@ class Discovery:
 
         self.reset()
 
-        get_tee().add(
+        get_router().add_client(
             lambda msg: HEARTBEAT_BASE == msg.arbitration_id & HEARTBEAT_BASE,
             self._recv_cb,
         )

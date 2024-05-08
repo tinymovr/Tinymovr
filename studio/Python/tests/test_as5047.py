@@ -21,6 +21,7 @@ import time
 from avlos.unit_field import get_registry
 
 import unittest
+import pytest
 from tests import TMTestCase
 
 ureg = get_registry()
@@ -32,19 +33,7 @@ tsleep = 0.50
 
 class TestAS5047(TMTestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        super(TestAS5047, cls).setUpClass()
-        
-        cls.configure_sensors(cls.tm.sensors.setup.external_spi.type.AS5047)
-        cls.select_sensors(cls.tm.sensors.select.position_sensor.connection.ONBOARD, cls.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
-        
-        # We look at the position estimate, which is highly unlikely to be exactly 0xFFFF.
-        if cls.tm.sensors.select.position_sensor.raw_angle == 16383:
-            raise unittest.SkipTest("AS5047 sensor not present. Skipping test.")
-
-        cls.reset_and_wait()
-
+    @pytest.mark.sensor_as5047
     def test_a_position_control_before_after_save_and_load_config(self):
         """
         Test position control after saving and loading config.
@@ -102,6 +91,7 @@ class TestAS5047(TMTestCase):
         self.tm.erase_config()
         time.sleep(0.2)
 
+    @pytest.mark.sensor_as5047
     def test_b_position_control_following_sensor_change(self):
         """
         Test position control before and after changing sensor connection and type.
@@ -163,7 +153,7 @@ class TestAS5047(TMTestCase):
         self.tm.erase_config()
         time.sleep(0.2)
 
-
+    @pytest.mark.sensor_as5047
     def test_c_position_control_change_baud_rates(self):
         """
         Test position control with external sensor and

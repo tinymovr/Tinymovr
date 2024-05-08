@@ -18,11 +18,14 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 import time
 from tests import TMTestCase
 
+import pytest
 
 iterations = 5000
 
 
 class TestRates(TMTestCase):
+
+    @pytest.mark.hitl_default
     def test_round_trip_time(self):
         """
         Test round-trip message time (2 packets)

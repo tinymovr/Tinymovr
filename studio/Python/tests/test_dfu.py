@@ -15,29 +15,29 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
 import time
 import can
 
-from tinymovr import init_tee, destroy_tee
+from tinymovr import init_router, destroy_router
 from tinymovr.config import (
     get_bus_config,
-    create_device
+    create_device,
+    configure_logging
 )
 
 import unittest
-
+import pytest
 
 class TMTestCase(unittest.TestCase):
 
     @classmethod
     def setUp(cls):
-        params = get_bus_config(["canine", "slcan_disco"])
-        params["bitrate"] = 1000000
-        cls.can_bus = can.Bus(**params)
+        cls.logger = configure_logging()
+        cls.params = get_bus_config(["canine", "slcan_disco"], bitrate=1000000)
+        init_router(can.Bus, cls.params, logger=cls.logger)
 
+    @pytest.mark.dfu
     def test_dfu(self, node_id=1):
-        init_tee(self.can_bus)
         time.sleep(0.5)
         for i in range(10):
             print("Testing DFU iteration ", i+1)
@@ -62,8 +62,7 @@ class TMTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        destroy_tee()
-        cls.can_bus.shutdown()
+        destroy_router()
 
 
 if __name__ == "__main__":

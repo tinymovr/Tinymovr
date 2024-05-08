@@ -22,6 +22,7 @@ import statistics as st
 from avlos.unit_field import get_registry
 
 import unittest
+import pytest
 from tests import TMTestCase
 
 ureg = get_registry()
@@ -32,6 +33,8 @@ tsleep = 0.20
 
 
 class TestBoard(TMTestCase):
+
+    @pytest.mark.hitl_default
     def test_a_sensor_readings(self):
         """
         Test sensor readings
@@ -43,6 +46,7 @@ class TestBoard(TMTestCase):
         # apparently the statistics lib works with quantities only
         self.assertLess(st.pstdev(pos_estimates) * ticks, 5 * ticks)
 
+    @pytest.mark.hitl_default
     def test_b_invalid_values(self):
         """
         Test rejection of invalid values for limits and gains
@@ -72,6 +76,7 @@ class TestBoard(TMTestCase):
 
         time.sleep(2)
 
+    @pytest.mark.hitl_default
     def test_c_calibrate(self):
         """
         Test board calibration if not calibrated
@@ -79,22 +84,30 @@ class TestBoard(TMTestCase):
         self.check_state(0)
         self.try_calibrate()
 
+    @pytest.mark.eol
+    @pytest.mark.hitl_default
     def test_d_position_control(self):
         """
         Test position control
         """
+        hw_rev = self.tm.hw_revision
         self.check_state(0)
+        self.tm.controller.current.Iq_limit = 5
         self.try_calibrate()
         self.tm.controller.position_mode()
         self.check_state(2)
 
-        for i in range(10):
-            self.tm.controller.position.setpoint = i * 1000 * ticks
-            time.sleep(tsleep)
+        for i in range(5):
+            self.tm.controller.position.setpoint = i * 3000 * ticks
+            if hw_rev > 20:
+                time.sleep(0.50)
+            else:
+                time.sleep(0.20)
             self.assertAlmostEqual(
-                i * 1000 * ticks, self.tm.sensors.user_frame.position_estimate, delta=1000 * ticks
+                i * 3000 * ticks, self.tm.sensors.user_frame.position_estimate, delta=1000 * ticks
             )
 
+    @pytest.mark.hitl_default
     def test_e_velocity_control(self):
         """
         Test velocity control
@@ -135,6 +148,7 @@ class TestBoard(TMTestCase):
         for target, estimate in velocity_pairs:
             self.assertAlmostEqual(target, estimate, delta=30000 * ticks / s)
 
+    @pytest.mark.hitl_default
     def test_f_random_pos_control(self):
         """
         Test random positions
@@ -154,6 +168,7 @@ class TestBoard(TMTestCase):
                 delta=2000 * ticks,
             )
 
+    @pytest.mark.hitl_default
     def test_g_limits(self):
         """
         Test limits
@@ -190,6 +205,7 @@ class TestBoard(TMTestCase):
         self.tm.controller.velocity.setpoint = 0
         time.sleep(0.5)
 
+    @pytest.mark.hitl_default
     def test_h_timings(self):
         """
         Test DWT busy/total cycle timings
@@ -198,6 +214,7 @@ class TestBoard(TMTestCase):
             self.skipTest("Invalid timing values. Skipping test.")
         self.assertLess(self.tm.scheduler.load, 4000)
 
+    @pytest.mark.hitl_default
     def test_i_states(self):
         """
         Test state transitions
@@ -225,6 +242,7 @@ class TestBoard(TMTestCase):
         self.assertEqual(self.tm.controller.state, 2)
         self.tm.controller.idle()
 
+    @pytest.mark.hitl_default
     def test_j_gimbal_mode(self):
         """
         Test gimbal mode
@@ -248,6 +266,7 @@ class TestBoard(TMTestCase):
                 i * 1000 * ticks, self.tm.sensors.user_frame.position_estimate, delta=1000 * ticks
             )
 
+    @pytest.mark.hitl_default
     def test_k_rotor_offset_and_multiplier(self):
         """
         Test rotor offset and multiplier
@@ -296,6 +315,7 @@ class TestBoard(TMTestCase):
     #             20000 * k * ticks, values.position, delta=2000 * (k + 1) * ticks
     #         )
 
+    @pytest.mark.hitl_default
     def test_m_recalibrate(self):
         """
         Test re-calibration without reset
@@ -322,6 +342,7 @@ class TestBoard(TMTestCase):
         self.tm.controller.idle()
         self.assertLess(st.pstdev(pos_estimates) * ticks, 100 * ticks)
 
+    @pytest.mark.hitl_default
     def test_n_velocity_ramp(self):
         """
         Test velocity ramp
@@ -347,6 +368,7 @@ class TestBoard(TMTestCase):
         a, _ = np.polyfit(t_points, vel_estimates, 1)
         self.assertAlmostEqual(a, ramp_value * frequency, delta=5000)
 
+    @pytest.mark.hitl_default
     def test_o_composite_set_get(self):
         """
         Test composite setter/getter function
@@ -359,6 +381,7 @@ class TestBoard(TMTestCase):
         pos_estimate_comp = self.tm.controller.set_pos_vel_setpoints(0, 0) * ticks
         self.assertAlmostEqual(pos_estimate_ref, pos_estimate_comp, delta=200*ticks)
 
+    @pytest.mark.hitl_default
     def test_p_flux_braking(self):
         """
         Test flux braking

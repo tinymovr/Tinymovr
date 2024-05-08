@@ -73,7 +73,7 @@ def add_spec(spec, logger=None):
 init_specs_dict()
 
 
-def get_bus_config(suggested_types=None):
+def get_bus_config(suggested_types=None, bitrate=None):
     """
     Get the bus configuration (interface, channel) for
     the first of the suggested interface types. Present
@@ -81,7 +81,10 @@ def get_bus_config(suggested_types=None):
     """
     configs = can.interface.detect_available_configs(suggested_types)
     try:
-        return configs[0]
+        config = configs[0]
+        if bitrate:
+            configs[0]["bitrate"] = bitrate
+        return config
     except IndexError as exc:
         raise can.CanInitializationError("No active interface found") from exc
 
