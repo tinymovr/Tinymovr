@@ -24,7 +24,7 @@ import IPython
 from traitlets.config import Config
 from docopt import docopt
 from tinymovr.bus_router import init_router, destroy_router
-from tinymovr.config import get_bus_config, create_device
+from tinymovr.config import get_bus_config, create_device, configure_logging
 from tinymovr.channel import ResponseError
 
 """
@@ -148,6 +148,8 @@ def spawn():
     channel = arguments["--chan"]
     bitrate = int(arguments["--bitrate"])
 
+    logger = configure_logging()
+
     if not channel:
         params = get_bus_config(buses, bitrate=bitrate)
     else:
@@ -157,7 +159,7 @@ def spawn():
 
         input("Please power off the device and then press any key to continue...")
         print("Now power on the device.")
-        init_router(can.Bus, params, timeout=1.0)
+        init_router(can.Bus, params, logger=logger, timeout=1.0)
         while True:
             try:
                 device = create_device(node_id=node_id)
@@ -167,7 +169,7 @@ def spawn():
                 pass
     else:
     
-        init_router(can.Bus, params, timeout=1.0)
+        init_router(can.Bus, params, logger=logger, timeout=1.0)
         device = create_device(node_id=node_id)
 
         if not bin_path:
