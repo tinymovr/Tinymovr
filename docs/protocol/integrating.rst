@@ -22,12 +22,12 @@ Here below is an example using the API from Python scripts and controlling hardw
 .. code-block:: python
 
     import can
-    from tinymovr.tee import init_tee
+    from tinymovr.bus_router import init_router
     from tinymovr.config import get_bus_config, create_device
 
     params = get_bus_config(["canine", "slcan_disco"])
     params["bitrate"] = bitrate
-    init_tee(can.Bus(**params))
+    init_router(can.Bus(**params))
     tm = create_device(node_id=1)
 
     tm.controller.calibrate()

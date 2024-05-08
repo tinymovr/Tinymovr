@@ -23,7 +23,7 @@ from rich.progress import Progress
 import IPython
 from traitlets.config import Config
 from docopt import docopt
-from tinymovr.tee import init_tee, destroy_tee
+from tinymovr.bus_router import init_router, destroy_router
 from tinymovr.config import get_bus_config, create_device
 from tinymovr.channel import ResponseError
 
@@ -149,8 +149,7 @@ def spawn():
     bitrate = int(arguments["--bitrate"])
 
     if not channel:
-        params = get_bus_config(buses)
-        params["bitrate"] = bitrate
+        params = get_bus_config(buses, bitrate=bitrate)
     else:
         params = {"bustype": buses[0], "channel": channel, "bitrate": bitrate}
 
@@ -158,7 +157,7 @@ def spawn():
 
         input("Please power off the device and then press any key to continue...")
         print("Now power on the device.")
-        init_tee(can.Bus(**params), timeout=1.0)
+        init_router(can.Bus, params, timeout=1.0)
         while True:
             try:
                 device = create_device(node_id=node_id)
@@ -168,7 +167,7 @@ def spawn():
                 pass
     else:
     
-        init_tee(can.Bus(**params), timeout=1.0)
+        init_router(can.Bus, params, timeout=1.0)
         device = create_device(node_id=node_id)
 
         if not bin_path:
@@ -188,7 +187,7 @@ def spawn():
                 if not arguments["--no-reset"]:
                     print("Resetting device...")
                     device.reset()
-    destroy_tee()
+    destroy_router()
 
 
 if __name__ == "__main__":
