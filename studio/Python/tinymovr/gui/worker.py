@@ -21,8 +21,8 @@ import can
 from PySide6 import QtCore
 from PySide6.QtCore import QObject
 from tinymovr.gui import TimedGetter, get_dynamic_attrs
-from tinymovr.tee import init_tee, destroy_tee
-from tinymovr.discovery import Discovery
+from tinymovr.bus_router import init_router, destroy_router
+from tinymovr.device_discovery import DeviceDiscovery
 from tinymovr.constants import base_node_name
 
 
@@ -32,13 +32,14 @@ class Worker(QObject):
     regenSignal = QtCore.Signal(dict)
     handleErrorSignal = QtCore.Signal(object)
 
-    def __init__(self, busparams, logger, refresh_period=0.3):
+    def __init__(self, bus_params, logger, bus_class=can.Bus, refresh_period=0.3):
         super().__init__()
         self.logger = logger
         self.mutx = QtCore.QMutex()
-        init_tee(can.Bus(**busparams))
+        #TODO: router init should not happen in GUI worker
+        init_router(bus_class, bus_params, logger=logger)
         self._init_containers()
-        self.dsc = Discovery(
+        self.dsc = DeviceDiscovery(
             self._device_appeared, self._device_disappeared, self.logger
         )
         self.timed_getter = TimedGetter()
@@ -53,7 +54,7 @@ class Worker(QObject):
 
     @QtCore.Slot()
     def stop(self):
-        destroy_tee()
+        destroy_router()
 
     def force_regen(self):
         self.mutx.lock()

@@ -21,6 +21,7 @@ import time
 from avlos.unit_field import get_registry
 
 import unittest
+import pytest
 from tests import TMTestCase
 
 ureg = get_registry()
@@ -32,19 +33,7 @@ tsleep = 0.80
 
 class TestAMT22(TMTestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        super(TestAMT22, cls).setUpClass()
-        
-        cls.configure_sensors(cls.tm.sensors.setup.external_spi.type.AMT22)
-        cls.select_sensors(cls.tm.sensors.select.position_sensor.connection.ONBOARD, cls.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
-        
-        # We look at the position estimate, which is highly unlikely to be exactly 0xFFFF.
-        if cls.tm.sensors.select.position_sensor.raw_angle == 16383:
-            raise unittest.SkipTest("AMT22 sensor not present. Skipping test.")
-
-        cls.reset_and_wait()
-
+    @pytest.mark.sensor_amt22
     def test_a_position_control_before_after_save_and_load_config(self):
         """
         Test position control after saving and loading config.
@@ -56,8 +45,6 @@ class TestAMT22(TMTestCase):
 
         self.configure_sensors(self.tm.sensors.setup.external_spi.type.AMT22)
         self.select_sensors(self.tm.sensors.select.position_sensor.connection.ONBOARD, self.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
-
-        self.tm.motor.I_cal = 1.0
 
         self.try_calibrate()
 
@@ -105,6 +92,7 @@ class TestAMT22(TMTestCase):
         self.tm.erase_config()
         time.sleep(0.2)
 
+    @pytest.mark.sensor_amt22
     def test_b_position_control_following_sensor_change(self):
         """
         Test position control before and after changing sensor connection and type.
@@ -118,7 +106,6 @@ class TestAMT22(TMTestCase):
         # Initially configure with external SPI sensor
         self.configure_sensors(self.tm.sensors.setup.external_spi.type.AMT22)
         self.select_sensors(self.tm.sensors.select.position_sensor.connection.ONBOARD, self.tm.sensors.select.position_sensor.connection.EXTERNAL_SPI)
-        self.tm.motor.I_cal = 1.0
         self.try_calibrate()
 
         # Set initial controller gains

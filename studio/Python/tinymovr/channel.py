@@ -19,7 +19,7 @@ from threading import Lock, Event
 import can
 from functools import cached_property
 from avlos.channel import BaseChannel
-from tinymovr.tee import get_tee
+from tinymovr.bus_router import get_router
 from tinymovr.constants import (
     CAN_DEV_MASK,
     CAN_EP_SIZE,
@@ -43,7 +43,7 @@ class CANChannel(BaseChannel):
         self.queue = []
         self.lock = Lock()
         self.evt = Event()
-        get_tee().add(self._filter_frame, self._recv_cb)
+        get_router().add_client(self._filter_frame, self._recv_cb)
 
     def _filter_frame(self, frame):
         return not frame.is_remote_frame and ids_from_arbitration(frame.arbitration_id)[2] == self.node_id
@@ -60,10 +60,10 @@ class CANChannel(BaseChannel):
         """
         Send a CAN frame to a specific endpoint. The `rtr` flag is set
         based on whether data is provided, and the frame is sent via the
-        global tee instance.
+        global bus router instance.
         """
         rtr = False if data and len(data) else True
-        get_tee().send(self.create_frame(ep_id, rtr, data))
+        get_router().send(self.create_frame(ep_id, rtr, data))
 
     def recv(self, ep_id, timeout=1.0):
         """

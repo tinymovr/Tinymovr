@@ -176,8 +176,7 @@ class MainWindow(QMainWindow):
         self.max_timeouts = int(arguments["--max-timeouts"])
 
         if channel == None:
-            params = get_bus_config(buses)
-            params["bitrate"] = bitrate
+            params = get_bus_config(buses, bitrate=bitrate)
         else:
             params = {"bustype": buses[0], "channel": channel, "bitrate": bitrate}
 

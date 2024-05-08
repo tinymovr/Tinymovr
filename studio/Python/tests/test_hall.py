@@ -21,6 +21,7 @@ import time
 from avlos.unit_field import get_registry
 
 import unittest
+import pytest
 from tests import TMTestCase
 
 ureg = get_registry()
@@ -35,12 +36,12 @@ def set_pole_pairs(tm):
 
 class TestHall(TMTestCase):
 
+    @pytest.mark.sensor_hall
     def test_a_position_control_w_loaded_config(self):
         """
         Test position control after saving and loading config.
         WARNING: This will perform one NVRAM write and two erase cycles.
         """
-        pass
         self.check_state(0)
         self.tm.erase_config()
         time.sleep(0.2)
