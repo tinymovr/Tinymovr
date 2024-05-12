@@ -43,7 +43,7 @@ def get_device_spec(hash, logger=None):
         for hash_alias in hash_aliases[hash]:
             try:
                 spec = specs["hash_uint32"][hash_alias]
-                logger.debug("Found compatible spec via hash alias {} for device hash {}", hash_alias, hash)
+                logger.debug("Found compatible spec via hash alias {} for device hash {}".format(hash_alias, hash))
                 return spec
             except KeyError:
                 pass
