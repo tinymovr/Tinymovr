@@ -35,7 +35,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QTreeWidgetItem,
     QSplitter,
-    QTextBrowser
+    QTextBrowser,
 )
 from PySide6.QtGui import QAction
 import pyqtgraph as pg
@@ -60,7 +60,7 @@ from tinymovr.gui import (
     display_file_save_dialog,
     magnitude_of,
     check_selected_items,
-    configure_pretty_errors
+    configure_pretty_errors,
 )
 
 
@@ -70,6 +70,8 @@ class MainWindow(QMainWindow):
 
     def __init__(self, app, arguments, logger):
         super(MainWindow, self).__init__()
+
+        self.time_window = 10
 
         # set units default format
         get_registry().default_format = ".6f~"
@@ -100,9 +102,13 @@ class MainWindow(QMainWindow):
         self.file_menu.addAction(self.import_action)
         self.help_menu.addAction(self.about_action)
 
-        self.toggle_tree_action = QAction("Hide Tree", self)  # Assume tree is visible initially
+        self.toggle_tree_action = QAction(
+            "Hide Tree", self
+        )  # Assume tree is visible initially
         self.toggle_tree_action.triggered.connect(self.toggle_tree)
-        self.toggle_console_action = QAction("Hide Console", self)  # Assume console is visible initially
+        self.toggle_console_action = QAction(
+            "Hide Console", self
+        )  # Assume console is visible initially
         self.toggle_console_action.triggered.connect(self.toggle_console)
 
         self.clear_console_action = QAction("Clear Console", self)
@@ -111,6 +117,44 @@ class MainWindow(QMainWindow):
 
         self.view_menu.addAction(self.toggle_tree_action)
         self.view_menu.addAction(self.toggle_console_action)
+
+        self.time_window_menu = QMenu("Set Time Window")
+
+        self.time_window_10s_action = QAction("10 seconds", self)
+        self.time_window_10s_action.triggered.connect(lambda: self.set_time_window(10))
+
+        self.time_window_30s_action = QAction("30 seconds", self)
+        self.time_window_30s_action.triggered.connect(lambda: self.set_time_window(30))
+
+        self.time_window_60s_action = QAction("60 seconds", self)
+        self.time_window_60s_action.triggered.connect(lambda: self.set_time_window(60))
+
+        self.time_window_menu.addAction(self.time_window_10s_action)
+        self.time_window_menu.addAction(self.time_window_30s_action)
+        self.time_window_menu.addAction(self.time_window_60s_action)
+
+        self.view_menu.addMenu(self.time_window_menu)
+
+        self.timer_rate_menu = QMenu("Set Timer Rate")
+
+        self.timer_rate_12_5_action = QAction("12.5 Hz", self)
+        self.timer_rate_12_5_action.triggered.connect(lambda: self.set_timer_rate(80))
+
+        self.timer_rate_25_action = QAction("25 Hz", self)
+        self.timer_rate_25_action.triggered.connect(lambda: self.set_timer_rate(40))
+
+        self.timer_rate_50_action = QAction("50 Hz", self)
+        self.timer_rate_50_action.triggered.connect(lambda: self.set_timer_rate(20))
+
+        self.timer_rate_100_action = QAction("100 Hz", self)
+        self.timer_rate_100_action.triggered.connect(lambda: self.set_timer_rate(10))
+
+        self.timer_rate_menu.addAction(self.timer_rate_12_5_action)
+        self.timer_rate_menu.addAction(self.timer_rate_25_action)
+        self.timer_rate_menu.addAction(self.timer_rate_50_action)
+        self.timer_rate_menu.addAction(self.timer_rate_100_action)
+
+        self.view_menu.addMenu(self.timer_rate_menu)
 
         self.menu_bar.addMenu(self.file_menu)
         self.menu_bar.addMenu(self.view_menu)
@@ -166,7 +210,7 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(self.status_label)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
-        
+
         main_widget = QWidget()
         main_widget.setLayout(main_layout)
         main_widget.setMinimumHeight(600)
@@ -215,7 +259,7 @@ class MainWindow(QMainWindow):
 
         top_size = int(total_height * top_percentage)
         bottom_size = int(total_height * bottom_percentage)
-        
+
         self.main_splitter.setSizes([top_size, bottom_size])
 
         super(MainWindow, self).showEvent(event)
@@ -338,15 +382,20 @@ class MainWindow(QMainWindow):
                 self.logger.warn("Attribute widget disappeared while updating")
             if attr_name in self.graphs_by_id:
                 graph_info = self.graphs_by_id[attr_name]
+                current_time = time.time() - self.start_time
                 x = graph_info["data"]["x"]
                 y = graph_info["data"]["y"]
-                if len(x) >= 200:
+
+                # Remove data points outside the time window
+                while len(x) > 0 and current_time - x[0] > self.time_window:
                     x.pop(0)
                     y.pop(0)
-                x.append(time.time() - self.start_time)
+
+                x.append(current_time)
                 y.append(magnitude_of(val))
                 graph_info["data_line"].setData(x, y)
                 graph_info["widget"].update()
+
 
     @QtCore.Slot()
     def timings_updated(self, timings_dict):
@@ -444,7 +493,9 @@ class MainWindow(QMainWindow):
         """
         Check tree visibility after splitter is moved and update the action text.
         """
-        tree_size = self.splitter.sizes()[0]  # Assuming tree is always the first widget in the splitter
+        tree_size = self.splitter.sizes()[
+            0
+        ]  # Assuming tree is always the first widget in the splitter
         if tree_size == 0:
             self.toggle_tree_action.setText("Show Tree")
         else:
@@ -454,7 +505,9 @@ class MainWindow(QMainWindow):
         """
         Check console visibility after splitter is moved and update the action text.
         """
-        console_size = self.main_splitter.sizes()[-1]  # Assuming console is always the last widget in the splitter
+        console_size = self.main_splitter.sizes()[
+            -1
+        ]  # Assuming console is always the last widget in the splitter
         if console_size == 0:
             self.toggle_console_action.setText("Show Console")
         else:
@@ -484,3 +537,24 @@ class MainWindow(QMainWindow):
         # Check if the rectangle is within the visible region of the tree widget
         visible_region = self.tree_widget.visibleRegion()
         return visible_region.contains(rect)
+
+    def set_timer_rate(self, interval_ms):
+        """
+        Set the interval of the worker update timer.
+        :param interval_ms: Timer interval in milliseconds.
+        """
+        self.worker_update_timer.setInterval(interval_ms)
+        self.logger.info(f"Worker update timer set to {1000 / interval_ms:.1f} Hz")
+
+    def set_time_window(self, time_window):
+        """
+        Set the time window for the plots.
+        :param time_window: Time window in seconds.
+        """
+        self.time_window = time_window
+        self.logger.info(f"Time window set to {time_window} seconds")
+        # # Clear existing data to apply the new time window
+        # for graph_info in self.graphs_by_id.values():
+        #     graph_info["data"]["x"].clear()
+        #     graph_info["data"]["y"].clear()
+        #     graph_info["data_line"].setData([], [])
