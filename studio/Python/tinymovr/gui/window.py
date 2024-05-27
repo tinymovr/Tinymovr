@@ -112,6 +112,29 @@ class MainWindow(QMainWindow):
         self.view_menu.addAction(self.toggle_tree_action)
         self.view_menu.addAction(self.toggle_console_action)
 
+        # Create a sub-menu for selecting the timer rate
+        self.timer_rate_menu = QMenu("Set Timer Rate")
+
+        # Add actions for selecting the timer rate
+        self.timer_rate_12_5_action = QAction("12.5 Hz", self)
+        self.timer_rate_12_5_action.triggered.connect(lambda: self.set_timer_rate(80))
+
+        self.timer_rate_25_action = QAction("25 Hz", self)
+        self.timer_rate_25_action.triggered.connect(lambda: self.set_timer_rate(40))
+
+        self.timer_rate_50_action = QAction("50 Hz", self)
+        self.timer_rate_50_action.triggered.connect(lambda: self.set_timer_rate(20))
+
+        self.timer_rate_100_action = QAction("100 Hz", self)
+        self.timer_rate_100_action.triggered.connect(lambda: self.set_timer_rate(10))
+
+        self.timer_rate_menu.addAction(self.timer_rate_12_5_action)
+        self.timer_rate_menu.addAction(self.timer_rate_25_action)
+        self.timer_rate_menu.addAction(self.timer_rate_50_action)
+        self.timer_rate_menu.addAction(self.timer_rate_100_action)
+
+        self.view_menu.addMenu(self.timer_rate_menu)
+
         self.menu_bar.addMenu(self.file_menu)
         self.menu_bar.addMenu(self.view_menu)
         self.menu_bar.addMenu(self.help_menu)
@@ -484,3 +507,12 @@ class MainWindow(QMainWindow):
         # Check if the rectangle is within the visible region of the tree widget
         visible_region = self.tree_widget.visibleRegion()
         return visible_region.contains(rect)
+
+    def set_timer_rate(self, interval_ms):
+        """
+        Set the interval of the worker update timer.
+        :param interval_ms: Timer interval in milliseconds.
+        """
+        self.worker_update_timer.setInterval(interval_ms)
+        self.logger.info(f"Worker update timer set to {1000 / interval_ms:.1f} Hz")
+
