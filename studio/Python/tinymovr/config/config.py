@@ -25,13 +25,23 @@ from avlos.deserializer import deserialize
 from tinymovr.codec import DataType
 from tinymovr.channel import CANChannel
 
+
+class IncompatibleSpecVersionError(Exception):
+    def __init__(self, hash_value):
+        self.hash_value = hash_value
+        super().__init__(
+            f"Device found, but incompatible (no device spec found for hash {hash_value})."
+        )
+
+
 specs = {}
 
 # We added the following as a temporary solution
 # after a hash was modified without modifying the
 # spec (we are suspecting dependency upgrade
 # breaking hash computation)
-hash_aliases = { 3526126264 : [4118115615]}
+hash_aliases = {3526126264: [4118115615]}
+
 
 def get_device_spec(hash, logger=None):
     if logger is None:
@@ -40,14 +50,19 @@ def get_device_spec(hash, logger=None):
     try:
         return specs["hash_uint32"][hash]
     except KeyError:
-        for hash_alias in hash_aliases[hash]:
+        for hash_alias in hash_aliases.get(hash, []):
             try:
                 spec = specs["hash_uint32"][hash_alias]
-                logger.debug("Found compatible spec via hash alias {} for device hash {}".format(hash_alias, hash))
+                logger.debug(
+                    "Found compatible spec via hash alias {} for device hash {}".format(
+                        hash_alias, hash
+                    )
+                )
                 return spec
             except KeyError:
                 pass
     return None
+
 
 def init_specs_dict():
     global specs
@@ -65,7 +80,11 @@ def add_spec(spec, logger=None):
     tmp_node = deserialize(spec)
     hash_value = tmp_node.hash_uint32
     if hash_value in specs["hash_uint32"]:
-        logger.warning("Provided spec with hash {} already exists in hash/name dictionary".format(hash_value))
+        logger.warning(
+            "Provided spec with hash {} already exists in hash/name dictionary".format(
+                hash_value
+            )
+        )
     else:
         specs["hash_uint32"][hash_value] = spec
 
@@ -112,7 +131,7 @@ def create_device(node_id, logger=None):
     chan.compare_hash = protocol_hash & 0xFF
 
     if not device_spec:
-        raise ValueError(f"Device found, but incompatible (no device spec found for hash {protocol_hash}).")
+        raise IncompatibleSpecVersionError(protocol_hash)
 
     node = deserialize(device_spec)
     node._channel = chan
@@ -136,11 +155,7 @@ def create_device_with_hash_msg(heartbeat_msg, logger=None):
     chan.compare_hash = hash & 0xFF
 
     if not device_spec:
-        # TODO: This message is more descriptive than the
-        # previous ("no device spec found for hash #"), but
-        # may not always be accurate. Still we keep it in
-        # order to better guide the user.4
-        raise ValueError(f"Device found, but incompatible (no device spec found for hash {hash}).")
+        raise IncompatibleSpecVersionError(hash)
 
     node = deserialize(device_spec)
 
