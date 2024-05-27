@@ -105,6 +105,10 @@ class MainWindow(QMainWindow):
         self.toggle_console_action = QAction("Hide Console", self)  # Assume console is visible initially
         self.toggle_console_action.triggered.connect(self.toggle_console)
 
+        self.clear_console_action = QAction("Clear Console", self)
+        self.clear_console_action.triggered.connect(self.clear_console)
+        self.view_menu.addAction(self.clear_console_action)
+
         self.view_menu.addAction(self.toggle_tree_action)
         self.view_menu.addAction(self.toggle_console_action)
 
@@ -429,6 +433,12 @@ class MainWindow(QMainWindow):
             bottom_height = int(total_height * 0.25)
             self.main_splitter.setSizes([top_height, bottom_height])
             self.toggle_console_action.setText("Hide Console")
+
+    def clear_console(self):
+        """
+        Clear the console output.
+        """
+        self.console.clear()
 
     def check_tree_visibility(self, pos, index):
         """
