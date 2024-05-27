@@ -35,7 +35,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QTreeWidgetItem,
     QSplitter,
-    QTextBrowser
+    QTextBrowser,
 )
 from PySide6.QtGui import QAction
 import pyqtgraph as pg
@@ -60,7 +60,7 @@ from tinymovr.gui import (
     display_file_save_dialog,
     magnitude_of,
     check_selected_items,
-    configure_pretty_errors
+    configure_pretty_errors,
 )
 
 
@@ -100,9 +100,13 @@ class MainWindow(QMainWindow):
         self.file_menu.addAction(self.import_action)
         self.help_menu.addAction(self.about_action)
 
-        self.toggle_tree_action = QAction("Hide Tree", self)  # Assume tree is visible initially
+        self.toggle_tree_action = QAction(
+            "Hide Tree", self
+        )  # Assume tree is visible initially
         self.toggle_tree_action.triggered.connect(self.toggle_tree)
-        self.toggle_console_action = QAction("Hide Console", self)  # Assume console is visible initially
+        self.toggle_console_action = QAction(
+            "Hide Console", self
+        )  # Assume console is visible initially
         self.toggle_console_action.triggered.connect(self.toggle_console)
 
         self.clear_console_action = QAction("Clear Console", self)
@@ -189,7 +193,7 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(self.status_label)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
-        
+
         main_widget = QWidget()
         main_widget.setLayout(main_layout)
         main_widget.setMinimumHeight(600)
@@ -238,7 +242,7 @@ class MainWindow(QMainWindow):
 
         top_size = int(total_height * top_percentage)
         bottom_size = int(total_height * bottom_percentage)
-        
+
         self.main_splitter.setSizes([top_size, bottom_size])
 
         super(MainWindow, self).showEvent(event)
@@ -467,7 +471,9 @@ class MainWindow(QMainWindow):
         """
         Check tree visibility after splitter is moved and update the action text.
         """
-        tree_size = self.splitter.sizes()[0]  # Assuming tree is always the first widget in the splitter
+        tree_size = self.splitter.sizes()[
+            0
+        ]  # Assuming tree is always the first widget in the splitter
         if tree_size == 0:
             self.toggle_tree_action.setText("Show Tree")
         else:
@@ -477,7 +483,9 @@ class MainWindow(QMainWindow):
         """
         Check console visibility after splitter is moved and update the action text.
         """
-        console_size = self.main_splitter.sizes()[-1]  # Assuming console is always the last widget in the splitter
+        console_size = self.main_splitter.sizes()[
+            -1
+        ]  # Assuming console is always the last widget in the splitter
         if console_size == 0:
             self.toggle_console_action.setText("Show Console")
         else:
@@ -515,4 +523,3 @@ class MainWindow(QMainWindow):
         """
         self.worker_update_timer.setInterval(interval_ms)
         self.logger.info(f"Worker update timer set to {1000 / interval_ms:.1f} Hz")
-
