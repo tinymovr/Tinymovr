@@ -71,6 +71,8 @@ class MainWindow(QMainWindow):
     def __init__(self, app, arguments, logger):
         super(MainWindow, self).__init__()
 
+        self.time_window = 10
+
         # set units default format
         get_registry().default_format = ".6f~"
 
@@ -116,10 +118,25 @@ class MainWindow(QMainWindow):
         self.view_menu.addAction(self.toggle_tree_action)
         self.view_menu.addAction(self.toggle_console_action)
 
-        # Create a sub-menu for selecting the timer rate
+        self.time_window_menu = QMenu("Set Time Window")
+
+        self.time_window_10s_action = QAction("10 seconds", self)
+        self.time_window_10s_action.triggered.connect(lambda: self.set_time_window(10))
+
+        self.time_window_30s_action = QAction("30 seconds", self)
+        self.time_window_30s_action.triggered.connect(lambda: self.set_time_window(30))
+
+        self.time_window_60s_action = QAction("60 seconds", self)
+        self.time_window_60s_action.triggered.connect(lambda: self.set_time_window(60))
+
+        self.time_window_menu.addAction(self.time_window_10s_action)
+        self.time_window_menu.addAction(self.time_window_30s_action)
+        self.time_window_menu.addAction(self.time_window_60s_action)
+
+        self.view_menu.addMenu(self.time_window_menu)
+
         self.timer_rate_menu = QMenu("Set Timer Rate")
 
-        # Add actions for selecting the timer rate
         self.timer_rate_12_5_action = QAction("12.5 Hz", self)
         self.timer_rate_12_5_action.triggered.connect(lambda: self.set_timer_rate(80))
 
@@ -365,15 +382,20 @@ class MainWindow(QMainWindow):
                 self.logger.warn("Attribute widget disappeared while updating")
             if attr_name in self.graphs_by_id:
                 graph_info = self.graphs_by_id[attr_name]
+                current_time = time.time() - self.start_time
                 x = graph_info["data"]["x"]
                 y = graph_info["data"]["y"]
-                if len(x) >= 200:
+
+                # Remove data points outside the time window
+                while len(x) > 0 and current_time - x[0] > self.time_window:
                     x.pop(0)
                     y.pop(0)
-                x.append(time.time() - self.start_time)
+
+                x.append(current_time)
                 y.append(magnitude_of(val))
                 graph_info["data_line"].setData(x, y)
                 graph_info["widget"].update()
+
 
     @QtCore.Slot()
     def timings_updated(self, timings_dict):
@@ -523,3 +545,16 @@ class MainWindow(QMainWindow):
         """
         self.worker_update_timer.setInterval(interval_ms)
         self.logger.info(f"Worker update timer set to {1000 / interval_ms:.1f} Hz")
+
+    def set_time_window(self, time_window):
+        """
+        Set the time window for the plots.
+        :param time_window: Time window in seconds.
+        """
+        self.time_window = time_window
+        self.logger.info(f"Time window set to {time_window} seconds")
+        # # Clear existing data to apply the new time window
+        # for graph_info in self.graphs_by_id.values():
+        #     graph_info["data"]["x"].clear()
+        #     graph_info["data"]["y"].clear()
+        #     graph_info["data_line"].setData([], [])
