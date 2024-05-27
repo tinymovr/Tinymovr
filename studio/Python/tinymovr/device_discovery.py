@@ -21,7 +21,7 @@ from threading import Thread, Event
 from tinymovr.channel import ResponseError
 from tinymovr.bus_router import get_router
 from tinymovr.constants import HEARTBEAT_BASE
-from tinymovr.config import create_device_with_hash_msg
+from tinymovr.config import create_device_with_hash_msg, IncompatibleSpecVersionError
 
 
 class DeviceDiscovery:
@@ -72,7 +72,7 @@ class DeviceDiscovery:
                 self._append_to_queue((node, node_id))
             except ResponseError as e:
                 self.logger.error(e)
-            except ValueError as e:
+            except IncompatibleSpecVersionError as e:
                 self.logger.error(e)
                 self.incompatible_nodes.add(node_id)
             self.pending_nodes.remove(node_id)

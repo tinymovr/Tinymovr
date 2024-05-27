@@ -62,6 +62,7 @@ class Worker(QObject):
         self.mutx.unlock()
 
     def reset(self):
+        self.logger.info("Resetting Studio...")
         self.mutx.lock()
         self.dsc.reset()
         self._init_containers()
