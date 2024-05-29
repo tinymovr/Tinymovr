@@ -28,17 +28,6 @@ from avlos.definitions import RemoteAttribute, RemoteEnum, RemoteBitmask
 import pretty_errors
 import tinymovr
 
-
-class ConsoleColor:
-    NORMAL = "<font color='white'>"
-    ERROR = "<font color='red'>"
-    WARNING = "<font color='orange'>"
-    INFO = "<font color='lightblue'>"
-    DEBUG = "<font color='lightgreen'>"
-    TIMESTAMP = "<font color='gray'>"
-    END = "</font>"
-
-
 app_stylesheet = """
 
 /* --------------------------------------- QPushButton -----------------------------------*/

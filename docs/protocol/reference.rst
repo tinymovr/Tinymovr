@@ -753,7 +753,9 @@ Flags:
 
 - PHASE_INDUCTANCE_OUT_OF_RANGE
 
-- INVALID_POLE_PAIRS
+- POLE_PAIRS_CALCULATION_DID_NOT_CONVERGE
+
+- POLE_PAIRS_OUT_OF_RANGE
 
 sensors.user_frame.position_estimate
 -------------------------------------------------------------------

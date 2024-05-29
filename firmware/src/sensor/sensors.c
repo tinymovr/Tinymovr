@@ -308,12 +308,7 @@ bool sensors_calibrate_pole_pair_count_and_transforms(void)
     // Find pole pairs if not Hall; otherwise have to be defined manually
     if (sensor_get_type(commutation_sensor_p) != SENSOR_TYPE_HALL)
     {
-        if (!motor_find_pole_pairs(SENSOR_COMMON_RES_TICKS, commutation_frame_start, commutation_frame_end, motor_frame_end))
-        {
-            uint8_t *error_ptr = motor_get_error_ptr();
-            *error_ptr |= MOTOR_ERRORS_INVALID_POLE_PAIRS;
-            return false;
-        }
+        return motor_find_pole_pairs(SENSOR_COMMON_RES_TICKS, commutation_frame_start, commutation_frame_end, motor_frame_end);
     }
 
     const float motor_frame_end_ticks = SENSOR_COMMON_RES_TICKS * (motor_frame_end / (TWOPI * motor_get_pole_pairs()));

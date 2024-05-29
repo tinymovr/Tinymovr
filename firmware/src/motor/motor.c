@@ -163,13 +163,20 @@ TM_RAMFUNC uint8_t motor_find_pole_pairs(uint32_t ticks, float mpos_start, float
 	const uint8_t pairs_i = (uint8_t)our_floorf(pairs_f + 0.5f);
 	const float residual = our_fabsf(pairs_f - (float)pairs_i);
 
-	bool found = false;
-	if (residual <= 0.30f)
+	if (pairs_i > MOTOR_MAX_POLE_PAIRS)
 	{
-		found = true;
-		motor_set_pole_pairs(pairs_i);
+		uint8_t *error_ptr = motor_get_error_ptr();
+		*error_ptr |= MOTOR_ERRORS_POLE_PAIRS_OUT_OF_RANGE;
+		return false;
 	}
-	return found;
+	else if (residual > 0.30f)
+	{
+		uint8_t *error_ptr = motor_get_error_ptr();
+		*error_ptr |= MOTOR_ERRORS_POLE_PAIRS_CALCULATION_DID_NOT_CONVERGE;
+		return false;
+	}
+	motor_set_pole_pairs(pairs_i);
+	return true;
 }
 
 TM_RAMFUNC uint8_t motor_get_pole_pairs(void)
@@ -179,7 +186,7 @@ TM_RAMFUNC uint8_t motor_get_pole_pairs(void)
 
 TM_RAMFUNC void motor_set_pole_pairs(uint8_t pairs)
 {
-	if (pairs >= 1u)
+	if (pairs >= 1u && pairs <= MOTOR_MAX_POLE_PAIRS)
 	{
 		config.pole_pairs = pairs;
 		config.poles_calibrated = true;
