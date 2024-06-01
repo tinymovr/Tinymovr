@@ -74,6 +74,7 @@
 #endif
 
 #define BTL_TRIGGER_PATTERN  0x39
+#define BTL_TRIGGER_PATTERN_RAM  0x5048434D
 
 #define PI (3.141592f)
 #define TWOPI (6.283185f)

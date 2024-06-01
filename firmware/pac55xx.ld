@@ -4,7 +4,8 @@ MEMORY
 {
 	rom0 (rx) : ORIGIN = 0x00000000, LENGTH = 0x00001000
 	rom (rx)  : ORIGIN = 0x00001000, LENGTH = 0x0001F000
-	ram (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00008000
+	ram (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00007F00
+	SHARED (rwx) : ORIGIN = 0x20007F00, LENGTH = 0x00000100
 }
 
 _eram = 0x20000000 + 0x00008000;
@@ -139,6 +140,12 @@ SECTIONS
 	__StackTop = ORIGIN(ram ) + LENGTH(ram );
 	__StackLimit = __StackTop - SIZEOF(.co_stack);
 	PROVIDE(__stack = __StackTop);
+
+	.shared (NOLOAD):
+    {
+        /* place all symbols in input sections that start with .shared */
+        KEEP(*(*.shared*))
+    } > SHARED
 	
 	/* Check if data + heap + stack exceeds ram  limit */
 	ASSERT(__StackLimit >= __HeapLimit, "region ram  overflowed with stack")

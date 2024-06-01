@@ -25,7 +25,7 @@
 #include <src/observer/observer.h>
 #include <src/system/system.h>
 
-extern char _eram;
+__attribute__((section(".shared"))) volatile uint32_t shared_data;
 
 static SystemState state = {0};
 
@@ -83,7 +83,9 @@ void system_init(void)
     // Vp = 10V , 440mA-540mA, Charge Pump Enable
     pac5xxx_tile_register_write(ADDR_SYSCONF, 0x01);
 
-    // Ensure ADC GP0 register is zero, to bypass DFU mode on next boot
+    // Ensure shared data is 0xFF and ADC GP0 register
+    // is zero, to bypass DFU mode on next boot
+    shared_data = 0xFF;
     pac5xxx_tile_register_write(ADDR_GP0, 0);
 
     // Configure reporting of mcu cycles
@@ -115,13 +117,15 @@ TM_RAMFUNC void system_update(void)
 
 void system_reset(void)
 {
-    // GP0 register is already zeroed at `system_init()` 
+    // shared RAM and GP0 register is already zeroed at `system_init()` 
     NVIC_SystemReset();
 }
 
 void system_enter_dfu(void)
 {
+    shared_data = BTL_TRIGGER_PATTERN_RAM;
     pac5xxx_tile_register_write(ADDR_GP0, BTL_TRIGGER_PATTERN);
+
     NVIC_SystemReset();
 }
 

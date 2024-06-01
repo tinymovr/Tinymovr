@@ -18,6 +18,13 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 import time
 import can
 
+try:
+    from rd6006 import RD6006
+    rd = RD6006('/dev/tty.usbserial-2110')
+    psu_connected = True
+except:
+    psu_connected = False
+
 from tinymovr import init_router, destroy_router
 from tinymovr.config import (
     get_bus_config,
@@ -48,17 +55,47 @@ class TMTestCase(unittest.TestCase):
             bl = create_device(node_id=node_id)
             bl_hash = bl.protocol_hash
             bl.reset()
-            time.sleep(0.2)
+            time.sleep(0.1)
             tm = create_device(node_id=node_id)
             tm_hash2 = tm.protocol_hash
             tm.reset()
-            time.sleep(0.2)
+            time.sleep(0.1)
             tm_hash3 = tm.protocol_hash
             self.assertNotEqual(tm_hash, 0)
             self.assertEqual(tm_hash, tm_hash2)
             self.assertEqual(tm_hash, tm_hash3)
             self.assertNotEqual(tm_hash, bl_hash)
-            time.sleep(0.2)
+            time.sleep(0.1)
+
+    @pytest.mark.dfu
+    def test_dfu_power_off(self, node_id=1):
+        if psu_connected == False:
+            raise unittest.SkipTest("Skipping test because no connected RD series PSU found")
+        time.sleep(0.5)
+        for i in range(3):
+            print("Testing DFU iteration ", i+1)
+            tm = create_device(node_id=node_id)
+            tm_hash = tm.protocol_hash
+            tm.enter_dfu()
+            time.sleep(0.5)
+            bl = create_device(node_id=node_id)
+            bl_hash = bl.protocol_hash
+            rd.enable=False
+            time.sleep(2.0)
+            rd.enable=True
+            time.sleep(0.5)
+            tm = create_device(node_id=node_id)
+            tm_hash2 = tm.protocol_hash
+            rd.enable=False
+            time.sleep(2.0)
+            rd.enable=True
+            time.sleep(0.5)
+            tm_hash3 = tm.protocol_hash
+            self.assertNotEqual(tm_hash, 0)
+            self.assertEqual(tm_hash, tm_hash2)
+            self.assertEqual(tm_hash, tm_hash3)
+            self.assertNotEqual(tm_hash, bl_hash)
+            time.sleep(0.1)
 
     @classmethod
     def tearDownClass(cls):
