@@ -136,6 +136,8 @@
 #define SENSOR_COMMON_RES_HALF_TICKS (SENSOR_COMMON_RES_TICKS/2)
 #define SENSOR_COMMON_RES_TICKS_FLOAT ((float)(SENSOR_COMMON_RES_TICKS))
 
+#define MOTOR_MAX_POLE_PAIRS 24
+
 static const float one_by_sqrt3 = 0.57735026919f;
 static const float two_by_sqrt3 = 1.15470053838f;
 static const float threehalfpi = 4.7123889f;

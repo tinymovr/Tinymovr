@@ -28,7 +28,7 @@ void sensor_reset(Sensor *s)
 bool sensor_calibrate_eccentricity_compensation(Sensor *s, Observer *o, FrameTransform *xf_motor_to_sensor)
 {
     // Size below is an arbitrary large number ie > ECN_SIZE * npp
-    float error_ticks[ECN_SIZE * 24];
+    float error_ticks[ECN_SIZE * MOTOR_MAX_POLE_PAIRS];
     const int16_t npp = motor_get_pole_pairs();
     const int16_t n = ECN_SIZE * npp;
     const int16_t nconv = 100;
