@@ -48,17 +48,17 @@ class TMTestCase(unittest.TestCase):
             bl = create_device(node_id=node_id)
             bl_hash = bl.protocol_hash
             bl.reset()
-            time.sleep(0.2)
+            time.sleep(0.1)
             tm = create_device(node_id=node_id)
             tm_hash2 = tm.protocol_hash
             tm.reset()
-            time.sleep(0.2)
+            time.sleep(0.1)
             tm_hash3 = tm.protocol_hash
             self.assertNotEqual(tm_hash, 0)
             self.assertEqual(tm_hash, tm_hash2)
             self.assertEqual(tm_hash, tm_hash3)
             self.assertNotEqual(tm_hash, bl_hash)
-            time.sleep(0.2)
+            time.sleep(0.1)
 
     @classmethod
     def tearDownClass(cls):
