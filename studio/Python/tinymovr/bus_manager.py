@@ -49,7 +49,6 @@ class BusManager:
             self.attempt_reconnect()
         except AttributeError:
             self.attempt_reconnect()
-        return None
     
     def shutdown(self):
         try:
