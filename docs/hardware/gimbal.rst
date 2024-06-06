@@ -1,3 +1,5 @@
+.. _gimbal-motors:
+
 *************
 Gimbal Motors
 *************
@@ -27,6 +29,9 @@ A gimbal motor is a 3-phase brushless motor whose stator is wound with many turn
 To achieve closed-loop current control, motor controllers such as Tinymovr use current measurement resistors in each phase (usually in series with the low-side mosfet) to estimate the current in the motor windings. These resistors have low resistance (in the range of a few milliOhms at most), to limit power dissipation in the resistor and allow operation in wide current ranges (up to several tens of Amps, even hundreds). The drawback is that current measurements exhibit noise of 100s of mA, and as such do not offer accurate measurements of small currents.
 
 The gimbal mode of Tinymovr disables closed-loop current control. The commanded currents are converted to voltages using basic resistance and inductance formulas. 
+
+
+.. _enabling-gimbal-mode:
 
 Enabling Gimbal Mode
 --------------------

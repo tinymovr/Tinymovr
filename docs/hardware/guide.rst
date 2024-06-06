@@ -36,6 +36,26 @@ Most gimbal motors can be used with Tinymovr M5. Gimbal motors are essentially o
 
    * Motors with trapezoidal back-EMF can also be controlled, but control will be sub-optimal. The trapezoidal back-EMF will appear as residual in the dq frame, as a result it will be much harder for the current controller to regulate phase currents. The tangible result is that the motor may exhibit increased noise and vibration while running.
 
+Limitations
+***********
+
+Tinymovr controllers are designed with certain limitations in terms of motor internal resistance and inductance, to ensure optimal closed loop current control performance.
+
+.. list-table:: Motor Limits
+   :header-rows: 1
+
+   * - Controller Version
+     - Phase Resistance (ohms)
+     - Phase Inductance (henries)
+   * - Tinymovr R5.x and R3.x
+     - 0.01 to 1.0
+     - 5e-6 to 1e-3
+   * - Tinymovr M5.x
+     - 0.5 to 20.0
+     - 1e-5 to 1e-2
+
+Note that motors with parameters outside this range will result in calibration failing. Ensure that the motors you select adhere to these parameters for the best operational experience. You can still use motors outside this range with open loop current control, through :ref:`enabling-gimbal-mode`.
+
 
 Mechanical Setup
 ################
