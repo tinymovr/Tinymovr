@@ -308,7 +308,10 @@ bool sensors_calibrate_pole_pair_count_and_transforms(void)
     // Find pole pairs if not Hall; otherwise have to be defined manually
     if (sensor_get_type(commutation_sensor_p) != SENSOR_TYPE_HALL)
     {
-        return motor_find_pole_pairs(SENSOR_COMMON_RES_TICKS, commutation_frame_start, commutation_frame_end, motor_frame_end);
+        if (!motor_find_pole_pairs(SENSOR_COMMON_RES_TICKS, commutation_frame_start, commutation_frame_end, motor_frame_end))
+        {
+            return false;
+        }
     }
 
     const float motor_frame_end_ticks = SENSOR_COMMON_RES_TICKS * (motor_frame_end / (TWOPI * motor_get_pole_pairs()));
@@ -331,11 +334,11 @@ bool sensors_calibrate_pole_pair_count_and_transforms(void)
         frame_set_commutation_sensor_to_motor(t);
     }
 
-    if (commutation_sensor_p == position_sensor_p)
+    if (commutation_sensor_p == position_sensor_p) // same sensor
     {
         frame_set_position_sensor_to_motor(*(frame_commutation_sensor_to_motor_p()));
     }
-    else if (sensor_get_type(position_sensor_p) != SENSOR_TYPE_HALL)
+    else if (sensor_get_type(position_sensor_p) != SENSOR_TYPE_HALL) // different sensors, not Hall
     {
         frame_set_position_sensor_to_motor(derive_transform_2p(position_frame_start, 0, position_frame_end, motor_frame_end_ticks));
     }
