@@ -20,6 +20,7 @@ import time
 import can
 from PySide6 import QtCore
 from PySide6.QtCore import QObject
+from tinymovr.channel import ResponseError
 from tinymovr.gui import TimedGetter, get_dynamic_attrs
 from tinymovr.bus_router import init_router, destroy_router
 from tinymovr.device_discovery import DeviceDiscovery
@@ -140,8 +141,11 @@ class Worker(QObject):
 
     def _device_appeared(self, device, node_id):
         self.mutx.lock()
-        display_name = "{}{}".format(device.name, node_id)
-        self.logger.info("Found {} (uid {})".format(display_name, device.uid))
+        try:
+            display_name = "{}{}".format(device.name, node_id)
+            self.logger.info("Found {} (uid {})".format(display_name, device.uid))
+        except ResponseError as e:
+            self.handleErrorSignal.emit(e)
         self.devices_by_name[display_name] = device
         self.names_by_id[node_id] = display_name
         device.name = display_name

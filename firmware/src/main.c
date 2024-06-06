@@ -34,14 +34,14 @@ int main(void)
 {
   	__disable_irq();
     system_init();
-    UART_Init();
-	ADC_init();
-    CAN_init();
+    UART_Init(); // Keep UART init before config load for now
     if (!nvm_load_config())
     {
         sensors_init_with_defaults();
         observers_init_with_defaults();
     }
+    ADC_init();
+    CAN_init();
     timers_init();
     Watchdog_init();
     __enable_irq();
