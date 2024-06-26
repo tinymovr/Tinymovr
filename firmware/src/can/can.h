@@ -21,13 +21,15 @@ typedef struct
 {
     uint8_t id;
     uint8_t kbaud_rate;
-    uint16_t heartbeat_period;
+    uint16_t heartbeat_period_ms;
+    uint16_t can_reset_period_ms;
 } CANConfig;
 
 typedef struct 
 {
     uint8_t faults;
     uint32_t last_msg_ms;
+    uint32_t can_reset_counter_ms;
     bool send_heartbeat;
 } CANState;
 

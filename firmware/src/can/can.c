@@ -33,12 +33,14 @@
 static CANConfig config = {
     .id = 1,
     .kbaud_rate = CAN_BAUD_1000KHz,
-    .heartbeat_period = 1000
+    .heartbeat_period_ms = 1000,
+    .can_reset_period_ms = 10
 };
 
 static CANState can_state ={
     .faults = 0,
     .last_msg_ms = 0,
+    .can_reset_counter_ms = 0,
     .send_heartbeat = true
 };
 
@@ -180,12 +182,34 @@ void CAN_restore_config(CANConfig *config_)
     config = *config_;
 }
 
-void CAN_update(void) {
-    // Transmit heartbeat
+void CAN_update(void)
+{
+    // Periodic can task, transmitting heartbeat and resetting CAN controller if necessary
+    if (PAC55XX_CAN->MR.RM == 1 && PAC55XX_CAN->SR.BS == 1)
+    {
+        // We've entered bus off state
+        // TODO: Raise latch warning on protocol
+        can_state.can_reset_counter_ms += 1;
+
+        // Reset the controller in order to activate recovery procedure
+        if (can_state.can_reset_counter_ms >= config.can_reset_period_ms)
+        {
+            pac5xxx_can_reset_mode_set(1);
+            delay_us(100);
+            pac5xxx_can_reset_mode_set(0);
+            delay_us(100);
+            can_state.can_reset_counter_ms = 0;
+        }
+    }
+    else
+    {
+        can_state.can_reset_counter_ms = 0;
+    }
+
     if (can_state.send_heartbeat == true)
     {
         const uint32_t msg_diff = msTicks - can_state.last_msg_ms;
-        if (msg_diff >= config.heartbeat_period && PAC55XX_CAN->SR.TBS != 0)
+        if (msg_diff >= config.heartbeat_period_ms && PAC55XX_CAN->SR.TBS != 0)
         {
             can_state.last_msg_ms = msTicks;
             uint32_t proto_hash = _avlos_get_proto_hash();
