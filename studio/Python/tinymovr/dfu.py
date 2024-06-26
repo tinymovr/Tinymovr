@@ -1,12 +1,13 @@
 """
 Usage:
-    dfu.py --node_id=ID [--bin=PATH | --recovery] [--no-reset] [--bus=<bus>] [--chan=<chan>] [--bitrate=<bitrate>]
+    dfu.py --node_id=ID [--bin=PATH | --recovery] [--no-reset] [--force] [--bus=<bus>] [--chan=<chan>] [--bitrate=<bitrate>]
 
 Options:
     --node_id=ID The CAN Node ID of the device in DFU mode.
     --bin=PATH   The path of the .bin file to upload.
     --recovery   Perform recovery procedure for inaccessible DFU bootloader.
     --no-reset   Do not perform a reset following successful flashing.
+    --force      Force flashing even if device memory matches the .bin file.
     --bus=<bus>  One or more interfaces to use, first available is used [default: canine,slcan_disco].
     --chan=<chan>  The bus device "channel".
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
@@ -181,7 +182,7 @@ def spawn():
 
         # If an existing .bin file is specified, upload it to the device
         elif bin_path:
-            if compare_bin_w_device(device, bin_path):
+            if (not arguments["--force"]) and compare_bin_w_device(device, bin_path):
                 print("\nDevice memory matches the .bin file. Skipping flashing.")
             else:
                 upload_bin(device, bin_path)
