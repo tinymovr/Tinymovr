@@ -184,7 +184,7 @@ TM_RAMFUNC void CLControlStep(void)
     // separate because the latter takes into account a user-configurable deadband
     // around the position setpoint, where the integrator "sees" no error
     float vel_setpoint = state.vel_ramp_setpoint ;
-    float vel_setpoint_integral = state.vel_ramp_setpoint ;
+    float vel_setpoint_integral = state.vel_ramp_setpoint;
 
     if (state.mode >= CONTROLLER_MODE_POSITION)
     {
