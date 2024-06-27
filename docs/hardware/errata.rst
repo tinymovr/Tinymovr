@@ -3,7 +3,7 @@ Hardware Errata
 
 .. _alpha-erratum-1:
 
-Tinymovr Alpha CAN Bus Connector Erratum
+Tinymovr Alpha CAN Bus Connector
 ****************************************
 
 The CANine v1 Adapter that came with Tinymovr alpha had the DF-13 pins reversed and as such is not compatible with regular DF-13 cables. Alpha users are advised to use the alternative pin header on the board and the included DF-13 to 2.54mm pin converter cable to communicate with Tinymovr, as shown in the diagram below:
@@ -16,7 +16,7 @@ Note above that the red wire should stay disconnected and to the left side of th
 
 .. _alpha-erratum-2:
 
-Tinymovr Alpha USB Micro Connector Erratum
+Tinymovr Alpha USB Micro Connector
 ******************************************
 
 The USB Micro connector used in the v1 adapter was unfortunately not very robust. In order to ensure that there is a good contact between the board and the USB cable, please ensure the male connector of the cable is firmly seated in the female connector of the board.
@@ -33,6 +33,17 @@ Tinymovr R5 UART Silkscreen Reversed
 
 The silkscreen next to the UART port on the rear of Tinymovr R5 has the order of pins reversed. The correct pins are provided in the figure below.
 
+This does not affect R5.2 and above.
+
 .. image:: erratum_R51.png
   :width: 600
   :alt: Tinymovr R5 reversed silkscreen on UART port
+
+.. _r52-erratum-1:
+
+Tinymovr R5.2 FLEX2 Port as SPI
+************************************
+
+Even though Tinymovr R5.2 has the FLEX2 port which can function as SPI, due to a hardware incompatibility this port does not implement SPI correctly. As such, external sensors are only supported on the M5.x series at the moment.
+
+Tinymovr R5.3 and above does not have this issue and supports external SPI sensors normally.
