@@ -34,6 +34,18 @@ Tinymovr supports a number of external sensors over the SPI bus. Currently, the 
   Tinymovr R5.3 and above does not have this issue and supports external SPI sensors normally.
 
 
+MPS MA7XX
+------------------
+
+The MPS MA7XX are compact absolute angle magnetic sensors. We offer a breakout that is compatible with Tinymovr M5.x, but you can also use the MPS supplied evaluation board.
+
+.. image:: MA7XX_M52.jpg
+  :width: 800
+  :alt: MA7XX Sensor Breakout connection diagram for the Tinymovr M5.2
+
+A total of six wires need to be connected: 5V, GND, MISO, MOSI, SCLK and CS.
+
+
 AMS AS5047
 ------------------
 
