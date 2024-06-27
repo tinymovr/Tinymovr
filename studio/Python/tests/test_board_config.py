@@ -27,7 +27,7 @@ ureg = get_registry()
 A = ureg.ampere
 tick = ureg.ticks
 s = ureg.second
-tsleep = 0.20
+tsleep = 0.30
 
 
 class TestBoardConfig(TMTestCase):
@@ -161,6 +161,89 @@ class TestBoardConfig(TMTestCase):
 
         self.tm.erase_config()
         time.sleep(0.2)
+
+    def test_e_save_settings_and_reset(self):
+        """
+        Test case for issue reported by @Phosfor on Discord:
+        1. Configure current limits etc.
+        2. Calibrate the controller
+        3. Make sure everything is working (i.e. enter current/velocity mode)
+        4. Save the configuration
+        5. Reset the tinymovr; all settings are still correct and the tinymovr reports that it is calibrated
+        6. Try to enter current/velocity mode again; the tinymovr says it is in the correct mode and in the control state, but the motor is not turning
+        """
+        # Step 1: Configure current limits etc.
+        self.check_state(0)
+        self.tm.erase_config()
+        time.sleep(0.2)
+
+        self.tm.controller.current.Iq_limit = 15 * A
+        self.tm.controller.velocity.limit = 200000 * tick / s
+        self.tm.controller.velocity.i_gain = 1e-5
+        self.tm.controller.velocity.p_gain = 1.6e-4
+        self.tm.controller.velocity.deadband = 50 * tick
+        self.tm.traj_planner.max_vel = 110000 * tick / s
+        self.tm.traj_planner.max_accel = 500000 * tick / s
+        self.tm.traj_planner.max_decel = 500000 * tick / (s * s)
+
+        # Step 2: Calibrate the controller
+        self.try_calibrate()
+        self.assertEqual(self.tm.motor.calibrated, True)
+
+        # Step 3: Make sure everything is working (i.e. enter current/velocity mode)
+        self.tm.controller.velocity_mode()
+        self.check_state(2)
+        
+        for _ in range(5):
+            new_velocity = random.uniform(-50000, 50000)
+            self.tm.controller.velocity.setpoint = new_velocity * tick / s
+            time.sleep(tsleep)
+            self.assertAlmostEqual(
+                self.tm.sensors.user_frame.velocity_estimate,
+                self.tm.controller.velocity.setpoint,
+                delta=5000 * tick / s,
+            )
+        
+        self.tm.controller.idle()
+        time.sleep(0.1)
+
+        # Step 4: Save the configuration
+        self.tm.save_config()
+        time.sleep(0.2)
+
+        # Step 5: Reset the tinymovr; all settings are still correct and the tinymovr reports that it is calibrated
+        self.reset_and_wait()
+        self.assertEqual(self.tm.motor.calibrated, True)
+        self.assertAlmostEqual(self.tm.controller.current.Iq_limit, 15 * A)
+        self.assertAlmostEqual(self.tm.controller.velocity.limit, 200000 * tick / s)
+        self.assertAlmostEqual(self.tm.controller.velocity.i_gain, 1e-5)
+        self.assertAlmostEqual(self.tm.controller.velocity.p_gain, 1.6e-4)
+        self.assertAlmostEqual(self.tm.controller.velocity.deadband, 50 * tick)
+        self.assertAlmostEqual(self.tm.traj_planner.max_vel, 110000 * tick / s)
+        self.assertAlmostEqual(self.tm.traj_planner.max_accel, 500000 * tick / s)
+        self.assertAlmostEqual(self.tm.traj_planner.max_decel, 500000 * tick / (s * s))
+
+        # Step 6: Try to enter current/velocity mode again; the tinymovr says it is in the correct mode and in the control state, but the motor is not turning (and I don't hear any switching noise that I usually hear when the tinymovr is in the active state)
+        self.tm.controller.velocity_mode()
+        self.check_state(2)
+        
+        for _ in range(5):
+            new_velocity = random.uniform(-50000, 50000)
+            self.tm.controller.velocity.setpoint = new_velocity * tick / s
+            time.sleep(tsleep)
+            # Here we expect the motor not to turn, so we check for lack of movement
+            self.assertAlmostEqual(
+                self.tm.sensors.user_frame.velocity_estimate,
+                self.tm.controller.velocity.setpoint,
+                delta=5000 * tick / s,
+            )
+        
+        self.tm.controller.idle()
+        time.sleep(0.1)
+
+        self.tm.erase_config()
+        time.sleep(0.2)
+
 
 
 if __name__ == "__main__":
