@@ -1,4 +1,3 @@
-
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
 //  * Copyright (c) 2020-2023 Ioannis Chatzikonstantinou.
@@ -38,6 +37,7 @@ struct NVMStruct {
     CANConfig can_config;
     TrajPlannerConfig traj_planner_config;
     char version[16];
+    uint32_t checksum;
 };
 
 #define SETTINGS_PAGE (120)
@@ -50,4 +50,5 @@ extern const uint32_t config_size;
 bool nvm_save_config(void);
 bool nvm_load_config(void);
 void nvm_erase(void);
+uint32_t calculate_checksum(const uint8_t *data, size_t len);
 
