@@ -27,8 +27,9 @@ const uint32_t config_size = sizeof(struct NVMStruct);
 
 bool nvm_save_config(void)
 {
-	bool commited = false;
 	uint8_t data[sizeof(struct NVMStruct)];
+	uint8_t readback_data[sizeof(struct NVMStruct)];
+
 	s.node_id_1 = CAN_get_ID();
 	s.node_id_2 = CAN_get_ID();
 	frames_get_config(&(s.frames_config));
@@ -48,9 +49,14 @@ bool nvm_save_config(void)
 		flash_erase_page(SETTINGS_PAGE);
 		flash_write((uint8_t *)SETTINGS_PAGE_HEX, dataBuffer, sizeof(struct NVMStruct));
 		__enable_irq();
-		commited = true;
+
+		memcpy(readback_data, (uint8_t *)SETTINGS_PAGE_HEX, sizeof(struct NVMStruct));
+        if (memcmp(data, readback_data, sizeof(struct NVMStruct)) == 0)
+        {
+            return true;
+        }
 	}
-	return commited;
+	return false;
 }
 
 bool nvm_load_config(void)
