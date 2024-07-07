@@ -50,5 +50,6 @@ extern const uint32_t config_size;
 bool nvm_save_config(void);
 bool nvm_load_config(void);
 void nvm_erase(void);
+void nvm_erase_and_reset(void);
 uint32_t calculate_checksum(const uint8_t *data, size_t len);
 

@@ -49,8 +49,7 @@ bool nvm_save_config(void)
     s.controller_config = *controller_get_config();
     s.can_config = *CAN_get_config();
     s.traj_planner_config = *traj_planner_get_config();
-    strncpy(s.version, GIT_VERSION, sizeof(s.version) - 1);
-    s.version[sizeof(s.version) - 1] = '\0'; // Ensure null-termination
+    strncpy(s.version, GIT_VERSION, sizeof(s.version));
     
     memcpy(data, &s, sizeof(struct NVMStruct) - sizeof(s.checksum));
     s.checksum = calculate_checksum(data, sizeof(struct NVMStruct) - sizeof(s.checksum));
@@ -60,7 +59,7 @@ bool nvm_save_config(void)
     {
         uint8_t *dataBuffer = data;
         __disable_irq();
-        flash_erase_page(SETTINGS_PAGE);
+        nvm_erase();
         flash_write((uint8_t *)SETTINGS_PAGE_HEX, dataBuffer, sizeof(struct NVMStruct));
         __enable_irq();
 
@@ -79,7 +78,7 @@ bool nvm_load_config(void)
     uint32_t calculated_checksum = calculate_checksum((uint8_t *)&s, sizeof(struct NVMStruct) - sizeof(s.checksum));
     if (calculated_checksum != s.checksum)
     {
-        return false; // Checksum mismatch, data is corrupt
+        return false;
     }
 
     if (strncmp(s.version, GIT_VERSION, sizeof(s.version)) == 0)
@@ -99,12 +98,18 @@ bool nvm_load_config(void)
 
 void nvm_erase(void)
 {
-    if (CONTROLLER_STATE_IDLE == controller_get_state())
+    for (uint8_t i = 0; i < SETTINGS_PAGE_COUNT; i++)
+	{
+		flash_erase_page(SETTINGS_PAGE + i);
+	}
+}
+
+// This separate function is needed to interface with the protocol
+void nvm_erase_and_reset(void)
+{
+	if (CONTROLLER_STATE_IDLE == controller_get_state())
     {
-        for (uint8_t i = 0; i < SETTINGS_PAGE_COUNT; i++)
-        {
-            flash_erase_page(SETTINGS_PAGE + i);
-        }
-        system_reset();
-    }
+		nvm_erase();
+		system_reset();
+	}
 }
