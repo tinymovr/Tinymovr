@@ -163,7 +163,7 @@ uint8_t avlos_save_config(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command 
 
 uint8_t avlos_erase_config(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
-    nvm_erase();
+    nvm_erase_and_reset();
 
     return AVLOS_RET_CALL;
 }

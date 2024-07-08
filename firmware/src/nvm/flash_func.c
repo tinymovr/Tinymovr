@@ -22,7 +22,10 @@
 /// @retval None
 ///
 //==============================================================================
-TM_RAMFUNC void flash_erase_page(uint32_t page_num)
+#if defined(__GNUC__)
+    __attribute__((optimize("-O0")))
+#endif
+PAC5XXX_RAMFUNC void flash_erase_page(uint32_t page_num)
 {
     // Enable Write Access to FLash Controller
     PAC55XX_MEMCTL->FLASHLOCK = FLASH_LOCK_ALLOW_WRITE_ERASE_FLASH;
@@ -49,7 +52,10 @@ TM_RAMFUNC void flash_erase_page(uint32_t page_num)
 /// @retval None
 ///
 //==============================================================================
-TM_RAMFUNC void flash_erase_key(uint32_t key)
+#if defined(__GNUC__)
+    __attribute__((optimize("-O0")))
+#endif
+PAC5XXX_RAMFUNC void flash_erase_key(uint32_t key)
 {
     // Enable Write Access to FLash Controller
     PAC55XX_MEMCTL->FLASHLOCK = FLASH_LOCK_ALLOW_WRITE_ERASE_FLASH;

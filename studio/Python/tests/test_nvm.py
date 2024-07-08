@@ -30,7 +30,7 @@ s = ureg.second
 tsleep = 0.30
 
 
-class TestBoardConfig(TMTestCase):
+class TestNVM(TMTestCase):
     def test_a_state_errors(self):
         """
         Test state transitions
