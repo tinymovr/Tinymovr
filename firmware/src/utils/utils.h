@@ -115,7 +115,6 @@ static inline float our_floorf(float x)
 	return (float)((int)x - 1);
 }
 
-
 // based on https://github.com/divideconcept/FastTrigo/blob/master/fasttrigo.cpp
 static inline float cos_32s(float x)
 {
@@ -144,14 +143,24 @@ static inline float fast_sin(float angle)
     return fast_cos(halfpi-angle);
 }
 
-static inline int calculate_parity(int x, int mask)
+typedef struct {
+    float sum_current;
+    float sum_current_squared;
+    uint32_t size;
+} Statistics;
+
+static inline void update_statistics(Statistics *s, float new_current)
 {
-    x &= mask;
-    x ^= x >> 8;
-    x ^= x >> 4;
-    x ^= x >> 2;
-    x ^= x >> 1;
-    return x & 1;
+    s->sum_current += new_current;
+    s->sum_current_squared += new_current * new_current;
+    s->size++;
+}
+
+static inline float calculate_standard_deviation(Statistics *s)
+{
+    float mean = s->sum_current / s->size;
+    float mean_squares = s->sum_current_squared / s->size;
+    return fast_sqrt(mean_squares - mean * mean);
 }
 
 // https://github.com/madcowswe/ODrive/blob/3113aedf081cf40e942d25d3b0b36c8806f11f23/Firmware/MotorControl/utils.c
