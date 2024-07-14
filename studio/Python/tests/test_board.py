@@ -97,6 +97,9 @@ class TestBoard(TMTestCase):
         self.tm.controller.position_mode()
         self.check_state(2)
 
+        self.tm.controller.position.setpoint = 0
+        time.sleep(0.4)
+
         for i in range(5):
             self.tm.controller.position.setpoint = i * 3000 * ticks
             if hw_rev > 20:
