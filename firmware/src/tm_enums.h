@@ -56,7 +56,8 @@ typedef enum
 typedef enum
 {
     CONTROLLER_ERRORS_NONE = 0,
-    CONTROLLER_ERRORS_CURRENT_LIMIT_EXCEEDED = (1 << 0)
+    CONTROLLER_ERRORS_CURRENT_LIMIT_EXCEEDED = (1 << 0), 
+    CONTROLLER_ERRORS_PRE_CL_I_SD_EXCEEDED = (1 << 1)
 } controller_errors_flags;
 
 typedef enum
