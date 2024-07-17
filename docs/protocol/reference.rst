@@ -324,6 +324,8 @@ Flags:
 
 - CURRENT_LIMIT_EXCEEDED
 
+- PRE_CL_I_SD_EXCEEDED
+
 controller.position.setpoint
 -------------------------------------------------------------------
 

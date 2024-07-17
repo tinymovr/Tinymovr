@@ -15,11 +15,11 @@
 //  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/system/system.h"
+#include <src/system/system.h>
 #include <src/sensor/sensor.h>
 #include <src/observer/observer.h>
-#include "src/adc/adc.h"
-#include "src/motor/motor.h"
+#include <src/adc/adc.h>
+#include <src/motor/motor.h>
 #include <src/gatedriver/gatedriver.h>
 #include <src/utils/utils.h>
 #include <src/scheduler/scheduler.h>
@@ -27,6 +27,8 @@
 #include <src/controller/controller.h>
 #include "src/watchdog/watchdog.h"
 
+void CLPreStep(void);
+void CLPreCheck(void);
 void CLControlStep(void);
 static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
                                                             float vel_gain, float *I);
@@ -61,7 +63,10 @@ static ControllerState state = {
     .Iq_integrator = 0.0f,
     .Id_integrator = 0.0f,
 
-    .t_plan = 0.0f};
+    .t_plan = 0.0f
+};
+
+Statistics pre_cl_stats = {0};
 
 #if defined BOARD_REV_R32 || BOARD_REV_R33 || defined BOARD_REV_R5
 
@@ -134,12 +139,38 @@ void Controller_ControlLoop(void)
                 controller_set_state(CONTROLLER_STATE_IDLE);
                 Watchdog_reset();
             }
+            else if ((motor_get_is_gimbal() == false) && pre_cl_stats.size < MAX_CL_INIT_STEPS)
+            {
+                CLPreStep();
+            }
+            else if ((motor_get_is_gimbal() == false) && pre_cl_stats.size == MAX_CL_INIT_STEPS)
+            {
+                state.pos_setpoint = observer_get_pos_estimate(&position_observer);
+                CLPreStep();
+                CLPreCheck();
+            }
             else
             {
                 CLControlStep();
             }
         }
         wait_for_control_loop_interrupt();
+    }
+}
+
+TM_RAMFUNC void CLPreStep(void)
+{
+    gate_driver_set_duty_cycle(&three_phase_zero);
+    // Should approximate zero as from Kirchoff
+    float Iphase_meas_sum = state.I_phase_meas.A + state.I_phase_meas.B + state.I_phase_meas.C; 
+    update_statistics(&pre_cl_stats, Iphase_meas_sum);
+}
+
+TM_RAMFUNC void CLPreCheck(void)
+{
+    if (calculate_standard_deviation(&pre_cl_stats) > PRE_CL_I_SD_MAX)
+    {
+        state.errors |= CONTROLLER_ERRORS_PRE_CL_I_SD_EXCEEDED;
     }
 }
 
@@ -312,7 +343,6 @@ TM_RAMFUNC void controller_set_state(controller_state_options new_state)
     {
         if ((new_state == CONTROLLER_STATE_CL_CONTROL) && (state.state == CONTROLLER_STATE_IDLE) && (!errors_exist()) && motor_get_calibrated())
         {
-            state.pos_setpoint = observer_get_pos_estimate(&position_observer);
             gate_driver_enable();
             state.state = CONTROLLER_STATE_CL_CONTROL;
         }
@@ -325,6 +355,7 @@ TM_RAMFUNC void controller_set_state(controller_state_options new_state)
         {
             gate_driver_set_duty_cycle(&three_phase_zero);
             gate_driver_disable();
+            memset(&pre_cl_stats, 0, sizeof(pre_cl_stats));
             state.state = CONTROLLER_STATE_IDLE;
         }
     }

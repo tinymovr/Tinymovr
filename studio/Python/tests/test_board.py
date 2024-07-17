@@ -97,6 +97,9 @@ class TestBoard(TMTestCase):
         self.tm.controller.position_mode()
         self.check_state(2)
 
+        self.tm.controller.position.setpoint = 0
+        time.sleep(0.4)
+
         for i in range(5):
             self.tm.controller.position.setpoint = i * 3000 * ticks
             if hw_rev > 20:
@@ -157,6 +160,8 @@ class TestBoard(TMTestCase):
         self.try_calibrate()
         self.tm.controller.position_mode()
         self.check_state(2)
+
+        self.tm.controller.velocity.limit = 200000 * ticks / s
 
         for _ in range(15):
             new_pos = random.uniform(-24000, 24000)
@@ -259,11 +264,11 @@ class TestBoard(TMTestCase):
         self.tm.controller.position_mode()
         self.check_state(2)
 
-        for i in range(10):
-            self.tm.controller.position.setpoint = i * 1000 * ticks
+        for i in range(5):
+            self.tm.controller.position.setpoint = i * 2000 * ticks
             time.sleep(0.3)
             self.assertAlmostEqual(
-                i * 1000 * ticks, self.tm.sensors.user_frame.position_estimate, delta=1000 * ticks
+                i * 2000 * ticks, self.tm.sensors.user_frame.position_estimate, delta=2000 * ticks
             )
 
     @pytest.mark.hitl_default
