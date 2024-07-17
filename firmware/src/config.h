@@ -31,6 +31,8 @@
 #define PWM_FREQ_HZ              (20000)
 #define SYSTICK_FREQ_HZ          (1000)
 
+#define MAX_CALIBRATION_POWER 30.0f // W
+
 // Control parameters
 #define PWM_LIMIT                   (0.8f)
 #define I_INTEGRATOR_DECAY_FACTOR   (0.995f)
