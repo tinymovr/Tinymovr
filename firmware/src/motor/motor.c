@@ -88,7 +88,8 @@ bool motor_calibrate_resistance(void)
         {
             ADC_get_phase_currents(&I_phase_meas);
             
-            if (powf(V_setpoint, 2) / MAX_PHASE_RESISTANCE > MAX_CALIBRATION_POWER)
+			// 
+            if (V_setpoint > MAX_CALIBRATION_VOLTAGE && I_phase_meas.A < MIN_CALIBRATION_CURRENT)
             {
                 uint8_t *error_ptr = motor_get_error_ptr();
                 *error_ptr |= MOTOR_ERRORS_ABNORMAL_CALIBRATION_VOLTAGE;
