@@ -83,17 +83,30 @@ bool motor_calibrate_resistance(void)
         float V_setpoint = 0.0f;
         FloatTriplet I_phase_meas = {0.0f};
         FloatTriplet modulation_values = {0.0f};
+        
         for (uint32_t i = 0; i < CAL_R_LEN; i++)
         {
             ADC_get_phase_currents(&I_phase_meas);
+            
+			// 
+            if (V_setpoint > MAX_CALIBRATION_VOLTAGE && I_phase_meas.A < MIN_CALIBRATION_CURRENT)
+            {
+                uint8_t *error_ptr = motor_get_error_ptr();
+                *error_ptr |= MOTOR_ERRORS_ABNORMAL_CALIBRATION_VOLTAGE;
+                gate_driver_set_duty_cycle(&three_phase_zero);
+                return false;
+            }
+            
             V_setpoint += CAL_V_GAIN * (I_cal - I_phase_meas.A);
             const float pwm_setpoint = V_setpoint / system_get_Vbus();
             SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
             gate_driver_set_duty_cycle(&modulation_values);
             wait_for_control_loop_interrupt();
         }
+        
         const float R = our_fabsf(V_setpoint / I_cal);
         gate_driver_set_duty_cycle(&three_phase_zero);
+        
         if ((R <= MIN_PHASE_RESISTANCE) || (R >= MAX_PHASE_RESISTANCE))
         {
             uint8_t *error_ptr = motor_get_error_ptr();
@@ -107,6 +120,7 @@ bool motor_calibrate_resistance(void)
     }
     return true;
 }
+
 
 bool motor_calibrate_inductance(void)
 {

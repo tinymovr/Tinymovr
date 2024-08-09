@@ -334,7 +334,7 @@ remote_attributes:
         setter_name: motor_set_I_cal
         summary: The calibration current.
       - name: errors
-        flags: [PHASE_RESISTANCE_OUT_OF_RANGE, PHASE_INDUCTANCE_OUT_OF_RANGE, POLE_PAIRS_CALCULATION_DID_NOT_CONVERGE, POLE_PAIRS_OUT_OF_RANGE]
+        flags: [PHASE_RESISTANCE_OUT_OF_RANGE, PHASE_INDUCTANCE_OUT_OF_RANGE, POLE_PAIRS_CALCULATION_DID_NOT_CONVERGE, POLE_PAIRS_OUT_OF_RANGE, ABNORMAL_CALIBRATION_VOLTAGE]
         meta: {dynamic: True}
         getter_name: motor_get_errors
         summary: Any motor/calibration errors, as a bitmask

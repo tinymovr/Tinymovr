@@ -759,6 +759,8 @@ Flags:
 
 - POLE_PAIRS_OUT_OF_RANGE
 
+- ABNORMAL_CALIBRATION_VOLTAGE
+
 sensors.user_frame.position_estimate
 -------------------------------------------------------------------
 
