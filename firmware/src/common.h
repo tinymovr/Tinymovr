@@ -92,7 +92,7 @@
 
 #if defined BOARD_REV_R32 || defined BOARD_REV_R33
 #define BOARD_REV_R3
-#elif defined BOARD_REV_R50 || BOARD_REV_R51 || defined BOARD_REV_R52
+#elif defined BOARD_REV_R50 || BOARD_REV_R51 || defined BOARD_REV_R52 || defined BOARD_REV_R53
 #define BOARD_REV_R5
 #elif defined BOARD_REV_M51
 #define BOARD_REV_M5
@@ -118,6 +118,8 @@
 #define BOARD_REV_IDX 11
 #elif defined BOARD_REV_R52
 #define BOARD_REV_IDX 12
+#elif defined BOARD_REV_R53
+#define BOARD_REV_IDX 13
 #elif defined BOARD_REV_M50
 #define BOARD_REV_IDX 20
 #elif defined BOARD_REV_M51
