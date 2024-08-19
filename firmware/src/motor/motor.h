@@ -28,14 +28,14 @@
 #define MIN_PHASE_INDUCTANCE (5e-6f)
 #define MAX_PHASE_INDUCTANCE (1e-3f)
 #define MAX_CALIBRATION_VOLTAGE (0.5f) // V
-#define MIN_CALIBRATION_CURRENT (0.05f) // A
+#define MIN_CALIBRATION_CURRENT (0.2f) // A
 #elif defined BOARD_REV_M5
 #define MIN_PHASE_RESISTANCE (0.5f)
 #define MAX_PHASE_RESISTANCE (20.0f)
 #define MIN_PHASE_INDUCTANCE (1e-5f)
 #define MAX_PHASE_INDUCTANCE (1e-2f)
 #define MAX_CALIBRATION_VOLTAGE (5.0f) // V
-#define MIN_CALIBRATION_CURRENT (0.01f) // A
+#define MIN_CALIBRATION_CURRENT (0.05f) // A
 #endif
 
 #define CAL_R_LEN             (2 * PWM_FREQ_HZ)
@@ -44,6 +44,7 @@
 #define CAL_STAY_LEN          (PWM_FREQ_HZ / 2)
 #define CAL_DIR_LEN           (3 * PWM_FREQ_HZ)
 #define CAL_PHASE_TURNS       (8)
+#define CAL_I_GAIN            (0.05f)
 #if defined BOARD_REV_R32 || BOARD_REV_R33 || defined BOARD_REV_R5
 #define CAL_V_GAIN            (0.0005f)
 #define CAL_V_INDUCTANCE      (2.0f)
