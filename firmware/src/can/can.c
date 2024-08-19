@@ -49,7 +49,16 @@ const size_t endpoint_count = sizeof(avlos_endpoints) / sizeof(avlos_endpoints[0
 
 void CAN_init(void)
 {
-#if defined(BOARD_REV_R52)
+#if defined(BOARD_REV_R53)
+    // Clearing bits for MUX F this way completely crashed the mcu
+    // no hardfault or anything, just debugger disconnected. 
+    // It was not possible connect via swd afterwards so the
+    // board got bricked. Thus avoid this command. Thankfully
+    // it is not necessary for enabling the gpio.
+    // PAC55XX_SCC->PFMUXSEL.w &= 0xFFFFFF0F;        // Clear bits to select GPIO function
+    PAC55XX_GPIOF->MODE.P5 = IO_PUSH_PULL_OUTPUT; // GPIO configured as an output
+    PAC55XX_GPIOF->OUT.P5 = 0;                    // Set low to force transceiver into normal mode
+#elif defined(BOARD_REV_R52)
     PAC55XX_SCC->PDMUXSEL.w &= 0xFFFFFF0F;        // Clear bits to select GPIO function
     PAC55XX_GPIOD->MODE.P7 = IO_PUSH_PULL_OUTPUT; // GPIO configured as an output
     PAC55XX_GPIOD->OUT.P7 = 0;                    // Set low to force transceiver into normal mode
@@ -83,6 +92,7 @@ void CAN_init(void)
     PAC55XX_GPIOD->OUT.P7 = 1;                    // Set high to set IO voltage to 3V3
     PAC55XX_GPIOD->MODE.P4 = IO_PUSH_PULL_OUTPUT; // GPIO configured as an output
     PAC55XX_GPIOD->OUT.P4 = 0;                    // Set low to force transceiver into normal mode
+
 
 #endif
 

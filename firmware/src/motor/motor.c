@@ -79,17 +79,21 @@ bool motor_calibrate_resistance(void)
 {
     if (!motor_get_is_gimbal())
     {
-        float I_cal = motor_get_I_cal();
-        float V_setpoint = 0.0f;
         FloatTriplet I_phase_meas = {0.0f};
         FloatTriplet modulation_values = {0.0f};
+
+		ADC_get_phase_currents(&I_phase_meas);
+
+		float I_meas = I_phase_meas.A;
+		float I_cal = motor_get_I_cal();
+        float V_setpoint = 0.0f;
         
         for (uint32_t i = 0; i < CAL_R_LEN; i++)
         {
             ADC_get_phase_currents(&I_phase_meas);
             
 			// 
-            if (V_setpoint > MAX_CALIBRATION_VOLTAGE && I_phase_meas.A < MIN_CALIBRATION_CURRENT)
+            if (V_setpoint > MAX_CALIBRATION_VOLTAGE && I_meas < MIN_CALIBRATION_CURRENT)
             {
                 uint8_t *error_ptr = motor_get_error_ptr();
                 *error_ptr |= MOTOR_ERRORS_ABNORMAL_CALIBRATION_VOLTAGE;
@@ -97,7 +101,8 @@ bool motor_calibrate_resistance(void)
                 return false;
             }
             
-            V_setpoint += CAL_V_GAIN * (I_cal - I_phase_meas.A);
+            V_setpoint += CAL_V_GAIN * (I_cal - I_meas);
+			I_meas += CAL_I_GAIN * (I_phase_meas.A - I_meas);
             const float pwm_setpoint = V_setpoint / system_get_Vbus();
             SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
             gate_driver_set_duty_cycle(&modulation_values);

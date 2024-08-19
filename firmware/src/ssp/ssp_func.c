@@ -661,11 +661,15 @@ void ssp_io_config(SSP_TYPE ssp, SSP_MS_TYPE ms_mode)
 
         case SSPD:
             // Select ssp D peripheral choose one!
-//            SSPD_IO_Select_PD4567(ms_mode);
 //            SSPD_IO_Select_PE4567(ms_mode);
             SSPD_IO_Select_PF4567(ms_mode);
 //            SSPD_IO_Select_PG0123(ms_mode);
 //            SSPD_IO_Select_PG4567(ms_mode);
+            break;
+
+        case SSPD_PD4567:
+            SSPD_IO_Select_PD4567(ms_mode);
+
             break;
 
         default:

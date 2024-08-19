@@ -35,6 +35,7 @@ tsleep = 0.20
 class TestBoard(TMTestCase):
 
     @pytest.mark.hitl_default
+    @pytest.mark.hitl_mini
     def test_a_sensor_readings(self):
         """
         Test sensor readings
@@ -47,6 +48,7 @@ class TestBoard(TMTestCase):
         self.assertLess(st.pstdev(pos_estimates) * ticks, 5 * ticks)
 
     @pytest.mark.hitl_default
+    @pytest.mark.hitl_mini
     def test_b_invalid_values(self):
         """
         Test rejection of invalid values for limits and gains
@@ -77,6 +79,7 @@ class TestBoard(TMTestCase):
         time.sleep(2)
 
     @pytest.mark.hitl_default
+    @pytest.mark.hitl_mini
     def test_c_calibrate(self):
         """
         Test board calibration if not calibrated
@@ -86,6 +89,7 @@ class TestBoard(TMTestCase):
 
     @pytest.mark.eol
     @pytest.mark.hitl_default
+    @pytest.mark.hitl_mini
     def test_d_position_control(self):
         """
         Test position control
@@ -111,10 +115,12 @@ class TestBoard(TMTestCase):
             )
 
     @pytest.mark.hitl_default
+    @pytest.mark.hitl_mini
     def test_e_velocity_control(self):
         """
         Test velocity control
         """
+        hw_rev = self.tm.hw_revision
         self.check_state(0)
         self.try_calibrate()
         self.tm.controller.velocity_mode()
@@ -122,50 +128,65 @@ class TestBoard(TMTestCase):
 
         R = 15
 
+        if hw_rev > 20:
+            multiplier = 4000 * ticks / s
+            max_delta = 15000 * ticks / s
+        else:
+            multiplier = 20000 * ticks / s
+            max_delta = 30000 * ticks / s
+
         velocity_pairs = []
 
         for i in range(R):
-            target = i * 20000 * ticks / s
+            target = i * multiplier
             self.tm.controller.velocity.setpoint = target
             time.sleep(tsleep)
             velocity_pairs.append((target, self.tm.sensors.user_frame.velocity_estimate))
 
         for i in range(R):
-            target = (R - i) * 20000 * ticks / s
+            target = (R - i) * multiplier
             self.tm.controller.velocity.setpoint = target
             time.sleep(tsleep)
             velocity_pairs.append((target, self.tm.sensors.user_frame.velocity_estimate))
 
         for i in range(R):
-            target = -i * 20000 * ticks / s
+            target = -i * multiplier
             self.tm.controller.velocity.setpoint = target
             time.sleep(tsleep)
             velocity_pairs.append((target, self.tm.sensors.user_frame.velocity_estimate))
 
         for i in range(R):
-            target = (i - R) * 20000 * ticks / s
+            target = (i - R) * multiplier
             self.tm.controller.velocity.setpoint = target
             time.sleep(tsleep)
             velocity_pairs.append((target, self.tm.sensors.user_frame.velocity_estimate))
 
         for target, estimate in velocity_pairs:
-            self.assertAlmostEqual(target, estimate, delta=30000 * ticks / s)
+            self.assertAlmostEqual(target, estimate, delta=max_delta)
 
     @pytest.mark.hitl_default
+    @pytest.mark.hitl_mini
     def test_f_random_pos_control(self):
         """
         Test random positions
         """
+        hw_rev = self.tm.hw_revision
         self.check_state(0)
         self.try_calibrate()
         self.tm.controller.position_mode()
         self.check_state(2)
 
-        self.tm.controller.velocity.limit = 200000 * ticks / s
+        if hw_rev > 20:
+            self.tm.controller.velocity.limit = 100000 * ticks / s
+            tick_range = 10000
+        else:
+            self.tm.controller.velocity.limit = 200000 * ticks / s
+            tick_range = 24000
 
         for _ in range(15):
-            new_pos = random.uniform(-24000, 24000)
+            new_pos = random.uniform(-tick_range, tick_range)
             self.tm.controller.position.setpoint = new_pos * ticks
+            
             time.sleep(0.35)
             self.assertAlmostEqual(
                 self.tm.sensors.user_frame.position_estimate,

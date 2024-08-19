@@ -126,8 +126,11 @@ void Controller_ControlLoop(void)
         {
             state.is_calibrating = true;
             system_reset_calibration();
-            (void)(ADC_calibrate_offset() && motor_calibrate_resistance() && motor_calibrate_inductance());
-            (void)(sensors_calibrate());
+            // TODO: sensors_calibrate should also return bool, and be integrated in the calibration sequence
+            if (ADC_calibrate_offset() && motor_calibrate_resistance() && motor_calibrate_inductance())
+            {
+                (void)(sensors_calibrate());
+            }
             state.is_calibrating = false;
             controller_set_state(CONTROLLER_STATE_IDLE); 
         }
