@@ -38,7 +38,8 @@ typedef enum
     SSPA = 0,
     SSPB = 1,
     SSPC = 2,
-    SSPD = 3
+    SSPD = 3,
+    SSPD_PD4567 = 4
 } SSP_TYPE;
 
 
