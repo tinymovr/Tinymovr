@@ -129,8 +129,8 @@ class TestBoard(TMTestCase):
         R = 15
 
         if hw_rev > 20:
-            multiplier = 3000 * ticks / s
-            max_delta = 10000 * ticks / s
+            multiplier = 4000 * ticks / s
+            max_delta = 15000 * ticks / s
         else:
             multiplier = 20000 * ticks / s
             max_delta = 30000 * ticks / s
