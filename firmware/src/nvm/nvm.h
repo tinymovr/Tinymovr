@@ -1,4 +1,3 @@
-
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
 //  * Copyright (c) 2020-2023 Ioannis Chatzikonstantinou.
@@ -17,35 +16,40 @@
 
 #pragma once
 
+#include <src/xfs.h>
 #include <src/adc/adc.h>
 #include <src/motor/motor.h>
-#include <src/encoder/hall.h>
-#include <src/encoder/ma7xx.h>
-#include <src/encoder/encoder.h>
+#include <src/sensor/sensors.h>
 #include <src/observer/observer.h>
 #include <src/controller/controller.h>
 #include <src/controller/trajectory_planner.h>
 #include <src/can/can.h>
 
-#define SETTINGS_PAGE (120)
-#define SETTINGS_PAGE_HEX (0x0001E000)
-
 struct NVMStruct {
     uint8_t node_id_1;
     uint8_t node_id_2;
+    FramesConfig frames_config;
     ADCConfig adc_config;
     MotorConfig motor_config;
-    HallConfig hall_config;
-    MA7xxConfig ma7xx_config;
-    EncoderConfig encoder_config;
-    ObserverConfig observer_config;
+    SensorsConfig sensors_config;
+    ObserversConfig observers_config;
     ControllerConfig controller_config;
     CANConfig can_config;
     TrajPlannerConfig traj_planner_config;
     char version[16];
+    uint32_t checksum;
 };
+
+#define SETTINGS_PAGE (120)
+#define SETTINGS_PAGE_HEX (0x0001E000)
+#define NVM_PAGE_SIZE (1024)
+#define SETTINGS_PAGE_COUNT (DIVIDE_AND_ROUND_UP(sizeof(struct NVMStruct), NVM_PAGE_SIZE))
+
+extern const uint32_t config_size;
 
 bool nvm_save_config(void);
 bool nvm_load_config(void);
 void nvm_erase(void);
+void nvm_erase_and_reset(void);
+uint32_t calculate_checksum(const uint8_t *data, size_t len);
 

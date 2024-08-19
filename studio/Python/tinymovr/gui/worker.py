@@ -20,9 +20,10 @@ import time
 import can
 from PySide6 import QtCore
 from PySide6.QtCore import QObject
+from tinymovr.channel import ResponseError
 from tinymovr.gui import TimedGetter, get_dynamic_attrs
-from tinymovr.tee import init_tee, destroy_tee
-from tinymovr.discovery import Discovery
+from tinymovr.bus_router import init_router, destroy_router
+from tinymovr.device_discovery import DeviceDiscovery
 from tinymovr.constants import base_node_name
 
 
@@ -32,24 +33,29 @@ class Worker(QObject):
     regenSignal = QtCore.Signal(dict)
     handleErrorSignal = QtCore.Signal(object)
 
-    def __init__(self, busparams, logger):
+    def __init__(self, bus_params, logger, bus_class=can.Bus, refresh_period=0.3):
         super().__init__()
         self.logger = logger
         self.mutx = QtCore.QMutex()
-        init_tee(can.Bus(**busparams))
+        #TODO: router init should not happen in GUI worker
+        init_router(bus_class, bus_params, logger=logger)
         self._init_containers()
-        self.dsc = Discovery(
+        self.dsc = DeviceDiscovery(
             self._device_appeared, self._device_disappeared, self.logger
         )
         self.timed_getter = TimedGetter()
+
+        self.refresh_period = refresh_period
 
         self.dt_update = 1
         self.dt_load = 0
         self.t_last_update = time.time()
 
+        self.visible_attrs = set()
+
     @QtCore.Slot()
     def stop(self):
-        destroy_tee()
+        destroy_router()
 
     def force_regen(self):
         self.mutx.lock()
@@ -57,6 +63,7 @@ class Worker(QObject):
         self.mutx.unlock()
 
     def reset(self):
+        self.logger.info("Resetting Studio...")
         self.mutx.lock()
         self.dsc.reset()
         self._init_containers()
@@ -78,18 +85,19 @@ class Worker(QObject):
             except Exception as e:
                 self.handleErrorSignal.emit(e)
         start_time = time.time()
-        self.dynamic_attrs.sort(
+        attrs_to_update = [attr for attr in self.dynamic_attrs if attr.full_name in self.visible_attrs]
+        attrs_to_update.sort(
             key=lambda attr: self.dynamic_attrs_last_update[attr.full_name]
             if attr.full_name in self.dynamic_attrs_last_update
             else 0
         )
-        for attr in self.dynamic_attrs:
+        for attr in attrs_to_update:
             t = (
                 self.dynamic_attrs_last_update[attr.full_name]
                 if attr.full_name in self.dynamic_attrs_last_update
                 else 0
             )
-            if (attr.full_name not in vals) and (start_time - t > 0.5):
+            if (attr.full_name not in vals) and (start_time - t > self.refresh_period):
                 try:
                     vals[attr.full_name] = self.timed_getter.get_value(attr.get_value)
                     self.dynamic_attrs_last_update[attr.full_name] = start_time
@@ -97,6 +105,13 @@ class Worker(QObject):
                     self.handleErrorSignal.emit(e)
                 break
         return vals
+    
+    @QtCore.Slot(set)
+    def update_visible_attrs(self, attrs):
+        """
+        Update the set of visible attributes based on the signal from the main window.
+        """
+        self.visible_attrs = attrs
 
     def _init_containers(self):
         self.active_attrs = set()
@@ -126,7 +141,11 @@ class Worker(QObject):
 
     def _device_appeared(self, device, node_id):
         self.mutx.lock()
-        display_name = "{}{}".format(device.name, node_id)
+        try:
+            display_name = "{}{}".format(device.name, node_id)
+            self.logger.info("Found {} (uid {})".format(display_name, device.uid))
+        except ResponseError as e:
+            self.handleErrorSignal.emit(e)
         self.devices_by_name[display_name] = device
         self.names_by_id[node_id] = display_name
         device.name = display_name

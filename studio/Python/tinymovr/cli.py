@@ -19,8 +19,8 @@ import IPython
 from traitlets.config import Config
 from docopt import docopt
 
-from tinymovr import init_tee, destroy_tee
-from tinymovr.discovery import Discovery
+from tinymovr import init_router, destroy_router
+from tinymovr.device_discovery import DeviceDiscovery
 from tinymovr.constants import app_name
 from tinymovr.config import get_bus_config, configure_logging, add_spec
 
@@ -62,8 +62,7 @@ def spawn():
     bitrate = int(arguments["--bitrate"])
 
     if not channel:
-        params = get_bus_config(buses)
-        params["bitrate"] = bitrate
+        params = get_bus_config(buses, bitrate=bitrate)
     else:
         params = {"bustype": buses[0], "channel": channel, "bitrate": bitrate}
 
@@ -85,15 +84,16 @@ def spawn():
 
     print(app_name + " " + str(version))
 
-    init_tee(can.Bus(**params))
-    dsc = Discovery(node_appeared, node_disappeared, logger)
+    #TODO: router init should not happen in CLI spawn function
+    init_router(can.Bus, params, logger=logger)
+    dsc = DeviceDiscovery(node_appeared, node_disappeared, logger)
     print("Listening for nodes...")
 
     c = Config()
     c.TerminalIPythonApp.display_banner = False
     IPython.start_ipython(argv=[], config=c, user_ns=user_ns)
     logger.debug("Exiting...")
-    destroy_tee()
+    destroy_router()
 
 
 if __name__ == "__main__":

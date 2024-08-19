@@ -36,23 +36,23 @@ void UART_WriteAddr(uint8_t addr, int32_t data)
         controller_set_Iq_setpoint_user_frame(0);
         controller_set_vel_setpoint_user_frame(0);
         controller_set_pos_setpoint_user_frame(data);
-        controller_set_mode(CTRL_POSITION);
+        controller_set_mode(CONTROLLER_MODE_POSITION);
         break;
 
     case 'V': // vel setpoint
         controller_set_Iq_setpoint_user_frame(0);
         controller_set_vel_setpoint_user_frame(data);
-        controller_set_mode(CTRL_VELOCITY);
+        controller_set_mode(CONTROLLER_MODE_VELOCITY);
         controller_set_vel_setpoint_user_frame((float)data);
         break;
 
     case 'I': // current setpoint
-        controller_set_mode(CTRL_CURRENT);
+        controller_set_mode(CONTROLLER_MODE_CURRENT);
         controller_set_Iq_setpoint_user_frame((float)data * ONE_OVER_UART_I_SCALING_FACTOR);
         break;
 
     case 'G': // velocity integrator gain
-        controller_set_vel_integrator_gain((float)data * ONE_OVER_UART_VEL_INT_SCALING_FACTOR);
+        controller_set_vel_integral_gain((float)data * ONE_OVER_UART_VEL_INT_SCALING_FACTOR);
         break;
 
     case 'Y': // Position gain
@@ -125,7 +125,7 @@ int32_t UART_ReadAddr(uint8_t addr)
     break;
 
     case 'p': // pos estimate
-        ret_val = observer_get_pos_estimate_user_frame();
+        ret_val = user_frame_get_pos_estimate();
         break;
 
     case 'P': // pos setpoint
@@ -133,7 +133,7 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
     case 'v': // vel estimate
-        ret_val = (int32_t)observer_get_vel_estimate_user_frame();
+        ret_val = (int32_t)user_frame_get_vel_estimate();
         break;
 
     case 'V': // vel setpoint
@@ -149,7 +149,7 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
     case 'G': // velocity integrator setpoint
-        ret_val = (int32_t)(controller_get_vel_integrator_gain() * UART_VEL_INT_SCALING_FACTOR);
+        ret_val = (int32_t)(controller_get_vel_integral_gain() * UART_VEL_INT_SCALING_FACTOR);
         break;
 
     case 'H': // phase resistance
@@ -181,15 +181,15 @@ int32_t UART_ReadAddr(uint8_t addr)
         break;
 
     case 'Q': // calibrate
-        controller_set_state(STATE_CALIBRATE);
+        controller_set_state(CONTROLLER_STATE_CALIBRATE);
         break;
 
     case 'A': // closed loop
-        controller_set_state(STATE_CL_CONTROL);
+        controller_set_state(CONTROLLER_STATE_CL_CONTROL);
         break;
 
     case 'Z': // idle
-        controller_set_state(STATE_IDLE);
+        controller_set_state(CONTROLLER_STATE_IDLE);
         break;
 
     case 'R': // reset mcu

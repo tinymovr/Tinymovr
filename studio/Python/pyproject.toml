@@ -1,0 +1,14 @@
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+markers = [
+    "hitl_default: marks default hardware in the loop tests",
+    "sensor_amt22: marks tests that need the amt22 sensor",
+    "sensor_as5047: marks tests that need the as5047 sensor",
+    "sensor_hall: marks tests that need a hall effect sensored motor",
+    "eol: marks tests for end-of-line testing",
+    "dfu: marks tests for dfu testing",
+]

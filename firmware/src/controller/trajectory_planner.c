@@ -23,8 +23,8 @@
 #include <src/controller/trajectory_planner.h>
 
 static TrajPlannerConfig config = {
-	.max_accel = ENCODER_TICKS_FLOAT,
-	.max_decel = ENCODER_TICKS_FLOAT,
+	.max_accel = SENSOR_COMMON_RES_TICKS_FLOAT,
+	.max_decel = SENSOR_COMMON_RES_TICKS_FLOAT,
 	.max_vel = 50000.0f,
 	.deltat_accel = 2.0f,
 	.deltat_decel = 2.0f,
@@ -40,7 +40,7 @@ bool planner_move_to_tlimit(float p_target)
 	if (!errors_exist() && planner_prepare_plan_tlimit(p_target, config.deltat_total, config.deltat_accel, config.deltat_decel, &motion_plan))
 	{
 		controller_set_motion_plan(motion_plan);
-		controller_set_mode(CTRL_TRAJECTORY);
+		controller_set_mode(CONTROLLER_MODE_TRAJECTORY);
 		response = true;
 	}
 	return response;
@@ -53,7 +53,7 @@ bool planner_move_to_vlimit(float p_target)
 	if (!errors_exist() && planner_prepare_plan_vlimit(p_target, config.max_vel, config.max_accel, config.max_decel, &motion_plan))
 	{
 		controller_set_motion_plan(motion_plan);
-		controller_set_mode(CTRL_TRAJECTORY);
+		controller_set_mode(CONTROLLER_MODE_TRAJECTORY);
 		response = true;
 	}
 	return response;

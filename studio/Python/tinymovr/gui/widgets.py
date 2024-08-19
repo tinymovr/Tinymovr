@@ -31,11 +31,12 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QPushButton,
     QFormLayout,
+    QCheckBox
 )
 from pint.errors import UndefinedUnitError
 from avlos import get_registry
 from avlos.datatypes import DataType
-from tinymovr.gui.helpers import load_icon, load_pixmap, format_value
+from tinymovr.gui.helpers import load_icon, load_pixmap, format_value, strtobool
 
 
 class NodeTreeWidgetItem(QTreeWidgetItem):
@@ -239,10 +240,38 @@ class OptionsTreeWidgetItem(EdgeTreeWidgetItem):
         )
         self.treeWidget().setItemWidget(self, 1, self.combo_box_container)
 
+    def set_text(self, value):
+        self.combo_box_container.combo.setCurrentIndex(self._tm_node.options[value])
+
     @QtCore.Slot()
     def _on_combobox_changed(self, index):
         self._tm_node.set_value(index)
         self.combo_box_container.combo.setCurrentIndex(self._tm_node.get_value())
+
+
+class BoolTreeWidgetItem(EdgeTreeWidgetItem):
+
+    def __init__(self, name, node, *args, **kwargs):
+        super().__init__(name, node, *args, **kwargs)
+        self._checkbox = QCheckBox()
+        # Set the initial state of the checkbox based on the attribute value
+        self._checkbox.setChecked(node.get_value())
+        if not self._tm_node.setter_name:
+            self._checkbox.setEnabled(False)
+        else:
+            self._checkbox.stateChanged.connect(self._on_checkbox_state_changed)
+
+    def _add_to_tree_cb(self):
+        self.treeWidget().setItemWidget(self, 1, self._checkbox)
+
+    def set_text(self, value):
+        self._checkbox.setChecked(strtobool(value))
+
+    @QtCore.Slot()
+    def _on_checkbox_state_changed(self, state):
+        # Convert the checkbox state to a boolean and set the attribute value
+        value = state == QtCore.Qt.Checked
+        self._tm_node.set_value(value)
 
 
 class PlaceholderQTreeWidget(QTreeWidget):

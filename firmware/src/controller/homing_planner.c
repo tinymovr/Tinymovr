@@ -4,27 +4,28 @@
 #include <src/observer/observer.h>
 #include <src/controller/controller.h>
 #include <src/utils/utils.h>
+#include <src/xfs.h>
 #include <homing_planner.h>
 #include <src/can/can_endpoints.h>
 
 static HomingPlannerConfig config = {
-    .homing_velocity = -8192.0f, // ticks/s
+    .homing_velocity = SENSOR_COMMON_RES_TICKS_FLOAT, // ticks/s
     .max_homing_t = 20.0f, // s
-    .max_stay_vel = 4000.0f, // ticks/s
-    .max_stay_dpos = 1000.0f, // ticks
+    .max_stay_vel = (SENSOR_COMMON_RES_TICKS_FLOAT/2.0f), // ticks/s
+    .max_stay_dpos = (SENSOR_COMMON_RES_TICKS_FLOAT/8.0f), // ticks
     .max_stay_t = 1.0f, // s
-    .retract_distance = 1000.0f // ticks
+    .retract_distance = (SENSOR_COMMON_RES_TICKS_FLOAT/8.0f) // ticks
 };
 
 static HomingPlannerState state = {0};
 
 bool homing_planner_home(void)
 {
-    if (!errors_exist() && controller_get_mode() != CTRL_HOMING)
+    if (!errors_exist() && controller_get_mode() != CONTROLLER_MODE_HOMING)
     {
         state.stay_t_current = 0;
         state.home_t_current = 0;
-        controller_set_mode(CTRL_HOMING);
+        controller_set_mode(CONTROLLER_MODE_HOMING);
         state.warnings = HOMING_WARNINGS_NONE;
         return true;
     }
@@ -50,14 +51,14 @@ TM_RAMFUNC bool homing_planner_evaluate()
         controller_set_pos_setpoint_user_frame(next_pos_setpoint);
         controller_set_vel_setpoint_user_frame(config.homing_velocity);
 
-        if (fabsf(observer_get_vel_estimate_user_frame()) < config.max_stay_vel && fabsf(current_pos_setpoint - observer_get_pos_estimate_user_frame()) > config.max_stay_dpos)
+        const float observer_pos = user_frame_get_pos_estimate();
+        if (fabsf(user_frame_get_vel_estimate()) < config.max_stay_vel && fabsf(current_pos_setpoint - observer_pos) > config.max_stay_dpos)
         {
             state.stay_t_current += PWM_PERIOD_S;
             if (state.stay_t_current >= config.max_stay_t)
             {
                 // First time the endstop is considered found, reset origins and setpoints
-                motor_set_user_offset(0);
-                motor_set_user_offset(observer_get_pos_estimate_user_frame());
+                frame_user_to_position_sensor_set_offset(observer_pos);
                 controller_set_pos_setpoint_user_frame(0);
                 controller_set_vel_setpoint_user_frame(0);
             }

@@ -7,7 +7,7 @@ DEST_DIR="./release_binaries"
 mkdir -p "$DEST_DIR"
 
 # Board revisions for which the firmware needs to be built
-REVISIONS=("R32" "R33" "R50" "R51" "R52" "M51")
+REVISIONS=("R32" "R33" "R50" "R51" "R52" "R53" "M51")
 
 # Build types
 TYPES=("release" "upgrade")

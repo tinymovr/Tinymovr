@@ -1,12 +1,13 @@
 """
 Usage:
-    dfu.py --node_id=ID [--bin=PATH | --recovery] [--no-reset] [--bus=<bus>] [--chan=<chan>] [--bitrate=<bitrate>]
+    dfu.py --node_id=ID [--bin=PATH | --recovery] [--no-reset] [--force] [--bus=<bus>] [--chan=<chan>] [--bitrate=<bitrate>]
 
 Options:
     --node_id=ID The CAN Node ID of the device in DFU mode.
     --bin=PATH   The path of the .bin file to upload.
     --recovery   Perform recovery procedure for inaccessible DFU bootloader.
     --no-reset   Do not perform a reset following successful flashing.
+    --force      Force flashing even if device memory matches the .bin file.
     --bus=<bus>  One or more interfaces to use, first available is used [default: canine,slcan_disco].
     --chan=<chan>  The bus device "channel".
     --bitrate=<bitrate>  CAN bitrate [default: 1000000].
@@ -23,8 +24,8 @@ from rich.progress import Progress
 import IPython
 from traitlets.config import Config
 from docopt import docopt
-from tinymovr.tee import init_tee, destroy_tee
-from tinymovr.config import get_bus_config, create_device
+from tinymovr.bus_router import init_router, destroy_router
+from tinymovr.config import get_bus_config, create_device, configure_logging
 from tinymovr.channel import ResponseError
 
 """
@@ -89,6 +90,7 @@ def upload_bin(device, bin_path):
     """
     total_size = os.path.getsize(bin_path)  # Get the total size of .bin file
     uploaded_size = 0
+
     print("\nErasing flash...")
     try:
         # Assume device.erase_all can take hash_validation and attempt to call it
@@ -100,6 +102,7 @@ def upload_bin(device, bin_path):
         print("\nError while erasing!")
         return
     print("Done.")
+    
     with Progress() as progress:
         task2 = progress.add_task("[orange]Flashing...", total=total_size)
         with open(bin_path, "rb") as bin_file:
@@ -146,9 +149,10 @@ def spawn():
     channel = arguments["--chan"]
     bitrate = int(arguments["--bitrate"])
 
+    logger = configure_logging()
+
     if not channel:
-        params = get_bus_config(buses)
-        params["bitrate"] = bitrate
+        params = get_bus_config(buses, bitrate=bitrate)
     else:
         params = {"bustype": buses[0], "channel": channel, "bitrate": bitrate}
 
@@ -156,7 +160,7 @@ def spawn():
 
         input("Please power off the device and then press any key to continue...")
         print("Now power on the device.")
-        init_tee(can.Bus(**params), timeout=1.0)
+        init_router(can.Bus, params, logger=logger, timeout=1.0)
         while True:
             try:
                 device = create_device(node_id=node_id)
@@ -166,7 +170,7 @@ def spawn():
                 pass
     else:
     
-        init_tee(can.Bus(**params), timeout=1.0)
+        init_router(can.Bus, params, logger=logger, timeout=1.0)
         device = create_device(node_id=node_id)
 
         if not bin_path:
@@ -178,7 +182,7 @@ def spawn():
 
         # If an existing .bin file is specified, upload it to the device
         elif bin_path:
-            if compare_bin_w_device(device, bin_path):
+            if (not arguments["--force"]) and compare_bin_w_device(device, bin_path):
                 print("\nDevice memory matches the .bin file. Skipping flashing.")
             else:
                 upload_bin(device, bin_path)
@@ -186,7 +190,7 @@ def spawn():
                 if not arguments["--no-reset"]:
                     print("Resetting device...")
                     device.reset()
-    destroy_tee()
+    destroy_router()
 
 
 if __name__ == "__main__":

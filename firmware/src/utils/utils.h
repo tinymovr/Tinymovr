@@ -22,6 +22,10 @@
 
 #include "src/common.h"
 
+#define DIVIDE_AND_ROUND_UP(numerator, divisor) (((numerator) + (divisor) - 1) / (divisor))
+
+extern void wait_for_control_loop_interrupt(void);
+
 #if __ARM_FEATURE_FMA && __ARM_FP&4 && !__SOFTFP__ && !BROKEN_VFP_ASM
 
 static inline float fast_sqrt(float x)
@@ -41,6 +45,14 @@ static inline float our_fabsf(float x)
 #error No math implemented without Arm FPU!
 
 #endif
+
+static inline void wait_pwm_cycles(uint32_t cycles)
+{
+    for (uint32_t i = 0; i < cycles; i++)
+    {
+        wait_for_control_loop_interrupt();
+    }
+}
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
@@ -81,7 +93,7 @@ static inline void delay_us(uint32_t us)
     pac_delay_asm(us * 16u);
 }
 
-static inline bool our_clampc(float *d, float min, float max)
+static inline bool our_clampc(float *d, const float min, const float max)
 {
     const float t = *d < min ? min : *d;
     *d = t > max ? max : t;
@@ -102,7 +114,6 @@ static inline float our_floorf(float x)
 	}
 	return (float)((int)x - 1);
 }
-
 
 // based on https://github.com/divideconcept/FastTrigo/blob/master/fasttrigo.cpp
 static inline float cos_32s(float x)
@@ -132,21 +143,24 @@ static inline float fast_sin(float angle)
     return fast_cos(halfpi-angle);
 }
 
-static inline uint16_t crc16_ccitt(const uint32_t block[], uint16_t blockLength, uint16_t crc)
+typedef struct {
+    float sum_current;
+    float sum_current_squared;
+    uint32_t size;
+} Statistics;
+
+static inline void update_statistics(Statistics *s, float new_current)
 {
-    PAC55XX_CRC->SEED.CRCSEED = crc;
+    s->sum_current += new_current;
+    s->sum_current_squared += new_current * new_current;
+    s->size++;
+}
 
-    // Compute CRC using 32-bit input on memory that is 32-bit aligned 
-    while(blockLength)    
-    {
-        PAC55XX_CRC->DATAIN = *block++;             // Input a 32-bit word
-        blockLength = blockLength - 4;              // Decrement Length by 4 bytes
-    }
-    
-    __asm__("NOP");
-    __asm__("NOP");
-
-    return PAC55XX_CRC->OUT.CRCOUT;
+static inline float calculate_standard_deviation(Statistics *s)
+{
+    float mean = s->sum_current / s->size;
+    float mean_squares = s->sum_current_squared / s->size;
+    return fast_sqrt(mean_squares - mean * mean);
 }
 
 // https://github.com/madcowswe/ODrive/blob/3113aedf081cf40e942d25d3b0b36c8806f11f23/Firmware/MotorControl/utils.c

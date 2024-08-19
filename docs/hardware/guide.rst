@@ -36,6 +36,26 @@ Most gimbal motors can be used with Tinymovr M5. Gimbal motors are essentially o
 
    * Motors with trapezoidal back-EMF can also be controlled, but control will be sub-optimal. The trapezoidal back-EMF will appear as residual in the dq frame, as a result it will be much harder for the current controller to regulate phase currents. The tangible result is that the motor may exhibit increased noise and vibration while running.
 
+Limitations
+***********
+
+Tinymovr controllers are designed with certain limitations in terms of motor internal resistance and inductance, to ensure optimal closed loop current control performance.
+
+.. list-table:: Motor Limits
+   :header-rows: 1
+
+   * - Controller Version
+     - Phase Resistance (ohms)
+     - Phase Inductance (henries)
+   * - Tinymovr R5.x and R3.x
+     - 0.01 to 1.0
+     - 5e-6 to 1e-3
+   * - Tinymovr M5.x
+     - 0.5 to 20.0
+     - 1e-5 to 1e-2
+
+Note that motors with parameters outside this range will result in calibration failing. Ensure that the motors you select adhere to these parameters for the best operational experience. You can still use motors outside this range with open loop current control, through :ref:`enabling-gimbal-mode`.
+
 
 Mechanical Setup
 ################
@@ -73,9 +93,9 @@ Sensor Magnet and Mounting Tips
 
 * Ensure the sensor magnet is firmly attached to the motor shaft, otherwise it may slip out of sync. Use strong adhesive to secure.
 
-* It is possible to have the magnet on the rear side of the PCB, i.e. opposite of the magnet sensor IC, but the gap needs to be reduced to account for the PCB thickness. This has been verified by MPS in `this forum post <https://forum.monolithicpower.com/t/mounting-ma702-and-magnet-on-opposite-sides-of-pcb/1609>`_, quoted below: 
+* It is possible to have the magnet on the rear side of the PCB, i.e. opposite of the magnet sensor IC, but the gap needs to be reduced to account for the PCB thickness. This has been verified by MPS in a forum post [1]_, quoted below: 
   *[...] this type of arrangement is possible, what really matters in the end is that there is enough magnetic field reaching the sensor.
-  Of course the minimum distance is imposed by the thickness of the PCB, so it puts some constraints on the design, that you have to take into account when chosing the magnet (you can use our online simulation tool for that). But as long as the PCB is not acting as a magnetic shield (due to copper plane), then it is fine.*
+  Of course the minimum distance is imposed by the thickness of the PCB, so it puts some constraints on the design, that you have to take into account when choosing the magnet (you can use our online simulation tool for that). But as long as the PCB is not acting as a magnetic shield (due to copper plane), then it is fine.*
 
 * Calibration needs to be performed without any loads on the motor. If the motor is coupled to a load, the sensor offset angle may not be determined correctly, leading to a sub-optimal setup.
 
@@ -118,7 +138,7 @@ Connect the CAN bus header to one of the two CAN sockets on the board. It is not
 
 * Tinymovr M5.x: you will need to provide an external 120Ω termination resistor.
 
-In small setups with few nodes and short wires, it is better to enable just a single termination resistor, either on one Tinymovr board or on the CAN adapter. In setups with many nodes and long cables, you may need to enable termination resistors in both terminal nodes.
+In small setups with few nodes and short wires, it is better to enable just a single termination resistor, either on one Tinymovr board or on the CAN adapter. In setups with many nodes and long cables, you may need to enable termination resistors in both terminal nodes. A typical CAN driver has an “open-drain” output structure, meaning that the dominant edge is actively driven and the recessive edge is not. Therefore, properly terminating the bus is very important because it ensures that the recessive edge decays properly, and in time for the next bit's sample point [2]_.
 
 .. warning::
    The UART pins in Tinymovr R5.1 have the silkscreen reversed. If you are planning to use UART with R5.1, consult :ref:`r51-erratum-1`. 
@@ -149,3 +169,7 @@ Multiple nodes can be connected in a single CAN Bus network by means of daisy-ch
 .. image:: daisy_chain.png
   :width: 800
   :alt: Connecting multiple nodes by daisy-chaining
+
+
+.. [1] MPS forum post on mounting MA702 and magnet on opposite sides of PCB: https://forum.monolithicpower.com/t/mounting-ma702-and-magnet-on-opposite-sides-of-pcb/1609
+.. [2] Split Termination, Texas Instruments. Available at `https://www.ti.com/document-viewer/lit/html/SSZTB40#:~:text=for%20each%20termination.-,Split%20Termination,typically%20between%201%2D100nF`.

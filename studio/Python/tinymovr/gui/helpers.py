@@ -16,15 +16,17 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import time
+import logging
+from datetime import datetime
 import os
 import enum
 import pint
 from PySide6 import QtGui
-from PySide6.QtGui import QGuiApplication, QPalette
+from PySide6.QtGui import QGuiApplication, QPalette, QTextCursor
 from PySide6.QtWidgets import QMessageBox, QFileDialog
 from avlos.definitions import RemoteAttribute, RemoteEnum, RemoteBitmask
+import pretty_errors
 import tinymovr
-
 
 app_stylesheet = """
 
@@ -200,6 +202,8 @@ app_stylesheet = """
 
 
 app_stylesheet_dark = """
+
+QSplitter::handle { background-color: black; }
 
 /* --------------------------------------- QPushButton -----------------------------------*/
 
@@ -464,6 +468,67 @@ def magnitude_of(val):
     return val
 
 
+class StreamRedirector(object):
+    """
+    A class to redirect writes from a stream to a QPlainTextEdit, including pretty_errors handling and timestamps.
+    """
+    def __init__(self, widget):
+        self.widget = widget
+        self.buffer = ''
+
+    def write(self, message):
+        # Timestamp the message
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        message_with_timestamp = f"[{timestamp}] {message}"
+
+        # Redirect to the QPlainTextEdit widget
+        self.widget.moveCursor(QtGui.QTextCursor.End)
+        self.widget.insertPlainText(message_with_timestamp)
+        self.widget.ensureCursorVisible()
+
+    def flush(self):
+        pass
+
+
+class QTextBrowserLogger(logging.Handler):
+    """A logging handler that directs logging output to a QTextBrowser widget."""
+    def __init__(self, widget):
+        super().__init__()
+        self.widget = widget
+        self.widget.setReadOnly(True)
+        self.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+
+    def emit(self, record):
+        msg = self.format(record)
+        self.widget.append(self.colorize_message(record.levelno, msg))
+
+    def colorize_message(self, level, message):
+        color = {
+            logging.DEBUG: "lightgreen",
+            logging.INFO: "lightblue",
+            logging.WARNING: "orange",
+            logging.ERROR: "red",
+            logging.CRITICAL: "purple"
+        }.get(level, "black")
+        timestamp = datetime.now().strftime('%H:%M:%S')
+        return f'<font color="gray">[{timestamp}]</font> <font color="{color}">{message}</font>'
+    
+
+def configure_pretty_errors():
+    pretty_errors.configure(
+        separator_character='*',
+        filename_display=pretty_errors.FILENAME_EXTENDED,
+        line_number_first=True,
+        display_link=True,
+        lines_before=5,
+        lines_after=2,
+        line_color=pretty_errors.RED + '> ' + pretty_errors.default_config.line_color,
+        code_color='  ' + pretty_errors.default_config.code_color,
+        truncate_code=True,  # Truncate code lines to not overflow in the GUI
+        display_locals=True
+    )
+
+
 class TimedGetter:
     """
     An interface class that maintains timing
@@ -545,3 +610,19 @@ def get_dynamic_attrs(attr_dict):
             dynamic_attrs.extend(get_dynamic_attrs(attr.remote_attributes))
 
     return dynamic_attrs
+
+
+def strtobool (val):
+    """
+    Convert a string representation of truth to true (1) or false (0).
+    True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
+    are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
+    'val' is anything else.
+    """
+    val = val.lower()
+    if val in ('y', 'yes', 't', 'true', 'on', '1'):
+        return 1
+    elif val in ('n', 'no', 'f', 'false', 'off', '0'):
+        return 0
+    else:
+        raise ValueError("invalid truth value %r" % (val,))

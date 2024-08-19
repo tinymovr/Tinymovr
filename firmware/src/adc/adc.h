@@ -106,8 +106,9 @@ typedef struct
 
 void ADC_init(void);
 void ADC_reset(void);
-float adc_get_mcu_temp(void);
-void ADC_GetPhaseCurrents(FloatTriplet *phc);
+bool ADC_calibrate_offset(void);
+float ADC_get_mcu_temp(void);
+void ADC_get_phase_currents(FloatTriplet *phc);
 void ADC_update(void);
 
 ADCConfig *ADC_get_config(void);

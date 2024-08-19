@@ -7,10 +7,14 @@ from tinymovr.gui.helpers import (
     display_file_open_dialog,
     display_file_save_dialog,
     magnitude_of,
+    StreamRedirector,
+    QTextBrowserLogger,
     TimedGetter,
     check_selected_items,
     get_dynamic_attrs,
-    is_dark_mode
+    is_dark_mode,
+    strtobool,
+    configure_pretty_errors
 )
 from tinymovr.gui.widgets import (
     NodeTreeWidgetItem,
@@ -19,7 +23,8 @@ from tinymovr.gui.widgets import (
     OptionsTreeWidgetItem,
     PlaceholderQTreeWidget,
     IconComboBoxWidget,
-    ArgumentInputDialog
+    ArgumentInputDialog,
+    BoolTreeWidgetItem
 )
 from tinymovr.gui.worker import Worker
 from tinymovr.gui.window import MainWindow

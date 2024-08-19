@@ -15,19 +15,20 @@
 //  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "src/system/system.h"
-#include <src/encoder/encoder.h>
+#include <src/system/system.h>
+#include <src/sensor/sensor.h>
 #include <src/observer/observer.h>
-#include "src/adc/adc.h"
-#include "src/motor/motor.h"
+#include <src/adc/adc.h>
+#include <src/motor/motor.h>
 #include <src/gatedriver/gatedriver.h>
 #include <src/utils/utils.h>
 #include <src/scheduler/scheduler.h>
-#include <src/motor/calibration.h>
 #include <src/can/can_endpoints.h>
 #include <src/controller/controller.h>
 #include "src/watchdog/watchdog.h"
 
+void CLPreStep(void);
+void CLPreCheck(void);
 void CLControlStep(void);
 static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
                                                             float vel_gain, float *I);
@@ -35,16 +36,16 @@ static inline bool Controller_LimitVelocity(float min_limit, float max_limit, fl
 static MotionPlan motion_plan;
 static ControllerState state = {
 
-    .state = STATE_IDLE,
-    .mode = CTRL_CURRENT,
+    .state = CONTROLLER_STATE_IDLE,
+    .mode = CONTROLLER_MODE_CURRENT,
     .errors = CONTROLLER_ERRORS_NONE,
     .is_calibrating = false,
 
     .I_phase_meas = {0.0f, 0.0f, 0.0f},
     .modulation_values = {0.0f, 0.0f, 0.0f},
 
-    .Iq_est = 0.0f,
-    .Id_est = 0.0f,
+    .Iq_estimate = 0.0f,
+    .Id_estimate = 0.0f,
 
     .Ibus_est = 0.0f,
     .power_est = 0.0f,
@@ -57,12 +58,15 @@ static ControllerState state = {
 
     .Vq_setpoint = 0.0f,
 
-    .vel_integrator_Iq = 0.0f,
+    .vel_integrator = 0.0f,
 
-    .Iq_integrator_Vq = 0.0f,
-    .Id_integrator_Vd = 0.0f,
+    .Iq_integrator = 0.0f,
+    .Id_integrator = 0.0f,
 
-    .t_plan = 0.0f};
+    .t_plan = 0.0f
+};
+
+Statistics pre_cl_stats = {0};
 
 #if defined BOARD_REV_R32 || BOARD_REV_R33 || defined BOARD_REV_R5
 
@@ -71,12 +75,12 @@ static ControllerConfig config = {
     .I_limit = 10.0f,
     .pos_gain = 20.0f,
     .vel_gain = 8.0e-5f,
-    .vel_integrator_gain = 0.00020f,
-    .vel_integrator_deadband = 200.0f,
+    .vel_integral_gain = 0.00020f,
+    .vel_integral_deadband = 200.0f,
     .I_bw = 2000.0,
     .I_gain = 0.0f,
-    .Iq_integrator_gain = 0.0f,
-    .Id_integrator_gain = 0.0f,
+    .Iq_integral_gain = 0.0f,
+    .Id_integral_gain = 0.0f,
     .I_k = 0.3f,
     .vel_increment = 100.0f, // ticks/cycle
     .max_Ibus_regen = 0.0f,
@@ -89,12 +93,12 @@ static ControllerConfig config = {
     .I_limit = 4.0f,
     .pos_gain = 8.0f,
     .vel_gain = 5.0e-5f,
-    .vel_integrator_gain = 0.00020f,
-    .vel_integrator_deadband = 200.0f,
+    .vel_integral_gain = 0.00020f,
+    .vel_integral_deadband = 200.0f,
     .I_bw = 2000.0,
     .I_gain = 0.0f,
-    .Iq_integrator_gain = 0.0f,
-    .Id_integrator_gain = 0.0f,
+    .Iq_integral_gain = 0.0f,
+    .Id_integral_gain = 0.0f,
     .I_k = 0.3f,
     .vel_increment = 100.0f, // ticks/cycle
     .max_Ibus_regen = 0.0f,
@@ -108,49 +112,68 @@ void Controller_ControlLoop(void)
     {
         state.warnings = 0;
         const float Iq = controller_get_Iq_estimate();
-        if ((Iq > (config.I_limit * I_TRIP_MARGIN)) ||
-            (Iq < -(config.I_limit * I_TRIP_MARGIN)))
+        const float Iq_trip = our_fmaxf(config.I_limit * I_TRIP_MARGIN, MIN_TRIP_CURRENT);
+        if (our_fabsf(Iq) > Iq_trip)
         {
             state.errors |= CONTROLLER_ERRORS_CURRENT_LIMIT_EXCEEDED;
         }
-        if (errors_exist() && (state.state != STATE_IDLE))
+        if (errors_exist() && (state.state != CONTROLLER_STATE_IDLE))
         {
-            controller_set_state(STATE_IDLE);
+            controller_set_state(CONTROLLER_STATE_IDLE);
         }
 
-        if (state.state == STATE_CALIBRATE)
+        if (state.state == CONTROLLER_STATE_CALIBRATE)
         {
             state.is_calibrating = true;
-            reset_calibration();
-            if (ENCODER_MA7XX == encoder_get_type())
+            system_reset_calibration();
+            // TODO: sensors_calibrate should also return bool, and be integrated in the calibration sequence
+            if (ADC_calibrate_offset() && motor_calibrate_resistance() && motor_calibrate_inductance())
             {
-                (void)((CalibrateADCOffset() && CalibrateResistance() && CalibrateInductance()) && CalibrateDirectionAndPolePairs() && calibrate_offset_and_rectification());
-            }
-            else if (ENCODER_HALL == encoder_get_type())
-            {
-                (void)((CalibrateADCOffset() && CalibrateResistance() && CalibrateInductance()) && calibrate_hall_sequence());
+                (void)(sensors_calibrate());
             }
             state.is_calibrating = false;
-            controller_set_state(STATE_IDLE);
+            controller_set_state(CONTROLLER_STATE_IDLE); 
         }
-        else if (state.state == STATE_CL_CONTROL)
+        else if (state.state == CONTROLLER_STATE_CL_CONTROL)
         {
             // Check the watchdog and revert to idle if it has timed out
             if (Watchdog_triggered())
             {
-                controller_set_state(STATE_IDLE);
+                controller_set_state(CONTROLLER_STATE_IDLE);
                 Watchdog_reset();
+            }
+            else if ((motor_get_is_gimbal() == false) && pre_cl_stats.size < MAX_CL_INIT_STEPS)
+            {
+                CLPreStep();
+            }
+            else if ((motor_get_is_gimbal() == false) && pre_cl_stats.size == MAX_CL_INIT_STEPS)
+            {
+                state.pos_setpoint = observer_get_pos_estimate(&position_observer);
+                CLPreStep();
+                CLPreCheck();
             }
             else
             {
                 CLControlStep();
             }
         }
-        else
-        {
-            // pass
-        }
-        WaitForControlLoopInterrupt();
+        wait_for_control_loop_interrupt();
+    }
+}
+
+TM_RAMFUNC void CLPreStep(void)
+{
+    gate_driver_set_duty_cycle(&three_phase_zero);
+    // Should approximate zero as from Kirchoff
+    float Iphase_meas_sum = state.I_phase_meas.A + state.I_phase_meas.B + state.I_phase_meas.C; 
+    update_statistics(&pre_cl_stats, Iphase_meas_sum);
+}
+
+TM_RAMFUNC void CLPreCheck(void)
+{
+    if (calculate_standard_deviation(&pre_cl_stats) > PRE_CL_I_SD_MAX)
+    {
+        state.errors |= CONTROLLER_ERRORS_PRE_CL_I_SD_EXCEEDED;
     }
 }
 
@@ -158,22 +181,22 @@ TM_RAMFUNC void CLControlStep(void)
 {
     switch (state.mode)
     {
-        case CTRL_TRAJECTORY:
+        case CONTROLLER_MODE_TRAJECTORY:
         state.t_plan += PWM_PERIOD_S;
         // This will set state.pos_setpoint state.vel_setpoint (in user frame)
         if (!traj_planner_evaluate(state.t_plan, &motion_plan))
         {
             // Drop to position mode on error or completion
-            controller_set_mode(CTRL_POSITION);
+            controller_set_mode(CONTROLLER_MODE_POSITION);
             state.t_plan = 0;
         }
         break;
-        case CTRL_HOMING:
+        case CONTROLLER_MODE_HOMING:
         // This will set state.pos_setpoint state.vel_setpoint (in user frame)
         if (!homing_planner_evaluate())
         {
             // Drop to position mode on error or completion
-            controller_set_mode(CTRL_POSITION);
+            controller_set_mode(CONTROLLER_MODE_POSITION);
         }
         break;
         default: break;
@@ -195,49 +218,49 @@ TM_RAMFUNC void CLControlStep(void)
     // separate because the latter takes into account a user-configurable deadband
     // around the position setpoint, where the integrator "sees" no error
     float vel_setpoint = state.vel_ramp_setpoint ;
-    float vel_setpoint_integrator = state.vel_ramp_setpoint ;
+    float vel_setpoint_integral = state.vel_ramp_setpoint ;
 
-    if (state.mode >= CTRL_POSITION)
+    if (state.mode >= CONTROLLER_MODE_POSITION)
     {
-        const float delta_pos = observer_get_diff(state.pos_setpoint);
-        const float delta_pos_integrator = sgnf(delta_pos) * our_fmaxf(0, fabsf(delta_pos) - config.vel_integrator_deadband);
+        const float delta_pos = get_diff_position_sensor_frame(state.pos_setpoint);
+        const float delta_pos_integral = sgnf(delta_pos) * our_fmaxf(0, fabsf(delta_pos) - config.vel_integral_deadband);
         vel_setpoint += delta_pos * config.pos_gain;
-        vel_setpoint_integrator += delta_pos_integrator * config.pos_gain;
+        vel_setpoint_integral += delta_pos_integral * config.pos_gain;
     }
 
-    const float vel_estimate = observer_get_vel_estimate();
+    const float vel_estimate = observer_get_vel_estimate(&position_observer);
     float Iq_setpoint = state.Iq_setpoint;
 
-    if (state.mode >= CTRL_VELOCITY)
+    if (state.mode >= CONTROLLER_MODE_VELOCITY) 
     {
         const float delta_vel = vel_setpoint - vel_estimate;
-        const float delta_vel_integrator = vel_setpoint_integrator - vel_estimate;
         // Velocity limiting will be done later on based on the estimate
-        Iq_setpoint += delta_vel * config.vel_gain;
-        Iq_setpoint += state.vel_integrator_Iq;
-        state.vel_integrator_Iq += delta_vel_integrator * PWM_PERIOD_S * config.vel_integrator_gain;
+        Iq_setpoint += apply_velocity_transform(delta_vel * config.vel_gain + state.vel_integrator, frame_position_sensor_to_motor_p());
+        state.vel_integrator += (vel_setpoint_integral - vel_estimate) * PWM_PERIOD_S * config.vel_integral_gain;
     }
     else
     {
-        state.vel_integrator_Iq = 0.0f;
+        state.vel_integrator = 0.0f;
     }
 
     // Velocity-dependent current limiting
-    if (Controller_LimitVelocity(-config.vel_limit, config.vel_limit, vel_estimate, config.vel_gain, &Iq_setpoint) == true)
+    const float vel_estimate_motor_frame = apply_velocity_transform(vel_estimate, frame_position_sensor_to_motor_p());
+    if (Controller_LimitVelocity(-config.vel_limit, config.vel_limit, vel_estimate_motor_frame, config.vel_gain, &Iq_setpoint) == true)
     {
-        state.vel_integrator_Iq *= 0.995f;
+        state.vel_integrator *= 0.995f;
         state.warnings |= CONTROLLER_WARNINGS_VELOCITY_LIMITED;
     }
 
     // Absolute current & velocity integrator limiting
     if (our_clampc(&Iq_setpoint, -config.I_limit, config.I_limit) == true)
     {
-        state.vel_integrator_Iq *= 0.995f;
+        state.vel_integrator *= 0.995f;
         state.warnings |= CONTROLLER_WARNINGS_CURRENT_LIMITED;
     }
 
     // Flux braking
     const float Vbus_voltage = system_get_Vbus();
+    const float one_over_Vbus_voltage = 1.0f / Vbus_voltage;
     if (config.max_Ibrake > 0)
     {
         state.Id_setpoint = our_clamp(-state.Ibus_est*Vbus_voltage, 0, config.max_Ibrake);
@@ -247,7 +270,7 @@ TM_RAMFUNC void CLControlStep(void)
         state.Id_setpoint = 0.0f;
     }
 
-    const float e_phase = observer_get_epos();
+    const float e_phase = observer_get_epos_motor_frame();
     const float c_I = fast_cos(e_phase);
     const float s_I = fast_sin(e_phase);
 
@@ -255,13 +278,13 @@ TM_RAMFUNC void CLControlStep(void)
     float Vq;
     if (motor_get_is_gimbal() == true)
     {
-        const float e_phase_vel = observer_get_evel();
+        const float e_phase_vel = observer_get_evel_motor_frame();
         Vd = -e_phase_vel * motor_get_phase_inductance() * Iq_setpoint;
         Vq = motor_get_phase_resistance() * Iq_setpoint;
     }
     else
     {
-        ADC_GetPhaseCurrents(&(state.I_phase_meas));
+        ADC_get_phase_currents(&(state.I_phase_meas));
 
         // Clarke transform
         const float Ialpha = state.I_phase_meas.A;
@@ -271,23 +294,23 @@ TM_RAMFUNC void CLControlStep(void)
         const float Id = (c_I * Ialpha) + (s_I * Ibeta);
         const float Iq = (c_I * Ibeta) - (s_I * Ialpha);
 
-        state.Id_est += config.I_k * (Id - state.Id_est);
-        state.Iq_est += config.I_k * (Iq - state.Iq_est);
+        state.Id_estimate += config.I_k * (Id - state.Id_estimate);
+        state.Iq_estimate += config.I_k * (Iq - state.Iq_estimate);
 
-        const float delta_Id = state.Id_setpoint - state.Id_est;
-        const float delta_Iq = Iq_setpoint - state.Iq_est;
+        const float delta_Id = state.Id_setpoint - state.Id_estimate;
+        const float delta_Iq = Iq_setpoint - state.Iq_estimate;
 
-        state.Id_integrator_Vd += delta_Id * PWM_PERIOD_S * config.Id_integrator_gain;
-        state.Iq_integrator_Vq += delta_Iq * PWM_PERIOD_S * config.Iq_integrator_gain;
+        state.Id_integrator += delta_Id * PWM_PERIOD_S * config.Id_integral_gain;
+        state.Iq_integrator += delta_Iq * PWM_PERIOD_S * config.Iq_integral_gain;
 
-        Vd = (delta_Id * config.I_gain) + state.Id_integrator_Vd;
-        Vq = (delta_Iq * config.I_gain) + state.Iq_integrator_Vq;
+        Vd = (delta_Id * config.I_gain) + state.Id_integrator;
+        Vq = (delta_Iq * config.I_gain) + state.Iq_integrator;
     }
     state.Vq_setpoint = Vq;
     
-    float mod_q = Vq / Vbus_voltage;
-    float mod_d = Vd / Vbus_voltage;
-    state.Ibus_est = state.Iq_est * mod_q + state.Id_est * mod_d;
+    float mod_q = Vq * one_over_Vbus_voltage;
+    float mod_d = Vd * one_over_Vbus_voltage;
+    state.Ibus_est = state.Iq_estimate * mod_q + state.Id_estimate * mod_d;
     state.power_est = state.Ibus_est * Vbus_voltage;
 
     // dq modulation limiter
@@ -297,14 +320,14 @@ TM_RAMFUNC void CLControlStep(void)
     {
         mod_q *= dq_mod_scale_factor;
         mod_d *= dq_mod_scale_factor;
-        state.Id_integrator_Vd *= I_INTEGRATOR_DECAY_FACTOR;
-        state.Iq_integrator_Vq *= I_INTEGRATOR_DECAY_FACTOR;
+        state.Id_integrator *= I_INTEGRATOR_DECAY_FACTOR;
+        state.Iq_integrator *= I_INTEGRATOR_DECAY_FACTOR;
         state.warnings |= CONTROLLER_WARNINGS_MODULATION_LIMITED;
     }
 
     // Inverse Park transform
-    float mod_a = (c_I * mod_d) - (s_I * mod_q);
-    float mod_b = (c_I * mod_q) + (s_I * mod_d);
+    const float mod_a = (c_I * mod_d) - (s_I * mod_q);
+    const float mod_b = (c_I * mod_q) + (s_I * mod_d);
 
     SVM(mod_a, mod_b, &state.modulation_values.A,
         &state.modulation_values.B, &state.modulation_values.C);
@@ -312,64 +335,64 @@ TM_RAMFUNC void CLControlStep(void)
 }
 
 
-TM_RAMFUNC ControlState controller_get_state(void)
+TM_RAMFUNC controller_state_options controller_get_state(void)
 {
     return state.state;
 }
 
-TM_RAMFUNC void controller_set_state(ControlState new_state)
+TM_RAMFUNC void controller_set_state(controller_state_options new_state)
 {
     if ((new_state != state.state) && (false == state.is_calibrating))
     {
-        if ((new_state == STATE_CL_CONTROL) && (state.state == STATE_IDLE) && (!errors_exist()) && motor_get_calibrated())
-        {
-            state.pos_setpoint = observer_get_pos_estimate();
-            gate_driver_enable();
-            state.state = STATE_CL_CONTROL;
-        }
-        else if ((new_state == STATE_CALIBRATE) && (state.state == STATE_IDLE) && (!errors_exist()))
+        if ((new_state == CONTROLLER_STATE_CL_CONTROL) && (state.state == CONTROLLER_STATE_IDLE) && (!errors_exist()) && motor_get_calibrated())
         {
             gate_driver_enable();
-            state.state = STATE_CALIBRATE;
+            state.state = CONTROLLER_STATE_CL_CONTROL;
         }
-        else // state != STATE_IDLE --> Got to idle state anyway
+        else if ((new_state == CONTROLLER_STATE_CALIBRATE) && (state.state == CONTROLLER_STATE_IDLE) && (!errors_exist()))
+        {
+            gate_driver_enable();
+            state.state = CONTROLLER_STATE_CALIBRATE;
+        }
+        else // state != CONTROLLER_STATE_IDLE --> Got to idle state anyway
         {
             gate_driver_set_duty_cycle(&three_phase_zero);
             gate_driver_disable();
-            state.state = STATE_IDLE;
+            memset(&pre_cl_stats, 0, sizeof(pre_cl_stats));
+            state.state = CONTROLLER_STATE_IDLE;
         }
     }
 }
 
-TM_RAMFUNC ControlMode controller_get_mode(void)
+TM_RAMFUNC controller_mode_options controller_get_mode(void)
 {
     return state.mode;
 }
 
-TM_RAMFUNC void controller_set_mode(ControlMode new_mode)
+TM_RAMFUNC void controller_set_mode(controller_mode_options new_mode)
 {
     if (new_mode != state.mode)
     {
         switch (new_mode)
         {
-            case CTRL_HOMING:
-            state.mode = CTRL_HOMING;
+            case CONTROLLER_MODE_HOMING:
+            state.mode = CONTROLLER_MODE_HOMING;
             break;
 
-            case CTRL_TRAJECTORY:
-            state.mode = CTRL_TRAJECTORY;
+            case CONTROLLER_MODE_TRAJECTORY:
+            state.mode = CONTROLLER_MODE_TRAJECTORY;
             break;
 
-            case CTRL_POSITION:
-            state.mode = CTRL_POSITION;
+            case CONTROLLER_MODE_POSITION:
+            state.mode = CONTROLLER_MODE_POSITION;
             break;
 
-            case CTRL_VELOCITY:
-            state.mode = CTRL_VELOCITY;
+            case CONTROLLER_MODE_VELOCITY:
+            state.mode = CONTROLLER_MODE_VELOCITY;
             break;
 
-            case CTRL_CURRENT:
-            state.mode = CTRL_CURRENT;
+            case CONTROLLER_MODE_CURRENT:
+            state.mode = CONTROLLER_MODE_CURRENT;
             break;
 
             default:
@@ -378,80 +401,60 @@ TM_RAMFUNC void controller_set_mode(ControlMode new_mode)
     }
 }
 
-TM_RAMFUNC float controller_get_pos_setpoint_user_frame(void)
+TM_RAMFUNC float controller_get_Iq_estimate_user_frame(void)
 {
-    return (state.pos_setpoint - motor_get_user_offset()) * motor_get_user_direction();
+    return apply_velocity_transform(state.Iq_estimate, frame_motor_to_user_p());
 }
 
-TM_RAMFUNC void controller_set_pos_setpoint_user_frame(float value)
+TM_RAMFUNC float controller_get_pos_setpoint_user_frame(void)
 {
-    // direction is either 1 or -1 so we can multiply instead of divide
-    state.pos_setpoint = value * motor_get_user_direction() + motor_get_user_offset();
+    return apply_transform(state.pos_setpoint, frame_position_sensor_to_user_p());
 }
 
 TM_RAMFUNC float controller_get_vel_setpoint_user_frame(void)
 {
-    return state.vel_setpoint * motor_get_user_direction();
-}
-
-TM_RAMFUNC void controller_set_vel_setpoint_user_frame(float value)
-{
-    // direction is either 1 or -1 so we can multiply instead of divide
-    state.vel_setpoint = value * motor_get_user_direction();
+    return apply_velocity_transform(state.vel_setpoint, frame_position_sensor_to_user_p());
 }
 
 TM_RAMFUNC float controller_get_Iq_estimate(void)
 {
-    return state.Iq_est;
+    return state.Iq_estimate;
 }
-
-TM_RAMFUNC float controller_get_Iq_setpoint(void)
-{
-    return state.Iq_setpoint;
-}
-
-TM_RAMFUNC void controller_set_Iq_setpoint(float value)
-{
-    state.Iq_setpoint = value;
-}
-
-TM_RAMFUNC float controller_get_Iq_estimate_user_frame(void)
-{
-    return state.Iq_est * motor_get_user_direction();
-}
-
 TM_RAMFUNC float controller_get_Iq_setpoint_user_frame(void)
 {
-    return state.Iq_setpoint * motor_get_user_direction();
-}
-
-TM_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value)
-{
-    state.Iq_setpoint = value * motor_get_user_direction();
+    return apply_velocity_transform(state.Iq_setpoint, frame_motor_to_user_p());
 }
 
 TM_RAMFUNC float controller_get_Id_setpoint_user_frame(void)
 {
-    return state.Id_setpoint;
+    return apply_velocity_transform(state.Id_setpoint, frame_motor_to_user_p());
+}
+
+TM_RAMFUNC void controller_set_pos_setpoint_user_frame(float value)
+{
+    state.pos_setpoint = apply_transform(value, frame_user_to_position_sensor_p());
+}
+
+TM_RAMFUNC void controller_set_vel_setpoint_user_frame(float value)
+{
+    state.vel_setpoint = apply_velocity_transform(value, frame_user_to_position_sensor_p());
+}
+
+TM_RAMFUNC void controller_set_Iq_setpoint_user_frame(float value)
+{
+    state.Iq_setpoint = apply_velocity_transform(value, frame_user_to_motor_p());
+}
+
+float controller_set_pos_vel_setpoints_user_frame(float pos_setpoint, float vel_setpoint)
+{
+    controller_set_pos_setpoint_user_frame(pos_setpoint);
+    controller_set_vel_setpoint_user_frame(vel_setpoint);
+    return user_frame_get_pos_estimate();
 }
 
 TM_RAMFUNC float controller_get_Vq_setpoint_user_frame(void)
 {
-    return state.Vq_setpoint * motor_get_user_direction();
-}
-
-TM_RAMFUNC float controller_set_pos_vel_setpoints(float pos_setpoint, float vel_setpoint)
-{
-    controller_set_pos_setpoint_user_frame(pos_setpoint);
-    controller_set_vel_setpoint_user_frame(vel_setpoint);
-    return observer_get_pos_estimate_user_frame();
-}
-
-void controller_get_modulation_values(FloatTriplet *dc)
-{
-    dc->A = state.modulation_values.A;
-    dc->B = state.modulation_values.B;
-    dc->C = state.modulation_values.C;
+    return apply_velocity_transform(state.Vq_setpoint, frame_motor_to_user_p());
 }
 
 float controller_get_pos_gain(void)
@@ -480,29 +483,29 @@ void controller_set_vel_gain(float gain)
     }
 }
 
-float controller_get_vel_integrator_gain(void)
+float controller_get_vel_integral_gain(void)
 {
-    return config.vel_integrator_gain;
+    return config.vel_integral_gain;
 }
 
-void controller_set_vel_integrator_gain(float gain)
+void controller_set_vel_integral_gain(float gain)
 {
     if (gain >= 0.0f)
     {
-        config.vel_integrator_gain = gain;
+        config.vel_integral_gain = gain;
     }
 }
 
-float controller_get_vel_integrator_deadband(void)
+float controller_get_vel_integral_deadband(void)
 {
-    return config.vel_integrator_deadband;
+    return config.vel_integral_deadband;
 }
 
-void controller_set_vel_integrator_deadband(float value)
+void controller_set_vel_integral_deadband(float value)
 {
     if (value >= 0.0f)
     {
-        config.vel_integrator_deadband = value;
+        config.vel_integral_deadband = value;
     }
 }
 
@@ -616,8 +619,8 @@ void controller_restore_config(ControllerConfig *config_)
     config = *config_;
 }
 
-static inline bool Controller_LimitVelocity(float min_limit, float max_limit, float vel_estimate,
-                                            float vel_gain, float *I)
+static inline bool Controller_LimitVelocity(const float min_limit, const float max_limit, const float vel_estimate,
+                                            const float vel_gain, float *I)
 {
     float Imax = (max_limit - vel_estimate) * vel_gain;
     float Imin = (min_limit - vel_estimate) * vel_gain;
@@ -628,8 +631,8 @@ TM_RAMFUNC void controller_update_I_gains(void)
 {
     config.I_gain = config.I_bw * motor_get_phase_inductance();
     float plant_pole = motor_get_phase_resistance() / motor_get_phase_inductance();
-    config.Iq_integrator_gain = plant_pole * config.I_gain;
-    config.Id_integrator_gain = config.Iq_integrator_gain;
+    config.Iq_integral_gain = plant_pole * config.I_gain;
+    config.Id_integral_gain = config.Iq_integral_gain;
 }
 
 TM_RAMFUNC uint8_t controller_get_warnings(void)

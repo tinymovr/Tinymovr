@@ -19,20 +19,32 @@ import os
 import time
 import can
 
-from tinymovr import init_tee, destroy_tee
-from tinymovr.config import get_bus_config, create_device
+from tinymovr import init_router, destroy_router
+from tinymovr.config import get_bus_config, create_device, configure_logging
 
 import unittest
 
 
 class TMTestCase(unittest.TestCase):
+
+    @classmethod
+    def configure_sensors(cls, external_spi_type):
+        cls.tm.sensors.setup.external_spi.type = external_spi_type
+        time.sleep(0.2)
+
+    @classmethod
+    def select_sensors(cls, commutation_sensor_connection, position_sensor_connection):
+        cls.tm.sensors.select.commutation_sensor.connection = commutation_sensor_connection
+        cls.tm.sensors.select.position_sensor.connection = position_sensor_connection
+        time.sleep(0.2)
+
     @classmethod
     def setUpClass(cls):
-        params = get_bus_config(["canine", "slcan_disco"])
-        params["bitrate"] = 1000000
-        cls.can_bus = can.Bus(**params)
-        init_tee(cls.can_bus)
+        params = get_bus_config(["canine", "slcan_disco"], bitrate=1000000)
+        cls.logger = configure_logging()
+        init_router(can.Bus, params, logger=cls.logger)
         cls.tm = create_device(node_id=1)
+        
         cls.reset_and_wait()
 
     def tearDown(self):
@@ -41,18 +53,31 @@ class TMTestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.tm.reset()
-        destroy_tee()
-        cls.can_bus.shutdown()
+        destroy_router()
 
     @classmethod
     def reset_and_wait(cls, timeout=0.5):
         cls.tm.reset()
         time.sleep(timeout)
 
-    def try_calibrate(self, force=False, *args, **kwargs):
+    def try_calibrate(self, I_cal=None, force=False, precheck_callback=None,*args, **kwargs):
         if True == force or not self.tm.calibrated:
+            hw_rev = self.tm.hw_revision
+            self.check_state(0)
+            if I_cal and I_cal > 0:
+                self.tm.motor.I_cal = I_cal
+            elif hw_rev > 20:
+                self.tm.motor.I_cal = 0.8
+            else:
+                self.tm.motor.I_cal = 5
+
+            if hw_rev > 20:
+                self.tm.controller.velocity.P_gain = 2e-05
+
             self.tm.controller.calibrate()
             self.wait_for_calibration(*args, **kwargs)
+            if precheck_callback:
+                precheck_callback(self.tm)
             self.assertTrue(self.tm.calibrated)
 
     def wait_for_calibration(self, check_interval=0.05):

@@ -15,33 +15,45 @@
 //  * You should have received a copy of the GNU General Public License 
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef GATEDRIVER_GATEDRIVER_H_
-#define GATEDRIVER_GATEDRIVER_H_
+#pragma once
 
+#include <src/common.h>
 
 void gate_driver_enable(void);
 void gate_driver_disable(void);
-bool gate_driver_is_enabled(void);
-void gate_driver_set_duty_cycle(const FloatTriplet *dc);
 
+typedef struct {
+    bool enabled;
+} GateDriverState;
 
-//=============================================
-// Motor Driver Duty Cycle Macro Functions
-//=============================================
+extern GateDriverState gate_driver_state;
+
 static inline void m1_u_set_duty(const float duty)
 {
     uint16_t val = ((uint16_t)(duty * (TIMER_FREQ_HZ/PWM_FREQ_HZ) )) >>1;
     PAC55XX_TIMERA->CCTR4.CTR = val;
 }
+
 static inline void m1_v_set_duty(const float duty)
 {
     uint16_t val = ((uint16_t)(duty * (TIMER_FREQ_HZ/PWM_FREQ_HZ) )) >>1;
     PAC55XX_TIMERA->CCTR5.CTR = val;
 }
+
 static inline void m1_w_set_duty(const float duty)
 {
     uint16_t val = ((uint16_t)(duty * (TIMER_FREQ_HZ/PWM_FREQ_HZ) )) >>1;
     PAC55XX_TIMERA->CCTR6.CTR = val;
 }
 
-#endif /* GATEDRIVER_GATEDRIVER_H_ */
+static inline void gate_driver_set_duty_cycle(const FloatTriplet *dutycycles)
+{
+	m1_u_set_duty(dutycycles->A);
+	m1_v_set_duty(dutycycles->B);
+	m1_w_set_duty(dutycycles->C);
+}
+
+static inline bool gate_driver_is_enabled(void)
+{
+    return gate_driver_state.enabled;
+}

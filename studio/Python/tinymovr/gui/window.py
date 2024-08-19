@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import sys
 import time
 import logging
 import pkg_resources
@@ -28,11 +29,13 @@ from PySide6.QtWidgets import (
     QMenuBar,
     QWidget,
     QFrame,
-    QHBoxLayout,
     QVBoxLayout,
     QHeaderView,
     QLabel,
     QMessageBox,
+    QTreeWidgetItem,
+    QSplitter,
+    QTextBrowser,
 )
 from PySide6.QtGui import QAction
 import pyqtgraph as pg
@@ -40,6 +43,7 @@ from tinymovr.constants import app_name
 from tinymovr.channel import ResponseError as ChannelResponseError
 from tinymovr.config import get_bus_config
 from avlos import get_registry
+from avlos.datatypes import DataType
 from avlos.json_codec import AvlosEncoder
 from tinymovr.gui import (
     NodeTreeWidgetItem,
@@ -48,28 +52,33 @@ from tinymovr.gui import (
     OptionsTreeWidgetItem,
     Worker,
     PlaceholderQTreeWidget,
+    BoolTreeWidgetItem,
+    StreamRedirector,
+    QTextBrowserLogger,
     format_value,
     display_file_open_dialog,
     display_file_save_dialog,
     magnitude_of,
     check_selected_items,
+    configure_pretty_errors,
 )
 
 
 class MainWindow(QMainWindow):
     TreeItemCheckedSignal = Signal(dict)
+    updateVisibleAttrsSignal = Signal(set)
 
     def __init__(self, app, arguments, logger):
         super(MainWindow, self).__init__()
+
+        self.time_window = 10
 
         # set units default format
         get_registry().default_format = ".6f~"
 
         self.start_time = time.time()
-        if logger is None:
-            self.logger = logging.getLogger("tinymovr")
-        else:
-            self.logger = logger
+        self.logger = logger if logger is not None else logging.getLogger("tinymovr")
+        configure_pretty_errors()
 
         self.attr_widgets_by_id = {}
         self.graphs_by_id = {}
@@ -81,6 +90,7 @@ class MainWindow(QMainWindow):
 
         self.file_menu = QMenu("File")
         self.help_menu = QMenu("Help")
+        self.view_menu = QMenu("View")
 
         self.export_action = QAction("Export Config...", self)
         self.import_action = QAction("Import Config", self)
@@ -92,22 +102,81 @@ class MainWindow(QMainWindow):
         self.file_menu.addAction(self.import_action)
         self.help_menu.addAction(self.about_action)
 
+        self.toggle_tree_action = QAction(
+            "Hide Tree", self
+        )  # Assume tree is visible initially
+        self.toggle_tree_action.triggered.connect(self.toggle_tree)
+        self.toggle_console_action = QAction(
+            "Hide Console", self
+        )  # Assume console is visible initially
+        self.toggle_console_action.triggered.connect(self.toggle_console)
+
+        self.clear_console_action = QAction("Clear Console", self)
+        self.clear_console_action.triggered.connect(self.clear_console)
+        self.view_menu.addAction(self.clear_console_action)
+
+        self.view_menu.addAction(self.toggle_tree_action)
+        self.view_menu.addAction(self.toggle_console_action)
+
+        self.time_window_menu = QMenu("Set Time Window")
+
+        self.time_window_10s_action = QAction("10 seconds", self)
+        self.time_window_10s_action.triggered.connect(lambda: self.set_time_window(10))
+
+        self.time_window_30s_action = QAction("30 seconds", self)
+        self.time_window_30s_action.triggered.connect(lambda: self.set_time_window(30))
+
+        self.time_window_60s_action = QAction("60 seconds", self)
+        self.time_window_60s_action.triggered.connect(lambda: self.set_time_window(60))
+
+        self.time_window_menu.addAction(self.time_window_10s_action)
+        self.time_window_menu.addAction(self.time_window_30s_action)
+        self.time_window_menu.addAction(self.time_window_60s_action)
+
+        self.view_menu.addMenu(self.time_window_menu)
+
+        self.timer_rate_menu = QMenu("Set Timer Rate")
+
+        self.timer_rate_12_5_action = QAction("12.5 Hz", self)
+        self.timer_rate_12_5_action.triggered.connect(lambda: self.set_timer_rate(80))
+
+        self.timer_rate_25_action = QAction("25 Hz", self)
+        self.timer_rate_25_action.triggered.connect(lambda: self.set_timer_rate(40))
+
+        self.timer_rate_50_action = QAction("50 Hz", self)
+        self.timer_rate_50_action.triggered.connect(lambda: self.set_timer_rate(20))
+
+        self.timer_rate_100_action = QAction("100 Hz", self)
+        self.timer_rate_100_action.triggered.connect(lambda: self.set_timer_rate(10))
+
+        self.timer_rate_menu.addAction(self.timer_rate_12_5_action)
+        self.timer_rate_menu.addAction(self.timer_rate_25_action)
+        self.timer_rate_menu.addAction(self.timer_rate_50_action)
+        self.timer_rate_menu.addAction(self.timer_rate_100_action)
+
+        self.view_menu.addMenu(self.timer_rate_menu)
+
         self.menu_bar.addMenu(self.file_menu)
+        self.menu_bar.addMenu(self.view_menu)
         self.menu_bar.addMenu(self.help_menu)
         self.setMenuBar(self.menu_bar)
 
-        # Setup the tree widget
         self.tree_widget = PlaceholderQTreeWidget()
         self.tree_widget.itemChanged.connect(self.item_changed)
+        self.tree_widget.itemExpanded.connect(self.update_visible_attrs)
+        self.tree_widget.itemCollapsed.connect(self.update_visible_attrs)
         self.tree_widget.setHeaderLabels(["Attribute", "Value"])
 
         self.status_label = QLabel()
         self.status_label.setStyleSheet("margin: 5px;")
 
+        self.splitter = QSplitter(QtCore.Qt.Horizontal)
+        self.splitter.setHandleWidth(0)
+        self.splitter.splitterMoved.connect(self.check_tree_visibility)
+
         self.left_frame = QFrame(self)
         self.left_layout = QVBoxLayout()
         self.left_layout.addWidget(self.tree_widget)
-        self.left_layout.addWidget(self.status_label)
         self.left_layout.setSpacing(0)
         self.left_layout.setContentsMargins(0, 0, 0, 0)
         self.left_frame.setLayout(self.left_layout)
@@ -121,9 +190,24 @@ class MainWindow(QMainWindow):
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_frame.setLayout(self.right_layout)
 
-        main_layout = QHBoxLayout()
-        main_layout.addWidget(self.left_frame)
-        main_layout.addWidget(self.right_frame)
+        self.splitter.addWidget(self.left_frame)
+        self.splitter.addWidget(self.right_frame)
+
+        self.console = QTextBrowser()
+        self.console.setReadOnly(True)
+        self.log_handler = QTextBrowserLogger(self.console)
+        self.logger.addHandler(self.log_handler)
+
+        self.main_splitter = QSplitter(QtCore.Qt.Vertical)
+        self.main_splitter.setHandleWidth(0)
+        self.main_splitter.showEvent = self.on_show_event
+        self.main_splitter.splitterMoved.connect(self.check_console_visibility)
+        self.main_splitter.addWidget(self.splitter)
+        self.main_splitter.addWidget(self.console)
+
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(self.main_splitter)
+        main_layout.addWidget(self.status_label)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -140,8 +224,7 @@ class MainWindow(QMainWindow):
         self.max_timeouts = int(arguments["--max-timeouts"])
 
         if channel == None:
-            params = get_bus_config(buses)
-            params["bitrate"] = bitrate
+            params = get_bus_config(buses, bitrate=bitrate)
         else:
             params = {"bustype": buses[0], "channel": channel, "bitrate": bitrate}
 
@@ -158,15 +241,33 @@ class MainWindow(QMainWindow):
         self.worker.updateTimingsSignal.connect(
             self.timings_updated, QtCore.Qt.QueuedConnection
         )
+        self.updateVisibleAttrsSignal.connect(self.worker.update_visible_attrs)
         app.aboutToQuit.connect(self.about_to_quit)
 
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.worker._update)
-        self.timer.start(40)
+        self.worker_update_timer = QTimer(self)
+        self.worker_update_timer.timeout.connect(self.worker._update)
+        self.worker_update_timer.start(40)
+
+        self.visibility_update_timer = QTimer(self)
+        self.visibility_update_timer.timeout.connect(self.update_visible_attrs)
+        self.visibility_update_timer.start(1000)
+
+    def on_show_event(self, event):
+        total_height = self.splitter.size().height()
+        top_percentage = 0.75  # 75% for the top widget
+        bottom_percentage = 0.25  # 25% for the bottom widget
+
+        top_size = int(total_height * top_percentage)
+        bottom_size = int(total_height * bottom_percentage)
+
+        self.main_splitter.setSizes([top_size, bottom_size])
+
+        super(MainWindow, self).showEvent(event)
 
     @QtCore.Slot()
     def about_to_quit(self):
-        self.timer.stop()
+        self.visibility_update_timer.stop()
+        self.worker_update_timer.stop()
         self.worker.stop()
 
     @QtCore.Slot()
@@ -209,6 +310,19 @@ class MainWindow(QMainWindow):
         self.right_layout.addWidget(graph_widget)
 
     @QtCore.Slot()
+    def update_visible_attrs(self):
+        """
+        Collects names of visible attributes and emits a signal with these names.
+        """
+        visible_attrs = {
+            attr_name
+            for attr_name, widget_info in self.attr_widgets_by_id.items()
+            if self.is_widget_visible(widget_info["widget"])
+            and self.is_item_visible_in_viewport(widget_info["widget"])
+        }
+        self.updateVisibleAttrsSignal.emit(visible_attrs)
+
+    @QtCore.Slot()
     def regen_tree(self, devices_by_name):
         """
         Regenerate the attribute tree
@@ -237,7 +351,10 @@ class MainWindow(QMainWindow):
             if hasattr(node, "options"):
                 widget = OptionsTreeWidgetItem(name, node)
             elif hasattr(node, "get_value"):
-                widget = AttrTreeWidgetItem(name, node)
+                if node.dtype == DataType.BOOL:
+                    widget = BoolTreeWidgetItem(name, node)
+                else:
+                    widget = AttrTreeWidgetItem(name, node)
             self.attr_widgets_by_id[node.full_name] = {
                 "node": node,
                 "widget": widget,
@@ -265,15 +382,20 @@ class MainWindow(QMainWindow):
                 self.logger.warn("Attribute widget disappeared while updating")
             if attr_name in self.graphs_by_id:
                 graph_info = self.graphs_by_id[attr_name]
+                current_time = time.time() - self.start_time
                 x = graph_info["data"]["x"]
                 y = graph_info["data"]["y"]
-                if len(x) >= 200:
+
+                # Remove data points outside the time window
+                while len(x) > 0 and current_time - x[0] > self.time_window:
                     x.pop(0)
                     y.pop(0)
-                x.append(time.time() - self.start_time)
+
+                x.append(current_time)
                 y.append(magnitude_of(val))
                 graph_info["data_line"].setData(x, y)
                 graph_info["widget"].update()
+
 
     @QtCore.Slot()
     def timings_updated(self, timings_dict):
@@ -326,3 +448,113 @@ class MainWindow(QMainWindow):
                 app_str
             ),
         )
+
+    def toggle_tree(self):
+        """
+        Toggle the visibility of the tree based on actual size.
+        """
+        tree_size = self.splitter.sizes()[0]
+        if tree_size > 0:
+            self.tree_widget.setVisible(False)
+            self.splitter.setSizes([0, self.splitter.size().width()])
+            self.toggle_tree_action.setText("Show Tree")
+        else:
+            self.tree_widget.setVisible(True)
+            total_size = self.splitter.size().width()
+            left_size = int(total_size * 0.25)
+            right_size = int(total_size * 0.75)
+            self.splitter.setSizes([left_size, right_size])
+            self.toggle_tree_action.setText("Hide Tree")
+
+    def toggle_console(self):
+        """
+        Toggle the visibility of the console based on actual size.
+        """
+        console_height = self.main_splitter.sizes()[-1]
+        if console_height > 0:
+            self.console.setVisible(False)
+            self.main_splitter.setSizes([self.main_splitter.size().height(), 0])
+            self.toggle_console_action.setText("Show Console")
+        else:
+            self.console.setVisible(True)
+            total_height = self.main_splitter.size().height()
+            top_height = int(total_height * 0.75)
+            bottom_height = int(total_height * 0.25)
+            self.main_splitter.setSizes([top_height, bottom_height])
+            self.toggle_console_action.setText("Hide Console")
+
+    def clear_console(self):
+        """
+        Clear the console output.
+        """
+        self.console.clear()
+
+    def check_tree_visibility(self, pos, index):
+        """
+        Check tree visibility after splitter is moved and update the action text.
+        """
+        tree_size = self.splitter.sizes()[
+            0
+        ]  # Assuming tree is always the first widget in the splitter
+        if tree_size == 0:
+            self.toggle_tree_action.setText("Show Tree")
+        else:
+            self.toggle_tree_action.setText("Hide Tree")
+
+    def check_console_visibility(self, pos, index):
+        """
+        Check console visibility after splitter is moved and update the action text.
+        """
+        console_size = self.main_splitter.sizes()[
+            -1
+        ]  # Assuming console is always the last widget in the splitter
+        if console_size == 0:
+            self.toggle_console_action.setText("Show Console")
+        else:
+            self.toggle_console_action.setText("Hide Console")
+
+    def is_widget_visible(self, widget):
+        """
+        Check if the given widget is visible, i.e., not hidden and all its
+        ancestor widgets are expanded.
+        """
+        if widget.isHidden():
+            return False
+        parent = widget.parent()
+        while parent is not None:
+            if isinstance(parent, QTreeWidgetItem) and not parent.isExpanded():
+                return False
+            parent = parent.parent()
+        return True
+
+    def is_item_visible_in_viewport(self, item):
+        """
+        Check if the QTreeWidgetItem is visible in the viewport of the QTreeWidget.
+        """
+        # Get the item's rectangle in tree widget coordinates
+        rect = self.tree_widget.visualItemRect(item)
+
+        # Check if the rectangle is within the visible region of the tree widget
+        visible_region = self.tree_widget.visibleRegion()
+        return visible_region.contains(rect)
+
+    def set_timer_rate(self, interval_ms):
+        """
+        Set the interval of the worker update timer.
+        :param interval_ms: Timer interval in milliseconds.
+        """
+        self.worker_update_timer.setInterval(interval_ms)
+        self.logger.info(f"Worker update timer set to {1000 / interval_ms:.1f} Hz")
+
+    def set_time_window(self, time_window):
+        """
+        Set the time window for the plots.
+        :param time_window: Time window in seconds.
+        """
+        self.time_window = time_window
+        self.logger.info(f"Time window set to {time_window} seconds")
+        # # Clear existing data to apply the new time window
+        # for graph_info in self.graphs_by_id.values():
+        #     graph_info["data"]["x"].clear()
+        #     graph_info["data"]["y"].clear()
+        #     graph_info["data_line"].setData([], [])
