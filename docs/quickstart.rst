@@ -67,7 +67,7 @@ The Tinymovr Servo Kit motor and encoder are already calibrated. If you have you
 In Tinymovr Studio, navigate to `tmx->controller`. Press the button with the arrow next to the `calibrate` label. Note that after pressing this button, the motor will spin. Ensure the rotor is free of obstructions or loads, and the motor is firmly fixed.
 
 Follow the on-screen prompts. The motor will produce an audible beep and rotate in one direction.
-Your Tinymovr is now ready for operation. Navigate to `tmx->motor`. This will reveal identified motor parameters, namely: phase resistance, phase inductance, number of pole pairs and encoder ticks.
+Your Tinymovr is now ready for operation. Navigate to `tmx->motor`. This will reveal identified motor parameters, namely: phase resistance (R), phase inductance (L) and number of pole pairs.
 
 Testing Position Control using the Studio GUI
 #############################################
