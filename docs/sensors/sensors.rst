@@ -11,13 +11,29 @@ This document provides information and guides for using the various angle sensor
 Connector Overview
 ******************
 
+R5.3
+====
+.. image:: connectors_R53.jpg
+  :width: 800
+  :alt: Tinymovr R5.3 connector diagram
+
+R5.2
+====
 .. image:: connectors_R52.jpg
   :width: 800
   :alt: Tinymovr R5.2 connector diagram
 
+R5.1
+====
 .. image:: connectors_R51.jpg
   :width: 800
   :alt: Tinymovr R5.1 connector diagram
+
+M5.1/M5.2
+=========
+.. image:: connectors_M52.jpg
+  :width: 800
+  :alt: Tinymovr M5.1/M5.2 connector diagram
 
 
 Hardware Setup
@@ -153,23 +169,6 @@ As a summary, the following ransforms are derived during calibration and are sto
 Tinymovr makes use of the XF1 library, which has been developed for this purpose and offers convenience functions to perform transforms, derive transforms from data, as well as inverse and constrained transforms.
 
 
-Onboard Magnetic
-****************
-
-All Tinymovr controllers feature an onboard magnetic absolute angle sensor that allows high precision angle measurement for efficient commutation and highly dynamic motor control. This is enabled by default and does not require any specific setup, apart from initial reference frame calibration.
-
-The onboard angle sensor is enabled by default, so no special configuration is necessary. Should you need to switch to the onboard sensor, use the following commands:
-
-.. code-block:: python
-
-    tmx.encoder.type = 0
-    tmx.encoder.bandwidth = 300
-    tmx.save_config()
-    tmx.reset() # sensor type change is applied after reset
-
-The value of 300Hz in bandwidth is the default value configured based on the charasteristics of the onboard angle sensor.
-
-
 Sensor Configuration
 ********************
 
@@ -180,6 +179,8 @@ Sensor Setup
 
 Onboard Magnetic Sensor
 -----------------------
+
+Tinymovr R and M series feature an onboard magnetic absolute angle sensor that allows high precision angle measurement for efficient commutation and highly dynamic motor control. This is enabled by default and does not require any specific setup, apart from initial reference frame calibration.
 
 The Onboard Magnetic Sensor does not require any configuration. In this section the calibration state and any sensor errors can be seen.
 
@@ -338,12 +339,18 @@ At this point, you are ready to perform motor/sensor calibration. This will meas
 
     tmx.controller.calibrate()
 
-After calibration finishes, you should be able to control the motor. Note that the default reference frame for the hall sensors maps to 8192 ticks per motor electrical cycle. You can change this by modifying the 
+After calibration finishes, you should be able to control the motor. Note that the default reference frame for the hall sensors maps to 8192 ticks per motor electrical cycle. You can change this by modifying the user frame multiplier:
+
+.. code-block:: python
+
+    tmx.sensors.user_frame.multiplier = 1
+
+Go ahead and enter velocity control mode, and set a setpoint:
 
 .. code-block:: python
 
     tmx.controller.velocity_mode()
-    tmx.controller.velocity.setpoint = 100 # around 60 rpm for a 15 pp motor
+    tmx.controller.velocity.setpoint = 80000 # around 60 rpm for a 15 pp motor
 
 The motor should now move at a constant velocity.
 
