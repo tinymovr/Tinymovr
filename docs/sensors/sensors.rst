@@ -153,23 +153,6 @@ As a summary, the following ransforms are derived during calibration and are sto
 Tinymovr makes use of the XF1 library, which has been developed for this purpose and offers convenience functions to perform transforms, derive transforms from data, as well as inverse and constrained transforms.
 
 
-Onboard Magnetic
-****************
-
-All Tinymovr controllers feature an onboard magnetic absolute angle sensor that allows high precision angle measurement for efficient commutation and highly dynamic motor control. This is enabled by default and does not require any specific setup, apart from initial reference frame calibration.
-
-The onboard angle sensor is enabled by default, so no special configuration is necessary. Should you need to switch to the onboard sensor, use the following commands:
-
-.. code-block:: python
-
-    tmx.encoder.type = 0
-    tmx.encoder.bandwidth = 300
-    tmx.save_config()
-    tmx.reset() # sensor type change is applied after reset
-
-The value of 300Hz in bandwidth is the default value configured based on the charasteristics of the onboard angle sensor.
-
-
 Sensor Configuration
 ********************
 
@@ -180,6 +163,8 @@ Sensor Setup
 
 Onboard Magnetic Sensor
 -----------------------
+
+Tinymovr R and M series feature an onboard magnetic absolute angle sensor that allows high precision angle measurement for efficient commutation and highly dynamic motor control. This is enabled by default and does not require any specific setup, apart from initial reference frame calibration.
 
 The Onboard Magnetic Sensor does not require any configuration. In this section the calibration state and any sensor errors can be seen.
 
