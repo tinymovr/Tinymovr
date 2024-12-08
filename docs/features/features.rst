@@ -30,7 +30,7 @@ Before using the planner, the desired acceleration, deceleration and max velocit
     tm1.traj_planner.max_decel = {max_deceleration} # ticks/sec^2
     tm1.traj_planner.max_vel = {mac_velocity} # ticks/sec
 
-Once you set the desired acceleration and deceleration parameters, they do not need to be re-set. The parameters can be saved in NVRAM using ``tmx.save_config()``.
+Once you set the desired acceleration and deceleration parameters, they do not need to be re-set. The parameters can be saved in NVRAM using ``tm1.save_config()``.
 
 Once the parameters are set, you can execute a plan to a target position:
 
@@ -95,14 +95,14 @@ Because the homing planner relies on mechanical resistance of the structure, it 
 
 There are six parameters in total that control the homing behavior:
 
-* ``tmx.homing.velocity``: The velocity at which the motor performs homing
-* ``tmx.homing.max_homing_t``: The maximum time the motor is allowed to travel before aborting homing
-* ``tmx.homing.retract_dist``: The retraction distance the motor travels after the endstop has been found
-* ``tmx.homing.stall_detect.velocity``: The velocity below which (and together with ``stall_detect.delta_pos``) stall detection mode is triggered
-* ``tmx.homing.stall_detect.delta_pos``: The position error above which (and together with ``stall_detect.velocity``) stall detection mode is triggered
-* ``tmx.homing.stall_detect.t``: The time to remain in stall detection mode before the motor is considered stalled
+* ``tm1.homing.velocity``: The velocity at which the motor performs homing
+* ``tm1.homing.max_homing_t``: The maximum time the motor is allowed to travel before aborting homing
+* ``tm1.homing.retract_dist``: The retraction distance the motor travels after the endstop has been found
+* ``tm1.homing.stall_detect.velocity``: The velocity below which (and together with ``stall_detect.delta_pos``) stall detection mode is triggered
+* ``tm1.homing.stall_detect.delta_pos``: The position error above which (and together with ``stall_detect.velocity``) stall detection mode is triggered
+* ``tm1.homing.stall_detect.t``: The time to remain in stall detection mode before the motor is considered stalled
 
-In addition to the above, the phase current while the motor is stopped, until ``stall_detect.t`` time passes is the maximum allowed phase current, as defined in ``tmx.controller.current.Iq_limit``. It is advisable to set this value so that mechanical damage or fatigue is avoided.
+In addition to the above, the phase current while the motor is stopped, until ``stall_detect.t`` time passes is the maximum allowed phase current, as defined in ``tm1.controller.current.Iq_limit``. It is advisable to set this value so that mechanical damage or fatigue is avoided.
 
 Operation
 *********
@@ -125,7 +125,7 @@ FOC decouples the torque-producing and magnetizing currents by aligning the stat
 
 Two parameters control flux braking:
 
-1. ``tmx.controller.current.max_Ibus_regen``: The maximum current (in amperes) allowed to be fed back to the power source before flux braking activates. By adjusting this value, you can control the regenerative braking threshold and determine when flux braking should take effect.
+1. ``tm1.controller.current.max_Ibus_regen``: The maximum current (in amperes) allowed to be fed back to the power source before flux braking activates. By adjusting this value, you can control the regenerative braking threshold and determine when flux braking should take effect.
 
-2. ``tmx.controller.current.max_Ibrake``: The maximum current (in amperes) allowed to be dumped to the motor windings during flux braking. By setting this value to zero, you can deactivate flux braking. Adjusting this parameter allows you to manage the braking torque and the heat generated during the braking process.
+2. ``tm1.controller.current.max_Ibrake``: The maximum current (in amperes) allowed to be dumped to the motor windings during flux braking. By setting this value to zero, you can deactivate flux braking. Adjusting this parameter allows you to manage the braking torque and the heat generated during the braking process.
 

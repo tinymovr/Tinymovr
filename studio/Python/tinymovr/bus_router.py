@@ -20,6 +20,7 @@ import warnings
 from enum import Enum
 from threading import Thread, Lock
 from tinymovr.bus_manager import BusManager
+from logging import Logger
 
 
 bus_router = None
@@ -86,7 +87,7 @@ class BusRouter:
         self.bus_manager.send(frame)
 
 
-def init_router(bus_class, bus_params, logger, timeout=0.1):
+def init_router(bus_class, bus_params, logger=Logger("tinymovr"), timeout=0.1):
     """
     Initializes a bus router using a python-can bus instance
     """

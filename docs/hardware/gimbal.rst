@@ -65,7 +65,7 @@ Example
     >>>tm1.motor.L = 2e-3
     >>>tm1.motor.I_cal = 0.5
 
-     >>>tmx.set_motor_RL(5, 0.002)
+     >>>tm1.set_motor_RL(5, 0.002)
 
 This specifies a motor with 5 Ohms resistance, 2 Millihenries inductance and 0.5Amps calibration current.
 Alternatuvely, using the units interface:
@@ -99,7 +99,7 @@ Ensure the values above are correct. You can now calibrate the motor:
     
     >>>tm1.controller.calibrate()
 
-Because the motor is set as gimbal, calibration will bypass resistance and inductance measurement, and will only calculate pole pairs, offset and direction. After calibration `tmx.motor.calibrated` should have a value of True:
+Because the motor is set as gimbal, calibration will bypass resistance and inductance measurement, and will only calculate pole pairs, offset and direction. After calibration `tm1.motor.calibrated` should have a value of True:
 
 |gui| Calibrate Motor
 

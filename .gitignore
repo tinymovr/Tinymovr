@@ -7,3 +7,5 @@ docs/_build/
 *.log
 *.state.json
 Tinymovr.code-workspace
+.aider*
+.env

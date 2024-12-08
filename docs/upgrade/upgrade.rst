@@ -91,7 +91,7 @@ Flashing the Firmware
 
    .. code-block:: python
 
-      tmx.enter_dfu()
+      tm1.enter_dfu()
 
    Then exit the CLI by typing ``exit``.
 

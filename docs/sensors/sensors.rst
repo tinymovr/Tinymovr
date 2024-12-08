@@ -172,7 +172,7 @@ Tinymovr makes use of the XF1 library, which has been developed for this purpose
 Sensor Configuration
 ********************
 
-The sensor configuration consists of two steps. The first step concerns the setup of the individual sensors being used, and the second step concerns sensor selection. The corresponding sections in the device spec are `tmx.sensors.setup`, and `tmx.sensors.select`.
+The sensor configuration consists of two steps. The first step concerns the setup of the individual sensors being used, and the second step concerns sensor selection. The corresponding sections in the device spec are `tm1.sensors.setup`, and `tm1.sensors.select`.
 
 Sensor Setup
 ============
@@ -220,27 +220,27 @@ Then, configure the external sensor type as follows:
 
 .. code-block:: python
 
-    tmx.sensors.setup.external_spi.type = tmx.sensors.setup.external_spi.type.AS5047
+    tm1.sensors.setup.external_spi.type = tm1.sensors.setup.external_spi.type.AS5047
 
 Then select the `EXTERNAL_SPI` sensor for each of the position and commutation sensors:
 
 .. code-block:: python
 
-    tmx.sensors.select.commutation_sensor.connection = tmx.sensors.select.commutation_sensor.connection.EXTERNAL_SPI
-    tmx.sensors.select.position_sensor.connection = tmx.sensors.select.position_sensor.connection.EXTERNAL_SPI
+    tm1.sensors.select.commutation_sensor.connection = tm1.sensors.select.commutation_sensor.connection.EXTERNAL_SPI
+    tm1.sensors.select.position_sensor.connection = tm1.sensors.select.position_sensor.connection.EXTERNAL_SPI
 
 At this point, you are ready to perform motor/sensor calibration. This will measure the R and L values of the motor, derive frame transforms and eccentricity compensation tables.
 
 .. code-block:: python
 
-    tmx.controller.calibrate()
+    tm1.controller.calibrate()
 
 After calibration finishes, you should be able to control the motor:
 
 .. code-block:: python
 
-    tmx.controller.velocity_mode()
-    tmx.controller.velocity.setpoint = 8192 # 60 rpm
+    tm1.controller.velocity_mode()
+    tm1.controller.velocity.setpoint = 8192 # 60 rpm
 
 The motor should now move at a constant velocity.
 
@@ -248,8 +248,8 @@ Once you have determined that the motor behaves as expected, set to idle and per
 
 .. code-block:: python
 
-    tmx.controller.idle()
-    tmx.save_config()
+    tm1.controller.idle()
+    tm1.save_config()
 
 
 External AMT22 Sensor for Positioning and Onboard MA702/704 for Commutation
@@ -264,27 +264,27 @@ Then, configure the external sensor type as follows:
 
 .. code-block:: python
 
-    tmx.sensors.setup.external_spi.type = tmx.sensors.setup.external_spi.type.AMT22
+    tm1.sensors.setup.external_spi.type = tm1.sensors.setup.external_spi.type.AMT22
 
 Then select the `EXTERNAL_SPI` sensor for each of the position and commutation sensors:
 
 .. code-block:: python
 
-    tmx.sensors.select.commutation_sensor.connection = tmx.sensors.select.commutation_sensor.connection.ONBOARD
-    tmx.sensors.select.position_sensor.connection = tmx.sensors.select.position_sensor.connection.EXTERNAL_SPI
+    tm1.sensors.select.commutation_sensor.connection = tm1.sensors.select.commutation_sensor.connection.ONBOARD
+    tm1.sensors.select.position_sensor.connection = tm1.sensors.select.position_sensor.connection.EXTERNAL_SPI
 
 At this point, you are ready to perform motor/sensor calibration. This will measure the R and L values of the motor, derive frame transforms and eccentricity compensation tables.
 
 .. code-block:: python
 
-    tmx.controller.calibrate()
+    tm1.controller.calibrate()
 
 After calibration finishes, you should be able to control the motor:
 
 .. code-block:: python
 
-    tmx.controller.velocity_mode()
-    tmx.controller.velocity.setpoint = 8192 # 60 rpm
+    tm1.controller.velocity_mode()
+    tm1.controller.velocity.setpoint = 8192 # 60 rpm
 
 The motor should now move at a constant velocity.
 
@@ -292,8 +292,8 @@ Once you have determined that the motor behaves as expected, set to idle and per
 
 .. code-block:: python
 
-    tmx.controller.idle()
-    tmx.save_config()
+    tm1.controller.idle()
+    tm1.save_config()
 
 
 Hall Effect Sensor
@@ -308,10 +308,10 @@ Then select the `HALL` sensor for each of the position and commutation sensors, 
 
 .. code-block:: python
 
-    tmx.sensors.select.commutation_sensor.connection = HALL
-    tmx.sensors.select.position_sensor.connection = HALL
-    tmx.sensors.select.commutation_sensor.bandwidth = 200
-    tmx.sensors.select.position_sensor.bandwidth = 20
+    tm1.sensors.select.commutation_sensor.connection = HALL
+    tm1.sensors.select.position_sensor.connection = HALL
+    tm1.sensors.select.commutation_sensor.bandwidth = 200
+    tm1.sensors.select.position_sensor.bandwidth = 20
 
 This sets the type to Hall effect sensor, and each of the commutation and position observer bandwidths. The commutation observer is set to a higher bandwidth value, in order to ensure that commutation is accurate and a runoff scenario is avoided.
 
@@ -319,7 +319,7 @@ Next, you need to set the motor pole pairs:
 
 .. code-block:: python
 
-    tmx.motor.pole_pairs = 15
+    tm1.motor.pole_pairs = 15
     
 Next comes tuning of gains. Gains are determined on the tick count of a full mechanical turn of the motor. When using the an absolute sensor, the tick count is fixed to 8192 ticks (the resolution can be higher as the tick count is a floating point value). 
 
@@ -328,8 +328,8 @@ Because of this it is possible that the gains need to be updated. Below we prese
 
 .. code-block:: python
 
-    tmx.controller.position.p_gain = 5
-    tmx.controller.velocity.p_gain = 0.00001
+    tm1.controller.position.p_gain = 5
+    tm1.controller.velocity.p_gain = 0.00001
 
 For your own motor, you need to determine these experimentally. Take a look at :ref:`Tuning` for more information.
 
@@ -337,20 +337,20 @@ At this point, you are ready to perform motor/sensor calibration. This will meas
 
 .. code-block:: python
 
-    tmx.controller.calibrate()
+    tm1.controller.calibrate()
 
 After calibration finishes, you should be able to control the motor. Note that the default reference frame for the hall sensors maps to 8192 ticks per motor electrical cycle. You can change this by modifying the user frame multiplier:
 
 .. code-block:: python
 
-    tmx.sensors.user_frame.multiplier = 1
+    tm1.sensors.user_frame.multiplier = 1
 
 Go ahead and enter velocity control mode, and set a setpoint:
 
 .. code-block:: python
 
-    tmx.controller.velocity_mode()
-    tmx.controller.velocity.setpoint = 80000 # around 60 rpm for a 15 pp motor
+    tm1.controller.velocity_mode()
+    tm1.controller.velocity.setpoint = 80000 # around 60 rpm for a 15 pp motor
 
 The motor should now move at a constant velocity.
 
@@ -358,8 +358,8 @@ Once you have determined that the motor behaves as expected, set to idle and per
 
 .. code-block:: python
 
-    tmx.controller.idle()
-    tmx.save_config()
+    tm1.controller.idle()
+    tm1.save_config()
 
 
 Observer Bandwidth
