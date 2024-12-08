@@ -98,6 +98,11 @@ class TestBoard(TMTestCase):
         self.check_state(0)
         self.tm.controller.current.Iq_limit = 5
         self.try_calibrate()
+        if hw_rev > 20:
+            self.tm.controller.position.p_gain = 5
+            self.tm.controller.velocity.p_gain = 2e-5
+            self.tm.controller.velocity.i_gain = 0
+
         self.tm.controller.position_mode()
         self.check_state(2)
 
