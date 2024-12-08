@@ -198,6 +198,30 @@ Example:
 By default, Tinymovr Studio will use slcan as the interface, and will search for CANAble/CANtact-type devices with slcan firmware. Such is the CANine adapter supplied with Tinymovr Servo Kits.
 
 
+``--bitrate=<chan>``
+====================
+
+Specifies a bitrate in baud.
+
+Example:
+
+|gui|
+
+.. code-block:: console
+
+    tinymovr --bus=socketcan --bitrate=1000000
+
+|cli|
+
+.. code-block:: console
+
+    tinymovr_cli --bus=socketcan --bitrate=1000000
+
+By default, Tinymovr Studio will use 1000000 as bitrate.
+We tested with 1000000, 500000 and 250000 baud.
+
+
+
 Units
 #####
 
