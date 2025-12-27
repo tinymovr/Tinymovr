@@ -107,6 +107,8 @@ or
 Replace "tm1" with the correct device ID if necessary. Full tab completion is available.
 
 
+.. _multiple-instances:
+
 Multiple Instances
 ##################
 
