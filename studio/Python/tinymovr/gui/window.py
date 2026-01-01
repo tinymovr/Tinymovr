@@ -18,7 +18,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 import sys
 import time
 import logging
-import pkg_resources
+from importlib.metadata import version as get_version
 from contextlib import suppress
 import json
 from PySide6 import QtCore
@@ -439,7 +439,7 @@ class MainWindow(QMainWindow):
             self.delete_graph_by_attr_name(attr_name)
 
     def show_about_box(self):
-        version_str = pkg_resources.require("tinymovr")[0].version
+        version_str = get_version("tinymovr")
         app_str = "{} {}".format(app_name, version_str)
         QMessageBox.about(
             self,

@@ -14,8 +14,8 @@ Options:
 
 import yaml
 import can
-import pkg_resources
 import IPython
+from importlib.metadata import version as get_version
 from traitlets.config import Config
 from docopt import docopt
 
@@ -46,7 +46,7 @@ def spawn():
     """
     Spawns the Tinymovr Studio IPython-based CLI.
     """
-    version = pkg_resources.require("tinymovr")[0].version
+    version = get_version("tinymovr")
     arguments = docopt(__doc__, version=app_name + " " + str(version))
 
     logger = configure_logging()
