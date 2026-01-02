@@ -15,7 +15,7 @@ Options:
 
 import sys
 import yaml
-import pkg_resources
+from importlib.metadata import version as get_version
 from importlib_resources import files
 from docopt import docopt
 from PySide6.QtWidgets import QApplication
@@ -44,7 +44,7 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 def spawn():
-    version = pkg_resources.require("tinymovr")[0].version
+    version = get_version("tinymovr")
     arguments = docopt(__doc__, version=app_name + " " + str(version))
 
     logger = configure_logging()
