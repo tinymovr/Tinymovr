@@ -87,22 +87,35 @@ bool motor_calibrate_resistance(void)
 		float I_meas = I_phase_meas.A;
 		float I_cal = motor_get_I_cal();
         float V_setpoint = 0.0f;
-        
+        uint32_t abnormal_condition_count = 0;
+
         for (uint32_t i = 0; i < CAL_R_LEN; i++)
         {
             ADC_get_phase_currents(&I_phase_meas);
-            
-			// 
-            if (V_setpoint > MAX_CALIBRATION_VOLTAGE && I_meas < MIN_CALIBRATION_CURRENT)
-            {
-                uint8_t *error_ptr = motor_get_error_ptr();
-                *error_ptr |= MOTOR_ERRORS_ABNORMAL_CALIBRATION_VOLTAGE;
-                gate_driver_set_duty_cycle(&three_phase_zero);
-                return false;
-            }
-            
+
             V_setpoint += CAL_V_GAIN * (I_cal - I_meas);
 			I_meas += CAL_I_GAIN * (I_phase_meas.A - I_meas);
+
+            // Debounced abnormal voltage check (after warm-up period)
+            if (i > CAL_R_WARMUP_ITERATIONS)
+            {
+                if (V_setpoint > MAX_CALIBRATION_VOLTAGE && I_meas < MIN_CALIBRATION_CURRENT)
+                {
+                    abnormal_condition_count++;
+                    if (abnormal_condition_count >= CAL_R_ABNORMAL_DEBOUNCE)
+                    {
+                        uint8_t *error_ptr = motor_get_error_ptr();
+                        *error_ptr |= MOTOR_ERRORS_ABNORMAL_CALIBRATION_VOLTAGE;
+                        gate_driver_set_duty_cycle(&three_phase_zero);
+                        return false;
+                    }
+                }
+                else
+                {
+                    abnormal_condition_count = 0;  // Reset counter if condition clears
+                }
+            }
+
             const float pwm_setpoint = V_setpoint / system_get_Vbus();
             SVM(pwm_setpoint, 0.0f, &modulation_values.A, &modulation_values.B, &modulation_values.C);
             gate_driver_set_duty_cycle(&modulation_values);
