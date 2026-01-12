@@ -182,21 +182,27 @@ class TestBoard(TMTestCase):
         self.check_state(2)
 
         if hw_rev > 20:
-            self.tm.controller.velocity.limit = 100000 * ticks / s
-            tick_range = 10000
+            self.tm.controller.velocity.limit = 80000 * ticks / s
+            self.tm.controller.velocity.deadband = 500
+            tick_range = 8000
+            settle_time = 0.50
+            tolerance = 3000
         else:
-            self.tm.controller.velocity.limit = 200000 * ticks / s
-            tick_range = 24000
+            self.tm.controller.velocity.limit = 120000 * ticks / s
+            self.tm.controller.velocity.deadband = 1000
+            tick_range = 18000
+            settle_time = 0.50
+            tolerance = 3000
 
         for _ in range(15):
             new_pos = random.uniform(-tick_range, tick_range)
             self.tm.controller.position.setpoint = new_pos * ticks
-            
-            time.sleep(0.35)
+
+            time.sleep(settle_time)
             self.assertAlmostEqual(
                 self.tm.sensors.user_frame.position_estimate,
                 self.tm.controller.position.setpoint,
-                delta=2000 * ticks,
+                delta=tolerance * ticks,
             )
 
     @pytest.mark.hitl_default

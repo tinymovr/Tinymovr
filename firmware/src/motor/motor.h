@@ -53,6 +53,9 @@
 #define CAL_V_INDUCTANCE      (5.0f)
 #endif
 
+#define CAL_R_WARMUP_ITERATIONS (1500u)   // ~75ms warm-up at 20kHz
+#define CAL_R_ABNORMAL_DEBOUNCE (300u)     // ~15ms debounce at 20kHz
+
 
 
 typedef struct
