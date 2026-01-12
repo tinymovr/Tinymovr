@@ -25,9 +25,7 @@ If you would like to propose a feature or think you have found a bug, [open a ne
 
 ### Repository Structure
 
-> **Note**
->
-> The `main` branch of this repository reflects the latest release. Development takes place at the [develop branch](https://github.com/tinymovr/Tinymovr/tree/develop).
+> **Note**: The `main` branch reflects the latest release. Development happens on [develop](https://github.com/tinymovr/Tinymovr/tree/develop).
 
 The repository is organized as follows:
 
@@ -37,17 +35,25 @@ The repository is organized as follows:
 
 [hardware](./hardware): Designs and drawings for related hardware
 
-[documentation](./docs): Documentation source
+[docs](./docs): User documentation source (built with Sphinx)
 
-### Branching Model
+See also: Developer documentation in root (ARCHITECTURE.md, CONTRIBUTING.md, etc.)
 
-The `main` branch reflects the latest release.
+### Developer Documentation
 
-Features are merged into the [develop](https://github.com/tinymovr/Tinymovr/tree/develop) branch.
+For contributors and AI agents working with the codebase:
 
-Hotfixes are merged directly into `main`, resulting in a new release.
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - System design and module organization
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Setup, workflow, and PR process
+- **[SAFETY.md](SAFETY.md)** - Safety-critical constraints (read before modifying firmware)
+- **[CLAUDE.md](CLAUDE.md)** - Navigation guide for AI agents
 
-We try to follow [A successful Git branching model](https://nvie.com/posts/a-successful-git-branching-model/) as much as possible, but within reason.
+Additional technical documentation:
+- [AVLOS_GUIDE.md](AVLOS_GUIDE.md) - Protocol modification workflow
+- [CONVENTIONS.md](CONVENTIONS.md) - Code style and patterns
+- [TESTING.md](TESTING.md) - Testing practices
+- [STRUCTURE.md](STRUCTURE.md) - Directory organization
+- [PAC5527_NOTES.md](PAC5527_NOTES.md) - MCU architecture
 
 ## Versioning
 
@@ -56,6 +62,10 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+**New contributors**: See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions and workflow.
+
+**AI agents**: See [CLAUDE.md](CLAUDE.md) for navigation and guidelines.
 
 ## License
 
