@@ -1,6 +1,9 @@
 # --- Macos Specific
 .DS_Store
 
+# --- Hardware datasheets (copyright restrictions)
+hardware/Datasheets/
+
 # --- Sphinx documentation
 docs/_build/
 
