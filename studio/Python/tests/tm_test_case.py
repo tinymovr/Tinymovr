@@ -95,6 +95,64 @@ class TMTestCase(unittest.TestCase):
             self.assertEqual(errors, 0)
         self.assertEqual(self.tm.controller.state, target_state)
 
+    def save_config(self):
+        """Save config to non-volatile memory.
+
+        Works with both 2.3.x and 2.4.x protocols.
+        """
+        self.tm.save_config()
+
+    def erase_config(self):
+        """Erase config from non-volatile memory and reset device.
+
+        Works with both 2.3.x and 2.4.x protocols.
+        """
+        self.tm.erase_config()
+
+    def get_nvm_num_slots(self):
+        """Get number of NVM wear leveling slots.
+
+        Returns:
+            Number of slots (2.4.x+) or None (2.3.x and earlier)
+        """
+        if hasattr(self.tm, 'nvm'):
+            return self.tm.nvm.num_slots
+        else:
+            return None
+
+    def get_nvm_current_slot(self):
+        """Get current active wear leveling slot.
+
+        Returns:
+            Current slot index (2.4.x+) or None (2.3.x and earlier)
+        """
+        if hasattr(self.tm, 'nvm'):
+            return self.tm.nvm.current_slot
+        else:
+            return None
+
+    def get_nvm_write_count(self):
+        """Get total NVM write count since first use.
+
+        Returns:
+            Write count (2.4.x+) or None (2.3.x and earlier)
+        """
+        if hasattr(self.tm, 'nvm'):
+            return self.tm.nvm.write_count
+        else:
+            return None
+
+    def get_nvm_remaining_writes_estimate(self):
+        """Get estimated remaining NVM write cycles.
+
+        Returns:
+            Remaining writes estimate (2.4.x+) or None (2.3.x and earlier)
+        """
+        if hasattr(self.tm, 'nvm'):
+            return self.tm.nvm.remaining_writes_estimate
+        else:
+            return None
+
 
 # TODO: This is temporary, should be removed when
 # slcan autodiscovery is merged in python-can
