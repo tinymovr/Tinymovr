@@ -43,7 +43,7 @@ class TestHall(TMTestCase):
         WARNING: This will perform one NVRAM write and two erase cycles.
         """
         self.check_state(0)
-        self.tm.erase_config()
+        self.erase_config()
         time.sleep(0.2)
 
         self.tm.sensors.select.position_sensor.connection = self.tm.sensors.select.position_sensor.connection.HALL
@@ -78,7 +78,7 @@ class TestHall(TMTestCase):
 
         time.sleep(0.1)
 
-        self.tm.save_config()
+        self.save_config()
         
         time.sleep(0.2)
 
@@ -97,7 +97,7 @@ class TestHall(TMTestCase):
                 delta=30000 * tick,
             )
 
-        self.tm.erase_config()
+        self.erase_config()
         time.sleep(0.2)
 
 

@@ -40,7 +40,7 @@ class TestAMT22(TMTestCase):
         WARNING: This will perform one NVRAM write and two erase cycles.
         """
         self.check_state(0)
-        self.tm.erase_config()
+        self.erase_config()
         time.sleep(0.2)
 
         self.configure_sensors(self.tm.sensors.setup.external_spi.type.AMT22)
@@ -70,7 +70,7 @@ class TestAMT22(TMTestCase):
 
         time.sleep(0.1)
 
-        self.tm.save_config()
+        self.save_config()
         
         time.sleep(0.2)
 
@@ -89,7 +89,7 @@ class TestAMT22(TMTestCase):
                 delta=200 * tick,
             )
 
-        self.tm.erase_config()
+        self.erase_config()
         time.sleep(0.2)
 
     @pytest.mark.sensor_amt22
@@ -100,7 +100,7 @@ class TestAMT22(TMTestCase):
         to an onboard connection, and verify if the position control maintains accuracy.
         """
         self.check_state(0)
-        self.tm.erase_config()
+        self.erase_config()
         time.sleep(0.2)
 
         # Initially configure with external SPI sensor
@@ -151,7 +151,7 @@ class TestAMT22(TMTestCase):
                 delta=2000 * tick,
             )
 
-        self.tm.erase_config()
+        self.erase_config()
         time.sleep(0.2)
 
 

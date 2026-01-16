@@ -40,7 +40,7 @@ class TestAS5047(TMTestCase):
         WARNING: This will perform one NVRAM write and two erase cycles.
         """
         self.check_state(0)
-        self.tm.erase_config()
+        self.erase_config()
         time.sleep(0.2)
 
         self.configure_sensors(self.tm.sensors.setup.external_spi.type.AS5047)
@@ -69,7 +69,7 @@ class TestAS5047(TMTestCase):
 
         time.sleep(0.1)
 
-        self.tm.save_config()
+        self.save_config()
         
         time.sleep(0.2)
 
@@ -88,7 +88,7 @@ class TestAS5047(TMTestCase):
                 delta=2000 * tick,
             )
 
-        self.tm.erase_config()
+        self.erase_config()
         time.sleep(0.2)
 
     @pytest.mark.sensor_as5047
@@ -99,7 +99,7 @@ class TestAS5047(TMTestCase):
         to an onboard connection, and verify if the position control maintains accuracy.
         """
         self.check_state(0)
-        self.tm.erase_config()
+        self.erase_config()
         time.sleep(0.2)
 
         # Initially configure with external SPI sensor
@@ -150,7 +150,7 @@ class TestAS5047(TMTestCase):
                 delta=2000 * tick,
             )
 
-        self.tm.erase_config()
+        self.erase_config()
         time.sleep(0.2)
 
     @pytest.mark.sensor_as5047
@@ -160,7 +160,7 @@ class TestAS5047(TMTestCase):
         different baud rates.
         """
         self.check_state(0)
-        self.tm.erase_config()
+        self.erase_config()
         time.sleep(0.2)
 
         self.configure_sensors(self.tm.sensors.setup.external_spi.type.AS5047)
