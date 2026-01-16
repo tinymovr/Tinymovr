@@ -34,7 +34,7 @@ typedef struct {
 
 static NVMWearLevelingState wl_state = {0};
 
-uint32_t calculate_checksum(const uint8_t *data, size_t len)
+PAC5XXX_RAMFUNC uint32_t calculate_checksum(const uint8_t *data, size_t len)
 {
     uint32_t checksum = 0;
     for (size_t i = 0; i < len; ++i)
@@ -225,7 +225,7 @@ void nvm_erase_and_reset(void)
  * @param metadata Pointer to metadata to validate
  * @return true if metadata is valid and uncorrupted, false otherwise
  */
-bool nvm_wl_validate_metadata(const NVMMetadata *metadata)
+PAC5XXX_RAMFUNC bool nvm_wl_validate_metadata(const NVMMetadata *metadata)
 {
     // Check magic marker
     if (metadata->magic_marker != NVM_MAGIC_MARKER)
