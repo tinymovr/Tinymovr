@@ -34,7 +34,7 @@ typedef struct {
 
 static NVMWearLevelingState wl_state = {0};
 
-PAC5XXX_RAMFUNC uint32_t calculate_checksum(const uint8_t *data, size_t len)
+uint32_t calculate_checksum(const uint8_t *data, size_t len)
 {
     uint32_t checksum = 0;
     for (size_t i = 0; i < len; ++i)
@@ -225,7 +225,7 @@ void nvm_erase_and_reset(void)
  * @param metadata Pointer to metadata to validate
  * @return true if metadata is valid and uncorrupted, false otherwise
  */
-PAC5XXX_RAMFUNC bool nvm_wl_validate_metadata(const NVMMetadata *metadata)
+bool nvm_wl_validate_metadata(const NVMMetadata *metadata)
 {
     // Check magic marker
     if (metadata->magic_marker != NVM_MAGIC_MARKER)
@@ -284,7 +284,7 @@ void nvm_wl_prepare_metadata(NVMMetadata *metadata, uint16_t data_size)
  * This function scans all NVM_NUM_SLOTS slots to find the one with the
  * highest sequence number. It handles sequence number wraparound correctly.
  */
-PAC5XXX_RAMFUNC void nvm_wl_scan_slots(void)
+void nvm_wl_scan_slots(void)
 {
     // Initialize state
     wl_state.current_slot = 0;
