@@ -52,6 +52,29 @@ bool nvm_save_config(void)
         nvm_wl_scan_slots();
     }
 
+    // Check if node ID has changed - if so, force write to slot 0
+    // This ensures slot 0 always contains the current CAN ID
+    uint8_t current_node_id = CAN_get_ID();
+    if (wl_state.latest_sequence > 0)
+    {
+        // Read metadata from current slot
+        uint32_t current_slot_addr = SETTINGS_PAGE_HEX +
+            (wl_state.current_slot * NVM_SLOT_BYTES);
+        const NVMMetadata *current_metadata = (const NVMMetadata *)current_slot_addr;
+
+        // If node ID differs, force write to slot 0
+        if (current_metadata->node_id_1 != current_node_id ||
+            current_metadata->node_id_2 != current_node_id)
+        {
+            wl_state.next_write_slot = 0;
+        }
+    }
+    else
+    {
+        // No valid config yet, write to slot 0
+        wl_state.next_write_slot = 0;
+    }
+
     // Prepare combined buffer: [Metadata 16B][NVMStruct]
     uint8_t data[NVM_METADATA_SIZE + sizeof(struct NVMStruct)];
     uint8_t readback_data[NVM_METADATA_SIZE + sizeof(struct NVMStruct)];
