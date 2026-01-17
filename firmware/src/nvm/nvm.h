@@ -27,6 +27,9 @@
 
 // Wear leveling metadata prepended to each config slot
 typedef struct {
+    uint8_t node_id_1;          // Node ID copy (redundancy 1)
+    uint8_t node_id_2;          // Node ID copy (redundancy 2)
+    uint8_t reserved[14];       // Padding for 16-byte alignment
     uint32_t sequence_number;   // Increments with each write, identifies most recent
     uint32_t magic_marker;      // 0x544D4E56 ("TMNV" in ASCII) - validates slot
     uint16_t data_size;         // Size of NVMStruct (for compatibility check)
@@ -34,7 +37,7 @@ typedef struct {
     uint32_t metadata_checksum; // Checksum of this metadata (corruption detection)
 } NVMMetadata;
 
-_Static_assert(sizeof(NVMMetadata) == 16, "NVMMetadata must be 16 bytes");
+_Static_assert(sizeof(NVMMetadata) == 32, "NVMMetadata must be 32 bytes");
 _Static_assert(sizeof(NVMMetadata) % 16 == 0, "NVMMetadata must be 16-byte aligned for flash");
 
 struct NVMStruct {
@@ -62,7 +65,7 @@ struct NVMStruct {
 
 // Wear leveling configuration - GENERIC, adapts to any structure size
 #define NVM_TOTAL_PAGES (SETTINGS_PAGE_END - SETTINGS_PAGE_START + 1)  // 8 pages
-#define NVM_METADATA_SIZE (sizeof(NVMMetadata))                         // 16 bytes
+#define NVM_METADATA_SIZE (sizeof(NVMMetadata))                         // 32 bytes
 #define NVM_SLOT_SIZE (SETTINGS_PAGE_COUNT)                             // Pages per slot
 #define NVM_SLOT_BYTES (NVM_SLOT_SIZE * NVM_PAGE_SIZE)                 // Bytes per slot
 #define NVM_NUM_SLOTS (NVM_TOTAL_PAGES / NVM_SLOT_SIZE)                // Number of slots

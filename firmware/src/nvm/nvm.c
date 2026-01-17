@@ -266,6 +266,9 @@ bool nvm_wl_validate_metadata(const NVMMetadata *metadata)
  */
 void nvm_wl_prepare_metadata(NVMMetadata *metadata, uint16_t data_size)
 {
+    metadata->node_id_1 = CAN_get_ID();
+    metadata->node_id_2 = CAN_get_ID();
+    memset(metadata->reserved, 0, sizeof(metadata->reserved));
     metadata->sequence_number = wl_state.latest_sequence + 1;
     metadata->magic_marker = NVM_MAGIC_MARKER;
     metadata->data_size = data_size;
