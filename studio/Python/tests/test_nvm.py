@@ -127,7 +127,7 @@ class TestNVM(TMTestCase):
 
         # Define hardware-specific parameters
         if hw_rev > 20:
-            self.tm.controller.velocity.limit = 80000
+            self.tm.controller.velocity.limit = 85000
             self.tm.controller.velocity.deadband = 500
             settle_time = 0.50
             tick_range = 8000
@@ -209,11 +209,11 @@ class TestNVM(TMTestCase):
         
         # Define hardware-specific parameters
         if hw_rev > 20:
-            velocity_limit = 80000
+            velocity_limit = 85000
             vel_i_gain = 0
             vel_p_gain = 3e-5
             vel_deadband = 50
-            max_vel = 80000
+            max_vel = 85000
             max_accel = 500000
             max_decel = 500000
             velocity_range = 30000
@@ -643,6 +643,130 @@ class TestNVM(TMTestCase):
         # Verify write count is 1 after first save post-erase
         write_count_after_save = self.get_nvm_write_count()
         self.assertEqual(write_count_after_save, 1, "Write count should be 1 after first save post-erase")
+
+        # Clean up
+        self.erase_config()
+        time.sleep(0.2)
+
+    def test_m_can_id_change_forces_slot_0_and_dfu(self):
+        """
+        Test that changing CAN ID forces write to slot 0, and verify ID persists in DFU mode.
+        This ensures slot 0 always contains the current CAN ID.
+        WARNING: This will perform multiple NVRAM write cycles and enter DFU mode.
+        """
+        self.check_state(0)
+
+        # Start fresh
+        self.erase_config()
+        time.sleep(0.2)
+
+        # Get number of slots
+        num_slots = self.get_nvm_num_slots()
+
+        # Skip if wear leveling debug endpoints not available
+        if num_slots is None:
+            self.skipTest("Wear leveling debug endpoints not available in this protocol version")
+
+        # Calibrate first
+        self.try_calibrate()
+
+        # Save initial config with node ID 1 (default)
+        initial_node_id = self.tm.comms.can.id
+        self.save_config()
+        time.sleep(0.2)
+
+        # Should be in slot 0 after first save
+        self.assertEqual(self.get_nvm_current_slot(), 0,
+            "First save should be in slot 0")
+
+        # Perform multiple saves to move to different slots
+        for i in range(3):
+            self.tm.controller.velocity.p_gain = 1e-5 + i * 1e-6
+            self.save_config()
+            time.sleep(0.1)
+
+        # Verify we moved past slot 0
+        current_slot_before_id_change = self.get_nvm_current_slot()
+        self.assertNotEqual(current_slot_before_id_change, 0,
+            "Should have moved past slot 0 after multiple saves")
+
+        # Change CAN ID
+        new_node_id = 5
+        self.tm.comms.can.id = new_node_id
+        time.sleep(0.2)
+
+        # Recreate device object with new node ID
+        from tinymovr.config import create_device
+        tm_new = create_device(node_id=new_node_id)
+
+        # Verify ID changed
+        self.assertEqual(tm_new.comms.can.id, new_node_id,
+            f"CAN ID should be {new_node_id}")
+
+        # Save config - should force write to slot 0
+        tm_new.save_config()
+        time.sleep(0.2)
+
+        # Verify we're back in slot 0
+        self.assertEqual(tm_new.nvm.current_slot, 0,
+            "Changing CAN ID should force write to slot 0")
+
+        # Reset and verify new ID persists
+        tm_new.reset()
+        time.sleep(0.5)
+
+        # Recreate device object after reset
+        tm_new = create_device(node_id=new_node_id)
+
+        self.assertEqual(tm_new.comms.can.id, new_node_id,
+            f"CAN ID should persist as {new_node_id} after reset")
+        self.assertEqual(tm_new.motor.calibrated, True,
+            "Motor should remain calibrated after reset")
+
+        # Verify still in slot 0
+        self.assertEqual(tm_new.nvm.current_slot, 0,
+            "After reset, should still be using slot 0")
+
+        # Enter DFU mode to verify CAN ID persists there
+        tm_new.enter_dfu()
+        time.sleep(0.5)
+
+        # Create bootloader device instance
+        bl = create_device(node_id=new_node_id)
+
+        # Verify CAN ID matches in DFU mode
+        self.assertEqual(bl.node_id, new_node_id,
+            f"CAN ID in DFU mode should be {new_node_id}")
+
+        # Exit DFU and return to normal operation
+        bl.reset()
+        time.sleep(0.5)
+
+        # Recreate device object after exiting DFU
+        tm_new = create_device(node_id=new_node_id)
+
+        # Verify CAN ID still correct after exiting DFU
+        self.assertEqual(tm_new.comms.can.id, new_node_id,
+            f"CAN ID should still be {new_node_id} after exiting DFU")
+
+        # Change ID back and verify slot 0 write again
+        tm_new.comms.can.id = initial_node_id
+        time.sleep(0.2)
+
+        # Recreate device object with original node ID
+        self.tm = create_device(node_id=initial_node_id)
+
+        self.save_config()
+        time.sleep(0.2)
+
+        # Verify back in slot 0
+        self.assertEqual(self.get_nvm_current_slot(), 0,
+            "Changing CAN ID back should force write to slot 0 again")
+
+        # Reset and verify original ID restored
+        self.reset_and_wait()
+        self.assertEqual(self.tm.comms.can.id, initial_node_id,
+            f"CAN ID should be back to {initial_node_id}")
 
         # Clean up
         self.erase_config()
