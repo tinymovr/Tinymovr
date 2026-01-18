@@ -453,24 +453,3 @@ uint32_t nvm_wl_get_write_count(void)
     return wl_state.latest_sequence;
 }
 
-/**
- * @brief Get estimated remaining writes
- * @return Estimated remaining writes before wear out
- */
-uint32_t nvm_wl_get_remaining_writes_estimate(void)
-{
-    if (!wl_state.initialized)
-    {
-        nvm_wl_scan_slots();
-    }
-
-    // Conservative estimate: 10,000 cycles per page × number of slots
-    const uint32_t total_lifetime = (uint32_t)NVM_NUM_SLOTS * 10000;
-
-    if (wl_state.latest_sequence >= total_lifetime)
-    {
-        return 0;  // Already exceeded conservative estimate
-    }
-
-    return total_lifetime - wl_state.latest_sequence;
-}

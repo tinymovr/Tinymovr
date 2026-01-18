@@ -81,10 +81,6 @@ remote_attributes:
         summary: Total writes since first use (sequence number).
         getter_name: nvm_wl_get_write_count
         dtype: uint32
-      - name: remaining_writes_estimate
-        summary: Estimated remaining writes (num_slots × 10000 - write_count).
-        getter_name: nvm_wl_get_remaining_writes_estimate
-        dtype: uint32
   - name: reset
     summary: Reset the device.
     caller_name: system_reset

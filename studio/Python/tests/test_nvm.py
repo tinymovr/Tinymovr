@@ -345,13 +345,6 @@ class TestNVM(TMTestCase):
         self.assertGreaterEqual(write_count, num_slots + 1,
             f"Write count should be at least {num_slots + 1}, got {write_count}")
 
-        # Verify remaining writes estimate is reasonable
-        remaining = self.get_nvm_remaining_writes_estimate()
-        expected_lifetime = num_slots * 10000
-        self.assertGreater(remaining, 0, "Remaining writes should be > 0")
-        self.assertLess(remaining, expected_lifetime,
-            f"Remaining writes should be < {expected_lifetime}")
-
         # Reset and verify most recent config loaded
         self.reset_and_wait()
 
@@ -531,61 +524,6 @@ class TestNVM(TMTestCase):
         self.erase_config()
         time.sleep(0.2)
 
-    def test_k_remaining_writes_estimate_decreases(self):
-        """
-        Test that remaining writes estimate decreases correctly as writes are performed.
-        WARNING: This will perform 10 NVRAM write cycles.
-        """
-        self.check_state(0)
-
-        # Start fresh
-        self.erase_config()
-        time.sleep(0.2)
-
-        # Get number of slots
-        num_slots = self.get_nvm_num_slots()
-
-        # Skip if wear leveling debug endpoints not available
-        if num_slots is None:
-            self.skipTest("Wear leveling debug endpoints not available in this protocol version")
-
-        # Calibrate first
-        self.try_calibrate()
-
-        # Check initial remaining writes
-        initial_remaining = self.get_nvm_remaining_writes_estimate()
-        expected_lifetime = num_slots * 10000
-
-        self.assertAlmostEqual(initial_remaining, expected_lifetime, delta=10,
-            msg=f"Initial remaining writes should be ~{expected_lifetime}")
-
-        # Perform 10 writes
-        num_writes = 10
-        for i in range(num_writes):
-            # Modify a parameter to ensure config changes
-            self.tm.controller.velocity.limit = (100000 + i * 1000) * tick / s
-
-            # Save config
-            self.save_config()
-            time.sleep(0.05)
-
-        # Check final remaining writes
-        final_remaining = self.get_nvm_remaining_writes_estimate()
-        expected_remaining = expected_lifetime - num_writes
-
-        self.assertAlmostEqual(final_remaining, expected_remaining, delta=10,
-            msg=f"Remaining writes should decrease to ~{expected_remaining}")
-
-        # Verify calculation: remaining = lifetime - write_count
-        write_count = self.get_nvm_write_count()
-        calculated_remaining = expected_lifetime - write_count
-        self.assertEqual(final_remaining, calculated_remaining,
-            f"Remaining writes calculation incorrect: expected {calculated_remaining}, got {final_remaining}")
-
-        # Clean up
-        self.erase_config()
-        time.sleep(0.2)
-
     def test_l_post_erase_state_clean(self):
         """
         Test that erase properly resets all wear leveling state.
@@ -622,14 +560,9 @@ class TestNVM(TMTestCase):
         # Check all wear leveling state is reset
         write_count_after = self.get_nvm_write_count()
         current_slot_after = self.get_nvm_current_slot()
-        remaining_after = self.get_nvm_remaining_writes_estimate()
 
         self.assertEqual(write_count_after, 0, "Write count should be 0 after erase")
         self.assertEqual(current_slot_after, 0, "Current slot should be 0 after erase")
-
-        expected_lifetime = num_slots * 10000
-        self.assertAlmostEqual(remaining_after, expected_lifetime, delta=10,
-            msg=f"Remaining writes should be ~{expected_lifetime} after erase")
 
         # Verify motor becomes uncalibrated
         self.assertEqual(self.tm.motor.calibrated, False, "Motor should be uncalibrated after erase")

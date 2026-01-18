@@ -434,7 +434,7 @@ Application
 ### Code Generation
 
 **Tool**: Avlos (Python package)
-**Command**: `python -m avlos.generate avlos_config.yaml`
+**Command**: `avlos from file <spec_file>.yaml`
 **Input**: YAML specs in [studio/Python/tinymovr/specs/](studio/Python/tinymovr/specs/)
 **Output**: C code, enums, documentation
 

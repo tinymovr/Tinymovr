@@ -246,9 +246,11 @@ Find the `motor` section and add:
 ### Step 2: Run Code Generator
 
 ```bash
-# From repository root
-python -m avlos.generate avlos_config.yaml
+cd studio/Python/tinymovr/specs
+avlos from file <spec_file>.yaml
 ```
+
+Replace `<spec_file>` with the appropriate protocol version spec file (e.g., `tinymovr_2_3_x`, `tinymovr_2_4_x`, etc.). Use the spec file that matches the firmware version you're working with.
 
 **Output**:
 ```
@@ -513,7 +515,7 @@ tm = deserialize(spec)
 
 3. **Generate code** for both versions:
    ```bash
-   python -m avlos.generate avlos_config.yaml
+   avlos from file <spec_file>.yaml
    ```
 
 4. **Update firmware** to use new generated code
@@ -742,7 +744,7 @@ class TestProtocolHash(unittest.TestCase):
 
 **Solution**: Always run code generation after YAML changes:
 ```bash
-python -m avlos.generate avlos_config.yaml
+avlos from file <spec_file>.yaml
 ```
 
 ### 2. Editing Generated Files Directly

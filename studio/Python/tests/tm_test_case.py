@@ -142,18 +142,6 @@ class TMTestCase(unittest.TestCase):
         else:
             return None
 
-    def get_nvm_remaining_writes_estimate(self):
-        """Get estimated remaining NVM write cycles.
-
-        Returns:
-            Remaining writes estimate (2.4.x+) or None (2.3.x and earlier)
-        """
-        if hasattr(self.tm, 'nvm'):
-            return self.tm.nvm.remaining_writes_estimate
-        else:
-            return None
-
-
 # TODO: This is temporary, should be removed when
 # slcan autodiscovery is merged in python-can
 import serial

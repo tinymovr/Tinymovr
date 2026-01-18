@@ -102,5 +102,4 @@ bool nvm_wl_migrate_legacy_config(void);
 uint8_t nvm_wl_get_num_slots(void);
 uint8_t nvm_wl_get_current_slot(void);
 uint32_t nvm_wl_get_write_count(void);
-uint32_t nvm_wl_get_remaining_writes_estimate(void);
 

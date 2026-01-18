@@ -210,7 +210,7 @@ If modifying the API (adding/removing endpoints):
 
 2. **Generate code**:
    ```bash
-   python -m avlos.generate avlos_config.yaml
+   avlos from file <spec_file>.yaml
    ```
 
    This generates:
