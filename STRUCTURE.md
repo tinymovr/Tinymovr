@@ -284,7 +284,7 @@ docs/
 
 **Workflow**:
 ```bash
-python -m avlos.generate avlos_config.yaml
+avlos from file <spec_file>.yaml
 ```
 
 ## Build Artifacts
@@ -333,7 +333,7 @@ __pycache__/              # Python bytecode cache
 
 ### Adding API Endpoint
 - Edit: [studio/Python/tinymovr/specs/tinymovr_2_3_x.yaml](studio/Python/tinymovr/specs/tinymovr_2_3_x.yaml)
-- Generate: `python -m avlos.generate avlos_config.yaml`
+- Generate: `avlos from file <spec_file>.yaml`
 - Implement: Appropriate module in `firmware/src/`
 
 ### Modifying Calibration

@@ -17,8 +17,18 @@
 #include <src/watchdog/watchdog.h>
 #include <src/can/can_endpoints.h>
 
+static inline uint8_t _avlos_getter_string(uint8_t *buffer, uint8_t *buffer_len, uint8_t (*getter)(char*)) {
+    *buffer_len = getter((char *)buffer);
+    return AVLOS_RET_READ;
+}
 
-uint8_t (*avlos_endpoints[97])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_protocol_hash, &avlos_uid, &avlos_fw_version, &avlos_hw_revision, &avlos_Vbus, &avlos_Ibus, &avlos_power, &avlos_temp, &avlos_calibrated, &avlos_errors, &avlos_warnings, &avlos_save_config, &avlos_erase_config, &avlos_reset, &avlos_enter_dfu, &avlos_config_size, &avlos_scheduler_load, &avlos_scheduler_warnings, &avlos_controller_state, &avlos_controller_mode, &avlos_controller_warnings, &avlos_controller_errors, &avlos_controller_position_setpoint, &avlos_controller_position_p_gain, &avlos_controller_velocity_setpoint, &avlos_controller_velocity_limit, &avlos_controller_velocity_p_gain, &avlos_controller_velocity_i_gain, &avlos_controller_velocity_deadband, &avlos_controller_velocity_increment, &avlos_controller_current_Iq_setpoint, &avlos_controller_current_Id_setpoint, &avlos_controller_current_Iq_limit, &avlos_controller_current_Iq_estimate, &avlos_controller_current_bandwidth, &avlos_controller_current_Iq_p_gain, &avlos_controller_current_max_Ibus_regen, &avlos_controller_current_max_Ibrake, &avlos_controller_voltage_Vq_setpoint, &avlos_controller_calibrate, &avlos_controller_idle, &avlos_controller_position_mode, &avlos_controller_velocity_mode, &avlos_controller_current_mode, &avlos_controller_set_pos_vel_setpoints, &avlos_comms_can_rate, &avlos_comms_can_id, &avlos_comms_can_heartbeat, &avlos_motor_R, &avlos_motor_L, &avlos_motor_pole_pairs, &avlos_motor_type, &avlos_motor_calibrated, &avlos_motor_I_cal, &avlos_motor_errors, &avlos_sensors_user_frame_position_estimate, &avlos_sensors_user_frame_velocity_estimate, &avlos_sensors_user_frame_offset, &avlos_sensors_user_frame_multiplier, &avlos_sensors_setup_onboard_calibrated, &avlos_sensors_setup_onboard_errors, &avlos_sensors_setup_external_spi_type, &avlos_sensors_setup_external_spi_rate, &avlos_sensors_setup_external_spi_calibrated, &avlos_sensors_setup_external_spi_errors, &avlos_sensors_setup_hall_calibrated, &avlos_sensors_setup_hall_errors, &avlos_sensors_select_position_sensor_connection, &avlos_sensors_select_position_sensor_bandwidth, &avlos_sensors_select_position_sensor_raw_angle, &avlos_sensors_select_position_sensor_position_estimate, &avlos_sensors_select_position_sensor_velocity_estimate, &avlos_sensors_select_commutation_sensor_connection, &avlos_sensors_select_commutation_sensor_bandwidth, &avlos_sensors_select_commutation_sensor_raw_angle, &avlos_sensors_select_commutation_sensor_position_estimate, &avlos_sensors_select_commutation_sensor_velocity_estimate, &avlos_traj_planner_max_accel, &avlos_traj_planner_max_decel, &avlos_traj_planner_max_vel, &avlos_traj_planner_t_accel, &avlos_traj_planner_t_decel, &avlos_traj_planner_t_total, &avlos_traj_planner_move_to, &avlos_traj_planner_move_to_tlimit, &avlos_traj_planner_errors, &avlos_homing_velocity, &avlos_homing_max_homing_t, &avlos_homing_retract_dist, &avlos_homing_warnings, &avlos_homing_stall_detect_velocity, &avlos_homing_stall_detect_delta_pos, &avlos_homing_stall_detect_t, &avlos_homing_home, &avlos_watchdog_enabled, &avlos_watchdog_triggered, &avlos_watchdog_timeout };
+static inline uint8_t _avlos_setter_string(const uint8_t *buffer, void (*setter)(const char*)) {
+    setter((const char *)buffer);
+    return AVLOS_RET_WRITE;
+}
+
+
+uint8_t (*avlos_endpoints[100])(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd) = {&avlos_protocol_hash, &avlos_uid, &avlos_fw_version, &avlos_hw_revision, &avlos_Vbus, &avlos_Ibus, &avlos_power, &avlos_temp, &avlos_calibrated, &avlos_errors, &avlos_warnings, &avlos_save_config, &avlos_erase_config, &avlos_nvm_num_slots, &avlos_nvm_current_slot, &avlos_nvm_write_count, &avlos_reset, &avlos_enter_dfu, &avlos_config_size, &avlos_scheduler_load, &avlos_scheduler_warnings, &avlos_controller_state, &avlos_controller_mode, &avlos_controller_warnings, &avlos_controller_errors, &avlos_controller_position_setpoint, &avlos_controller_position_p_gain, &avlos_controller_velocity_setpoint, &avlos_controller_velocity_limit, &avlos_controller_velocity_p_gain, &avlos_controller_velocity_i_gain, &avlos_controller_velocity_deadband, &avlos_controller_velocity_increment, &avlos_controller_current_Iq_setpoint, &avlos_controller_current_Id_setpoint, &avlos_controller_current_Iq_limit, &avlos_controller_current_Iq_estimate, &avlos_controller_current_bandwidth, &avlos_controller_current_Iq_p_gain, &avlos_controller_current_max_Ibus_regen, &avlos_controller_current_max_Ibrake, &avlos_controller_voltage_Vq_setpoint, &avlos_controller_calibrate, &avlos_controller_idle, &avlos_controller_position_mode, &avlos_controller_velocity_mode, &avlos_controller_current_mode, &avlos_controller_set_pos_vel_setpoints, &avlos_comms_can_rate, &avlos_comms_can_id, &avlos_comms_can_heartbeat, &avlos_motor_R, &avlos_motor_L, &avlos_motor_pole_pairs, &avlos_motor_type, &avlos_motor_calibrated, &avlos_motor_I_cal, &avlos_motor_errors, &avlos_sensors_user_frame_position_estimate, &avlos_sensors_user_frame_velocity_estimate, &avlos_sensors_user_frame_offset, &avlos_sensors_user_frame_multiplier, &avlos_sensors_setup_onboard_calibrated, &avlos_sensors_setup_onboard_errors, &avlos_sensors_setup_external_spi_type, &avlos_sensors_setup_external_spi_rate, &avlos_sensors_setup_external_spi_calibrated, &avlos_sensors_setup_external_spi_errors, &avlos_sensors_setup_hall_calibrated, &avlos_sensors_setup_hall_errors, &avlos_sensors_select_position_sensor_connection, &avlos_sensors_select_position_sensor_bandwidth, &avlos_sensors_select_position_sensor_raw_angle, &avlos_sensors_select_position_sensor_position_estimate, &avlos_sensors_select_position_sensor_velocity_estimate, &avlos_sensors_select_commutation_sensor_connection, &avlos_sensors_select_commutation_sensor_bandwidth, &avlos_sensors_select_commutation_sensor_raw_angle, &avlos_sensors_select_commutation_sensor_position_estimate, &avlos_sensors_select_commutation_sensor_velocity_estimate, &avlos_traj_planner_max_accel, &avlos_traj_planner_max_decel, &avlos_traj_planner_max_vel, &avlos_traj_planner_t_accel, &avlos_traj_planner_t_decel, &avlos_traj_planner_t_total, &avlos_traj_planner_move_to, &avlos_traj_planner_move_to_tlimit, &avlos_traj_planner_errors, &avlos_homing_velocity, &avlos_homing_max_homing_t, &avlos_homing_retract_dist, &avlos_homing_warnings, &avlos_homing_stall_detect_velocity, &avlos_homing_stall_detect_delta_pos, &avlos_homing_stall_detect_t, &avlos_homing_home, &avlos_watchdog_enabled, &avlos_watchdog_triggered, &avlos_watchdog_timeout };
 
 uint32_t _avlos_get_proto_hash(void)
 {
@@ -52,8 +62,7 @@ if (AVLOS_CMD_READ == cmd) {
 uint8_t avlos_fw_version(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
 {
 if (AVLOS_CMD_READ == cmd) {
-        *buffer_len = system_get_fw_version_string((char *)buffer); 
-        return AVLOS_RET_READ;
+        return _avlos_getter_string(buffer, buffer_len, system_get_fw_version_string);
     }
     return AVLOS_RET_NOACTION;
 }
@@ -166,6 +175,42 @@ uint8_t avlos_erase_config(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command
     nvm_erase_and_reset();
 
     return AVLOS_RET_CALL;
+}
+
+uint8_t avlos_nvm_num_slots(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        uint8_t v;
+        v = nvm_wl_get_num_slots();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_nvm_current_slot(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        uint8_t v;
+        v = nvm_wl_get_current_slot();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
+}
+
+uint8_t avlos_nvm_write_count(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)
+{
+if (AVLOS_CMD_READ == cmd) {
+        uint32_t v;
+        v = nvm_wl_get_write_count();
+        *buffer_len = sizeof(v);
+        memcpy(buffer, &v, sizeof(v));
+        return AVLOS_RET_READ;
+    }
+    return AVLOS_RET_NOACTION;
 }
 
 uint8_t avlos_reset(uint8_t * buffer, uint8_t * buffer_len, Avlos_Command cmd)

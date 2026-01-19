@@ -155,7 +155,7 @@ Use this decision tree to find the right documentation:
 
 1. **Edited Generated Files**: Never edit `can_endpoints.c/h` or `tm_enums.h` directly
 2. **C Function Signature Mismatch**: YAML `dtype` must match C function return type
-3. **Forgot to Regenerate**: After YAML change, must run `python -m avlos.generate avlos_config.yaml`
+3. **Forgot to Regenerate**: After YAML change, must run `avlos from file <spec_file>.yaml` (where `<spec_file>` is the appropriate protocol version like `tinymovr_2_3_x` or `tinymovr_2_4_x`)
 
 **Details**: [AVLOS_GUIDE.md § Common Pitfalls](AVLOS_GUIDE.md#common-pitfalls)
 
@@ -262,8 +262,11 @@ pytest -m eol                                 # Comprehensive tests
 ### Code Generation
 
 ```bash
-python -m avlos.generate avlos_config.yaml
+cd studio/Python/tinymovr/specs
+avlos from file <spec_file>.yaml
 ```
+
+**Note**: Replace `<spec_file>` with the appropriate protocol version (e.g., `tinymovr_2_3_x`, `tinymovr_2_4_x`). Always verify which spec file matches the firmware version being worked on.
 
 **Details**: [AVLOS_GUIDE.md § Code Generation Configuration](AVLOS_GUIDE.md#code-generation-configuration)
 

@@ -246,9 +246,11 @@ Find the `motor` section and add:
 ### Step 2: Run Code Generator
 
 ```bash
-# From repository root
-python -m avlos.generate avlos_config.yaml
+cd studio/Python/tinymovr/specs
+avlos from file <spec_file>.yaml
 ```
+
+Replace `<spec_file>` with the appropriate protocol version spec file (e.g., `tinymovr_2_3_x`, `tinymovr_2_4_x`, etc.). Use the spec file that matches the firmware version you're working with.
 
 **Output**:
 ```
@@ -476,6 +478,105 @@ tm = deserialize(spec)
   summary: "[DEPRECATED] Use new_parameter instead."
 ```
 
+## Breaking Changes and Protocol Versioning
+
+### When to Create a New Protocol Version
+
+**Always create a new protocol version** (e.g., 2.3.x → 2.4.x) when making breaking changes:
+
+1. **API Structure Changes**
+   - Moving endpoints to new namespaces
+   - Renaming endpoints
+   - Changing endpoint hierarchy
+
+2. **Data Type Changes**
+   - Changing `dtype` of existing endpoint
+   - Changing units
+   - Changing enum values or flags
+
+3. **Removing Endpoints**
+   - Deleting functionality (even if deprecated)
+
+**Never** create new versions for:
+- Adding new endpoints (append to end of spec)
+- Fixing typos in documentation (`summary` fields)
+- Adding metadata (`meta` fields)
+- Internal implementation changes
+
+### How to Create a New Protocol Version
+
+1. **Copy the previous version file**:
+   ```bash
+   cp studio/Python/tinymovr/specs/tinymovr_2_3_x.yaml \
+      studio/Python/tinymovr/specs/tinymovr_2_4_x.yaml
+   ```
+
+2. **Make breaking changes** in the new file
+
+3. **Generate code** for both versions:
+   ```bash
+   avlos from file <spec_file>.yaml
+   ```
+
+4. **Update firmware** to use new generated code
+
+5. **Test with Python client** - it will automatically detect version via protocol hash
+
+6. **Keep old version file** for backward compatibility with older firmware
+
+### Example: Adding Monitoring Endpoints Under New Namespace
+
+When adding new monitoring/debug endpoints, group them under a descriptive namespace while keeping user-facing operations at the top level for backward compatibility.
+
+**Before** (v2.3.x):
+```yaml
+name: tm
+remote_attributes:
+  - name: save_config
+    caller_name: nvm_save_config
+    dtype: void
+  - name: erase_config
+    caller_name: nvm_erase_and_reset
+    dtype: void
+```
+
+**After** (v2.4.x) - Adding wear leveling monitoring:
+```yaml
+name: tm
+remote_attributes:
+  # User operations stay at top level (no breaking changes)
+  - name: save_config
+    caller_name: nvm_save_config
+    dtype: void
+  - name: erase_config
+    caller_name: nvm_erase_and_reset
+    dtype: void
+  # New monitoring endpoints under nvm namespace
+  - name: nvm
+    remote_attributes:
+      - name: num_slots
+        getter_name: nvm_wl_get_num_slots
+        dtype: uint8
+      - name: current_slot
+        getter_name: nvm_wl_get_current_slot
+        dtype: uint8
+      - name: write_count
+        getter_name: nvm_wl_get_write_count
+        dtype: uint32
+```
+
+**Impact**:
+- User operations unchanged: `tm.save_config()`, `tm.erase_config()` (backward compatible)
+- New monitoring API: `tm.nvm.num_slots`, `tm.nvm.write_count`, etc.
+- Protocol hash changes (2.3.x clients won't see new endpoints, but existing code works)
+- Tests can detect protocol version via `hasattr(tm, 'nvm')` for optional features
+
+### Version Numbering Convention
+
+- **Major version** (e.g., 1.x → 2.x): Major firmware rewrite, architecture change
+- **Minor version** (e.g., 2.3.x → 2.4.x): Breaking protocol changes, API reorganization
+- **Patch version** (within x.y.x): Usually not reflected in spec filename, used for firmware-only changes
+
 ## Generated Code Structure
 
 ### Firmware (C)
@@ -643,7 +744,7 @@ class TestProtocolHash(unittest.TestCase):
 
 **Solution**: Always run code generation after YAML changes:
 ```bash
-python -m avlos.generate avlos_config.yaml
+avlos from file <spec_file>.yaml
 ```
 
 ### 2. Editing Generated Files Directly

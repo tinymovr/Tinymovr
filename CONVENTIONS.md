@@ -40,15 +40,48 @@ return 25+d/(c.r*0.00393);
 
 ### RAM Functions
 
-Mark control loop functions with `TM_RAMFUNC` for zero-wait-state execution:
+Functions must be placed in RAM using `TM_RAMFUNC` or `PAC5XXX_RAMFUNC` for two distinct reasons:
+
+#### 1. Flash Write Operations (Hardware Constraint)
+
+**CRITICAL**: Code that writes or erases flash **cannot execute from flash** - it must run from RAM. This is a hardware limitation: the flash controller cannot simultaneously execute code and modify flash memory.
 
 ```c
-TM_RAMFUNC void CLControlStep(void) {
-    // Runs at 20 kHz from RAM
+PAC5XXX_RAMFUNC void flash_write(uint8_t *dest, uint8_t *src, uint32_t size) {
+    // Must run from RAM because flash is being modified
+    // Executing from flash during write would cause undefined behavior
+}
+
+PAC5XXX_RAMFUNC void flash_erase_page(uint32_t page_num) {
+    // Must run from RAM - cannot execute from flash during erase
 }
 ```
 
-**Rule**: If called every 50 μs (20 kHz), it **must** be `TM_RAMFUNC`.
+**Rule**: Any function that writes/erases flash **must** be `PAC5XXX_RAMFUNC`. See [flash_func.c](firmware/src/nvm/flash_func.c).
+
+#### 2. Control Loop Performance (Zero Wait State)
+
+Mark control loop functions with `TM_RAMFUNC` for deterministic zero-wait-state execution:
+
+```c
+TM_RAMFUNC void CLControlStep(void) {
+    // Runs at 20 kHz from RAM for predictable timing
+}
+```
+
+**Rule**: If called every 50 μs (20 kHz), it **must** be `TM_RAMFUNC` for performance.
+
+#### Important: When NOT to Use RAMFUNC
+
+**Do NOT add RAMFUNC unless required by one of the two reasons above.** Unnecessary RAMFUNC markers:
+- Waste limited RAM space (only 64 KB total)
+- Trigger GCC debug symbol bugs on some compiler versions
+- Provide no benefit for non-critical code
+
+Example: NVM wear leveling functions (`nvm_wl_scan_slots`, `calculate_checksum`) do NOT need RAMFUNC:
+- Not called from control loop (performance reason doesn't apply)
+- Don't write to flash themselves (hardware constraint doesn't apply)
+- Called by `nvm_save_config` which calls `flash_write`, but that's fine - only `flash_write` needs RAM placement
 
 ### Performance Guidelines
 
