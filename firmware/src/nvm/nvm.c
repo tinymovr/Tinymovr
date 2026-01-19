@@ -374,9 +374,11 @@ bool nvm_wl_detect_legacy_config(void)
 {
     // Check if page 120 has new-format config (with metadata header)
     const NVMMetadata *potential_metadata = (const NVMMetadata *)SETTINGS_PAGE_HEX;
-    if (potential_metadata->magic_marker == NVM_MAGIC_MARKER)
+
+    // Use full metadata validation instead of just magic_marker
+    if (nvm_wl_validate_metadata(potential_metadata))
     {
-        return false;  // Not legacy, already has metadata
+        return false;  // Not legacy, already has valid metadata
     }
 
     // Try to validate as legacy config (no metadata, starts directly with NVMStruct)
@@ -408,6 +410,17 @@ bool nvm_wl_migrate_legacy_config(void)
 
     // Temporarily store in RAM
     s = legacy_config;
+
+    // Restore runtime configuration from legacy config
+    // This ensures nvm_save_config() will save the legacy data, not current runtime
+    frames_restore_config(&s.frames_config);
+    ADC_restore_config(&s.adc_config);
+    motor_restore_config(&s.motor_config);
+    sensors_restore_config(&s.sensors_config);
+    observers_restore_config(&s.observers_config);
+    controller_restore_config(&s.controller_config);
+    CAN_restore_config(&s.can_config);
+    traj_planner_restore_config(&s.traj_planner_config);
 
     // Save using new format (automatically adds metadata and uses wear leveling)
     // This will write to slot 0 with sequence number 1
