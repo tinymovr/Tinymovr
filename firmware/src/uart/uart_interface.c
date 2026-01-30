@@ -99,7 +99,7 @@ static void UART_send_response(uint16_t ep_id, const uint8_t *payload, uint8_t p
  */
 void UART_process_message(void)
 {
-    // Minimum frame size: Sync + Length + Hash + EP_ID(2) + CMD + CRC(2) = 9 bytes
+    // Minimum frame size: Sync + Length + Hash + EP_ID(2) + CMD + CRC(2) = 8 bytes
     if (uart_rx_msg_len < UART_FRAME_MIN_SIZE)
     {
         return;  // Frame too short
@@ -152,15 +152,20 @@ void UART_process_message(void)
     // Calculate payload length
     uint8_t payload_len = length - 4;  // length - (Hash + EP_ID(2) + CMD)
     
-    // Prepare buffer for endpoint call
-    uint8_t buffer[8];
-    uint8_t buffer_len = 0;
+    // Reject frames with invalid payload size (defense in depth)
+    if (payload_len > 8)
+    {
+        return;  // Payload too large
+    }
     
-    // Copy payload to buffer (for write commands)
-    if (payload_len > 0 && payload_len <= 8)
+    // Prepare buffer for endpoint call
+    uint8_t buffer[8] = {0};
+    uint8_t buffer_len = payload_len;
+    
+    // Copy payload to buffer
+    if (payload_len > 0)
     {
         memcpy(buffer, &uart_rx_msg[UART_FRAME_HEADER_SIZE], payload_len);
-        buffer_len = payload_len;
     }
     
     // Map command to Avlos command type
