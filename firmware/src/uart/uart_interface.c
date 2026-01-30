@@ -15,239 +15,167 @@
 //  * You should have received a copy of the GNU General Public License
 //  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "string.h"
-#include "src/system/system.h"
-#include "src/motor/motor.h"
-#include "src/observer/observer.h"
-#include "src/controller/controller.h"
-#include "src/controller/trajectory_planner.h"
-#include "src/adc/adc.h"
-#include "src/nvm/nvm.h"
-#include "src/can/can.h"
-#include "src/utils/utils.h"
-#include "src/uart/uart_lowlevel.h"
-#include "src/uart/uart_interface.h"
+#include <string.h>
+#include <src/common.h>
+#include <src/can/can_endpoints.h>
+#include <src/uart/uart_lowlevel.h>
+#include <src/uart/uart_interface.h>
+#include <src/watchdog/watchdog.h>
 
-void UART_WriteAddr(uint8_t addr, int32_t data)
+// Protocol hash (low 8 bits) for version verification
+static const uint8_t avlos_proto_hash_8 = (uint8_t)(avlos_proto_hash & 0xFF);
+static const size_t endpoint_count = sizeof(avlos_endpoints) / sizeof(avlos_endpoints[0]);
+
+/**
+ * @brief Calculate CRC-16-CCITT using hardware CRC peripheral
+ * @param data Pointer to data buffer
+ * @param len Length of data in bytes
+ * @return 16-bit CRC value
+ */
+static uint16_t UART_calculate_crc16(const uint8_t *data, uint8_t len)
 {
-    switch (addr)
+    // Configure CRC peripheral for CRC-16-CCITT
+    PAC55XX_CRC->CTL.POLYSEL = CRC16_CCITT;
+    PAC55XX_CRC->CTL.DATAWIDTH = CRC_DATA_WIDTH_8BITS;
+    PAC55XX_CRC->CTL.INREF = 0;
+    PAC55XX_CRC->CTL.OUTREF = 0;
+    
+    // Set seed value
+    PAC55XX_CRC->SEED.CRCSEED = 0xFFFF;
+    
+    // Feed data bytes
+    for (uint8_t i = 0; i < len; i++)
     {
-    case 'P': // pos setpoint
-        controller_set_Iq_setpoint_user_frame(0);
-        controller_set_vel_setpoint_user_frame(0);
-        controller_set_pos_setpoint_user_frame(data);
-        controller_set_mode(CONTROLLER_MODE_POSITION);
-        break;
-
-    case 'V': // vel setpoint
-        controller_set_Iq_setpoint_user_frame(0);
-        controller_set_vel_setpoint_user_frame(data);
-        controller_set_mode(CONTROLLER_MODE_VELOCITY);
-        controller_set_vel_setpoint_user_frame((float)data);
-        break;
-
-    case 'I': // current setpoint
-        controller_set_mode(CONTROLLER_MODE_CURRENT);
-        controller_set_Iq_setpoint_user_frame((float)data * ONE_OVER_UART_I_SCALING_FACTOR);
-        break;
-
-    case 'G': // velocity integrator gain
-        controller_set_vel_integral_gain((float)data * ONE_OVER_UART_VEL_INT_SCALING_FACTOR);
-        break;
-
-    case 'Y': // Position gain
-        controller_set_pos_gain(data);
-        break;
-
-    case 'F': // Velocity gain
-        controller_set_vel_gain(data * ONE_OVER_UART_VEL_GAIN_SCALING_FACTOR);
-        break;
-
-    case 'H': // phase resistance
-        motor_set_phase_resistance((float)data * ONE_OVER_UART_R_SCALING_FACTOR);
-        break;
-
-    case 'L': // phase inductance
-        motor_set_phase_inductance((float)data * ONE_OVER_UART_L_SCALING_FACTOR);
-        break;
-
-    case 'M': // Set is motor gimbal?
-        motor_set_is_gimbal((bool)data);
-        break;
-
-    case 'W': // Set Iq Limit
-        controller_set_Iq_limit((float)data * ONE_OVER_UART_IQ_LIMIT_SCALING_FACTOR);
-        break;
-        
-    case 'U': // CAN Baud Rate
-        CAN_set_kbit_rate((uint16_t)data);
-        break;
-
-    case 'C': // CAN ID
-        CAN_set_ID((uint8_t)data);
-        break;
-
-    case '<': // Max Decel
-        planner_set_max_decel((float)data);
-        break;
-
-    case '>': // Max Accel
-        planner_set_max_accel((float)data);
-        break;
-
-    case '^': // Max Vel
-        planner_set_max_vel((float)data);
-        break;
-
-    case 'T': // Plan trajectory
-        planner_move_to_vlimit((float)data);
-        break;
-
-    default:
-        // No action
-        break;
+        PAC55XX_CRC->DATAIN = data[i];
     }
+    
+    // Return computed CRC
+    return (uint16_t)PAC55XX_CRC->OUT.CRCOUT;
 }
 
-int32_t UART_ReadAddr(uint8_t addr)
+/**
+ * @brief Send a response frame over UART
+ * @param ep_id Endpoint ID
+ * @param payload Pointer to payload data
+ * @param payload_len Length of payload
+ */
+static void UART_send_response(uint16_t ep_id, const uint8_t *payload, uint8_t payload_len)
 {
-    int32_t ret_val = 0;
-    switch (addr)
+    // Build response frame
+    // Format: | Sync (1) | Length (1) | Hash (1) | EP_ID (2) | CMD (1) | Payload (0-8) | CRC16 (2) |
+    uint8_t frame_len = UART_FRAME_HEADER_SIZE + payload_len;
+    
+    uart_tx_msg[0] = UART_SYNC_BYTE;
+    uart_tx_msg[1] = UART_FRAME_HEADER_SIZE - 2 + payload_len;  // Length after length field, excluding CRC
+    uart_tx_msg[2] = avlos_proto_hash_8;
+    uart_tx_msg[3] = (uint8_t)(ep_id & 0xFF);         // EP_ID low byte
+    uart_tx_msg[4] = (uint8_t)((ep_id >> 8) & 0xFF);  // EP_ID high byte
+    uart_tx_msg[5] = AVLOS_CMD_READ;                  // Response is always a "read" result
+    
+    // Copy payload
+    if (payload_len > 0 && payload != NULL)
     {
-    case 'b': // vbus value
-        ret_val = (int32_t)(system_get_Vbus() * UART_V_SCALING_FACTOR);
-        break;
-
-    case 'e': // controller error
-    {
-        // pass
+        memcpy(&uart_tx_msg[UART_FRAME_HEADER_SIZE], payload, payload_len);
     }
-    break;
-
-    case 'p': // pos estimate
-        ret_val = user_frame_get_pos_estimate();
-        break;
-
-    case 'P': // pos setpoint
-        ret_val = controller_get_pos_setpoint_user_frame();
-        break;
-
-    case 'v': // vel estimate
-        ret_val = (int32_t)user_frame_get_vel_estimate();
-        break;
-
-    case 'V': // vel setpoint
-        ret_val = (int32_t)controller_get_vel_setpoint_user_frame();
-        break;
-
-    case 'i': // current estimate
-        ret_val = (int32_t)(controller_get_Iq_estimate_user_frame() * UART_I_SCALING_FACTOR);
-        break;
-
-    case 'I': // current setpoint
-        ret_val = (int32_t)(controller_get_Iq_setpoint_user_frame() * UART_I_SCALING_FACTOR);
-        break;
-
-    case 'G': // velocity integrator setpoint
-        ret_val = (int32_t)(controller_get_vel_integral_gain() * UART_VEL_INT_SCALING_FACTOR);
-        break;
-
-    case 'H': // phase resistance
-        ret_val = (int32_t)(motor_get_phase_resistance() * UART_R_SCALING_FACTOR);
-        break;
-
-    case 'L': // phase inductance
-        ret_val = (int32_t)(motor_get_phase_inductance() * UART_L_SCALING_FACTOR);
-        break;
-
-    case 'W': // Get Iq Limit
-        ret_val = (int32_t)(controller_get_Iq_limit() * UART_IQ_LIMIT_SCALING_FACTOR);
-        break;
-
-    case 'C': // CAN ID
-        ret_val = CAN_get_ID();
-        break;
-
-    case 'M': // Is motor gimbal?
-        ret_val = motor_get_is_gimbal();
-        break;
-
-    case 'Y': //
-        ret_val = controller_get_pos_gain();
-        break;
-
-    case 'F': //
-        ret_val = controller_get_vel_gain() * UART_VEL_GAIN_SCALING_FACTOR;
-        break;
-
-    case 'Q': // calibrate
-        controller_set_state(CONTROLLER_STATE_CALIBRATE);
-        break;
-
-    case 'A': // closed loop
-        controller_set_state(CONTROLLER_STATE_CL_CONTROL);
-        break;
-
-    case 'Z': // idle
-        controller_set_state(CONTROLLER_STATE_IDLE);
-        break;
-
-    case 'R': // reset mcu
-        system_reset();
-        break;
-
-    case 'S': // save config
-        nvm_save_config();
-        break;
-
-    case 'X': // erase config
-        nvm_erase();
-        break;
-
-    default:
-        // No action
-        break;
-    }
-    return ret_val;
+    
+    // Calculate CRC over entire frame (excluding CRC field itself)
+    uint16_t crc = UART_calculate_crc16((uint8_t *)uart_tx_msg, frame_len);
+    uart_tx_msg[frame_len] = (uint8_t)(crc & 0xFF);         // CRC low byte
+    uart_tx_msg[frame_len + 1] = (uint8_t)((crc >> 8) & 0xFF);  // CRC high byte
+    
+    // Set total frame length including CRC
+    uart_tx_frame_len = frame_len + 2;
+    uart_tx_byte_idx = 0;
+    
+    // Enable transmit interrupt to send response
+    pac5xxx_uart_int_enable_THREI2(UART_REF, 1);
 }
 
+/**
+ * @brief Process received UART message using Avlos protocol
+ * 
+ * Frame format:
+ * | Sync (1) | Length (1) | Hash (1) | EP_ID (2) | CMD (1) | Payload (0-8) | CRC16 (2) |
+ */
 void UART_process_message(void)
 {
-    int8_t addr = uart_rx_msg[1];
-    int8_t len = ((int8_t)uart_rx_msg_len) - 3;
-
-    // Ensure buffer is null-terminated
-    uart_rx_msg[uart_rx_msg_len] = '\0';
-
-    if (len > 0)
+    // Minimum frame size: Sync + Length + Hash + EP_ID(2) + CMD + CRC(2) = 9 bytes
+    if (uart_rx_msg_len < UART_FRAME_MIN_SIZE)
     {
-        // Write operation
-        int32_t n = atol(&(uart_rx_msg)[2]);
-        UART_WriteAddr(addr, n);
+        return;  // Frame too short
     }
-    else if (len == 0)
+    
+    // Verify sync byte
+    if (uart_rx_msg[0] != UART_SYNC_BYTE)
     {
-        // Read operation
-        int32_t val = UART_ReadAddr(uart_rx_msg[1]);
-        UART_SendInt32(val);
+        return;  // Invalid sync byte
     }
-    else
+    
+    // Get length field
+    uint8_t length = uart_rx_msg[1];
+    uint8_t total_len = length + 2 + 2;  // +2 for Sync+Length, +2 for CRC
+    
+    // Validate total length
+    if (total_len != uart_rx_msg_len || total_len > UART_FRAME_MAX_SIZE)
     {
-        // Error
+        return;  // Length mismatch
     }
-}
-
-void UART_SendInt32(int32_t val)
-{
-    (void)itoa(val, uart_tx_msg, 10);
-    for (uint8_t i = 0; i < UART_BYTE_LIMIT; i++)
+    
+    // Verify CRC (over all bytes except CRC itself)
+    uint8_t crc_offset = total_len - 2;
+    uint16_t received_crc = (uint16_t)uart_rx_msg[crc_offset] | 
+                            ((uint16_t)uart_rx_msg[crc_offset + 1] << 8);
+    uint16_t calculated_crc = UART_calculate_crc16((uint8_t *)uart_rx_msg, crc_offset);
+    
+    if (received_crc != calculated_crc)
     {
-        if (uart_tx_msg[i] == '\0')
-        {
-            uart_tx_msg[i] = UART_LINEFEED;
-            break;
-        }
+        return;  // CRC mismatch
     }
-    // Enable transmit interrupt to send reponse to host
-    pac5xxx_uart_int_enable_THREI2(UART_REF, 1);
+    
+    // Extract frame fields
+    uint8_t frame_hash = uart_rx_msg[2];
+    uint16_t ep_id = (uint16_t)uart_rx_msg[3] | ((uint16_t)uart_rx_msg[4] << 8);
+    uint8_t cmd = uart_rx_msg[5];
+    
+    // Verify protocol hash (accept 0 for backward compatibility, like CAN does)
+    if (frame_hash != avlos_proto_hash_8 && frame_hash != 0)
+    {
+        return;  // Protocol hash mismatch
+    }
+    
+    // Validate endpoint ID
+    if (ep_id >= endpoint_count)
+    {
+        return;  // Invalid endpoint
+    }
+    
+    // Calculate payload length
+    uint8_t payload_len = length - 4;  // length - (Hash + EP_ID(2) + CMD)
+    
+    // Prepare buffer for endpoint call
+    uint8_t buffer[8];
+    uint8_t buffer_len = 0;
+    
+    // Copy payload to buffer (for write commands)
+    if (payload_len > 0 && payload_len <= 8)
+    {
+        memcpy(buffer, &uart_rx_msg[UART_FRAME_HEADER_SIZE], payload_len);
+        buffer_len = payload_len;
+    }
+    
+    // Map command to Avlos command type
+    Avlos_Command avlos_cmd = (cmd == AVLOS_CMD_WRITE) ? AVLOS_CMD_WRITE : AVLOS_CMD_READ;
+    
+    // Call endpoint handler (same pattern as CAN)
+    uint8_t (*callback)(uint8_t buffer[], uint8_t *buffer_length, Avlos_Command cmd) = avlos_endpoints[ep_id];
+    uint8_t response_type = callback(buffer, &buffer_len, avlos_cmd);
+    
+    // Send response if needed
+    if ((AVLOS_RET_READ == response_type || AVLOS_RET_CALL == response_type) && buffer_len > 0)
+    {
+        UART_send_response(ep_id, buffer, buffer_len);
+    }
+    
+    // Reset watchdog on successful message
+    Watchdog_reset();
 }

@@ -17,36 +17,48 @@
 
 #include <string.h>
 #include <src/common.h>
-#include "src/uart/uart_func.h"
+#include <src/uart/uart_func.h>
 #include <src/uart/uart_lowlevel.h>
 
-char uart_rx_buf[96] = {0};
+// Receive buffer
+char uart_rx_buf[UART_RX_BUFFER_SIZE] = {0};
 uint8_t uart_rx_byte_idx = 0;
+char uart_rx_msg[UART_RX_BUFFER_SIZE];
+uint8_t uart_rx_msg_len = 0;
 
+// Transmit buffer
+char uart_tx_msg[UART_TX_BUFFER_SIZE];
+uint8_t uart_tx_byte_idx = 0;
+uint8_t uart_tx_frame_len = 0;
+
+// Receive state machine
 typedef enum {
-    MSG_TYPE_UNKNOWN = 0,
-    MSG_TYPE_ASCII = 1,
-    MSG_TYPE_BINARY = 2
-} SerialMessageType;
+    RX_STATE_IDLE = 0,      // Waiting for sync byte
+    RX_STATE_LENGTH,        // Waiting for length byte
+    RX_STATE_DATA           // Receiving data bytes
+} RxState;
 
-SerialMessageType rx_msg_type = MSG_TYPE_UNKNOWN;
+static RxState rx_state = RX_STATE_IDLE;
+static uint8_t rx_expected_len = 0;
 
-void ResetRxQueue(void)
+static void ResetRxState(void)
 {
     uart_rx_byte_idx = 0;
-    rx_msg_type = MSG_TYPE_UNKNOWN;
+    rx_state = RX_STATE_IDLE;
+    rx_expected_len = 0;
 }
 
-void ResetTxQueue(void)
+static void ResetTxState(void)
 {
     uart_tx_byte_idx = 0;
+    uart_tx_frame_len = 0;
 }
 
-void UART_Init()
+void UART_Init(void)
 {
     uart_init(UART_ENUM, UART_BAUD_RATE);
-    ResetRxQueue();
-    ResetTxQueue();
+    ResetRxState();
+    ResetTxState();
 }
 
 void USARTB_IRQHandler(void)
@@ -56,53 +68,82 @@ void USARTB_IRQHandler(void)
 
     if (int_type == UARTIIR_INTID_TX_HOLD_EMPTY)
     {
-        pac5xxx_uart_write2(UART_REF, uart_tx_msg[uart_tx_byte_idx]);
-        uart_tx_byte_idx++;
-
-        // Terminate transmission upon newline or transmit overflow
-        if ((uart_tx_msg[uart_tx_byte_idx - 1u] == UART_LINEFEED) ||
-                (uart_tx_byte_idx > UART_BYTE_LIMIT))
+        // Transmit interrupt - send next byte
+        if (uart_tx_byte_idx < uart_tx_frame_len)
+        {
+            pac5xxx_uart_write2(UART_REF, uart_tx_msg[uart_tx_byte_idx]);
+            uart_tx_byte_idx++;
+        }
+        
+        // Check if transmission complete
+        if (uart_tx_byte_idx >= uart_tx_frame_len)
         {
             // Disable transmit interrupt
             pac5xxx_uart_int_enable_THREI2(UART_REF, UART_INT_DISABLE);
-            // Enable receive data interrupt for next incoming message
-            // pac5xxx_uart_int_enable_RDAI2(UART_REF, UART_INT_ENABLE);
-            ResetTxQueue();
+            ResetTxState();
         }
     }
     else
-    {	
-        // Check first byte or return
-        if ((uart_rx_byte_idx == 0u) && (data == UART_ASCII_PROT_START_BYTE))
+    {
+        // Receive interrupt - process incoming byte
+        switch (rx_state)
         {
-            rx_msg_type = MSG_TYPE_ASCII;
-        }
-
-        if (rx_msg_type != MSG_TYPE_UNKNOWN)
-        {
-            uart_rx_buf[uart_rx_byte_idx] = data;
-            if ((rx_msg_type == MSG_TYPE_ASCII) &&
-                (uart_rx_buf[uart_rx_byte_idx] == UART_LINEFEED))
-            {
-                uart_rx_msg_len = uart_rx_byte_idx + 1u;
-                memcpy(&uart_rx_msg, &uart_rx_buf, uart_rx_msg_len);
-                ResetRxQueue();
-                UART_ReceiveMessageHandler();
-                // Disable receive data interrupt
-                //pac5xxx_uart_int_enable_RDAI2(UART_REF, UART_INT_DISABLE);
-                // Reset RX FIFO, to clear RDAI interrupt
-                pac5xxx_uart_rx_fifo_reset2(UART_REF);
-
-            }
-            else if (uart_rx_byte_idx >= UART_BYTE_LIMIT)
-            {
-                ResetRxQueue();
-            }
-            else
-            {
+            case RX_STATE_IDLE:
+                // Looking for sync byte
+                if (data == UART_SYNC_BYTE_LL)
+                {
+                    uart_rx_buf[0] = data;
+                    uart_rx_byte_idx = 1;
+                    rx_state = RX_STATE_LENGTH;
+                }
+                break;
+                
+            case RX_STATE_LENGTH:
+                // Got length byte
+                uart_rx_buf[1] = data;
+                uart_rx_byte_idx = 2;
+                // Total frame length = Sync(1) + Length(1) + data(length) + CRC(2)
+                rx_expected_len = 2 + data + 2;
+                
+                // Validate length
+                if (rx_expected_len > UART_RX_BUFFER_SIZE || data < 4)
+                {
+                    // Invalid length, reset
+                    ResetRxState();
+                }
+                else
+                {
+                    rx_state = RX_STATE_DATA;
+                }
+                break;
+                
+            case RX_STATE_DATA:
+                // Receiving data bytes
+                uart_rx_buf[uart_rx_byte_idx] = data;
                 uart_rx_byte_idx++;
-            }
-
+                
+                // Check if frame complete
+                if (uart_rx_byte_idx >= rx_expected_len)
+                {
+                    // Copy to message buffer and signal handler
+                    uart_rx_msg_len = uart_rx_byte_idx;
+                    memcpy(uart_rx_msg, uart_rx_buf, uart_rx_msg_len);
+                    ResetRxState();
+                    UART_ReceiveMessageHandler();
+                    
+                    // Reset RX FIFO
+                    pac5xxx_uart_rx_fifo_reset2(UART_REF);
+                }
+                else if (uart_rx_byte_idx >= UART_RX_BUFFER_SIZE)
+                {
+                    // Buffer overflow, reset
+                    ResetRxState();
+                }
+                break;
+                
+            default:
+                ResetRxState();
+                break;
         }
     }
 }

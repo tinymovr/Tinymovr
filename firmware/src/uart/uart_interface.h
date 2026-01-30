@@ -19,9 +19,15 @@
 #ifndef UART_UART_INTERFACE_H_
 #define UART_UART_INTERFACE_H_
 
-#include "src/common.h"
+#include <src/common.h>
 
+// UART Avlos Binary Protocol Constants
+#define UART_SYNC_BYTE          0xAA    // Frame start marker
+#define UART_FRAME_HEADER_SIZE  6       // Sync + Length + Hash + EP_ID(2) + CMD
+#define UART_FRAME_MIN_SIZE     9       // Header + CRC(2), no payload
+#define UART_FRAME_MAX_SIZE     17      // Header + 8 bytes payload + CRC(2)
+
+// Process received UART message (called from scheduler)
 void UART_process_message(void);
-void UART_SendInt32(int32_t val);
 
 #endif /* UART_UART_INTERFACE_H_ */

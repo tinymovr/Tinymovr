@@ -18,22 +18,26 @@
 #ifndef UART_UART_LOWLEVEL_H_
 #define UART_UART_LOWLEVEL_H_
 
-#define UART_LINEFEED 0x0A
-#define UART_CRETURN 0x0D
-#define UART_ASCII_PROT_START_BYTE 0x2E
-#define UART_BYTE_LIMIT 32
+#include <src/common.h>
 
-char uart_rx_msg[96];
-uint8_t uart_rx_msg_len;
+// UART Protocol Constants
+#define UART_SYNC_BYTE_LL       0xAA    // Binary protocol sync byte
+#define UART_RX_BUFFER_SIZE     32      // Max receive buffer size
+#define UART_TX_BUFFER_SIZE     32      // Max transmit buffer size
 
-char uart_tx_msg[96];
-uint8_t uart_tx_byte_idx;
+// Receive buffer and state
+extern char uart_rx_msg[UART_RX_BUFFER_SIZE];
+extern uint8_t uart_rx_msg_len;
 
+// Transmit buffer and state
+extern char uart_tx_msg[UART_TX_BUFFER_SIZE];
+extern uint8_t uart_tx_byte_idx;
+extern uint8_t uart_tx_frame_len;
+
+// Initialize UART peripheral
 void UART_Init(void);
 
-// The following message handler is called when a UART
-// message completes being received i.e.  with a newline
-// character
+// Message handler callback (called when a complete frame is received)
 extern void UART_ReceiveMessageHandler(void);
 
 #endif /* UART_UART_LOWLEVEL_H_ */

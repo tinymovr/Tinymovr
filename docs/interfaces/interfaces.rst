@@ -27,7 +27,7 @@ For a detailed description, please see :ref:`integrating` and :ref:`api-referenc
 UART
 ----
 
-As an alternative to CAN Bus, Tinymovr offers UART-based (serial) communication. The protocol is much simpler than CAN and mainly designed for troubleshooting or testing in the absence of CAN hardware.
+Tinymovr offers UART-based (serial) communication as an alternative to CAN Bus. The UART interface uses the same Avlos binary protocol as CAN, providing **full API parity** with all endpoints available over both interfaces.
 
 .. warning::
    The UART port on Tinymovr is NOT 5V tolerant. Applying 5V voltage will immediately damage the onboard PAC5527 controller. Please use only 3.3V for UART communication.
@@ -35,302 +35,107 @@ As an alternative to CAN Bus, Tinymovr offers UART-based (serial) communication.
 .. warning::
    The UART port on Tinymovr offers a 3.3v output for driving very light loads (30mA absolute max). Tinymovr cannot be powered by this pin. In addition, most UART adapters offer 5V power, which is incompatible with Tinymovr. **In short: If in doubt, leave this pin disconnected**.
 
-Protocol Description
-####################
+Physical Layer
+##############
 
-The UART port is TTL at 115200 baud. A regular FTDI-style USB to UART adapter should be sufficient.
+- **Baud rate**: 115200
+- **Data bits**: 8
+- **Parity**: None
+- **Stop bits**: 1
+- **Voltage level**: 3.3V TTL
 
-UART communication is based on a simple human-readable protocole dubbed the "dot protocol", because the dot is the command starting character. The protocol is response-only, meaning that Tinymovr will only respond to commands initiated by the client, it will never initiate a transmission on it's own.
+A standard FTDI-style USB to UART adapter at 3.3V is suitable.
 
-The command template is as follows:
+Binary Protocol
+###############
 
-.. code-block:: shell
+UART uses a binary protocol with CRC-16 error detection. The protocol is request-response: Tinymovr only responds to commands initiated by the host.
 
-    .Cxxxx
+Frame Format
+============
 
-The command begins with a dot. The next single character identifies the command. The characters following the second one are optional values to pass to write commands. Read commands only include the dot and command character. The command is finalized with a newline character (\n, not shown above).
+All frames follow this structure:
 
-For instance, to get the current position estimate:
+.. code-block:: text
 
-.. code-block:: shell
+    | Sync (1) | Length (1) | Hash (1) | EP_ID (2) | CMD (1) | Payload (0-8) | CRC16 (2) |
 
-    command: .p
-    response: 1000
+- **Sync** (1 byte): Frame start marker, always ``0xAA``
+- **Length** (1 byte): Number of bytes after Length field, excluding CRC (min 4, max 12)
+- **Hash** (1 byte): Low 8 bits of protocol hash (for version verification), or ``0x00`` to skip check
+- **EP_ID** (2 bytes): Endpoint ID, little-endian (see :ref:`api-reference` for endpoint list)
+- **CMD** (1 byte): Command type: ``0x00`` = read/call, ``0x01`` = write
+- **Payload** (0-8 bytes): Data payload (for write commands or function arguments)
+- **CRC16** (2 bytes): CRC-16-CCITT checksum, little-endian
 
-To set the velocity estimate in encoder ticks:
+CRC Calculation
+===============
 
-.. code-block:: shell
+The CRC-16-CCITT algorithm is used:
 
-    command: .V10000
-    (no response)
+- **Polynomial**: 0x1021
+- **Initial value**: 0xFFFF
+- **Input reflection**: No
+- **Output reflection**: No
 
-The values passed or returned are always integers scaled by the mentioned factor (see command reference below).
+The CRC is calculated over all bytes from Sync to the end of Payload (excluding the CRC field itself).
 
-Note that command characters are case-sensitive, i.e. capitals and small represent different commands. As a convention, capital letters are setters and small are getters, where applicable.
+Example: Read Bus Voltage
+=========================
 
-Command Reference
-#################
+To read the bus voltage (endpoint ID 4):
 
-.Z
-==
+**Request frame** (hex):
 
-Transition to idle state.
+.. code-block:: text
 
-Example
+    AA 04 00 04 00 00 [CRC16]
+    |  |  |  |  |  +-- CMD: 0x00 (read)
+    |  |  |  +--+-- EP_ID: 0x0004 (Vbus)
+    |  |  +-- Hash: 0x00 (skip check)
+    |  +-- Length: 4 bytes
+    +-- Sync: 0xAA
 
-.. code-block:: shell
+**Response frame** (hex):
 
-    .Z
-    0
+.. code-block:: text
 
-.Q
-==
+    AA 08 XX 04 00 00 [4-byte float] [CRC16]
+    |  |  |  |  |  |  +-- Payload: Vbus value as IEEE 754 float
+    |  |  |  +--+--+-- EP_ID + CMD
+    |  |  +-- Hash: protocol hash (low 8 bits)
+    |  +-- Length: 8 bytes
+    +-- Sync: 0xAA
 
-Transition to calibration state.
+Example: Set Position Setpoint
+==============================
 
-Example
+To set position setpoint (endpoint ID 25) to 1000.0 ticks:
 
-.. code-block:: shell
+**Request frame** (hex):
 
-    .Q
-    0
+.. code-block:: text
 
-.A
-==
+    AA 08 00 19 00 01 00 00 7A 44 [CRC16]
+    |  |  |  |  |  |  +----------+-- Payload: 1000.0f (IEEE 754: 0x447A0000)
+    |  |  |  |  |  +-- CMD: 0x01 (write)
+    |  |  |  +--+-- EP_ID: 0x0019 (25 = controller.position.setpoint)
+    |  |  +-- Hash: 0x00
+    |  +-- Length: 8 bytes
+    +-- Sync: 0xAA
 
-Transition to closed loop control state.
+Write commands do not return a response unless the endpoint is a function with a return value.
 
-Example
+API Reference
+#############
 
-.. code-block:: shell
+UART provides access to all Avlos endpoints. See :ref:`api-reference` for the complete endpoint list with IDs, data types, and descriptions.
 
-    .A
-    0
+Common endpoints:
 
-.e
-==
-
-Get the error code.
-
-Example
-
-.. code-block:: shell
-
-    .e
-    0
-
-.p
-==
-
-Get position estimate (ticks).
-
-Example
-
-.. code-block:: shell
-
-    .p
-    1000
-
-.v
-==
-
-Get velocity estimate (ticks/s).
-
-
-Example
-
-.. code-block:: shell
-
-    .v
-    -200
-
-.i
-==
-
-Get current (Iq) estimate (mA).
-
-Example
-
-.. code-block:: shell
-
-    .i
-    2000
-
-.P
-==
-
-Get/set position setpoint (ticks).
-
-Example
-
-.. code-block:: shell
-
-    .P
-    1000
-
-.. code-block:: shell
-
-    .P1000
-
-.V
-==
-
-Get/set velocity setpoint (ticks/s).
-
-Example
-
-.. code-block:: shell
-
-    .V
-    -10000
-
-.. code-block:: shell
-
-    .V-10000
-
-.I
-==
-
-Get/set current (Iq) setpoint (mA).
-
-Example
-
-.. code-block:: shell
-
-    .I
-    1000
-
-.. code-block:: shell
-
-    .I1000
-
-.W
-==
-
-Get/set current (Iq) limit (mA).
-
-Example
-
-.. code-block:: shell
-
-    .W
-    10000
-
-.. code-block:: shell
-
-    .W15000
-    
-.Y
-==
-
-Get/set position gain.
-
-Example
-
-.. code-block:: shell
-
-    .Y
-    25
-
-.. code-block:: shell
-
-    .Y25
-    
-.F
-==
-
-Get/set velocity gain (x0.000001).
-
-Example
-
-.. code-block:: shell
-
-    .F
-    20
-
-.. code-block:: shell
-
-    .F20
-
-.G
-==
-
-Get/set velocity integrator gain (x0.001).
-
-Note that high values (e.g. above 10) may cause instability.
-
-Example
-
-.. code-block:: shell
-
-    .G
-    2
-
-.. code-block:: shell
-
-    .G2
-
-.H
-==
-
-Get/set motor phase resistance (mOhm).
-
-Example
-
-.. code-block:: shell
-
-    .H
-    200
-
-.. code-block:: shell
-
-    .H 200
-
-.L
-==
-
-Get/set motor phase inductance (μH).
-
-Example
-
-.. code-block:: shell
-
-    .L
-    2000
-
-.. code-block:: shell
-
-    .L 2000
-
-.R
-==
-
-Reset the MCU.
-
-Example
-
-.. code-block:: shell
-
-    .R
-
-.S
-==
-
-Save board configuration.
-
-Example
-
-.. code-block:: shell
-
-    .S
-
-.X
-==
-
-Erase board configuration and reset.
-
-Example
-
-.. code-block:: shell
-
-    .X
+- **ID 0**: ``protocol_hash`` - Protocol version hash (uint32)
+- **ID 4**: ``Vbus`` - Bus voltage in volts (float)
+- **ID 21**: ``controller.state`` - Controller state (uint8)
+- **ID 25**: ``controller.position.setpoint`` - Position setpoint in ticks (float)
+- **ID 42**: ``controller.calibrate()`` - Start calibration (void)
+- **ID 43**: ``controller.idle()`` - Set idle mode (void)
