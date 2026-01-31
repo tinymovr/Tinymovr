@@ -420,7 +420,7 @@ Application
 **Toolchain**: GNU ARM Embedded (arm-none-eabi-gcc)
 **Build Tool**: GNU Make
 **Targets**: `debug`, `release`, `clean`
-**Board Selection**: `REV=R52` (or R53, M51, etc.)
+**Board Selection**: `REV=R53` (or R52, M51, etc.)
 
 **Linker Script**: [firmware/pac55xx.ld](firmware/pac55xx.ld) - Memory layout
 
