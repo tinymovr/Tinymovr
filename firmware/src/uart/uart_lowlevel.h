@@ -1,4 +1,3 @@
-
 //  * This file is part of the Tinymovr-Firmware distribution
 //  * (https://github.com/yconst/tinymovr-firmware).
 //  * Copyright (c) 2020-2023 Ioannis Chatzikonstantinou.
@@ -18,22 +17,26 @@
 #ifndef UART_UART_LOWLEVEL_H_
 #define UART_UART_LOWLEVEL_H_
 
-#define UART_LINEFEED 0x0A
-#define UART_CRETURN 0x0D
-#define UART_ASCII_PROT_START_BYTE 0x2E
+// Binary protocol frame markers
+#define UART_BINARY_START_BYTE 0x02  // STX
+
+// Buffer limits
 #define UART_BYTE_LIMIT 32
+#define UART_MAX_PAYLOAD 10  // endpoint_id + cmd + 8 data bytes
 
-char uart_rx_msg[96];
-uint8_t uart_rx_msg_len;
+// Receive buffer and state
+extern uint8_t uart_rx_msg[UART_BYTE_LIMIT];
+extern uint8_t uart_rx_msg_len;
 
-char uart_tx_msg[96];
-uint8_t uart_tx_byte_idx;
+// Transmit buffer and state
+extern uint8_t uart_tx_msg[UART_BYTE_LIMIT];
+extern uint8_t uart_tx_msg_len;
+extern uint8_t uart_tx_byte_idx;
 
 void UART_Init(void);
 
 // The following message handler is called when a UART
-// message completes being received i.e.  with a newline
-// character
+// binary frame is completely received
 extern void UART_ReceiveMessageHandler(void);
 
 #endif /* UART_UART_LOWLEVEL_H_ */
