@@ -79,7 +79,7 @@ static void UART_send_response(uint16_t ep_id, const uint8_t *payload, uint8_t p
     }
     
     // Calculate CRC over entire frame (excluding CRC field itself)
-    uint16_t crc = UART_calculate_crc16((uint8_t *)uart_tx_msg, frame_len);
+    uint16_t crc = UART_calculate_crc16(uart_tx_msg, frame_len);
     uart_tx_msg[frame_len] = (uint8_t)(crc & 0xFF);         // CRC low byte
     uart_tx_msg[frame_len + 1] = (uint8_t)((crc >> 8) & 0xFF);  // CRC high byte
     
@@ -125,7 +125,7 @@ void UART_process_message(void)
     uint8_t crc_offset = total_len - 2;
     uint16_t received_crc = (uint16_t)uart_rx_msg[crc_offset] | 
                             ((uint16_t)uart_rx_msg[crc_offset + 1] << 8);
-    uint16_t calculated_crc = UART_calculate_crc16((uint8_t *)uart_rx_msg, crc_offset);
+    uint16_t calculated_crc = UART_calculate_crc16(uart_rx_msg, crc_offset);
     
     if (received_crc != calculated_crc)
     {

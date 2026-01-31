@@ -21,13 +21,13 @@
 #include <src/uart/uart_lowlevel.h>
 
 // Receive buffer
-char uart_rx_buf[UART_RX_BUFFER_SIZE] = {0};
+uint8_t uart_rx_buf[UART_RX_BUFFER_SIZE] = {0};
 uint8_t uart_rx_byte_idx = 0;
-char uart_rx_msg[UART_RX_BUFFER_SIZE];
+uint8_t uart_rx_msg[UART_RX_BUFFER_SIZE];
 uint8_t uart_rx_msg_len = 0;
 
 // Transmit buffer
-char uart_tx_msg[UART_TX_BUFFER_SIZE];
+uint8_t uart_tx_msg[UART_TX_BUFFER_SIZE];
 uint8_t uart_tx_byte_idx = 0;
 uint8_t uart_tx_frame_len = 0;
 

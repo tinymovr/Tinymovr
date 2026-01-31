@@ -26,11 +26,11 @@
 #define UART_TX_BUFFER_SIZE     32      // Max transmit buffer size
 
 // Receive buffer and state
-extern char uart_rx_msg[UART_RX_BUFFER_SIZE];
+extern uint8_t uart_rx_msg[UART_RX_BUFFER_SIZE];
 extern uint8_t uart_rx_msg_len;
 
 // Transmit buffer and state
-extern char uart_tx_msg[UART_TX_BUFFER_SIZE];
+extern uint8_t uart_tx_msg[UART_TX_BUFFER_SIZE];
 extern uint8_t uart_tx_byte_idx;
 extern uint8_t uart_tx_frame_len;
 
