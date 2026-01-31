@@ -41,6 +41,74 @@ The above code block will instantiate a Tinymovr with CAN bus id of 1 and calibr
     tm.controller.velocity_mode()
     tm.controller.velocity.setpoint = 80000
 
+Direct UART Integration
+#######################
+
+For embedded systems without CAN support, Tinymovr provides a UART interface using Avlos binary framing. This replaces the previous ASCII-based UART protocol with full API parity to CAN.
+
+.. note::
+   The legacy ASCII UART protocol (dot-notation commands) has been removed. All UART communication now uses the Avlos binary frame format described below.
+
+UART Frame Format
+-----------------
+
+All UART frames follow this structure:
+
+.. code-block:: text
+
+    | Sync (1) | Length (1) | Hash (1) | EP_ID (2) | CMD (1) | Payload (0-8) | CRC16 (2) |
+
+- **Sync** (1 byte): ``0xAA`` - Frame start marker
+- **Length** (1 byte): Bytes after Length field, excluding CRC (range: 4-12)
+- **Hash** (1 byte): Low 8 bits of protocol hash, or ``0x00`` to skip version check
+- **EP_ID** (2 bytes): Endpoint ID, little-endian
+- **CMD** (1 byte): ``0x00`` = read/call, ``0x01`` = write
+- **Payload** (0-8 bytes): Data for write commands (max 8 bytes)
+- **CRC16** (2 bytes): CRC-16-CCITT checksum, little-endian
+
+Frame Size Limits
+-----------------
+
+- **Minimum frame**: 8 bytes (read request with no payload)
+- **Maximum frame**: 16 bytes (write request with 8-byte payload)
+- **Maximum payload**: 8 bytes
+
+CRC-16-CCITT Calculation
+------------------------
+
+The CRC is calculated over all bytes from Sync through Payload (excluding CRC field):
+
+- **Polynomial**: 0x1021
+- **Initial value**: 0xFFFF
+- **Input/Output reflection**: None
+
+Example (Python):
+
+.. code-block:: python
+
+    def crc16_ccitt(data: bytes) -> int:
+        crc = 0xFFFF
+        for byte in data:
+            crc ^= byte << 8
+            for _ in range(8):
+                if crc & 0x8000:
+                    crc = (crc << 1) ^ 0x1021
+                else:
+                    crc <<= 1
+                crc &= 0xFFFF
+        return crc
+
+Protocol Hash Behavior
+----------------------
+
+The protocol hash ensures firmware/client compatibility:
+
+- Include low 8 bits of ``protocol_hash`` (endpoint 0) in requests for version verification
+- Use ``0x00`` to skip the hash check (useful for initial connection or debugging)
+- Responses always include the actual protocol hash
+
+For physical layer details (baud rate, voltage levels) and complete examples, see :ref:`interfaces`.
+
 BusRouter API
 #############
 
