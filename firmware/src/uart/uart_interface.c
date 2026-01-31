@@ -98,7 +98,7 @@ void UART_process_message(void)
     // Verify CRC16 over [LEN][EP_ID][CMD][DATA...]
     // CRC is at position: 2 + len (after STX + LEN + payload)
     uint16_t rx_crc = uart_rx_msg[2 + len] | ((uint16_t)uart_rx_msg[3 + len] << 8);
-uint16_t calc_crc = UART_calculate_crc16(&uart_rx_msg[1], (uint8_t)(len + 1));
+    uint16_t calc_crc = UART_calculate_crc16(&uart_rx_msg[1], (uint8_t)(len + 1));
     
     if (rx_crc != calc_crc)
     {
@@ -112,22 +112,22 @@ uint16_t calc_crc = UART_calculate_crc16(&uart_rx_msg[1], (uint8_t)(len + 1));
         return;
     }
     
-if (len < 2 || len > UART_MAX_PAYLOAD) {
-    return;
-}
+    // Validate payload length
+    if (len < 2 || len > UART_MAX_PAYLOAD)
+    {
+        return;
+    }
 
-uint8_t buffer[8] = {0};
-uint8_t data_len = len - 2;
-if (data_len > sizeof(buffer)) {
-    return;
-}
-if (data_len > 0) {
-    memcpy(buffer, &uart_rx_msg[4], data_len);
-}
-    uint8_t buffer[8];
+    // Prepare data buffer for endpoint callback
+    uint8_t buffer[8] = {0};
     uint8_t data_len = len - 2;  // Subtract EP_ID and CMD from payload length
     
-    if (data_len > 0 && data_len <= 8)
+    if (data_len > sizeof(buffer))
+    {
+        return;
+    }
+    
+    if (data_len > 0)
     {
         memcpy(buffer, &uart_rx_msg[4], data_len);
     }
