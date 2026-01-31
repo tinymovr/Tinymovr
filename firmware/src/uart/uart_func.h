@@ -10,23 +10,19 @@
 // ONLY BY CERTAIN AUTHORIZED PERSONS.
 //
 //=============================================================================
- 
-#include "src/common.h"
 
 #ifndef UART_FUNC_H
 #define UART_FUNC_H
 
-#define DF_isr_for_UART
-#define DF_UART_PCLK            HCLK_FREQ_HZ
-#define DF_UART_BUSY_TICK       (25000u)
+#include "src/common.h"
 
-volatile uint8_t uart_read_buf[48];
-volatile uint8_t uart_write_buf[48];
-volatile uint32_t uart_read_count;
+#define DF_UART_PCLK HCLK_FREQ_HZ
 
-extern void uart_init(UART_TYPE uart, uint32_t baudrate);
-extern uint32_t uart_read_one(UART_TYPE uart, uint8_t *data);
-extern uint32_t uart_write_one(UART_TYPE uart, uint8_t data);
-extern uint32_t uart_write_multi(UART_TYPE uart, uint8_t *data, uint32_t byte_num);
+/**
+ * @brief Initialize UART peripheral
+ * @param uart UART type (only UARTB is supported)
+ * @param baudrate Desired baud rate
+ */
+void uart_init(UART_TYPE uart, uint32_t baudrate);
 
 #endif
