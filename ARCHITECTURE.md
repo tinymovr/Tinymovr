@@ -37,7 +37,7 @@ Tinymovr consists of **two separate projects**:
 - **Build**: Python package (pip install)
 
 ### Communication
-- **Physical**: CAN bus (CAN 2.0B extended ID)
+- **Physical**: CAN bus (CAN 2.0B extended ID), UART
 - **Protocol**: Avlos (schema-driven, auto-generated from YAML)
 - **Direction**: Bidirectional (host ↔ firmware)
 
