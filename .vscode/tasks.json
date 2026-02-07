@@ -83,6 +83,75 @@
                 "base": "$gcc", 
                 "fileLocation": ["relative", "${workspaceFolder}/docs"]
             }
+        },
+        {
+            "type": "shell",
+            "label": "Start PyOCD GDB Server",
+            "command": "${workspaceFolder}/firmware/scripts/pyocd_run.sh gdbserver -t pac5527 --pack pyocd_pac55xx/",
+            "windows": {
+                "command": "${workspaceFolder}\\firmware\\scripts\\pyocd_run.bat gdbserver -t pac5527 --pack pyocd_pac55xx/"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/firmware"
+            },
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(GDB server listening).*$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 3
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^.*Target type is.*$",
+                    "endsPattern": "^.*GDB server listening.*$"
+                }
+            }
+        },
+        {
+            "type": "shell",
+            "label": "ST-Link: Flash",
+            "command": "${workspaceFolder}/firmware/scripts/pyocd_run.sh flash -t pac5527 --pack pyocd_pac55xx/ build/tinymovr_fw.bin",
+            "windows": {
+                "command": "${workspaceFolder}\\firmware\\scripts\\pyocd_run.bat flash -t pac5527 --pack pyocd_pac55xx/ build\\tinymovr_fw.bin"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/firmware"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "ST-Link: Build Debug and Start Server",
+            "dependsOn": ["Clean and Build Project (Debug)", "Start PyOCD GDB Server"],
+            "dependsOrder": "sequence"
+        },
+        {
+            "label": "ST-Link: Build Release and Flash",
+            "dependsOn": ["Clean and Build Project (Release)", "ST-Link: Flash"],
+            "dependsOrder": "sequence"
+        },
+        {
+            "label": "ST-Link: Build Release, Flash and Start Server",
+            "dependsOn": ["ST-Link: Build Release and Flash", "Start PyOCD GDB Server"],
+            "dependsOrder": "sequence"
+        },
+        {
+            "label": "ST-Link: Flash and Start Server",
+            "dependsOn": ["ST-Link: Flash", "Start PyOCD GDB Server"],
+            "dependsOrder": "sequence"
+        },
+        {
+            "label": "Stop PyOCD Server",
+            "type": "shell",
+            "command": "pkill -f 'pyocd gdbserver' || true",
+            "windows": {
+                "command": "taskkill /F /IM pyocd.exe 2>nul || exit 0"
+            },
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": []
         }
     ],
     "inputs": [
