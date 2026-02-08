@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package schemaVersion="1.7.7" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.7/schema/PACK.xsd">
+  <vendor>Qorvo</vendor>
+  <name>PAC55XX_DFP</name>
+  <description>Qorvo PAC55XX Motor Controller Device Family Pack for PyOCD</description>
+  <url>https://github.com/tinymovr/Tinymovr</url>
+  <license>LICENSE</license>
+
+  <releases>
+    <release version="1.0.0" date="2026-02-06">
+      Initial release for PyOCD ST-Link support
+    </release>
+  </releases>
+
+  <keywords>
+    <keyword>Qorvo</keyword>
+    <keyword>PAC55XX</keyword>
+    <keyword>Motor Control</keyword>
+  </keywords>
+
+  <devices>
+    <family Dfamily="PAC55XX" Dvendor="Qorvo:140">
+      <processor Dcore="Cortex-M4" DcoreVersion="r0p1" Dfpu="SP_FPU" Dmpu="MPU" Dendian="Little-endian" Dclock="150000000"/>
+      <description>
+        PAC55XX family of intelligent motor controllers with ARM Cortex-M4F core running at 150MHz.
+        Features integrated power stage drivers, ADC, and motor control peripherals.
+      </description>
+
+      <!-- PAC5527 - Primary target for Tinymovr -->
+      <device Dname="PAC5527">
+        <memory name="IROM1" access="rx" start="0x00000000" size="0x20000" startup="1" default="1"/>
+        <memory name="IRAM1" access="rwx" start="0x20000000" size="0x8000" default="1"/>
+        <algorithm name="PAC55XX.FLM" start="0x00000000" size="0x20000" default="1"/>
+        <debug svd="PAC55XX.svd"/>
+      </device>
+
+      <!-- PAC5523 -->
+      <device Dname="PAC5523">
+        <memory name="IROM1" access="rx" start="0x00000000" size="0x20000" startup="1" default="1"/>
+        <memory name="IRAM1" access="rwx" start="0x20000000" size="0x8000" default="1"/>
+        <algorithm name="PAC55XX.FLM" start="0x00000000" size="0x20000" default="1"/>
+        <debug svd="PAC55XX.svd"/>
+      </device>
+
+      <!-- PAC5524 -->
+      <device Dname="PAC5524">
+        <memory name="IROM1" access="rx" start="0x00000000" size="0x20000" startup="1" default="1"/>
+        <memory name="IRAM1" access="rwx" start="0x20000000" size="0x8000" default="1"/>
+        <algorithm name="PAC55XX.FLM" start="0x00000000" size="0x20000" default="1"/>
+        <debug svd="PAC55XX.svd"/>
+      </device>
+
+      <!-- PAC5556 -->
+      <device Dname="PAC5556">
+        <memory name="IROM1" access="rx" start="0x00000000" size="0x20000" startup="1" default="1"/>
+        <memory name="IRAM1" access="rwx" start="0x20000000" size="0x8000" default="1"/>
+        <algorithm name="PAC55XX.FLM" start="0x00000000" size="0x20000" default="1"/>
+        <debug svd="PAC55XX.svd"/>
+      </device>
+
+    </family>
+  </devices>
+
+</package>

@@ -159,6 +159,76 @@
                 // Update the path below as necessary
                 "serverpath": "/opt/SEGGER/JLink/JLinkGDBServer" 
             }
+        },
+        // ============================================================
+        // ST-Link / PyOCD Configurations
+        // ============================================================
+        {
+            "name": "[ST-Link] Rebuild Debug and Start Session",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
+            "request": "attach",
+            "type": "cortex-debug",
+            "servertype": "external",
+            "gdbTarget": "localhost:3333",
+            "device": "pac5527",
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
+            "runToEntryPoint": "main",
+            "preLaunchTask": "ST-Link: Build Debug and Start Server",
+            "postDebugTask": "Stop PyOCD Server"
+        },
+        {
+            "name": "[ST-Link] Rebuild Release and Flash",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
+            "request": "attach",
+            "type": "cortex-debug",
+            "servertype": "external",
+            "gdbTarget": "localhost:3333",
+            "device": "pac5527",
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
+            "preLaunchTask": "ST-Link: Build Release, Flash and Start Server",
+            "postDebugTask": "Stop PyOCD Server"
+        },
+        {
+            "name": "[ST-Link] Flash Built Binary and Start Session",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
+            "request": "attach",
+            "type": "cortex-debug",
+            "servertype": "external",
+            "gdbTarget": "localhost:3333",
+            "device": "pac5527",
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
+            "runToEntryPoint": "main",
+            "preLaunchTask": "ST-Link: Flash and Start Server",
+            "postDebugTask": "Stop PyOCD Server"
+        },
+        {
+            "name": "[ST-Link] Flash Built Binary",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
+            "request": "attach",
+            "type": "cortex-debug",
+            "servertype": "external",
+            "gdbTarget": "localhost:3333",
+            "device": "pac5527",
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
+            "preLaunchTask": "ST-Link: Flash and Start Server",
+            "postDebugTask": "Stop PyOCD Server"
+        },
+        {
+            "name": "[ST-Link] Attach to Target",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/firmware/build/tinymovr_fw.elf",
+            "request": "attach",
+            "type": "cortex-debug",
+            "servertype": "external",
+            "gdbTarget": "localhost:3333",
+            "device": "pac5527",
+            "svdFile": "${workspaceRoot}/firmware/PAC55XX.svd",
+            "preLaunchTask": "Start PyOCD GDB Server",
+            "postDebugTask": "Stop PyOCD Server"
         }
     ]
 }

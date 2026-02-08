@@ -1,0 +1,2592 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- File naming: <vendor>_<part/series name>.svd -->
+<!--
+  Copyright (C) 2017 Active-Semi, Inc. All rights reserved.
+ -->
+<device schemaVersion="1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="..\..\CMSIS-SVD.xsd">
+  <vendor>Active-Semi</vendor>
+  <!-- device vendor name -->
+  <vendorID>140</vendorID>
+  <!-- device vendor short name -->
+  <name>PAC55XX</name>
+  <!-- name of part-->
+  <series>PAC55XX</series>
+  <!-- device series the device belongs to -->
+  <version>1.0</version>
+  <!-- version of this description, adding CMSIS-SVD 1.1 tags -->
+  <description>ARM Cortex-M4 processor with FPU, running up to 150MHz with a set of analog and digital peripherals for power and motor control applications.</description>
+  <licenseText>                                                   
+    THIS SOFTWARE IS SUBJECT TO A SOURCE CODE LICENSE AGREEMENT WHICH PROVIDES,
+	AMONG OTHER THINGS:  (i) THAT IT CAN BE USED ONLY TO ADAPT THE LICENSEE'S
+	APPLICATION TO PAC PROCESSORS SUPPLIED BY ACTIVE-SEMI INTERNATIONAL;
+	(ii) THAT  IT IS PROVIDED "AS IS" WITHOUT WARRANTY;  (iii) THAT
+	ACTIVE-SEMICONDUCTOR IS NOT LIABLE FOR ANY INDIRECT DAMAGES OR FOR DIRECT
+	DAMAGES EXCEEDING US$1,500;  AND (iv) THAT IT CAN BE DISCLOSED TO AND USED
+	ONLY BY CERTAIN AUTHORIZED PERSONS.
+  </licenseText>
+  <cpu>
+    <name>CM4</name>
+    <revision>r0p1</revision>
+    <endian>little</endian>
+    <mpuPresent>1</mpuPresent>
+    <fpuPresent>1</fpuPresent>
+    <nvicPrioBits>3</nvicPrioBits>
+    <vendorSystickConfig>1</vendorSystickConfig>
+  </cpu>
+  <addressUnitBits>8</addressUnitBits>
+  <width>32</width>
+  <!-- default settings implicitly inherited by subsequent sections -->
+  <size>32</size>
+  <access>read-write</access>
+  <resetValue>0x00000000</resetValue>
+  <resetMask>0xFFFFFFFF</resetMask>
+  <peripherals>
+    <peripheral>
+      <name>ADC</name>
+      <description>2.5 MSPS, 12-bit SAR ADC</description>
+      <baseAddress>0x40000000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x10000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>ADC0</name>
+        <value>3</value>
+      </interrupt>
+      <interrupt>
+        <name>ADC1</name>
+        <value>4</value>
+      </interrupt>
+      <interrupt>
+        <name>ADC2</name>
+        <value>5</value>
+      </interrupt>
+      <interrupt>
+        <name>ADC3</name>
+        <value>6</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>EMUXCTL</name>
+          <description>EMUX Control</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>EMUXDATA</name>
+          <description>EMUX Data</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>ADCCTL</name>
+          <description>ADC Control</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>ADCRES</name>
+          <description>ADC Result</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>ADCINT</name>
+          <description>ADC Interrupt Control</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>DTSETRIGENT0TO3</name>
+          <description>DTSE Trigger Entry 0 to 3</description>
+          <addressOffset>0x00000040</addressOffset>
+        </register>
+        <register>
+          <name>DTSETRIGENT4TO7</name>
+          <description>DTSE Trigger Entry 4 to 7</description>
+          <addressOffset>0x00000044</addressOffset>
+        </register>
+        <register>
+          <name>DTSETRIGENT8TO11</name>
+          <description>DTSE Trigger Entry 8 to 11</description>
+          <addressOffset>0x00000048</addressOffset>
+        </register>
+        <register>
+          <name>DTSETRIGENT12TO15</name>
+          <description>DTSE Trigger Entry 12 to 15</description>
+          <addressOffset>0x0000004C</addressOffset>
+        </register>
+        <register>
+          <name>DTSETRIGENT16TO19</name>
+          <description>DTSE Trigger Entry 16 to 19</description>
+          <addressOffset>0x00000050</addressOffset>
+        </register>
+        <register>
+          <name>DTSETRIGENT20TO23</name>
+          <description>DTSE Trigger Entry 20 to 23</description>
+          <addressOffset>0x00000054</addressOffset>
+        </register>
+        <register>
+          <name>DTSETRIGENT24TO27</name>
+          <description>DTSE Trigger Entry 24 to 27</description>
+          <addressOffset>0x00000058</addressOffset>
+        </register>
+        <register>
+          <name>DTSETRIGENT28TO31</name>
+          <description>DTSE Trigger Entry 28 to 31</description>
+          <addressOffset>0x0000005C</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG0</name>
+          <description>DTSE Sequence Config 0</description>
+          <addressOffset>0x00000080</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG1</name>
+          <description>DTSE Sequence Config 1</description>
+          <addressOffset>0x00000084</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG2</name>
+          <description>DTSE Sequence Config 2</description>
+          <addressOffset>0x00000088</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG3</name>
+          <description>DTSE Sequence Config 3</description>
+          <addressOffset>0x0000008C</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG4</name>
+          <description>DTSE Sequence Config 4</description>
+          <addressOffset>0x00000090</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG5</name>
+          <description>DTSE Sequence Config 5</description>
+          <addressOffset>0x00000094</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG6</name>
+          <description>DTSE Sequence Config 6</description>
+          <addressOffset>0x00000098</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG7</name>
+          <description>DTSE Sequence Config 7</description>
+          <addressOffset>0x0000009C</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG8</name>
+          <description>DTSE Sequence Config 8</description>
+          <addressOffset>0x00000100</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG9</name>
+          <description>DTSE Sequence Config 9</description>
+          <addressOffset>0x00000104</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG10</name>
+          <description>DTSE Sequence Config 10</description>
+          <addressOffset>0x00000108</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG11</name>
+          <description>DTSE Sequence Config 11</description>
+          <addressOffset>0x0000010C</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG12</name>
+          <description>DTSE Sequence Config 12</description>
+          <addressOffset>0x00000110</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG13</name>
+          <description>DTSE Sequence Config 13</description>
+          <addressOffset>0x00000114</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG14</name>
+          <description>DTSE Sequence Config 14</description>
+          <addressOffset>0x00000118</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG15</name>
+          <description>DTSE Sequence Config 15</description>
+          <addressOffset>0x0000011C</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG16</name>
+          <description>DTSE Sequence Config 16</description>
+          <addressOffset>0x00000120</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG17</name>
+          <description>DTSE Sequence Config 17</description>
+          <addressOffset>0x00000124</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG18</name>
+          <description>DTSE Sequence Config 18</description>
+          <addressOffset>0x00000128</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG19</name>
+          <description>DTSE Sequence Config 19</description>
+          <addressOffset>0x0000012C</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG20</name>
+          <description>DTSE Sequence Config 20</description>
+          <addressOffset>0x00000130</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG21</name>
+          <description>DTSE Sequence Config 21</description>
+          <addressOffset>0x00000134</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG22</name>
+          <description>DTSE Sequence Config 22</description>
+          <addressOffset>0x00000138</addressOffset>
+        </register>
+        <register>
+          <name>DTSESEQCFG23</name>
+          <description>DTSE Sequence Config 23</description>
+          <addressOffset>0x0000013C</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES0</name>
+          <description>DTSE Result 0</description>
+          <addressOffset>0x00000200</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES1</name>
+          <description>DTSE Result 1</description>
+          <addressOffset>0x00000204</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES2</name>
+          <description>DTSE Result 2</description>
+          <addressOffset>0x00000208</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES3</name>
+          <description>DTSE Result 3</description>
+          <addressOffset>0x0000020C</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES4</name>
+          <description>DTSE Result 4</description>
+          <addressOffset>0x00000210</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES5</name>
+          <description>DTSE Result 5</description>
+          <addressOffset>0x00000214</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES6</name>
+          <description>DTSE Result 6</description>
+          <addressOffset>0x00000218</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES7</name>
+          <description>DTSE Result 7</description>
+          <addressOffset>0x0000021C</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES8</name>
+          <description>DTSE Result 8</description>
+          <addressOffset>0x00000220</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES9</name>
+          <description>DTSE Result 9</description>
+          <addressOffset>0x00000224</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES10</name>
+          <description>DTSE Result 10</description>
+          <addressOffset>0x00000228</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES11</name>
+          <description>DTSE Result 11</description>
+          <addressOffset>0x0000022C</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES12</name>
+          <description>DTSE Result 12</description>
+          <addressOffset>0x00000230</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES13</name>
+          <description>DTSE Result 13</description>
+          <addressOffset>0x00000234</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES14</name>
+          <description>DTSE Result 14</description>
+          <addressOffset>0x00000238</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES15</name>
+          <description>DTSE Result 15</description>
+          <addressOffset>0x0000023C</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES16</name>
+          <description>DTSE Result 16</description>
+          <addressOffset>0x00000240</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES17</name>
+          <description>DTSE Result 17</description>
+          <addressOffset>0x00000244</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES18</name>
+          <description>DTSE Result 18</description>
+          <addressOffset>0x00000248</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES19</name>
+          <description>DTSE Result 19</description>
+          <addressOffset>0x0000024C</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES20</name>
+          <description>DTSE Result 20</description>
+          <addressOffset>0x00000250</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES21</name>
+          <description>DTSE Result 21</description>
+          <addressOffset>0x00000254</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES22</name>
+          <description>DTSE Result 22</description>
+          <addressOffset>0x00000258</addressOffset>
+        </register>
+        <register>
+          <name>DTSERES23</name>
+          <description>DTSE Result 23</description>
+          <addressOffset>0x0000025C</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+	
+    <peripheral>
+      <name>I2C</name>
+      <description>I2C</description>
+      <baseAddress>0x40010000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x10000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>I2C</name>
+        <value>22</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>CONSET</name>
+          <description>I2C Control Set</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>CONCLR</name>
+          <description>I2C Control Clear</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>STAT</name>
+          <description>I2C Status</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>DAT</name>
+          <description>I2C Data</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>CLK</name>
+          <description>I2C Clock Control</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>ADR0</name>
+          <description>I2C Slave Address 0</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+        <register>
+          <name>ADRM0</name>
+          <description>I2C Slave Address Mask 0</description>
+          <addressOffset>0x00000018</addressOffset>
+        </register>
+        <register>
+          <name>XADR0</name>
+          <description>I2C Extended Slave Address 0</description>
+          <addressOffset>0x0000001C</addressOffset>
+        </register>
+        <register>
+          <name>XADRM0</name>
+          <description>I2C Extended Slave Address Mask 0</description>
+          <addressOffset>0x00000020</addressOffset>
+        </register>
+        <register>
+          <name>RST</name>
+          <description>I2C Software Reset</description>
+          <addressOffset>0x00000024</addressOffset>
+        </register>
+        <register>
+          <name>ADR1</name>
+          <description>I2C Slave Address 1</description>
+          <addressOffset>0x00000028</addressOffset>
+        </register>
+        <register>
+          <name>ADRM1</name>
+          <description>I2C Slave Address Mask 1</description>
+          <addressOffset>0x0000002C</addressOffset>
+        </register>
+        <register>
+          <name>ADR2</name>
+          <description>I2C Slave Address 2</description>
+          <addressOffset>0x00000030</addressOffset>
+        </register>
+        <register>
+          <name>ADRM2</name>
+          <description>I2C Slave Address Mask 2</description>
+          <addressOffset>0x00000034</addressOffset>
+        </register>
+        <register>
+          <name>ADR3</name>
+          <description>I2C Slave Address 3</description>
+          <addressOffset>0x00000038</addressOffset>
+        </register>
+        <register>
+          <name>ADRM3</name>
+          <description>I2C Slave Address Mask 3</description>
+          <addressOffset>0x0000003C</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+	<peripheral>
+      <name>USARTA</name>
+      <description>USART A</description>
+      <baseAddress>0x40020000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x10000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>USARTA</name>
+        <value>23</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>RBR_CON</name>
+          <description>UART A Receive Buffer / SSP A Control</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>THR_STAT</name>
+          <description>UART A Transmit Holding / SSP A Status</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>DRL_DAT</name>
+          <description>UART A Divisor Latch / SSP A Data</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>IER_CLK</name>
+          <description>UART A Interrupt Enable / SSP A Clock Control</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+		<register>
+          <name>IIR_IMSC</name>
+          <description>UART A Interrupt Identification / SSP A Interrupt Mask Set and Clear</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>FCR_RIS</name>
+          <description>UART A FIFO Control / SSP A Raw Interrupt Status</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+        <register>
+          <name>LCR_MIS</name>
+          <description>UART A Line Control / SSP A Masked Interrupt Status</description>
+          <addressOffset>0x00000018</addressOffset>
+        </register>
+        <register>
+          <name>ICLR</name>
+          <description>SSP A Interrupt Clear</description>
+          <addressOffset>0x0000001C</addressOffset>
+        </register>
+        <register>
+          <name>LSR</name>
+          <description>UART A Line Status</description>
+          <addressOffset>0x00000020</addressOffset>
+        </register>
+        <register>
+          <name>SCR_SSCR</name>
+          <description>UART A Scratch Pad / SSP A Slave Select Configuration</description>
+          <addressOffset>0x00000028</addressOffset>
+        </register>		
+        <register>
+          <name>EFR</name>
+          <description>Enhanced Feature</description>
+          <addressOffset>0x0000002C</addressOffset>
+        </register>		
+      </registers>
+    </peripheral>
+
+	<peripheral>
+      <name>USARTB</name>
+      <description>USART B</description>
+      <baseAddress>0x40030000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x10000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>USARTB</name>
+        <value>24</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>RBR_CON</name>
+          <description>UART B Receive Buffer / SSP B Control</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>THR_STAT</name>
+          <description>UART B Transmit Holding / SSP B Status</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>DRL_DAT</name>
+          <description>UART B Divisor Latch / SSP B Data</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>IER_CLK</name>
+          <description>UART B Interrupt Enable / SSP B Clock Control</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+		<register>
+          <name>IIR_IMSC</name>
+          <description>UART B Interrupt Identification / SSP B Interrupt Mask Set and Clear</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>FCR_RIS</name>
+          <description>UART B FIFO Control / SSP B Raw Interrupt Status</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+        <register>
+          <name>LCR_MIS</name>
+          <description>UART B Line Control / SSP B Masked Interrupt Status</description>
+          <addressOffset>0x00000018</addressOffset>
+        </register>
+        <register>
+          <name>ICLR</name>
+          <description>SSP B Interrupt Clear</description>
+          <addressOffset>0x0000001C</addressOffset>
+        </register>
+        <register>
+          <name>LSR</name>
+          <description>UART B Line Status</description>
+          <addressOffset>0x00000020</addressOffset>
+        </register>
+        <register>
+          <name>SCR_SSCR</name>
+          <description>UART B Scratch Pad / SSP B Slave Select Configuration</description>
+          <addressOffset>0x00000028</addressOffset>
+        </register>		
+        <register>
+          <name>EFR</name>
+          <description>Enhanced Feature</description>
+          <addressOffset>0x0000002C</addressOffset>
+        </register>		
+      </registers>
+    </peripheral>
+
+
+	<peripheral>
+      <name>USARTC</name>
+      <description>USART C</description>
+      <baseAddress>0x40040000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x10000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>USARTC</name>
+        <value>25</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>RBR_CON</name>
+          <description>UART C Receive Buffer / SSP C Control</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>THR_STAT</name>
+          <description>UART C Transmit Holding / SSP C Status</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>DRL_DAT</name>
+          <description>UART C Divisor Latch / SSP C Data</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>IER_CLK</name>
+          <description>UART C Interrupt Enable / SSP C Clock Control</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+		<register>
+          <name>IIR_IMSC</name>
+          <description>UART C Interrupt Identification / SSP C Interrupt Mask Set and Clear</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>FCR_RIS</name>
+          <description>UART C FIFO Control / SSP C Raw Interrupt Status</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+        <register>
+          <name>LCR_MIS</name>
+          <description>UART C Line Control / SSP C Masked Interrupt Status</description>
+          <addressOffset>0x00000018</addressOffset>
+        </register>
+        <register>
+          <name>ICLR</name>
+          <description>SSP C Interrupt Clear</description>
+          <addressOffset>0x0000001C</addressOffset>
+        </register>
+        <register>
+          <name>LSR</name>
+          <description>UART C Line Status</description>
+          <addressOffset>0x00000020</addressOffset>
+        </register>
+        <register>
+          <name>SCR_SSCR</name>
+          <description>UART C Scratch Pad / SSP C Slave Select Configuration</description>
+          <addressOffset>0x00000028</addressOffset>
+        </register>		
+        <register>
+          <name>EFR</name>
+          <description>Enhanced Feature</description>
+          <addressOffset>0x0000002C</addressOffset>
+        </register>		
+      </registers>
+    </peripheral>
+
+	<peripheral>
+      <name>USARTD</name>
+      <description>USART D</description>
+      <baseAddress>0x40050000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x10000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>USARTD</name>
+        <value>26</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>RBR_CON</name>
+          <description>UART D Receive Buffer / SSP D Control</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>THR_STAT</name>
+          <description>UART D Transmit Holding / SSP D Status</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>DRL_DAT</name>
+          <description>UART D Divisor Latch / SSP D Data</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>IER_CLK</name>
+          <description>UART D Interrupt Enable / SSP D Clock Control</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+		<register>
+          <name>IIR_IMSC</name>
+          <description>UART D Interrupt Identification / SSP D Interrupt Mask Set and Clear</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>FCR_RIS</name>
+          <description>UART D FIFO Control / SSP D Raw Interrupt Status</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+        <register>
+          <name>LCR_MIS</name>
+          <description>UART D Line Control / SSP D Masked Interrupt Status</description>
+          <addressOffset>0x00000018</addressOffset>
+        </register>
+        <register>
+          <name>ICLR</name>
+          <description>SSP D Interrupt Clear</description>
+          <addressOffset>0x0000001C</addressOffset>
+        </register>
+        <register>
+          <name>LSR</name>
+          <description>UART D Line Status</description>
+          <addressOffset>0x00000020</addressOffset>
+        </register>
+        <register>
+          <name>SCR_SSCR</name>
+          <description>UART D Scratch Pad / SSP D Slave Select Configuration</description>
+          <addressOffset>0x00000028</addressOffset>
+        </register>		
+        <register>
+          <name>EFR</name>
+          <description>Enhanced Feature</description>
+          <addressOffset>0x0000002C</addressOffset>
+        </register>		
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>TimerA</name>
+      <description>Timer A</description>
+      <baseAddress>0x40060000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x10000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>TIMERA</name>
+        <value>7</value>
+      </interrupt>
+      <interrupt>
+        <name>TIMERAQEP</name>
+        <value>11</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>CTL</name>
+          <description>Timer A Control</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>INT</name>
+          <description>Timer A Interrupt Control</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>PRD</name>
+          <description>Timer A Period</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>CTR</name>
+          <description>Timer A Counter</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>QEPCTL</name>
+          <description>Timer A QEP Control</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>CCTL0</name>
+          <description>Timer A CC Control 0</description>
+          <addressOffset>0x00000100</addressOffset>
+        </register>
+        <register>
+          <name>CCTR0</name>
+          <description>Timer A CC Counter 0</description>
+          <addressOffset>0x00000104</addressOffset>
+        </register>
+        <register>
+          <name>CCTL1</name>
+          <description>Timer A CC Control 1</description>
+          <addressOffset>0x00000108</addressOffset>
+        </register>
+        <register>
+          <name>CCTR1</name>
+          <description>Timer A CC Counter 1</description>
+          <addressOffset>0x0000010C</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL2</name>
+          <description>Timer A CC Control 2</description>
+          <addressOffset>0x00000110</addressOffset>
+        </register>
+        <register>
+          <name>CCTR2</name>
+          <description>Timer A CC Counter 2</description>
+          <addressOffset>0x00000114</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL3</name>
+          <description>Timer A CC Control 3</description>
+          <addressOffset>0x00000118</addressOffset>
+        </register>
+        <register>
+          <name>CCTR3</name>
+          <description>Timer A CC Counter 3</description>
+          <addressOffset>0x0000011C</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL4</name>
+          <description>Timer A CC Control 4</description>
+          <addressOffset>0x00000120</addressOffset>
+        </register>
+        <register>
+          <name>CCTR4</name>
+          <description>Timer A CC Counter 4</description>
+          <addressOffset>0x00000124</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL5</name>
+          <description>Timer A CC Control 5</description>
+          <addressOffset>0x00000128</addressOffset>
+        </register>
+        <register>
+          <name>CCTR5</name>
+          <description>Timer A CC Counter 5</description>
+          <addressOffset>0x0000012C</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL6</name>
+          <description>Timer A CC Control 6</description>
+          <addressOffset>0x00000130</addressOffset>
+        </register>
+        <register>
+          <name>CCTR6</name>
+          <description>Timer A CC Counter 6</description>
+          <addressOffset>0x00000134</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL7</name>
+          <description>Timer A CC Control 7</description>
+          <addressOffset>0x00000138</addressOffset>
+        </register>
+        <register>
+          <name>CCTR7</name>
+          <description>Timer A CC Counter 7</description>
+          <addressOffset>0x0000013C</addressOffset>
+        </register>		
+        <register>
+          <name>DTGCTL0</name>
+          <description>Timer A DTG Control 0</description>
+          <addressOffset>0x00000200</addressOffset>
+        </register>
+        <register>
+          <name>DTGCTL1</name>
+          <description>Timer A DTG Control 1</description>
+          <addressOffset>0x00000204</addressOffset>
+        </register>
+        <register>
+          <name>DTGCTL2</name>
+          <description>Timer A DTG Control 2</description>
+          <addressOffset>0x00000208</addressOffset>
+        </register>
+        <register>
+          <name>DTGCTL3</name>
+          <description>Timer A DTG Control 3</description>
+          <addressOffset>0x0000020C</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+	
+    <peripheral>
+      <name>TimerB</name>
+      <description>Timer B</description>
+      <baseAddress>0x40070000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x10000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>TIMERB</name>
+        <value>8</value>
+      </interrupt>
+      <interrupt>
+        <name>TIMERBQEP</name>
+        <value>12</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>CTL</name>
+          <description>Timer B Control</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>INT</name>
+          <description>Timer B Interrupt Control</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>PRD</name>
+          <description>Timer B Period</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>CTR</name>
+          <description>Timer B Counter</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>QEPCTL</name>
+          <description>Timer B QEP Control</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>CCTL0</name>
+          <description>Timer B CC Control 0</description>
+          <addressOffset>0x00000100</addressOffset>
+        </register>
+        <register>
+          <name>CCTR0</name>
+          <description>Timer B CC Counter 0</description>
+          <addressOffset>0x00000104</addressOffset>
+        </register>
+        <register>
+          <name>CCTL1</name>
+          <description>Timer B CC Control 1</description>
+          <addressOffset>0x00000108</addressOffset>
+        </register>
+        <register>
+          <name>CCTR1</name>
+          <description>Timer B CC Counter 1</description>
+          <addressOffset>0x0000010C</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL2</name>
+          <description>Timer B CC Control 2</description>
+          <addressOffset>0x00000110</addressOffset>
+        </register>
+        <register>
+          <name>CCTR2</name>
+          <description>Timer B CC Counter 2</description>
+          <addressOffset>0x00000114</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL3</name>
+          <description>Timer B CC Control 3</description>
+          <addressOffset>0x00000118</addressOffset>
+        </register>
+        <register>
+          <name>CCTR3</name>
+          <description>Timer B CC Counter 3</description>
+          <addressOffset>0x0000011C</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL4</name>
+          <description>Timer B CC Control 4</description>
+          <addressOffset>0x00000120</addressOffset>
+        </register>
+        <register>
+          <name>CCTR4</name>
+          <description>Timer B CC Counter 4</description>
+          <addressOffset>0x00000124</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL5</name>
+          <description>Timer B CC Control 5</description>
+          <addressOffset>0x00000128</addressOffset>
+        </register>
+        <register>
+          <name>CCTR5</name>
+          <description>Timer B CC Counter 5</description>
+          <addressOffset>0x0000012C</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL6</name>
+          <description>Timer B CC Control 6</description>
+          <addressOffset>0x00000130</addressOffset>
+        </register>
+        <register>
+          <name>CCTR6</name>
+          <description>Timer B CC Counter 6</description>
+          <addressOffset>0x00000134</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL7</name>
+          <description>Timer B CC Control 7</description>
+          <addressOffset>0x00000138</addressOffset>
+        </register>
+        <register>
+          <name>CCTR7</name>
+          <description>Timer B CC Counter 7</description>
+          <addressOffset>0x0000013C</addressOffset>
+        </register>		
+        <register>
+          <name>DTGCTL0</name>
+          <description>Timer B DTG Control 0</description>
+          <addressOffset>0x00000200</addressOffset>
+        </register>
+        <register>
+          <name>DTGCTL1</name>
+          <description>Timer B DTG Control 1</description>
+          <addressOffset>0x00000204</addressOffset>
+        </register>
+        <register>
+          <name>DTGCTL2</name>
+          <description>Timer B DTG Control 2</description>
+          <addressOffset>0x00000208</addressOffset>
+        </register>
+        <register>
+          <name>DTGCTL3</name>
+          <description>Timer B DTG Control 3</description>
+          <addressOffset>0x0000020C</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>TimerC</name>
+      <description>Timer C</description>
+      <baseAddress>0x40080000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x10000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>TIMERC</name>
+        <value>9</value>
+      </interrupt>
+      <interrupt>
+        <name>TIMERCQEP</name>
+        <value>13</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>CTL</name>
+          <description>Timer C Control</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>INT</name>
+          <description>Timer C Interrupt Control</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>PRD</name>
+          <description>Timer C Period</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>CTR</name>
+          <description>Timer C Counter</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>QEPCTL</name>
+          <description>Timer C QEP Control</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>CCTL0</name>
+          <description>Timer C CC Control 0</description>
+          <addressOffset>0x00000100</addressOffset>
+        </register>
+        <register>
+          <name>CCTR0</name>
+          <description>Timer C CC Counter 0</description>
+          <addressOffset>0x00000104</addressOffset>
+        </register>
+        <register>
+          <name>CCTL1</name>
+          <description>Timer C CC Control 1</description>
+          <addressOffset>0x00000108</addressOffset>
+        </register>
+        <register>
+          <name>CCTR1</name>
+          <description>Timer C CC Counter 1</description>
+          <addressOffset>0x0000010C</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL2</name>
+          <description>Timer C CC Control 2</description>
+          <addressOffset>0x00000110</addressOffset>
+        </register>
+        <register>
+          <name>CCTR2</name>
+          <description>Timer C CC Counter 2</description>
+          <addressOffset>0x00000114</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL3</name>
+          <description>Timer C CC Control 3</description>
+          <addressOffset>0x00000118</addressOffset>
+        </register>
+        <register>
+          <name>CCTR3</name>
+          <description>Timer C CC Counter 3</description>
+          <addressOffset>0x0000011C</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL4</name>
+          <description>Timer C CC Control 4</description>
+          <addressOffset>0x00000120</addressOffset>
+        </register>
+        <register>
+          <name>CCTR4</name>
+          <description>Timer C CC Counter 4</description>
+          <addressOffset>0x00000124</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL5</name>
+          <description>Timer C CC Control 5</description>
+          <addressOffset>0x00000128</addressOffset>
+        </register>
+        <register>
+          <name>CCTR5</name>
+          <description>Timer C CC Counter 5</description>
+          <addressOffset>0x0000012C</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL6</name>
+          <description>Timer C CC Control 6</description>
+          <addressOffset>0x00000130</addressOffset>
+        </register>
+        <register>
+          <name>CCTR6</name>
+          <description>Timer C CC Counter 6</description>
+          <addressOffset>0x00000134</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL7</name>
+          <description>Timer C CC Control 7</description>
+          <addressOffset>0x00000138</addressOffset>
+        </register>
+        <register>
+          <name>CCTR7</name>
+          <description>Timer C CC Counter 7</description>
+          <addressOffset>0x0000013C</addressOffset>
+        </register>		
+        <register>
+          <name>DTGCTL0</name>
+          <description>Timer C DTG Control 0</description>
+          <addressOffset>0x00000200</addressOffset>
+        </register>
+        <register>
+          <name>DTGCTL1</name>
+          <description>Timer C DTG Control 1</description>
+          <addressOffset>0x00000204</addressOffset>
+        </register>
+        <register>
+          <name>DTGCTL2</name>
+          <description>Timer C DTG Control 2</description>
+          <addressOffset>0x00000208</addressOffset>
+        </register>
+        <register>
+          <name>DTGCTL3</name>
+          <description>Timer C DTG Control 3</description>
+          <addressOffset>0x0000020C</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>TimerD</name>
+      <description>Timer D</description>
+      <baseAddress>0x40090000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x10000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>TIMERD</name>
+        <value>10</value>
+      </interrupt>
+      <interrupt>
+        <name>TIMERDQEP</name>
+        <value>14</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>CTL</name>
+          <description>Timer D Control</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>INT</name>
+          <description>Timer D Interrupt Control</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>PRD</name>
+          <description>Timer D Period</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>CTR</name>
+          <description>Timer D Counter</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>QEPCTL</name>
+          <description>Timer D QEP Control</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>CCTL0</name>
+          <description>Timer D CC Control 0</description>
+          <addressOffset>0x00000100</addressOffset>
+        </register>
+        <register>
+          <name>CCTR0</name>
+          <description>Timer D CC Counter 0</description>
+          <addressOffset>0x00000104</addressOffset>
+        </register>
+        <register>
+          <name>CCTL1</name>
+          <description>Timer D CC Control 1</description>
+          <addressOffset>0x00000108</addressOffset>
+        </register>
+        <register>
+          <name>CCTR1</name>
+          <description>Timer D CC Counter 1</description>
+          <addressOffset>0x0000010C</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL2</name>
+          <description>Timer D CC Control 2</description>
+          <addressOffset>0x00000110</addressOffset>
+        </register>
+        <register>
+          <name>CCTR2</name>
+          <description>Timer D CC Counter 2</description>
+          <addressOffset>0x00000114</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL3</name>
+          <description>Timer D CC Control 3</description>
+          <addressOffset>0x00000118</addressOffset>
+        </register>
+        <register>
+          <name>CCTR3</name>
+          <description>Timer D CC Counter 3</description>
+          <addressOffset>0x0000011C</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL4</name>
+          <description>Timer D CC Control 4</description>
+          <addressOffset>0x00000120</addressOffset>
+        </register>
+        <register>
+          <name>CCTR4</name>
+          <description>Timer D CC Counter 4</description>
+          <addressOffset>0x00000124</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL5</name>
+          <description>Timer D CC Control 5</description>
+          <addressOffset>0x00000128</addressOffset>
+        </register>
+        <register>
+          <name>CCTR5</name>
+          <description>Timer D CC Counter 5</description>
+          <addressOffset>0x0000012C</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL6</name>
+          <description>Timer D CC Control 6</description>
+          <addressOffset>0x00000130</addressOffset>
+        </register>
+        <register>
+          <name>CCTR6</name>
+          <description>Timer D CC Counter 6</description>
+          <addressOffset>0x00000134</addressOffset>
+        </register>		
+        <register>
+          <name>CCTL7</name>
+          <description>Timer D CC Control 7</description>
+          <addressOffset>0x00000138</addressOffset>
+        </register>
+        <register>
+          <name>CCTR7</name>
+          <description>Timer D CC Counter 7</description>
+          <addressOffset>0x0000013C</addressOffset>
+        </register>		
+        <register>
+          <name>DTGCTL0</name>
+          <description>Timer D DTG Control 0</description>
+          <addressOffset>0x00000200</addressOffset>
+        </register>
+        <register>
+          <name>DTGCTL1</name>
+          <description>Timer D DTG Control 1</description>
+          <addressOffset>0x00000204</addressOffset>
+        </register>
+        <register>
+          <name>DTGCTL2</name>
+          <description>Timer D DTG Control 2</description>
+          <addressOffset>0x00000208</addressOffset>
+        </register>
+        <register>
+          <name>DTGCTL3</name>
+          <description>Timer D DTG Control 3</description>
+          <addressOffset>0x0000020C</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>CAN</name>
+      <description>CAN</description>
+      <baseAddress>0x400A0000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x10000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>CAN</name>
+        <value>27</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>ISR_SR_CMR_MR</name>
+          <description>Combined CAN MR, CMR, SR, and ISR registers</description>
+          <addressOffset>0x00000000</addressOffset>
+		  <fields>
+            <field>
+              <name>MR</name>
+              <description>CAN Mode</description>
+              <lsb>0</lsb>
+              <msb>7</msb>
+            </field>
+            <field>
+              <name>CMR</name>
+              <description>CAN Command</description>
+              <lsb>8</lsb>
+              <msb>15</msb>
+            </field>
+            <field>
+              <name>SR</name>
+              <description>CAN Status</description>
+              <lsb>16</lsb>
+              <msb>23</msb>
+            </field>
+            <field>
+              <name>ISR</name>
+              <description>CAN Interrupt Status/Acknowledge</description>
+              <lsb>24</lsb>
+              <msb>31</msb>
+            </field>
+          </fields>
+        </register>
+		<register>
+          <name>BTR1_BTR0_RMC_IMR</name>
+          <description>Combined CAN IMR, RMC, BTR0, and BTR1 registers</description>
+          <addressOffset>0x00000004</addressOffset>
+		  <fields>
+            <field>
+              <name>IMR</name>
+              <description>CAN Interrupt Mask</description>
+              <lsb>0</lsb>
+              <msb>7</msb>
+            </field>
+            <field>
+              <name>RMC</name>
+              <description>CAN Receive Message Counter</description>
+              <lsb>8</lsb>
+              <msb>15</msb>
+            </field>
+            <field>
+              <name>BTR0</name>
+              <description>CAN Bus Timing Register 0</description>
+              <lsb>16</lsb>
+              <msb>23</msb>
+            </field>
+            <field>
+              <name>BTR1</name>
+              <description>CAN Bus Timing Register 1</description>
+              <lsb>24</lsb>
+              <msb>31</msb>
+            </field>
+          </fields>
+        </register>
+		<register>
+          <name>TXBUF</name>
+          <description>Combined CAN Transmit Buffer registers</description>
+          <addressOffset>0x00000008</addressOffset>
+		  <fields>
+            <field>
+              <name>TXBUF0</name>
+              <description>CAN Transmit Buffer 0</description>
+              <lsb>0</lsb>
+              <msb>7</msb>
+            </field>
+            <field>
+              <name>TXBUF1</name>
+              <description>CAN Transmit Buffer 1</description>
+              <lsb>8</lsb>
+              <msb>15</msb>
+            </field>
+            <field>
+              <name>TXBUF2</name>
+              <description>CAN Transmit Buffer 2</description>
+              <lsb>16</lsb>
+              <msb>23</msb>
+            </field>
+            <field>
+              <name>TXBUF3</name>
+              <description>CAN Transmit Buffer 3</description>
+              <lsb>24</lsb>
+              <msb>31</msb>
+            </field>
+          </fields>
+        </register>
+		<register>
+          <name>RXBUF</name>
+          <description>Combined CAN Receive Buffer registers</description>
+          <addressOffset>0x0000000C</addressOffset>
+		  <fields>
+            <field>
+              <name>RXBUF0</name>
+              <description>CAN Receive Buffer 0</description>
+              <lsb>0</lsb>
+              <msb>7</msb>
+            </field>
+            <field>
+              <name>RXBUF1</name>
+              <description>CAN Receive Buffer 1</description>
+              <lsb>8</lsb>
+              <msb>15</msb>
+            </field>
+            <field>
+              <name>RXBUF2</name>
+              <description>CAN Receive Buffer 2</description>
+              <lsb>16</lsb>
+              <msb>23</msb>
+            </field>
+            <field>
+              <name>RXBUF3</name>
+              <description>CAN Receive Buffer 3</description>
+              <lsb>24</lsb>
+              <msb>31</msb>
+            </field>
+          </fields>
+        </register>
+		<register>
+          <name>ACR</name>
+          <description>Combined CAN Acceptance Code registers</description>
+          <addressOffset>0x00000010</addressOffset>
+		  <fields>
+            <field>
+              <name>ACR0</name>
+              <description>CAN Acceptance Code 0</description>
+              <lsb>0</lsb>
+              <msb>7</msb>
+            </field>
+            <field>
+              <name>ACR1</name>
+              <description>CAN Acceptance Code 1</description>
+              <lsb>8</lsb>
+              <msb>15</msb>
+            </field>
+            <field>
+              <name>ACR2</name>
+              <description>CAN Acceptance Code 2</description>
+              <lsb>16</lsb>
+              <msb>23</msb>
+            </field>
+            <field>
+              <name>ACR3</name>
+              <description>CAN Acceptance Code 3</description>
+              <lsb>24</lsb>
+              <msb>31</msb>
+            </field>
+          </fields>
+        </register>
+		<register>
+          <name>AMR</name>
+          <description>Combined CAN Acceptance Mask registers</description>
+          <addressOffset>0x00000014</addressOffset>
+		  <fields>
+            <field>
+              <name>AMR0</name>
+              <description>CAN Acceptance Mask 0</description>
+              <lsb>0</lsb>
+              <msb>7</msb>
+            </field>
+            <field>
+              <name>AMR1</name>
+              <description>CAN Acceptance Mask 1</description>
+              <lsb>8</lsb>
+              <msb>15</msb>
+            </field>
+            <field>
+              <name>AMR2</name>
+              <description>CAN Acceptance Mask 2</description>
+              <lsb>16</lsb>
+              <msb>23</msb>
+            </field>
+            <field>
+              <name>AMR3</name>
+              <description>CAN Acceptance Mask 3</description>
+              <lsb>24</lsb>
+              <msb>31</msb>
+            </field>
+          </fields>
+        </register>
+		<register>
+          <name>ALC_TXERR_RXERR_ECC</name>
+          <description>Combined CAN ECC, RXERR, TXERR, and ALC registers</description>
+          <addressOffset>0x00000018</addressOffset>
+		  <fields>
+            <field>
+              <name>ECC</name>
+              <description>CAN Error Code Capture</description>
+              <lsb>0</lsb>
+              <msb>7</msb>
+            </field>
+            <field>
+              <name>RXERR</name>
+              <description>CAN RX Error Counter</description>
+              <lsb>8</lsb>
+              <msb>15</msb>
+            </field>
+            <field>
+              <name>TXERR</name>
+              <description>CAN TX Error Counter</description>
+              <lsb>16</lsb>
+              <msb>23</msb>
+            </field>
+            <field>
+              <name>ALC</name>
+              <description>CAN Arbitration Lost Code Capture</description>
+              <lsb>24</lsb>
+              <msb>31</msb>
+            </field>
+          </fields>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>GPTIMERA</name>
+      <description>General Purpose Timer A (GPTimer A)</description>
+      <baseAddress>0x400B0000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x10000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>GPTIMERA</name>
+        <value>28</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>CTL</name>
+          <description>GPTimer A Control</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+		<register>
+          <name>CTR</name>
+          <description>GPTimer A Counter</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>GPTIMERB</name>
+      <description>General Purpose Timer B (GPTimer B)</description>
+      <baseAddress>0x400C0000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x10000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>GPTIMERB</name>
+        <value>29</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>CTL</name>
+          <description>GPTimer B Control</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+		<register>
+          <name>CTR</name>
+          <description>GPTimer B Counter</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>MEMCTL</name>
+      <description>Memory Controller</description>
+      <baseAddress>0x400D0000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x400</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>MEMCTL</name>
+        <value>0</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>MEMCTL</name>
+          <description>Memory Controller Configuration</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>MEMSTATUS</name>
+          <description>Memory Controller Status</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>FLASHLOCK</name>
+          <description>FLASH Lock Access</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>FLASHPAGE</name>
+          <description>FLASH Page</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>SWDUNLOCK</name>
+          <description>SWD Unlock</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>FLASHERASE</name>
+          <description>FLASH Erase</description>
+          <addressOffset>0x00000020</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>SCC</name>
+      <description>System and Clock Control</description>
+      <baseAddress>0x400D0400</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x400</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>SCC</name>
+        <value>30</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>CCSCTL</name>
+          <description>DESC</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>CCSPLLCTL</name>
+          <description>DESC</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>CCSROSCTRIM</name>
+          <description>DESC</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>PAMUXSEL</name>
+          <description>PA Peripheral MUX Select</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>PBMUXSEL</name>
+          <description>PB Peripheral MUX Select</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>PCMUXSEL</name>
+          <description>PC Peripheral MUX Select</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+        <register>
+          <name>PDMUXSEL</name>
+          <description>PD Peripheral MUX Select</description>
+          <addressOffset>0x00000018</addressOffset>
+        </register>
+        <register>
+          <name>PEMUXSEL</name>
+          <description>PE Peripheral MUX Select</description>
+          <addressOffset>0x0000001C</addressOffset>
+        </register>
+        <register>
+          <name>PFMUXSEL</name>
+          <description>PF Peripheral MUX Select</description>
+          <addressOffset>0x00000020</addressOffset>
+        </register>
+        <register>
+          <name>PGMUXSEL</name>
+          <description>PG Peripheral MUX Select</description>
+          <addressOffset>0x00000024</addressOffset>
+        </register>
+        <register>
+          <name>PAPUEN</name>
+          <description>PA Weak Pull-up Enable</description>
+          <addressOffset>0x00000028</addressOffset>
+        </register>
+        <register>
+          <name>PBPUEN</name>
+          <description>PB Weak Pull-up Enable</description>
+          <addressOffset>0x0000002C</addressOffset>
+        </register>
+        <register>
+          <name>PCPUEN</name>
+          <description>PC Weak Pull-up Enable</description>
+          <addressOffset>0x00000030</addressOffset>
+        </register>
+        <register>
+          <name>PDPUEN</name>
+          <description>PD Weak Pull-up Enable</description>
+          <addressOffset>0x00000034</addressOffset>
+        </register>
+        <register>
+          <name>PEPUEN</name>
+          <description>PE Weak Pull-up Enable</description>
+          <addressOffset>0x00000038</addressOffset>
+        </register>
+        <register>
+          <name>PFPUEN</name>
+          <description>PF Weak Pull-up Enable</description>
+          <addressOffset>0x0000003C</addressOffset>
+        </register>
+        <register>
+          <name>PGPUEN</name>
+          <description>PG Weak Pull-up Enable</description>
+          <addressOffset>0x00000040</addressOffset>
+        </register>
+        <register>
+          <name>PAPDEN</name>
+          <description>PA Weak Pull-down Enable</description>
+          <addressOffset>0x00000044</addressOffset>
+        </register>
+        <register>
+          <name>PBPDEN</name>
+          <description>PB Weak Pull-down Enable</description>
+          <addressOffset>0x00000048</addressOffset>
+        </register>
+        <register>
+          <name>PCPDEN</name>
+          <description>PC Weak Pull-down Enable</description>
+          <addressOffset>0x0000004C</addressOffset>
+        </register>
+        <register>
+          <name>PDPDEN</name>
+          <description>PD Weak Pull-down Enable</description>
+          <addressOffset>0x00000050</addressOffset>
+        </register>
+        <register>
+          <name>PEPDEN</name>
+          <description>PE Weak Pull-down Enable</description>
+          <addressOffset>0x00000054</addressOffset>
+        </register>
+        <register>
+          <name>PFPDEN</name>
+          <description>PF Weak Pull-down Enable</description>
+          <addressOffset>0x00000058</addressOffset>
+        </register>
+        <register>
+          <name>PGPDEN</name>
+          <description>PG Weak Pull-down Enable</description>
+          <addressOffset>0x0000005C</addressOffset>
+        </register>
+        <register>
+          <name>PADS</name>
+          <description>PA Drive Strength/Schmitt Trigger</description>
+          <addressOffset>0x00000060</addressOffset>
+        </register>
+        <register>
+          <name>PBDS</name>
+          <description>PB Drive Strength/Schmitt Trigger</description>
+          <addressOffset>0x00000064</addressOffset>
+        </register>
+        <register>
+          <name>PCDS</name>
+          <description>PC Drive Strength/Schmitt Trigger</description>
+          <addressOffset>0x00000068</addressOffset>
+        </register>
+        <register>
+          <name>PDDS</name>
+          <description>PD Drive Strength/Schmitt Trigger</description>
+          <addressOffset>0x0000006C</addressOffset>
+        </register>
+        <register>
+          <name>PEDS</name>
+          <description>PE Drive Strength/Schmitt Trigger</description>
+          <addressOffset>0x00000070</addressOffset>
+        </register>
+        <register>
+          <name>PFDS</name>
+          <description>PF Drive Strength/Schmitt Trigger</description>
+          <addressOffset>0x00000074</addressOffset>
+        </register>
+        <register>
+          <name>PGDS</name>
+          <description>PG Drive Strength/Schmitt Trigger</description>
+          <addressOffset>0x00000078</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>WWDT</name>
+      <description>Windowed Watchdog Timer</description>
+      <baseAddress>0x400D0800</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x400</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>WWDT</name>
+        <value>1</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>CTL</name>
+          <description>WWDT Control</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>LOAD</name>
+          <description>WWDT Load Counter Value</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>CTR</name>
+          <description>WWDT Counter</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>INTF</name>
+          <description>WWDT Interrupt Flag</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>INTCLR</name>
+          <description>WWDT Interrupt Clear</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>LOCK</name>
+          <description>WWDT Lock</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>RTC</name>
+      <description>Real-Time Clock (RTC) with Calendar</description>
+      <baseAddress>0x400D0C00</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x400</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>RTC</name>
+        <value>2</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>CTL</name>
+          <description>RTC Control</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>TIME</name>
+          <description>RTC Time</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>DATE</name>
+          <description>RTC Date</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>TIMESET</name>
+          <description>RTC Time Setting</description>
+          <addressOffset>0x0000000c</addressOffset>
+        </register>
+        <register>
+          <name>DATESET</name>
+          <description>RTC Date Setting</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>ALARMSET</name>
+          <description>RTC Alarm Setting</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>CRC</name>
+      <description>CRC</description>
+      <baseAddress>0x400D1000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x400</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <registers>
+        <register>
+          <name>CTL</name>
+          <description>CRC Control</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>DATAIN</name>
+          <description>CRC Data Input</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>SEED</name>
+          <description>CRC Seed Value</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>DATAOUT</name>
+          <description>CRC Data Output</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>GPIOA</name>
+      <description>GPIO A</description>
+      <baseAddress>0x400D1400</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x400</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>GPIOA</name>
+        <value>15</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>MODE</name>
+          <description>GPIO A Pin Mode Select</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>OUTMASK</name>
+          <description>GPIO A Data Output Write Mask</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>OUT</name>
+          <description>GPIO A Data Output Value</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>IN</name>
+          <description>GPIO A Data Input Value</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>INTEN</name>
+          <description>GPIO A Interrupt Enable</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>INTFLAGRAW</name>
+          <description>GPIO A Interrupt Flag Raw</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+        <register>
+          <name>INTFLAGMASKED</name>
+          <description>GPIO A Interrupt Flag Masked</description>
+          <addressOffset>0x00000018</addressOffset>
+        </register>
+        <register>
+          <name>INTCLEAR</name>
+          <description>GPIO A Interrupt Clear</description>
+          <addressOffset>0x0000001C</addressOffset>
+        </register>
+        <register>
+          <name>INTTYPE</name>
+          <description>GPIO A Interrupt Type</description>
+          <addressOffset>0x00000020</addressOffset>
+        </register>
+        <register>
+          <name>INTVALUE</name>
+          <description>GPIO A Interrupt Value</description>
+          <addressOffset>0x00000024</addressOffset>
+        </register>
+        <register>
+          <name>INTEDGEBOTH</name>
+          <description>GPIO A Interrupt Edge Both</description>
+          <addressOffset>0x00000028</addressOffset>
+        </register>
+        <register>
+          <name>DEBOUNCE</name>
+          <description>GPIO A De-bounce Filter</description>
+          <addressOffset>0x0000002C</addressOffset>
+        </register>
+        <register>
+          <name>DOSET</name>
+          <description>GPIO A Data Output Set</description>
+          <addressOffset>0x00000030</addressOffset>
+        </register>
+        <register>
+          <name>DOCLEAR</name>
+          <description>GPIO A Data Output Clear</description>
+          <addressOffset>0x00000034</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>GPIOB</name>
+      <description>GPIO B</description>
+      <baseAddress>0x400D1800</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x400</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>GPIOB</name>
+        <value>16</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>MODE</name>
+          <description>GPIO B Pin Mode Select</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>OUTMASK</name>
+          <description>GPIO B Data Output Write Mask</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>OUT</name>
+          <description>GPIO B Data Output Value</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>IN</name>
+          <description>GPIO B Data Input Value</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>INTEN</name>
+          <description>GPIO B Interrupt Enable</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>INTFLAGRAW</name>
+          <description>GPIO B Interrupt Flag Raw</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+        <register>
+          <name>INTFLAGMASKED</name>
+          <description>GPIO B Interrupt Flag Masked</description>
+          <addressOffset>0x00000018</addressOffset>
+        </register>
+        <register>
+          <name>INTCLEAR</name>
+          <description>GPIO B Interrupt Clear</description>
+          <addressOffset>0x0000001C</addressOffset>
+        </register>
+        <register>
+          <name>INTTYPE</name>
+          <description>GPIO B Interrupt Type</description>
+          <addressOffset>0x00000020</addressOffset>
+        </register>
+        <register>
+          <name>INTVALUE</name>
+          <description>GPIO B Interrupt Value</description>
+          <addressOffset>0x00000024</addressOffset>
+        </register>
+        <register>
+          <name>INTEDGEBOTH</name>
+          <description>GPIO B Interrupt Edge Both</description>
+          <addressOffset>0x00000028</addressOffset>
+        </register>
+        <register>
+          <name>DEBOUNCE</name>
+          <description>GPIO B De-bounce Filter</description>
+          <addressOffset>0x0000002C</addressOffset>
+        </register>
+        <register>
+          <name>DOSET</name>
+          <description>GPIO B Data Output Set</description>
+          <addressOffset>0x00000030</addressOffset>
+        </register>
+        <register>
+          <name>DOCLEAR</name>
+          <description>GPIO B Data Output Clear</description>
+          <addressOffset>0x00000034</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>GPIOC</name>
+      <description>GPIO C</description>
+      <baseAddress>0x400D1C00</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x400</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>GPIOC</name>
+        <value>17</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>MODE</name>
+          <description>GPIO C Pin Mode Select</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>OUTMASK</name>
+          <description>GPIO C Data Output Write Mask</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>OUT</name>
+          <description>GPIO C Data Output Value</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>IN</name>
+          <description>GPIO C Data Input Value</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>INTEN</name>
+          <description>GPIO C Interrupt Enable</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>INTFLAGRAW</name>
+          <description>GPIO C Interrupt Flag Raw</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+        <register>
+          <name>INTFLAGMASKED</name>
+          <description>GPIO C Interrupt Flag Masked</description>
+          <addressOffset>0x00000018</addressOffset>
+        </register>
+        <register>
+          <name>INTCLEAR</name>
+          <description>GPIO C Interrupt Clear</description>
+          <addressOffset>0x0000001C</addressOffset>
+        </register>
+        <register>
+          <name>INTTYPE</name>
+          <description>GPIO C Interrupt Type</description>
+          <addressOffset>0x00000020</addressOffset>
+        </register>
+        <register>
+          <name>INTVALUE</name>
+          <description>GPIO C Interrupt Value</description>
+          <addressOffset>0x00000024</addressOffset>
+        </register>
+        <register>
+          <name>INTEDGEBOTH</name>
+          <description>GPIO C Interrupt Edge Both</description>
+          <addressOffset>0x00000028</addressOffset>
+        </register>
+        <register>
+          <name>DEBOUNCE</name>
+          <description>GPIO C De-bounce Filter</description>
+          <addressOffset>0x0000002C</addressOffset>
+        </register>
+        <register>
+          <name>DOSET</name>
+          <description>GPIO C Data Output Set</description>
+          <addressOffset>0x00000030</addressOffset>
+        </register>
+        <register>
+          <name>DOCLEAR</name>
+          <description>GPIO C Data Output Clear</description>
+          <addressOffset>0x00000034</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>GPIOD</name>
+      <description>GPIO D</description>
+      <baseAddress>0x400D2000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x400</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>GPIOD</name>
+        <value>18</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>MODE</name>
+          <description>GPIO D Pin Mode Select</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>OUTMASK</name>
+          <description>GPIO D Data Output Write Mask</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>OUT</name>
+          <description>GPIO D Data Output Value</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>IN</name>
+          <description>GPIO D Data Input Value</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>INTEN</name>
+          <description>GPIO D Interrupt Enable</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>INTFLAGRAW</name>
+          <description>GPIO D Interrupt Flag Raw</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+        <register>
+          <name>INTFLAGMASKED</name>
+          <description>GPIO D Interrupt Flag Masked</description>
+          <addressOffset>0x00000018</addressOffset>
+        </register>
+        <register>
+          <name>INTCLEAR</name>
+          <description>GPIO D Interrupt Clear</description>
+          <addressOffset>0x0000001C</addressOffset>
+        </register>
+        <register>
+          <name>INTTYPE</name>
+          <description>GPIO D Interrupt Type</description>
+          <addressOffset>0x00000020</addressOffset>
+        </register>
+        <register>
+          <name>INTVALUE</name>
+          <description>GPIO D Interrupt Value</description>
+          <addressOffset>0x00000024</addressOffset>
+        </register>
+        <register>
+          <name>INTEDGEBOTH</name>
+          <description>GPIO D Interrupt Edge Both</description>
+          <addressOffset>0x00000028</addressOffset>
+        </register>
+        <register>
+          <name>DEBOUNCE</name>
+          <description>GPIO D De-bounce Filter</description>
+          <addressOffset>0x0000002C</addressOffset>
+        </register>
+        <register>
+          <name>DOSET</name>
+          <description>GPIO D Data Output Set</description>
+          <addressOffset>0x00000030</addressOffset>
+        </register>
+        <register>
+          <name>DOCLEAR</name>
+          <description>GPIO D Data Output Clear</description>
+          <addressOffset>0x00000034</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>GPIOE</name>
+      <description>GPIO E</description>
+      <baseAddress>0x400D2400</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x400</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>GPIOE</name>
+        <value>19</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>MODE</name>
+          <description>GPIO E Pin Mode Select</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>OUTMASK</name>
+          <description>GPIO E Data Output Write Mask</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>OUT</name>
+          <description>GPIO E Data Output Value</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>IN</name>
+          <description>GPIO E Data Input Value</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>INTEN</name>
+          <description>GPIO E Interrupt Enable</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>INTFLAGRAW</name>
+          <description>GPIO E Interrupt Flag Raw</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+        <register>
+          <name>INTFLAGMASKED</name>
+          <description>GPIO E Interrupt Flag Masked</description>
+          <addressOffset>0x00000018</addressOffset>
+        </register>
+        <register>
+          <name>INTCLEAR</name>
+          <description>GPIO E Interrupt Clear</description>
+          <addressOffset>0x0000001C</addressOffset>
+        </register>
+        <register>
+          <name>INTTYPE</name>
+          <description>GPIO E Interrupt Type</description>
+          <addressOffset>0x00000020</addressOffset>
+        </register>
+        <register>
+          <name>INTVALUE</name>
+          <description>GPIO E Interrupt Value</description>
+          <addressOffset>0x00000024</addressOffset>
+        </register>
+        <register>
+          <name>INTEDGEBOTH</name>
+          <description>GPIO E Interrupt Edge Both</description>
+          <addressOffset>0x00000028</addressOffset>
+        </register>
+        <register>
+          <name>DEBOUNCE</name>
+          <description>GPIO E De-bounce Filter</description>
+          <addressOffset>0x0000002C</addressOffset>
+        </register>
+        <register>
+          <name>DOSET</name>
+          <description>GPIO E Data Output Set</description>
+          <addressOffset>0x00000030</addressOffset>
+        </register>
+        <register>
+          <name>DOCLEAR</name>
+          <description>GPIO E Data Output Clear</description>
+          <addressOffset>0x00000034</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>GPIOF</name>
+      <description>GPIO F</description>
+      <baseAddress>0x400D2800</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x400</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>GPIOF</name>
+        <value>20</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>MODE</name>
+          <description>GPIO F Pin Mode Select</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>OUTMASK</name>
+          <description>GPIO F Data Output Write Mask</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>OUT</name>
+          <description>GPIO F Data Output Value</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>IN</name>
+          <description>GPIO F Data Input Value</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>INTEN</name>
+          <description>GPIO F Interrupt Enable</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>INTFLAGRAW</name>
+          <description>GPIO F Interrupt Flag Raw</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+        <register>
+          <name>INTFLAGMASKED</name>
+          <description>GPIO F Interrupt Flag Masked</description>
+          <addressOffset>0x00000018</addressOffset>
+        </register>
+        <register>
+          <name>INTCLEAR</name>
+          <description>GPIO F Interrupt Clear</description>
+          <addressOffset>0x0000001C</addressOffset>
+        </register>
+        <register>
+          <name>INTTYPE</name>
+          <description>GPIO F Interrupt Type</description>
+          <addressOffset>0x00000020</addressOffset>
+        </register>
+        <register>
+          <name>INTVALUE</name>
+          <description>GPIO F Interrupt Value</description>
+          <addressOffset>0x00000024</addressOffset>
+        </register>
+        <register>
+          <name>INTEDGEBOTH</name>
+          <description>GPIO F Interrupt Edge Both</description>
+          <addressOffset>0x00000028</addressOffset>
+        </register>
+        <register>
+          <name>DEBOUNCE</name>
+          <description>GPIO F De-bounce Filter</description>
+          <addressOffset>0x0000002C</addressOffset>
+        </register>
+        <register>
+          <name>DOSET</name>
+          <description>GPIO F Data Output Set</description>
+          <addressOffset>0x00000030</addressOffset>
+        </register>
+        <register>
+          <name>DOCLEAR</name>
+          <description>GPIO F Data Output Clear</description>
+          <addressOffset>0x00000034</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <peripheral>
+      <name>GPIOG</name>
+      <description>GPIO G</description>
+      <baseAddress>0x400D2C00</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x400</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>GPIOG</name>
+        <value>21</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>MODE</name>
+          <description>GPIO G Pin Mode Select</description>
+          <addressOffset>0x00000000</addressOffset>
+        </register>
+        <register>
+          <name>OUTMASK</name>
+          <description>GPIO G Data Output Write Mask</description>
+          <addressOffset>0x00000004</addressOffset>
+        </register>
+        <register>
+          <name>OUT</name>
+          <description>GPIO G Data Output Value</description>
+          <addressOffset>0x00000008</addressOffset>
+        </register>
+        <register>
+          <name>IN</name>
+          <description>GPIO G Data Input Value</description>
+          <addressOffset>0x0000000C</addressOffset>
+        </register>
+        <register>
+          <name>INTEN</name>
+          <description>GPIO G Interrupt Enable</description>
+          <addressOffset>0x00000010</addressOffset>
+        </register>
+        <register>
+          <name>INTFLAGRAW</name>
+          <description>GPIO G Interrupt Flag Raw</description>
+          <addressOffset>0x00000014</addressOffset>
+        </register>
+        <register>
+          <name>INTFLAGMASKED</name>
+          <description>GPIO G Interrupt Flag Masked</description>
+          <addressOffset>0x00000018</addressOffset>
+        </register>
+        <register>
+          <name>INTCLEAR</name>
+          <description>GPIO G Interrupt Clear</description>
+          <addressOffset>0x0000001C</addressOffset>
+        </register>
+        <register>
+          <name>INTTYPE</name>
+          <description>GPIO G Interrupt Type</description>
+          <addressOffset>0x00000020</addressOffset>
+        </register>
+        <register>
+          <name>INTVALUE</name>
+          <description>GPIO G Interrupt Value</description>
+          <addressOffset>0x00000024</addressOffset>
+        </register>
+        <register>
+          <name>INTEDGEBOTH</name>
+          <description>GPIO G Interrupt Edge Both</description>
+          <addressOffset>0x00000028</addressOffset>
+        </register>
+        <register>
+          <name>DEBOUNCE</name>
+          <description>GPIO G De-bounce Filter</description>
+          <addressOffset>0x0000002C</addressOffset>
+        </register>
+        <register>
+          <name>DOSET</name>
+          <description>GPIO G Data Output Set</description>
+          <addressOffset>0x00000030</addressOffset>
+        </register>
+        <register>
+          <name>DOCLEAR</name>
+          <description>GPIO G Data Output Clear</description>
+          <addressOffset>0x00000034</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+  </peripherals>
+</device>
